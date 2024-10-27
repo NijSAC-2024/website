@@ -1,5 +1,5 @@
 import { createContext, useContext, useMemo, ReactNode, useState } from 'react';
-import { AuthContextType } from '../types.ts';
+import { AuthContextType, UserType } from '../types.ts';
 import { enqueueSnackbar } from 'notistack';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -10,6 +10,7 @@ interface AuthProviderProps {
 
 export default function AuthProvider({ children }: AuthProviderProps) {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [user, setUser] = useState<UserType | undefined>(undefined);
   const checkAuth = async () => {
     try {
       const response = await fetch('/api/whoami', {
@@ -18,6 +19,8 @@ export default function AuthProvider({ children }: AuthProviderProps) {
       });
 
       if (response.ok) {
+        const body = await response.json();
+        setUser(body);
         setIsLoggedIn(true);
       } else {
         setIsLoggedIn(false);
@@ -39,6 +42,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
 
       if (response.ok) {
         setIsLoggedIn(false);
+        setUser(undefined);
         enqueueSnackbar('You logged out.', {
           variant: 'success'
         });
@@ -52,6 +56,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
 
   const value = useMemo(
     () => ({
+      user,
       isLoggedIn,
       checkAuth,
       logout

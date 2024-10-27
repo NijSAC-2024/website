@@ -23,7 +23,10 @@ export default function App() {
 
   const darkTheme = createTheme({
     palette: {
-      mode: themeCookie.theme ? 'dark' : 'light'
+      mode: themeCookie.theme ? 'dark' : 'light',
+      secondary: {
+        main: themeCookie.theme ? '#1A1A19' : '#133E87'
+      }
     }
   });
 

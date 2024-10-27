@@ -1,18 +1,12 @@
 import { Alert, AlertTitle, Button, Switch } from '@mui/material';
-import AuthDialog from '../components/AuthDialog.tsx';
-import { useState } from 'react';
 import { useAuth } from '../providers/AuthProvider.tsx';
 import { useTheme } from '../providers/ThemeProvider.tsx';
 import { enqueueSnackbar } from 'notistack';
+import MainMenu from '../components/MainMenu.tsx';
 
 export default function Home() {
-  const { isLoggedIn, logout, checkAuth } = useAuth();
+  const { isLoggedIn } = useAuth();
   const { themeCookie, toggleTheme } = useTheme();
-  const [authDialogOpen, setAuthDialogOpen] = useState<boolean>(false);
-  const handleAuthOpen = () => setAuthDialogOpen(true);
-  const handleAuthClose = () => setAuthDialogOpen(false);
-
-  checkAuth();
 
   const handleTestToken = async () => {
     const response = await fetch('/api/whoami');
@@ -38,18 +32,9 @@ export default function Home() {
 
   return (
     <>
+      <MainMenu />
       <div className="flex flex-col justify-center items-center h-screen">
         <div className="grid grid-cols-2 grid-flow-row gap-4 w-1/3">
-          {isLoggedIn ? (
-            <Button variant="contained" onClick={logout}>
-              Logout
-            </Button>
-          ) : (
-            <Button variant="contained" onClick={handleAuthOpen}>
-              Login/Signup
-            </Button>
-          )}
-
           <Button variant="contained" onClick={handleTestToken}>
             Test Token
           </Button>
@@ -67,7 +52,6 @@ export default function Home() {
           </Alert>
         </div>
       </div>
-      <AuthDialog open={authDialogOpen} onClose={handleAuthClose} />
     </>
   );
 }

@@ -9,6 +9,7 @@ export interface User {
 }
 
 export interface AuthContextType {
+  user: UserType | undefined;
   isLoggedIn: boolean;
   checkAuth: () => void;
   logout: () => void;
@@ -31,4 +32,15 @@ export interface ValidateProps {
   // eslint-disable-next-line no-unused-vars
   onChange: (isValid: boolean) => void;
   setValue: Dispatch<SetStateAction<string>>;
+}
+
+export interface UserType {
+  id: string;
+  created: string;
+  updated: string;
+  firstName: string;
+  lastName: string;
+  roles: string[];
+  status: string;
+  email: string;
 }
