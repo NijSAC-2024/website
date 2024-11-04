@@ -74,3 +74,11 @@ pub struct RegisterNewUser {
     ))]
     pub password: String,
 }
+
+#[derive(Serialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct BasicUser {
+    id: UserId,
+    first_name: String,
+    last_name: String,
+}

@@ -64,7 +64,7 @@ impl TryFrom<PgUser> for User {
 }
 
 impl UserStore {
-    pub async fn count(&self) -> Result<Count, Error> {
+    pub async fn count(&self) -> AppResult<Count> {
         let count = sqlx::query_as!(
             Count,
             r#"

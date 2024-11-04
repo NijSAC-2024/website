@@ -1,0 +1,104 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT w.id,\n                   w.start,\n                   w.\"end\",\n                   w.registration_start,\n                   w.registration_end,\n                   l.id AS location_id,\n                   l.name AS location_name,\n                   l.description AS location_description,\n                   t.id AS type_id,\n                   t.name AS type_name,\n                   t.description AS type_description,\n                   array_agg((u.id, u.first_name, u.last_name)) AS participants,\n                   w.description,\n                   w.created,\n                   w.updated\n            FROM weekend w \n                JOIN location l ON l.id = w.location \n                JOIN weekend_type t ON t.id = w.type \n                JOIN weekend_user wu ON wu.weekend_id = w.id \n                JOIN \"user\" u ON wu.user_id = u.id\n            GROUP BY w.id, l.id, t.id\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "start",
+        "type_info": "Date"
+      },
+      {
+        "ordinal": 2,
+        "name": "end",
+        "type_info": "Date"
+      },
+      {
+        "ordinal": 3,
+        "name": "registration_start",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 4,
+        "name": "registration_end",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 5,
+        "name": "location_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 6,
+        "name": "location_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "location_description",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "type_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 9,
+        "name": "type_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 10,
+        "name": "type_description",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 11,
+        "name": "participants",
+        "type_info": "RecordArray"
+      },
+      {
+        "ordinal": 12,
+        "name": "description",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 13,
+        "name": "created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 14,
+        "name": "updated",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      null,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "e090575aaafad57b32388c7a64faa814aa7bea865d00ce1025316ffcbfe85ebf"
+}

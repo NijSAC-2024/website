@@ -1,0 +1,83 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO weekend \n                (id, \n                 start,\n                 \"end\",\n                 registration_start,\n                 registration_end,\n                 location,\n                 type,\n                 description,\n                 created,\n                 updated)\n            VALUES (\n                    $1,\n                    $2,\n                    $3,\n                    $4, \n                    $5,\n                    $6,\n                    $7,\n                    $8,\n                    now(),\n                    now()\n            ) RETURNING *\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "start",
+        "type_info": "Date"
+      },
+      {
+        "ordinal": 2,
+        "name": "end",
+        "type_info": "Date"
+      },
+      {
+        "ordinal": 3,
+        "name": "registration_start",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 4,
+        "name": "registration_end",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 5,
+        "name": "location",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 6,
+        "name": "type",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 7,
+        "name": "description",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 9,
+        "name": "updated",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Date",
+        "Date",
+        "Timestamptz",
+        "Timestamptz",
+        "Uuid",
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "4b0b7d75eefed4dfdb146b0c3f64e312ff284f6d2ca7163ec91d9551fd53b65f"
+}
