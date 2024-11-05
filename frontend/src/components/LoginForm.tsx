@@ -50,28 +50,30 @@ export default function LoginForm({ onClose, setLoading }: FormsProps) {
   };
 
   return (
-    <div className="grid grid-cols-1 grid-flow-row gap-2">
-      <div className="flex justify-between">
-        <p className="text-2xl">Log In</p>
-        <IconButton onClick={onClose}>
-          <Close />
-        </IconButton>
+    <>
+      <div className="grid grid-cols-1 grid-flow-row gap-2">
+        <div className="flex justify-between">
+          <p className="text-2xl">Log In</p>
+          <IconButton onClick={onClose}>
+            <Close />
+          </IconButton>
+        </div>
+        <ValidatedTextField
+          label={'Email'}
+          validator={emailValidator}
+          onChange={(isValid) => (formValid.current.email = isValid)}
+          setValue={setEmail}
+        />
+        <ValidatedPassword
+          label={'Password'}
+          validator={noneValidator}
+          onChange={(isValid) => (formValid.current.password = isValid)}
+          setValue={setPassword}
+        />
+        <Button variant="contained" onClick={handleSubmit}>
+          Log In
+        </Button>
       </div>
-      <ValidatedTextField
-        label={'Email'}
-        validator={emailValidator}
-        onChange={(isValid) => (formValid.current.email = isValid)}
-        setValue={setEmail}
-      />
-      <ValidatedPassword
-        label={'Password'}
-        validator={noneValidator}
-        onChange={(isValid) => (formValid.current.password = isValid)}
-        setValue={setPassword}
-      />
-      <Button variant="contained" onClick={handleSubmit}>
-        Log In
-      </Button>
-    </div>
+    </>
   );
 }

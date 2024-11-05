@@ -1,12 +1,12 @@
 import { Alert, AlertTitle, Button, Switch } from '@mui/material';
 import { useAuth } from '../providers/AuthProvider.tsx';
-import { useTheme } from '../providers/ThemeProvider.tsx';
+import { useThemeMode } from '../providers/ThemeProvider.tsx';
 import { enqueueSnackbar } from 'notistack';
-import MainMenu from '../components/MainMenu.tsx';
+import Text from '../components/Text.tsx';
 
 export default function Home() {
   const { isLoggedIn } = useAuth();
-  const { themeCookie, toggleTheme } = useTheme();
+  const { themeCookie, toggleTheme } = useThemeMode();
 
   const handleTestToken = async () => {
     const response = await fetch('/api/whoami');
@@ -32,15 +32,22 @@ export default function Home() {
 
   return (
     <>
-      <MainMenu />
       <div className="flex flex-col justify-center items-center h-screen">
         <div className="grid grid-cols-2 grid-flow-row gap-4 w-1/3">
           <Button variant="contained" onClick={handleTestToken}>
-            Test Token
+            <Text english={'Test Token'} dutch={'Test token'} />
           </Button>
           <Alert severity="info" variant="outlined" className="col-span-2">
-            <AlertTitle>Are you logged in?</AlertTitle>
-            <p className="text-xl">{isLoggedIn ? 'Yes, you are.' : 'No, you are not.'}</p>
+            <AlertTitle>
+              <Text english={'Are you logged in?'} dutch={'Ben je ingelogd?'} />
+            </AlertTitle>
+            <p className="text-xl">
+              {isLoggedIn ? (
+                <Text english={'Yes, you are.'} dutch={'Ja, dat ben je'} />
+              ) : (
+                <Text english={'No, you are not.'} dutch={'Nee, dat ben je niet.'} />
+              )}
+            </p>
           </Alert>
           <Alert severity="info" variant="outlined" className="col-span-2">
             <AlertTitle>What theme do you prefer?</AlertTitle>

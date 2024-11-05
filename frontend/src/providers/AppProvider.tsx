@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import AuthProvider from './AuthProvider.tsx';
 import ThemeProvider from './ThemeProvider.tsx';
+import LanguageProvider from './LanguageProvider.tsx';
 
 interface AppProviderProps {
   children: ReactNode;
@@ -9,7 +10,9 @@ interface AppProviderProps {
 export default function AppProvider({ children }: AppProviderProps) {
   return (
     <AuthProvider>
-      <ThemeProvider>{children}</ThemeProvider>
+      <ThemeProvider>
+        <LanguageProvider>{children}</LanguageProvider>
+      </ThemeProvider>
     </AuthProvider>
   );
 }

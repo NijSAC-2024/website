@@ -4,6 +4,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { MouseEvent, useState } from 'react';
 import { useAuth } from '../providers/AuthProvider.tsx';
+import Text from './Text.tsx';
 
 export default function () {
   const { user, logout } = useAuth();
@@ -30,7 +31,6 @@ export default function () {
       </Tooltip>
       <Menu
         anchorEl={anchorEl}
-        id="account-menu"
         open={open}
         onClose={handleClose}
         onClick={handleClose}
@@ -39,20 +39,20 @@ export default function () {
           <ListItemIcon>
             <AccountCircleIcon />
           </ListItemIcon>
-          My account
+          <Text english="My account" dutch="Mijn account" />
         </MenuItem>
         <Divider />
         <MenuItem onClick={handleClose}>
           <ListItemIcon>
             <SettingsIcon fontSize="small" />
           </ListItemIcon>
-          Settings
+          <Text english="Settings" dutch="Instellingen" />
         </MenuItem>
         <MenuItem onClick={logout}>
           <ListItemIcon>
             <LogoutIcon fontSize="small" />
           </ListItemIcon>
-          Logout
+          <Text english="Logout" dutch="Uitloggen" />
         </MenuItem>
       </Menu>
     </>

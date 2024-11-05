@@ -20,6 +20,12 @@ export interface ThemeContextType {
   toggleTheme: () => void;
 }
 
+export interface LanguageContextType {
+  language: boolean;
+  setDutch: () => void;
+  setEnglish: () => void;
+}
+
 export interface FormsProps {
   onClose: () => void;
   setLoading: Dispatch<SetStateAction<boolean>>;

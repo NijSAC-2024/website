@@ -9,10 +9,9 @@ interface ThemeProviderProps {
 }
 
 export default function ThemeProvider({ children }: ThemeProviderProps) {
-  const [themeCookie, setCookie] = useCookies(['theme']);
-
+  const [themeCookie, setThemeCookie] = useCookies(['theme']);
   const toggleTheme = () => {
-    setCookie('theme', !themeCookie.theme, { secure: true, sameSite: 'strict' });
+    setThemeCookie('theme', !themeCookie.theme, { secure: true, sameSite: 'strict' });
   };
 
   const value = useMemo(
@@ -26,11 +25,10 @@ export default function ThemeProvider({ children }: ThemeProviderProps) {
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
-// Custom hook to use the providers context
-export const useTheme = (): ThemeContextType => {
+export const useThemeMode = (): ThemeContextType => {
   const context = useContext(ThemeContext);
   if (!context) {
-    throw new Error('useAuth must be used within a ThemeProvider');
+    throw new Error('useThemeMode must be used within a ThemeProvider');
   }
   return context;
 };
