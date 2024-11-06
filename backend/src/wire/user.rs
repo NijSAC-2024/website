@@ -47,6 +47,31 @@ pub(crate) struct UserContent {
     pub status: MembershipStatus,
     #[validate(email)]
     pub email: String,
+    pub phone: String,
+    #[validate(range(
+        min = 0,
+        max = 9_999_999_999,
+        message = "Student Number must only contain numbers"
+    ))]
+    pub student_number: u64,
+    #[validate(range(
+        min = 0,
+        max = 9_999_999_999,
+        message = "NKBV Number must only contain numbers"
+    ))]
+    pub nkbv_number: u64,
+    #[validate(range(
+        min = 0,
+        max = 9_999_999_999,
+        message = "Sportcard Number must only contain numbers"
+    ))]
+    pub sportcard_number: u64,
+    #[validate(length(min = 1, max = 100))]
+    pub ice_contact_name: String,
+    #[validate(email)]
+    pub ice_contact_email: String,
+    #[validate(length(min = 1, max = 100))]
+    pub ice_contact_phone: String,
 }
 
 #[derive(Deserialize, Validate)]
@@ -73,6 +98,30 @@ pub struct RegisterNewUser {
         message = "Password must contain between 10 and 128 characters"
     ))]
     pub password: String,
+    #[validate(range(
+        min = 0,
+        max = 9_999_999_999,
+        message = "Student Number must only contain numbers"
+    ))]
+    pub student_number: u64,
+    #[validate(range(
+        min = 0,
+        max = 9_999_999_999,
+        message = "NKBV Number must only contain numbers"
+    ))]
+    pub nkbv_number: u64,
+    #[validate(range(
+        min = 0,
+        max = 9_999_999_999,
+        message = "Sportcard Number must only contain numbers"
+    ))]
+    pub sportcard_number: u64,
+    #[validate(length(min = 1, max = 100))]
+    pub ice_contact_name: String,
+    #[validate(ice_contact_email)]
+    pub ice_contact_email: String,
+    #[validate(length(min = 1, max = 100))]
+    pub ice_contact_phone: String,
 }
 
 #[derive(Serialize, Debug)]
