@@ -66,6 +66,13 @@ pub(crate) async fn register(
         roles: vec![],
         status: MembershipStatus::Pending,
         email: new.email,
+        phone: "".to_string(),
+        student_number: None,
+        nkbv_number: None,
+        sportcard_number: None,
+        ice_contact_name: "".to_string(),
+        ice_contact_email: "".to_string(),
+        ice_contact_phone: "".to_string(),
     };
 
     let user = store.create(&user).await?;

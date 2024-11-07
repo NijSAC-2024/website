@@ -118,7 +118,7 @@ pub struct RegisterNewUser {
     pub sportcard_number: Option<i64>,
     #[validate(length(min = 1, max = 100))]
     pub ice_contact_name: String,
-    #[validate(ice_contact_email)]
+    #[validate(email)]
     pub ice_contact_email: String,
     #[validate(length(min = 1, max = 100))]
     pub ice_contact_phone: String,
