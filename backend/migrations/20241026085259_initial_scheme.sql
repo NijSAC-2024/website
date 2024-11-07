@@ -31,11 +31,11 @@ create table "user_material"
 (
     user_id         uuid    not null,
     material_id     uuid    not null,
-    material_amount numeric not null
+    material_amount numeric not null,
         constraint user_material_pk
-            primary key (user_id, material_id)
+            primary key (user_id, material_id),
         constraint fk_material
-            foreign key (material_id) references "material" (material_id) on delete cascade
+            foreign key (material_id) references "material" (material_id) on delete cascade,
         constraint fk_user
             foreign key (user_id) references "user" (id) on delete cascade
 );
