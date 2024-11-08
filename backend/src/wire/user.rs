@@ -50,19 +50,19 @@ pub(crate) struct UserContent {
     pub phone: String,
     #[validate(range(
         min = 0,
-        max = 9_999_999_999,
+        max = 9_999_999_999_i64,
         message = "Student Number must only contain numbers"
     ))]
     pub student_number: Option<i64>,
     #[validate(range(
         min = 0,
-        max = 9_999_999_999,
+        max = 9_999_999_999_i64,
         message = "NKBV Number must only contain numbers"
     ))]
     pub nkbv_number: Option<i64>,
     #[validate(range(
         min = 0,
-        max = 9_999_999_999,
+        max = 9_999_999_999_i64,
         message = "Sportcard Number must only contain numbers"
     ))]
     pub sportcard_number: Option<i64>,
@@ -100,19 +100,19 @@ pub struct RegisterNewUser {
     pub password: String,
     #[validate(range(
         min = 0,
-        max = 9_999_999_999,
+        max = 9_999_999_999_i64,
         message = "Student Number must only contain numbers"
     ))]
     pub student_number: Option<i64>,
     #[validate(range(
         min = 0,
-        max = 9_999_999_999,
+        max = 9_999_999_999_i64,
         message = "NKBV Number must only contain numbers"
     ))]
     pub nkbv_number: Option<i64>,
     #[validate(range(
         min = 0,
-        max = 9_999_999_999,
+        max = 9_999_999_999_i64,
         message = "Sportcard Number must only contain numbers"
     ))]
     pub sportcard_number: Option<i64>,
