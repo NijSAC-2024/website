@@ -6,12 +6,12 @@ create table "user"
     first_name        text              not null,
     last_name         text              not null,
     phone             text              not null,
-    student_number    bigint,
-    nkbv_number       bigint,
-    sportcard_number  bigint,
-    ice_contact_name  text              not null,
-    ice_contact_email text              not null,
-    ice_contact_phone text              not null,
+    student_number    integer CHECK (student_number >= 0),
+    nkbv_number       integer CHECK (nkbv_number >= 0),
+    sportcard_number  integer CHECK (sportcard_number >= 0),
+    ice_contact_name  text,
+    ice_contact_email text,
+    ice_contact_phone text,
     roles             jsonb             not null,
     status            membership_status not null,
     email             text              not null unique,
@@ -31,7 +31,7 @@ create table "user_material"
 (
     user_id         uuid    not null,
     material_id     uuid    not null,
-    material_amount bigint not null,
+    material_amount integer CHECK (material_amount >= 0) not null,
         constraint user_material_pk
             primary key (user_id, material_id),
         constraint fk_material
