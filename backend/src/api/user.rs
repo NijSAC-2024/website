@@ -70,9 +70,9 @@ pub(crate) async fn register(
         student_number: None,
         nkbv_number: None,
         sportcard_number: None,
-        ice_contact_name: "".to_string(),
-        ice_contact_email: "".to_string(),
-        ice_contact_phone: "".to_string(),
+        ice_contact_name: None,
+        ice_contact_email: None ,
+        ice_contact_phone: None ,
     };
 
     let user = store.create(&user).await?;

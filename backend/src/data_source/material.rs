@@ -8,9 +8,3 @@ pub struct Material {
     pub name_nl: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct UserMaterial {
-    pub user_id: Uuid,
-    pub material_id: Uuid,
-    pub material_amount: i64,
-}
