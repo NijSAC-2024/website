@@ -6,9 +6,9 @@ create table "user"
     first_name        text              not null,
     last_name         text              not null,
     phone             text              not null,
-    student_number    integer CHECK (student_number >= 0),
-    nkbv_number       integer CHECK (nkbv_number >= 0),
-    sportcard_number  integer CHECK (sportcard_number >= 0),
+    student_number    integer,
+    nkbv_number       integer,
+    sportcard_number  integer,
     ice_contact_name  text,
     ice_contact_email text,
     ice_contact_phone text,
@@ -31,7 +31,7 @@ create table "user_material"
 (
     user_id         uuid    not null,
     material_id     uuid    not null,
-    material_amount integer CHECK (material_amount >= 0) not null,
+    material_amount integer,
         constraint user_material_pk
             primary key (user_id, material_id),
         constraint fk_material
