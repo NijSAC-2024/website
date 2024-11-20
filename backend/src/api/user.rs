@@ -71,8 +71,8 @@ pub(crate) async fn register(
         nkbv_number: None,
         sportcard_number: None,
         ice_contact_name: None,
-        ice_contact_email: None ,
-        ice_contact_phone: None ,
+        ice_contact_email: None,
+        ice_contact_phone: None,
     };
 
     let user = store.create(&user).await?;

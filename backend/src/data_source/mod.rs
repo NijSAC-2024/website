@@ -1,5 +1,5 @@
-mod user;
 mod material;
+mod user;
 
 use axum::http::HeaderMap;
 pub(crate) use user::*;
