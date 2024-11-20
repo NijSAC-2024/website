@@ -7,4 +7,3 @@ pub struct Material {
     pub name_eng: String,
     pub name_nl: String,
 }
-
