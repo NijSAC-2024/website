@@ -5,10 +5,10 @@ edition = "2021"
 license = "MIT"
 
 [dependencies]
-tokio = { version = "1.41.0", features = ["full"] }
-axum = { version = "0.7.7", features = ["json", "macros"] }
-axum-extra = { version = "0.9.4", features = ["cookie"] }
-tower-http = { version = "0.6.1", features = ["trace"] }
+tokio = { version = "1.41.1", features = ["full"] }
+axum = { version = "0.7.9", features = ["json", "macros"] }
+axum-extra = { version = "0.9.6", features = ["cookie"] }
+tower-http = { version = "0.6.2", features = ["trace"] }
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
 sqlx = { version = "0.8.2", features = ["postgres", "runtime-tokio", "migrate", "macros", "time", "uuid"] }
@@ -17,8 +17,8 @@ validator = { version = "0.19.0", features = ["derive"] }
 uuid = { version = "1.8.0", features = ["v7", "serde"] }
 argon2 = "0.5.3"
 dotenvy = "0.15.7"
-serde = { version = "1.0.213", features = ["derive"] }
-serde_json = "1.0.132"
+serde = { version = "1.0.215", features = ["derive"] }
+serde_json = "1.0.133"
 memory-serve = "0.6.0"
 time = { version = "0.3.36" , features = ["serde"]}
 rand = "0.8.5"
