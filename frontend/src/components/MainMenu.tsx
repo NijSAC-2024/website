@@ -17,7 +17,7 @@ import UserMenu from './UserMenu.tsx';
 import LoginForm from './LoginForm.tsx';
 import SignupForm from './SignupForm.tsx';
 import { useLanguage } from '../providers/LanguageProvider.tsx';
-import Text from '../components/Text.tsx';
+import text from '../util.ts';
 
 type MenuName = 'association' | 'climbing' | 'alps' | 'language' | undefined;
 
@@ -66,7 +66,7 @@ export default function MainMenu() {
               onClick={() => alert('Navigate to Home')}
             />
             <Button color="inherit" onClick={() => alert('Navigate to Agenda')}>
-              <Text english="Agenda" dutch="Agenda" />
+              {text('Agenda', 'Agenda')}
             </Button>
 
             {/* Association Dropdown */}
@@ -74,21 +74,15 @@ export default function MainMenu() {
               color="inherit"
               className="flex items-center"
               onClick={(e) => handleMenuOpen(e, 'association')}>
-              <Text english="Association" dutch="Vereniging" /> <ExpandMoreIcon />
+              {text('Association', 'Vereniging')} <ExpandMoreIcon />
             </Button>
             <Menu anchorEl={anchorEl} open={openMenu === 'association'} onClose={handleMenuClose}>
               <MenuItem onClick={handleMenuClose}>
-                <Text english="About the NijSAC" dutch="Over de NijSAC" />
+                {text('About the NijSAC', 'Over de NijSAC')}
               </MenuItem>
-              <MenuItem onClick={handleMenuClose}>
-                <Text english="Board" dutch="Bestuur" />
-              </MenuItem>
-              <MenuItem onClick={handleMenuClose}>
-                <Text english="Committees" dutch="Commissies" />
-              </MenuItem>
-              <MenuItem onClick={handleMenuClose}>
-                <Text english="Introduction" dutch="Introductie" />
-              </MenuItem>
+              <MenuItem onClick={handleMenuClose}>{text('Board', 'Bestuur')}</MenuItem>
+              <MenuItem onClick={handleMenuClose}>{text('Committees', 'Commissies')}</MenuItem>
+              <MenuItem onClick={handleMenuClose}>{text('Introduction', 'Introductie')}</MenuItem>
             </Menu>
 
             {/* Climbing Dropdown */}
@@ -96,20 +90,20 @@ export default function MainMenu() {
               color="inherit"
               className="flex items-center"
               onClick={(e) => handleMenuOpen(e, 'climbing')}>
-              <Text english="Climbing" dutch="Klimmen" /> <ExpandMoreIcon />
+              {text('Climbing', 'Klimmen')} <ExpandMoreIcon />
             </Button>
             <Menu anchorEl={anchorEl} open={openMenu === 'climbing'} onClose={handleMenuClose}>
               <MenuItem onClick={handleMenuClose}>
-                <Text english="Indoor Climbing" dutch="Indoor Klimmen" />
+                {text('Indoor Climbing', 'Indoor Klimmen')}
               </MenuItem>
               <MenuItem onClick={handleMenuClose}>
-                <Text english="Outdoor Climbing" dutch="Buiten Klimmen" />
+                {text('Outdoor Climbing', 'Buiten Klimmen')}
               </MenuItem>
               <MenuItem onClick={handleMenuClose}>
-                <Text english="Climbing Areas" dutch="Klimgebieden" />
+                {text('Climbing Areas', 'Klimgebieden')}
               </MenuItem>
               <MenuItem onClick={handleMenuClose}>
-                <Text english="Material Rental" dutch="Materiaalverhuur" />
+                {text('Material Rental', 'Materiaalverhuur')}
               </MenuItem>
             </Menu>
 
@@ -118,38 +112,24 @@ export default function MainMenu() {
               color="inherit"
               className="flex items-center"
               onClick={(e) => handleMenuOpen(e, 'alps')}>
-              <Text english="Alps" dutch="Alpen" /> <ExpandMoreIcon />
+              {text('Alps', 'Alpen')} <ExpandMoreIcon />
             </Button>
             <Menu anchorEl={anchorEl} open={openMenu === 'alps'} onClose={handleMenuClose}>
               {/* Summer */}
-              <p className="px-3 py-1 text-gray-500">
-                <Text english="Summer" dutch="Zomer" />
-              </p>
+              <p className="px-3 py-1 text-gray-500">{text('Summer', 'Zomer')}</p>
               <MenuItem onClick={handleMenuClose}>
-                <Text english="Mountaineering" dutch="Bergbeklimmen" />
+                {text('Mountaineering', 'Bergbeklimmen')}
               </MenuItem>
-              <MenuItem onClick={handleMenuClose}>
-                <Text english="Canyoning" dutch="Canyoning" />
-              </MenuItem>
-              <MenuItem onClick={handleMenuClose}>
-                <Text english="Via Ferrata" dutch="Via Ferrata" />
-              </MenuItem>
-              <MenuItem onClick={handleMenuClose}>
-                <Text english="Hiking" dutch="Wandelen" />
-              </MenuItem>
+              <MenuItem onClick={handleMenuClose}>{text('Canyoning', 'Canyoning')}</MenuItem>
+              <MenuItem onClick={handleMenuClose}>{text('Via Ferrata', 'Via Ferrata')}</MenuItem>
+              <MenuItem onClick={handleMenuClose}>{text('Hiking', 'Wandelen')}</MenuItem>
               {/* Winter */}
-              <p className="px-3 py-1 mt-2 text-gray-500">
-                <Text english="Winter" dutch="Winter" />
-              </p>
+              <p className="px-3 py-1 mt-2 text-gray-500">{text('Winter', 'Winter')}</p>
+              <MenuItem onClick={handleMenuClose}>{text('Ice Climbing', 'IJsklimmen')}</MenuItem>
               <MenuItem onClick={handleMenuClose}>
-                <Text english="Ice Climbing" dutch="IJsklimmen" />
+                {text('Off Piste Skiing', 'Off Piste Skiën')}
               </MenuItem>
-              <MenuItem onClick={handleMenuClose}>
-                <Text english="Off Piste Skiing" dutch="Off Piste Skiën" />
-              </MenuItem>
-              <MenuItem onClick={handleMenuClose}>
-                <Text english="Tour Skiing" dutch="Toerskiën" />
-              </MenuItem>
+              <MenuItem onClick={handleMenuClose}>{text('Tour Skiing', 'Toerskiën')}</MenuItem>
             </Menu>
           </div>
 
@@ -159,7 +139,8 @@ export default function MainMenu() {
               color="inherit"
               className="flex items-center"
               onClick={(e) => handleMenuOpen(e, 'language')}>
-              <Text english="EN/NL" dutch="EN/NL" /> <ExpandMoreIcon />
+              {text('Language', 'Taal')}
+              <ExpandMoreIcon />
             </Button>
             <Menu anchorEl={anchorEl} open={openMenu === 'language'} onClose={handleMenuClose}>
               <MenuItem
@@ -183,11 +164,11 @@ export default function MainMenu() {
               <>
                 {/* Login */}
                 <Button color="inherit" onClick={handleLoginOpen}>
-                  <Text english="Login" dutch="Inloggen" />
+                  {text('Login', 'Inloggen')}
                 </Button>
                 {/* Become a Member */}
                 <Button variant="contained" onClick={handleSignupOpen}>
-                  <Text english="Become a member" dutch="Lid worden" />
+                  {text('Become a member', 'Lid worden')}
                 </Button>
               </>
             )}

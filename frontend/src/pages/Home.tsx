@@ -2,7 +2,7 @@ import { Alert, AlertTitle, Button, Switch } from '@mui/material';
 import { useAuth } from '../providers/AuthProvider.tsx';
 import { useThemeMode } from '../providers/ThemeProvider.tsx';
 import { enqueueSnackbar } from 'notistack';
-import Text from '../components/Text.tsx';
+import text from '../util.ts';
 
 export default function Home() {
   const { isLoggedIn } = useAuth();
@@ -35,26 +35,24 @@ export default function Home() {
       <div className="flex flex-col justify-center items-center h-screen">
         <div className="grid grid-cols-2 grid-flow-row gap-4 w-1/3">
           <Button variant="contained" onClick={handleTestToken}>
-            <Text english={'Test Token'} dutch={'Test token'} />
+            {text('Test Token', 'Test token')}
           </Button>
           <Alert severity="info" variant="outlined" className="col-span-2">
-            <AlertTitle>
-              <Text english={'Are you logged in?'} dutch={'Ben je ingelogd?'} />
-            </AlertTitle>
+            <AlertTitle>{text('Are you logged in?', 'Ben je ingelogd?')}</AlertTitle>
             <p className="text-xl">
-              {isLoggedIn ? (
-                <Text english={'Yes, you are.'} dutch={'Ja, dat ben je'} />
-              ) : (
-                <Text english={'No, you are not.'} dutch={'Nee, dat ben je niet.'} />
-              )}
+              {isLoggedIn
+                ? text('Yes, you are.', 'Ja, dat ben je.')
+                : text('No, you are not.', 'Nee, dat ben je niet.')}
             </p>
           </Alert>
           <Alert severity="info" variant="outlined" className="col-span-2">
-            <AlertTitle>What theme do you prefer?</AlertTitle>
+            <AlertTitle>
+              {text('What theme do you prefer?', 'Welke thema heeft je voorkeur?')}
+            </AlertTitle>
             <div className="grid grid-cols-3 grid-flow-row gap-4">
-              <p className="text-xl text-center">Light mode</p>
+              <p className="text-xl text-center">{text('Light mode', 'Lichte modus')}</p>
               <Switch className="m-auto" checked={themeCookie.theme} onChange={toggleTheme} />
-              <p className="text-xl text-center">Dark mode</p>
+              <p className="text-xl text-center">{text('Dark mode', 'Donkere modus')}</p>
             </div>
           </Alert>
         </div>

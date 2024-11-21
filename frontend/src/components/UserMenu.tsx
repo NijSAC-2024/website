@@ -4,7 +4,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { MouseEvent, useState } from 'react';
 import { useAuth } from '../providers/AuthProvider.tsx';
-import Text from './Text.tsx';
+import text from '../util.ts';
 
 export default function () {
   const { user, logout } = useAuth();
@@ -39,20 +39,20 @@ export default function () {
           <ListItemIcon>
             <AccountCircleIcon />
           </ListItemIcon>
-          <Text english="My account" dutch="Mijn account" />
+          {text('My account', 'Mijn account')}
         </MenuItem>
         <Divider />
         <MenuItem onClick={handleClose}>
           <ListItemIcon>
             <SettingsIcon fontSize="small" />
           </ListItemIcon>
-          <Text english="Settings" dutch="Instellingen" />
+          {text('Settings', 'Instellingen')}
         </MenuItem>
         <MenuItem onClick={logout}>
           <ListItemIcon>
             <LogoutIcon fontSize="small" />
           </ListItemIcon>
-          <Text english="Logout" dutch="Uitloggen" />
+          {text('Logout', 'Uitloggen')}
         </MenuItem>
       </Menu>
     </>

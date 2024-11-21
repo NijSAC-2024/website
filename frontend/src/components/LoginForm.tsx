@@ -6,6 +6,7 @@ import { FormsProps } from '../types';
 import { enqueueSnackbar } from 'notistack';
 import ValidatedTextField from './ValidatedTextField';
 import { emailValidator, noneValidator } from './validator.ts';
+import text from '../util.ts';
 
 export default function LoginForm({ onClose, setLoading }: FormsProps) {
   const [email, setEmail] = useState<string>('');
@@ -65,13 +66,13 @@ export default function LoginForm({ onClose, setLoading }: FormsProps) {
           setValue={setEmail}
         />
         <ValidatedPassword
-          label={'Password'}
+          label={text('Password', 'Wachtwoord')}
           validator={noneValidator}
           onChange={(isValid) => (formValid.current.password = isValid)}
           setValue={setPassword}
         />
         <Button variant="contained" onClick={handleSubmit}>
-          Log In
+          {text('Login', 'Inloggen')}
         </Button>
       </div>
     </>
