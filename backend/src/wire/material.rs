@@ -22,7 +22,3 @@ pub struct UserMaterial {
     ))]
     pub material_amount: i32,
 }
-
-
-
-
