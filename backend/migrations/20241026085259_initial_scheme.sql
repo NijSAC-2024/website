@@ -31,7 +31,7 @@ create table "user_material"
 (
     user_id         uuid    not null,
     material_id     uuid    not null,
-    material_amount integer,
+    material_amount integer not null, -- Probably want this not null, for qol?
         constraint user_material_pk
             primary key (user_id, material_id),
         constraint fk_material
