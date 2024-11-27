@@ -1,16 +1,11 @@
 use crate::{
     error::{AppResult, Error},
-    AppState,
     wire::material::{Material, UserMaterial},
-    Pagination,
+    AppState, Pagination,
 };
-use uuid::Uuid;
+use axum::{async_trait, extract::FromRequestParts, http::request::Parts};
 use sqlx::PgPool;
-use axum::{
-    async_trait,
-    extract::{FromRequestParts},
-    http::request::Parts,
-};
+use uuid::Uuid;
 
 pub(crate) struct MaterialStore {
     db: PgPool,
@@ -65,7 +60,6 @@ impl TryFrom<PgUserMaterial> for UserMaterial {
             material_amount: pg.material_amount,
         })
     }
-
 }
 
 impl MaterialStore {
@@ -91,9 +85,9 @@ impl MaterialStore {
             material_id,
             material_amount
         )
-            .fetch_one(&self.db)
-            .await?
-            .try_into()
+        .fetch_one(&self.db)
+        .await?
+        .try_into()
     }
 
     pub async fn update_user_material_amount(
@@ -104,33 +98,33 @@ impl MaterialStore {
     ) -> AppResult<Option<UserMaterial>> {
         if new_material_amount < 1 {
             sqlx::query!(
-            r#"
+                r#"
             DELETE FROM "user_material"
             WHERE user_id = $1 AND material_id = $2
             "#,
-            user_id,
-            material_id
-        )
-                .execute(&self.db)
-                .await?;
+                user_id,
+                material_id
+            )
+            .execute(&self.db)
+            .await?;
 
             return Ok(None);
         }
 
         let updated_material = sqlx::query_as!(
-        PgUserMaterial,
-        r#"
+            PgUserMaterial,
+            r#"
         UPDATE "user_material"
         SET material_amount = $3
         WHERE user_id = $1 AND material_id = $2
         RETURNING user_id, material_id, material_amount
         "#,
-        user_id,
-        material_id,
-        new_material_amount
-    )
-            .fetch_one(&self.db)
-            .await?;
+            user_id,
+            material_id,
+            new_material_amount
+        )
+        .fetch_one(&self.db)
+        .await?;
 
         Ok(Some(updated_material.try_into()?))
     }
@@ -154,11 +148,10 @@ impl MaterialStore {
             pagination.limit,
             pagination.offset
         )
-            .fetch_all(&self.db)
-            .await?
-            .into_iter()
-            .map(TryInto::try_into)
-            .collect()
+        .fetch_all(&self.db)
+        .await?
+        .into_iter()
+        .map(TryInto::try_into)
+        .collect()
     }
-
 }
