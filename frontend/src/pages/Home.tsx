@@ -3,6 +3,7 @@ import { useAuth } from '../providers/AuthProvider.tsx';
 import { useThemeMode } from '../providers/ThemeProvider.tsx';
 import { enqueueSnackbar } from 'notistack';
 import text from '../util.ts';
+import GenericPage from './GenericPage.tsx';
 
 export default function Home() {
   const { isLoggedIn } = useAuth();
@@ -31,7 +32,7 @@ export default function Home() {
   };
 
   return (
-    <>
+    <GenericPage>
       <div className="flex flex-col justify-center items-center h-screen">
         <div className="grid grid-cols-2 grid-flow-row gap-4 w-1/3">
           <Button variant="contained" onClick={handleTestToken}>
@@ -57,6 +58,6 @@ export default function Home() {
           </Alert>
         </div>
       </div>
-    </>
+    </GenericPage>
   );
 }

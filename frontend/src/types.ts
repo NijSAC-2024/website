@@ -17,13 +17,17 @@ export interface AuthContextType {
 
 export interface ThemeContextType {
   themeCookie: { [x: string]: boolean };
+  getThemeName: () => string;
   toggleTheme: () => void;
 }
 
 export interface LanguageContextType {
   language: boolean;
+  getLangCode: () => string;
+  getLocaleCode: () => string;
   setDutch: () => void;
   setEnglish: () => void;
+  toggleLanguage: () => void;
 }
 
 export interface FormsProps {
@@ -38,6 +42,38 @@ export interface ValidateProps {
   // eslint-disable-next-line no-unused-vars
   onChange: (isValid: boolean) => void;
   setValue: Dispatch<SetStateAction<string>>;
+}
+
+export interface I18nType<T> {
+  [K: string]: T;
+  'en-US': T;
+  'nl-NL': T;
+}
+
+export type I18nStringType = I18nType<string>;
+
+export interface CalendarCategoryType extends I18nStringType {
+  id: string;
+}
+
+export interface CalendarEventType {
+  id: string | number;
+  image: string;
+  title: I18nStringType;
+  categoryId: string;
+  categoryName: I18nStringType;
+  descriptionMarkdown: I18nStringType;
+  registrations: number;
+  startDateTime: string;
+  endDateTime: string;
+  registerState: string;
+  registrationOpenTime: string;
+  registrationCloseTime: string;
+}
+
+export interface ExpandedCalendarEventType extends CalendarEventType {
+  expandedDescriptionMarkdown: I18nStringType;
+  registrationsTable: { [K: string]: string | number }[];
 }
 
 export interface UserType {

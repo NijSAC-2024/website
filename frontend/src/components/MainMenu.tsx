@@ -1,4 +1,4 @@
-import { useState, MouseEvent } from 'react';
+import { useState, MouseEvent, useEffect } from 'react';
 import {
   AppBar,
   Toolbar,
@@ -19,10 +19,12 @@ import SignupForm from './SignupForm.tsx';
 import { useLanguage } from '../providers/LanguageProvider.tsx';
 import text from '../util.ts';
 
+import router from '../router.tsx';
+
 type MenuName = 'association' | 'climbing' | 'alps' | 'language' | undefined;
 
 export default function MainMenu() {
-  const { isLoggedIn, checkAuth } = useAuth();
+  const { isLoggedIn, logout } = useAuth();
   const { setEnglish, setDutch } = useLanguage();
   const [loading, setLoading] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | undefined>(undefined);
@@ -41,8 +43,6 @@ export default function MainMenu() {
     setAuthOpen(false);
   };
 
-  checkAuth();
-
   const handleMenuOpen = (event: MouseEvent<HTMLElement>, menu: MenuName) => {
     setAnchorEl(event.currentTarget);
     setOpenMenu(menu);
@@ -52,9 +52,26 @@ export default function MainMenu() {
     setOpenMenu(undefined);
   };
 
+  const [offset, setOffset] = useState(window.scrollY);
+
+  useEffect(() => {
+    const onScroll = () => setOffset(window.scrollY);
+    // clean up code
+    window.removeEventListener('scroll', onScroll);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   return (
     <>
-      <AppBar position="fixed">
+      <AppBar
+        position="fixed"
+        classes={{
+          root:
+            (offset === 0 && '!bg-transparent !shadow-none') +
+            ' !transition-all !duration-200 !ease-in-out'
+        }}
+      >
         <Toolbar className="flex justify-between w-1/2 m-auto">
           {/* Menu Items */}
           <div className="flex items-center">
@@ -65,7 +82,7 @@ export default function MainMenu() {
               className="hover:opacity-50 hover:cursor-pointer h-24 mr-4"
               onClick={() => alert('Navigate to Home')}
             />
-            <Button color="inherit" onClick={() => alert('Navigate to Agenda')}>
+            <Button color="inherit" onClick={() => router.navigate('/agenda')}>
               {text('Agenda', 'Agenda')}
             </Button>
 
@@ -168,14 +185,21 @@ export default function MainMenu() {
               <UserMenu />
             ) : (
               <>
-                {/* Login */}
-                <Button color="inherit" onClick={handleLoginOpen}>
-                  {text('Login', 'Inloggen')}
-                </Button>
-                {/* Become a Member */}
-                <Button variant="contained" onClick={handleSignupOpen}>
-                  {text('Become a member', 'Lid worden')}
-                </Button>
+                {/* Login+Become Member / Logout */}
+                {!isLoggedIn ? (
+                  <>
+                    <Button color="inherit" onClick={handleLoginOpen}>
+                      {text('Login', 'Inloggen')}
+                    </Button>
+                    <Button variant="contained" onClick={handleSignupOpen}>
+                      {text('Become a member', 'Lid worden')}
+                    </Button>
+                  </>
+                ) : (
+                  <Button color="inherit" onClick={logout}>
+                    {text('Logout', 'Uitloggen')}
+                  </Button>
+                )}
               </>
             )}
           </div>

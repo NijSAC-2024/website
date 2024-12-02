@@ -1,9 +1,7 @@
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { useThemeMode } from './providers/ThemeProvider.tsx';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import ErrorPage from './pages/ErrorPage.tsx';
-import Home from './pages/Home.tsx';
+import { RouterProvider } from 'react-router-dom';
 import { SnackbarProvider } from 'notistack';
 import Success from './alerts/Success.tsx';
 import Error from './alerts/Error.tsx';
@@ -11,16 +9,13 @@ import Warning from './alerts/Warning.tsx';
 import Info from './alerts/Info.tsx';
 import MainMenu from './components/MainMenu.tsx';
 
-const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <Home />,
-    errorElement: <ErrorPage />
-  }
-]);
+import router from './router.tsx';
+import { useEffect } from 'react';
+import { useLanguage } from './providers/LanguageProvider.tsx';
 
 export default function App() {
-  const { themeCookie } = useThemeMode();
+  const { themeCookie, toggleTheme } = useThemeMode();
+  const language = useLanguage();
 
   const darkTheme = createTheme({
     palette: {
@@ -42,8 +37,46 @@ export default function App() {
           }
         }
       }
+    },
+    components: {
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            borderRadius: 35,
+            padding: '0.5rem 1rem'
+          }
+        }
+      },
+      MuiTextField: {
+        styleOverrides: {
+          root: {
+            borderRadius: 35
+          }
+        }
+      }
     }
   });
+
+  // DEBUG: on "ctrl-,", flip the theme, on "ctrl-.", flip the language
+  const eventListener = (e: KeyboardEvent) => {
+    if (e.ctrlKey && e.key === ',') {
+      toggleTheme();
+    }
+
+    if (e.ctrlKey && e.key === '.') {
+      language.toggleLanguage();
+    }
+  };
+
+  if (import.meta.env.MODE === 'development') {
+    useEffect(() => {
+      addEventListener('keydown', eventListener);
+
+      return () => {
+        removeEventListener('keydown', eventListener);
+      };
+    });
+  }
 
   return (
     <ThemeProvider theme={darkTheme}>

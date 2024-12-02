@@ -8,7 +8,7 @@ services:
     volumes:
       - .:/app
     working_dir: /app/backend
-    command: cargo watch -x run
+    command: sh -c "cargo watch -x run" 
     environment:
       CARGO_HOME: .cargo
       DATABASE_URL: postgresql://nijsac@db/nijsac
@@ -32,7 +32,7 @@ services:
     volumes:
       - ./frontend:/app
     working_dir: /app
-    command: bash -c "npm install && npm run dev -- --host"
+    command: sh -c "npm install && npm run dev"
     environment:
       REMOTE_API: http://backend:3000
     ports: [ "127.0.0.1:5173:5173" ]
