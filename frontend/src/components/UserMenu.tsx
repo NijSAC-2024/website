@@ -6,7 +6,7 @@ import { MouseEvent, useState } from 'react';
 import { useAuth } from '../providers/AuthProvider.tsx';
 import text from '../util.ts';
 
-export default function () {
+export default function UserMenu() {
   const { user, logout } = useAuth();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
