@@ -23,7 +23,7 @@ jobs:
           toolchain: stable
 
       - name: Install cargo-llvm-cov
-        uses: taiki-e/install-action@45e0b9c640789c26691115a9756ab35b4cd6a511 # v2.45.2
+        uses: taiki-e/install-action@ec9269c9ddb8f79f082e226dcbb74bfb4c652ab1 # v2.45.14
         with:
           tool: cargo-llvm-cov
 
@@ -51,7 +51,7 @@ jobs:
         run: docker compose down
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@d168679d447a7d9f9917d4b26caf2cfbf080cfb4 # v5.0.6
+        uses: codecov/codecov-action@015f24e6818733317a2da2edd6290ab26238649a # v5.0.7
         with:
           files: lcov.info
           fail_ci_if_error: false
@@ -73,7 +73,7 @@ jobs:
           toolchain: nightly
 
       - name: Install udeps
-        uses: taiki-e/install-action@45e0b9c640789c26691115a9756ab35b4cd6a511 # v2.45.2
+        uses: taiki-e/install-action@ec9269c9ddb8f79f082e226dcbb74bfb4c652ab1 # v2.45.14
         with:
           tool: cargo-udeps
 
@@ -131,7 +131,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: EmbarkStudios/cargo-deny-action@8371184bd11e21dcf8ac82ebf8c9c9f74ebf7268
+      - uses: EmbarkStudios/cargo-deny-action@2d8c9929d8f9f42bedba73f1287cb0b479f07acb
         with:
           manifest-path: backend/Cargo.toml
           arguments: --workspace --all-features
