@@ -73,7 +73,8 @@ export default function MainMenu() {
             <Button
               color="inherit"
               className="flex items-center"
-              onClick={(e) => handleMenuOpen(e, 'association')}>
+              onClick={(e) => handleMenuOpen(e, 'association')}
+            >
               {text('Association', 'Vereniging')} <ExpandMoreIcon />
             </Button>
             <Menu anchorEl={anchorEl} open={openMenu === 'association'} onClose={handleMenuClose}>
@@ -89,7 +90,8 @@ export default function MainMenu() {
             <Button
               color="inherit"
               className="flex items-center"
-              onClick={(e) => handleMenuOpen(e, 'climbing')}>
+              onClick={(e) => handleMenuOpen(e, 'climbing')}
+            >
               {text('Climbing', 'Klimmen')} <ExpandMoreIcon />
             </Button>
             <Menu anchorEl={anchorEl} open={openMenu === 'climbing'} onClose={handleMenuClose}>
@@ -111,7 +113,8 @@ export default function MainMenu() {
             <Button
               color="inherit"
               className="flex items-center"
-              onClick={(e) => handleMenuOpen(e, 'alps')}>
+              onClick={(e) => handleMenuOpen(e, 'alps')}
+            >
               {text('Alps', 'Alpen')} <ExpandMoreIcon />
             </Button>
             <Menu anchorEl={anchorEl} open={openMenu === 'alps'} onClose={handleMenuClose}>
@@ -138,7 +141,8 @@ export default function MainMenu() {
             <Button
               color="inherit"
               className="flex items-center"
-              onClick={(e) => handleMenuOpen(e, 'language')}>
+              onClick={(e) => handleMenuOpen(e, 'language')}
+            >
               {text('Language', 'Taal')}
               <ExpandMoreIcon />
             </Button>
@@ -147,14 +151,16 @@ export default function MainMenu() {
                 onClick={() => {
                   setEnglish();
                   handleMenuClose();
-                }}>
+                }}
+              >
                 English
               </MenuItem>
               <MenuItem
                 onClick={() => {
                   setDutch();
                   handleMenuClose();
-                }}>
+                }}
+              >
                 Nederlands
               </MenuItem>
             </Menu>

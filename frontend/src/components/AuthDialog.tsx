@@ -27,7 +27,8 @@ export default function AuthDialog({ open, onClose }: AuthDialogProps) {
               <Link
                 onClick={() => {
                   setLogin(false);
-                }}>
+                }}
+              >
                 Sign up
               </Link>
             </>
@@ -37,7 +38,8 @@ export default function AuthDialog({ open, onClose }: AuthDialogProps) {
               <Link
                 onClick={() => {
                   setLogin(true);
-                }}>
+                }}
+              >
                 log in
               </Link>{' '}
               instead.
