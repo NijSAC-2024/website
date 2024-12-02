@@ -9,8 +9,8 @@ tokio = { version = "1.41.1", features = ["full"] }
 axum = { version = "0.7.9", features = ["json", "macros"] }
 axum-extra = { version = "0.9.6", features = ["cookie"] }
 tower-http = { version = "0.6.2", features = ["trace"] }
-tracing = "0.1.40"
-tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
+tracing = "0.1.41"
+tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
 sqlx = { version = "0.8.2", features = ["postgres", "runtime-tokio", "migrate", "macros", "time", "uuid"] }
 thiserror = "2.0.3"
 validator = { version = "0.19.0", features = ["derive"] }
