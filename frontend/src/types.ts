@@ -24,7 +24,6 @@ export interface ThemeContextType {
 export interface LanguageContextType {
   language: boolean;
   getLangCode: () => string;
-  getLocaleCode: () => string;
   setDutch: () => void;
   setEnglish: () => void;
   toggleLanguage: () => void;
@@ -44,36 +43,46 @@ export interface ValidateProps {
   setValue: Dispatch<SetStateAction<string>>;
 }
 
-export interface I18nType<T> {
-  [K: string]: T;
-  'en-US': T;
-  'nl-NL': T;
-}
-
-export type I18nStringType = I18nType<string>;
-
-export interface CalendarCategoryType extends I18nStringType {
-  id: string;
-}
-
-export interface CalendarEventType {
-  id: string | number;
+export interface AgendaEventType {
+  id: number;
   image: string;
-  title: I18nStringType;
-  categoryId: string;
-  categoryName: I18nStringType;
-  descriptionMarkdown: I18nStringType;
+  titleEN: string;
+  titleNL: string;
+  category: string;
+  locationEN: string;
+  locationNL: string;
+  descriptionMarkdownEN: string;
+  descriptionMarkdownNL: string;
   registrations: number;
+  maxRegistrations: number;
   startDateTime: string;
   endDateTime: string;
-  registerState: string;
   registrationOpenTime: string;
   registrationCloseTime: string;
 }
 
-export interface ExpandedCalendarEventType extends CalendarEventType {
-  expandedDescriptionMarkdown: I18nStringType;
-  registrationsTable: { [K: string]: string | number }[];
+interface registrationType {
+  id: number;
+  name: string;
+}
+
+export interface ExpandedAgendaEventType {
+  id: number;
+  image: string;
+  titleEN: string;
+  titleNL: string;
+  category: string;
+  locationEN: string;
+  locationNL: string;
+  descriptionMarkdownEN: string;
+  descriptionMarkdownNL: string;
+  registrations: number;
+  maxRegistrations: number;
+  startDateTime: string;
+  endDateTime: string;
+  registrationOpenTime: string;
+  registrationCloseTime: string;
+  registrationsTable: registrationType[];
 }
 
 export interface UserType {

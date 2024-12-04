@@ -37,23 +37,6 @@ export default function App() {
           }
         }
       }
-    },
-    components: {
-      MuiButton: {
-        styleOverrides: {
-          root: {
-            borderRadius: 35,
-            padding: '0.5rem 1rem'
-          }
-        }
-      },
-      MuiTextField: {
-        styleOverrides: {
-          root: {
-            borderRadius: 35
-          }
-        }
-      }
     }
   });
 

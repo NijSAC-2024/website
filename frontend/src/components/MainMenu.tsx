@@ -1,6 +1,5 @@
 import { useState, MouseEvent, useEffect } from 'react';
 import {
-  AppBar,
   Toolbar,
   Button,
   Menu,
@@ -64,15 +63,15 @@ export default function MainMenu() {
 
   return (
     <>
-      <AppBar
-        position="fixed"
-        classes={{
-          root:
-            (offset === 0 && '!bg-transparent !shadow-none') +
-            ' !transition-all !duration-200 !ease-in-out'
-        }}
+      <div
+        className={
+          (offset === 0
+            ? 'bg-transparent text-white'
+            : 'bg-white dark:bg-[#121212] shadow text-black dark:text-white') +
+          ' fixed !transition-all !duration-200 !ease-in-out !z-10 w-full'
+        }
       >
-        <Toolbar className="flex justify-between w-1/2 m-auto">
+        <Toolbar className="flex justify-between w-[80%] max-w-[1000px] mx-auto">
           {/* Menu Items */}
           <div className="flex items-center">
             {/* Logo Section */}
@@ -80,7 +79,7 @@ export default function MainMenu() {
               src={logo}
               alt="Logo"
               className="hover:opacity-50 hover:cursor-pointer h-24 mr-4"
-              onClick={() => alert('Navigate to Home')}
+              onClick={() => router.navigate('/')}
             />
             <Button color="inherit" onClick={() => router.navigate('/agenda')}>
               {text('Agenda', 'Agenda')}
@@ -153,14 +152,14 @@ export default function MainMenu() {
             </Menu>
           </div>
 
-          <div className="flex space-x-4">
+          <div className="flex">
             {/* Language Dropdown */}
             <Button
               color="inherit"
               className="flex items-center"
               onClick={(e) => handleMenuOpen(e, 'language')}
             >
-              {text('Language', 'Taal')}
+              {text('EN', 'NL')}
               <ExpandMoreIcon />
             </Button>
             <Menu anchorEl={anchorEl} open={openMenu === 'language'} onClose={handleMenuClose}>
@@ -204,7 +203,7 @@ export default function MainMenu() {
             )}
           </div>
         </Toolbar>
-      </AppBar>
+      </div>
       <Dialog open={authOpen} onClose={handleClose} fullWidth>
         <DialogContent>
           {login ? (
