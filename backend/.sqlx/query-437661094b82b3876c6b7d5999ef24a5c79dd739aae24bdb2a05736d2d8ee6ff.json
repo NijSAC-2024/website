@@ -1,0 +1,36 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO \"user_material\" (user_id, material_id, material_amount)\n            VALUES ($1, $2, $3)\n            ON CONFLICT (user_id, material_id) DO UPDATE\n            SET material_amount = $3\n            RETURNING\n                user_id,\n                material_id,\n                material_amount\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "user_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "material_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "material_amount",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "437661094b82b3876c6b7d5999ef24a5c79dd739aae24bdb2a05736d2d8ee6ff"
+}

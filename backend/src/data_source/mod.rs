@@ -1,3 +1,4 @@
+mod material;
 mod user;
 
 use axum::http::HeaderMap;

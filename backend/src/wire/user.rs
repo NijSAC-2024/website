@@ -47,6 +47,31 @@ pub(crate) struct UserContent {
     pub status: MembershipStatus,
     #[validate(email)]
     pub email: String,
+    pub phone: String,
+    #[validate(range(
+        min = 0,
+        max = 999_999_999,
+        message = "Student Number must contain a maximum of 9 numbers"
+    ))]
+    pub student_number: Option<i32>,
+    #[validate(range(
+        min = 0,
+        max = 999_999_999,
+        message = "NKBV Number must contain a maximum of 9 numbers"
+    ))]
+    pub nkbv_number: Option<i32>,
+    #[validate(range(
+        min = 0,
+        max = 999_999_999,
+        message = "Sportcard Number must contain a maximum of 9 numbers"
+    ))]
+    pub sportcard_number: Option<i32>,
+    #[validate(length(min = 1, max = 100))]
+    pub ice_contact_name: Option<String>,
+    #[validate(email)]
+    pub ice_contact_email: Option<String>,
+    #[validate(length(min = 1, max = 100))]
+    pub ice_contact_phone: Option<String>,
 }
 
 #[derive(Deserialize, Validate)]
@@ -73,6 +98,31 @@ pub struct RegisterNewUser {
         message = "Password must contain between 10 and 128 characters"
     ))]
     pub password: String,
+    pub phone: String,
+    #[validate(range(
+        min = 0,
+        max = 999_999_999,
+        message = "Student Number must contain a maximum of 9 numbers"
+    ))]
+    pub student_number: Option<i32>,
+    #[validate(range(
+        min = 0,
+        max = 999_999_999,
+        message = "NKBV Number must contain a maximum of 9 numbers"
+    ))]
+    pub nkbv_number: Option<i32>,
+    #[validate(range(
+        min = 0,
+        max = 999_999_999,
+        message = "Sportcard Number must contain a maximum of 9 numbers"
+    ))]
+    pub sportcard_number: Option<i32>,
+    #[validate(length(min = 1, max = 100))]
+    pub ice_contact_name: Option<String>,
+    #[validate(email)]
+    pub ice_contact_email: Option<String>,
+    #[validate(length(min = 1, max = 100))]
+    pub ice_contact_phone: Option<String>,
 }
 
 #[derive(Serialize, Debug)]
