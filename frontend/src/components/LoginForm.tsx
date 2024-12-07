@@ -1,16 +1,19 @@
 import { useState, useRef } from 'react';
-import { Button, IconButton } from '@mui/material';
-import { Close } from '@mui/icons-material';
+import { Backdrop, Button, CircularProgress } from '@mui/material';
 import ValidatedPassword from './ValidatedPassword.tsx';
-import { FormsProps } from '../types';
 import { enqueueSnackbar } from 'notistack';
 import ValidatedTextField from './ValidatedTextField';
 import { emailValidator, noneValidator } from './validator.ts';
-import text from '../util.ts';
+import { text } from '../util.ts';
 
-export default function LoginForm({ onClose, setLoading }: FormsProps) {
+interface LoginFormProps {
+  onClose: () => void;
+}
+
+export default function LoginForm({ onClose }: LoginFormProps) {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
 
   const formValid = useRef({ email: false, password: false });
 
@@ -52,13 +55,8 @@ export default function LoginForm({ onClose, setLoading }: FormsProps) {
 
   return (
     <>
-      <div className="grid grid-cols-1 grid-flow-row gap-2">
-        <div className="flex justify-between">
-          <p className="text-2xl">Log In</p>
-          <IconButton onClick={onClose}>
-            <Close />
-          </IconButton>
-        </div>
+      <div className="grid grid-cols-1 gap-2.5">
+        <p className="text-2xl mt-2">Login</p>
         <ValidatedTextField
           label={'Email'}
           validator={emailValidator}
@@ -75,6 +73,9 @@ export default function LoginForm({ onClose, setLoading }: FormsProps) {
           {text('Login', 'Inloggen')}
         </Button>
       </div>
+      <Backdrop open={loading}>
+        <CircularProgress />
+      </Backdrop>
     </>
   );
 }

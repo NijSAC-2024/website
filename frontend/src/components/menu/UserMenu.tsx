@@ -3,8 +3,8 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { MouseEvent, useState } from 'react';
-import { useAuth } from '../providers/AuthProvider.tsx';
-import text from '../util.ts';
+import { useAuth } from '../../providers/AuthProvider.tsx';
+import { text } from '../../util.ts';
 
 export default function UserMenu() {
   const { user, logout } = useAuth();

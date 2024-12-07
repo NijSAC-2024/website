@@ -9,6 +9,7 @@ import {
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { ValidateProps } from '../types.ts';
+import { text } from '../util.ts';
 
 export default function ValidatedPassword({ label, validator, onChange, setValue }: ValidateProps) {
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -29,7 +30,7 @@ export default function ValidatedPassword({ label, validator, onChange, setValue
 
   return (
     <FormControl variant="outlined" className="w-full" error={!!error}>
-      <InputLabel>Password</InputLabel>
+      <InputLabel>{text('Password', 'Wachtwoord')}</InputLabel>
       <OutlinedInput
         id="outlined-adornment-password"
         type={showPassword ? 'text' : 'password'}
