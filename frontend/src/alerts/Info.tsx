@@ -12,7 +12,7 @@ const Info = forwardRef<HTMLDivElement, CustomContentProps>(({ id, message, vari
   }, [id, closeSnackbar]);
 
   return (
-    <SnackbarContent ref={ref} className="p-4 bg-blue-600 rounded text-white">
+    <SnackbarContent ref={ref} className="p-4 bg-blue-600 rounded-2xl text-white">
       <div className="flex justify-center w-full">
         <InfoIcon />
         <div className="ml-3 w-full">

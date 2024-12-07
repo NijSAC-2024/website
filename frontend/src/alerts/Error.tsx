@@ -12,7 +12,7 @@ const Error = forwardRef<HTMLDivElement, CustomContentProps>(({ id, message, var
   }, [id, closeSnackbar]);
 
   return (
-    <SnackbarContent ref={ref} className="p-4 bg-red-600 rounded text-white">
+    <SnackbarContent ref={ref} className="p-4 bg-red-600 rounded-2xl text-white">
       <div className="flex justify-center w-full">
         <ErrorIcon />
         <div className="w-full ml-3">

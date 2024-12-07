@@ -9,7 +9,7 @@ interface LanguageProviderProps {
 }
 
 export default function LanguageProvider({ children }: LanguageProviderProps) {
-  const [language, setLanguage] = useState<boolean>(navigator.language.slice(0, 2) === 'en');
+  const [language, setLanguage] = useState<boolean>(navigator.language.slice(0, 2) !== 'nl');
 
   const setEnglish = () => {
     setLanguage(true);

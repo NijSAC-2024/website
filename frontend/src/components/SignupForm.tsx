@@ -1,23 +1,24 @@
 import { ReactNode, useRef, useState } from 'react';
-import { Button, IconButton } from '@mui/material';
-import { Close } from '@mui/icons-material';
+import { Backdrop, Button, Checkbox, CircularProgress, FormControlLabel } from '@mui/material';
 import ValidatedPassword from './ValidatedPassword.tsx';
-import { FormsProps } from '../types';
 import { enqueueSnackbar } from 'notistack';
 import ValidatedTextField from './ValidatedTextField';
 import { emailValidator, nameValidator, passwordValidator } from './validator.ts';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
+import router from '../router.tsx';
+import { text } from '../util.ts';
 
 const steps = ['Personal', 'Education', 'Financial', 'Emergency contact', 'Overview'];
 
-export default function SignupForm({ onClose, setLoading }: FormsProps) {
+export default function SignupForm() {
   const [activeStep, setActiveStep] = useState<number>(0);
   const [email, setEmail] = useState<string>('');
   const [firstName, setFirstName] = useState<string>('');
   const [lastName, setLastName] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
 
   const formValid = useRef({
     email: false,
@@ -51,8 +52,8 @@ export default function SignupForm({ onClose, setLoading }: FormsProps) {
       switch (response.status) {
         case 201: {
           await response.json();
-          onClose();
           enqueueSnackbar(`Created account: ${firstName} ${lastName}`, { variant: 'success' });
+          await router.navigate('/');
           break;
         }
         case 409:
@@ -70,13 +71,7 @@ export default function SignupForm({ onClose, setLoading }: FormsProps) {
 
   return (
     <>
-      <div className="grid grid-cols-1 grid-flow-row gap-2">
-        <div className="flex justify-between">
-          <p className="text-2xl">Sign Up</p>
-          <IconButton onClick={onClose}>
-            <Close />
-          </IconButton>
-        </div>
+      <div className="grid grid-cols-1 gap-3">
         <Stepper alternativeLabel activeStep={activeStep}>
           {steps.map((label) => {
             const stepProps: { completed?: boolean } = {};
@@ -91,28 +86,35 @@ export default function SignupForm({ onClose, setLoading }: FormsProps) {
           })}
         </Stepper>
         <ValidatedTextField
-          label={'First Name'}
+          label={text('First Name', 'Voornaam')}
           validator={nameValidator}
           onChange={(isValid) => (formValid.current.firstName = isValid)}
           setValue={setFirstName}
         />
         <ValidatedTextField
-          label={'Last Name'}
+          label={text('Last Name', 'Achternaam')}
           validator={nameValidator}
           onChange={(isValid) => (formValid.current.lastName = isValid)}
           setValue={setLastName}
         />
         <ValidatedTextField
-          label={'Email'}
+          label={text('Email', 'E-mail')}
           validator={emailValidator}
           onChange={(isValid) => (formValid.current.email = isValid)}
           setValue={setEmail}
         />
         <ValidatedPassword
-          label={'Password'}
+          label={text('Password', 'Wachtwoord')}
           validator={passwordValidator}
           onChange={(isValid) => (formValid.current.password = isValid)}
           setValue={setPassword}
+        />
+        <FormControlLabel
+          control={<Checkbox />}
+          label={text(
+            'I give permission to the NijSAC to save and process all personal data I enter on the site.',
+            'Ik geef toestemming aan de NijSAC om alle persoonlijke informatie die ik invoer op de site op te slaan en te verwerken.'
+          )}
         />
         <div className="flex justify-between">
           <Button color="inherit" disabled={activeStep === 0} onClick={handleBack}>
@@ -127,6 +129,9 @@ export default function SignupForm({ onClose, setLoading }: FormsProps) {
           )}
         </div>
       </div>
+      <Backdrop open={loading}>
+        <CircularProgress />
+      </Backdrop>
     </>
   );
 }

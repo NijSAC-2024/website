@@ -7,7 +7,7 @@ import Success from './alerts/Success.tsx';
 import Error from './alerts/Error.tsx';
 import Warning from './alerts/Warning.tsx';
 import Info from './alerts/Info.tsx';
-import MainMenu from './components/MainMenu.tsx';
+import MainMenu from './components/menu/MainMenu.tsx';
 
 import router from './router.tsx';
 import { useEffect } from 'react';
@@ -17,23 +17,48 @@ export default function App() {
   const { themeCookie, toggleTheme } = useThemeMode();
   const language = useLanguage();
 
+  const darkMode = themeCookie.theme;
+
   const darkTheme = createTheme({
     palette: {
-      mode: themeCookie.theme ? 'dark' : 'light'
+      mode: darkMode ? 'dark' : 'light'
     },
     components: {
       MuiButton: {
         styleOverrides: {
           root: {
-            borderRadius: 35,
+            borderRadius: 20,
             padding: '0.5rem 1rem'
           }
         }
       },
-      MuiTextField: {
+      MuiOutlinedInput: {
         styleOverrides: {
           root: {
-            borderRadius: 35
+            '& .MuiOutlinedInput-notchedOutline': {
+              borderRadius: 12
+            }
+          }
+        }
+      },
+      MuiMenu: {
+        styleOverrides: {
+          paper: {
+            borderRadius: 12
+          }
+        }
+      },
+      MuiDialog: {
+        styleOverrides: {
+          root: {
+            '& .MuiPaper-root': {
+              borderRadius: 16,
+              background: darkMode ? '#121212' : 'white',
+              borderBottom: darkMode ? '2px solid #90caf9' : '3px solid #1976d2'
+            },
+            '& .MuiBackdrop-root': {
+              backgroundColor: darkMode ? 'rgb(0,0,0,0.5)' : 'rgb(255,255,255,0.5)'
+            }
           }
         }
       }

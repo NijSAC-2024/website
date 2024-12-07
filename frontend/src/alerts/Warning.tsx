@@ -12,7 +12,7 @@ const Warning = forwardRef<HTMLDivElement, CustomContentProps>(({ id, message, v
   }, [id, closeSnackbar]);
 
   return (
-    <SnackbarContent ref={ref} className="p-4 bg-orange-600 rounded text-white">
+    <SnackbarContent ref={ref} className="p-4 bg-orange-600 rounded-2xl text-white">
       <div className="flex justify-center w-full">
         <WarningAmberIcon />
         <div className="w-full ml-3">

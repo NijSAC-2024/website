@@ -17,7 +17,6 @@ export interface AuthContextType {
 
 export interface ThemeContextType {
   themeCookie: { [x: string]: boolean };
-  getThemeName: () => string;
   toggleTheme: () => void;
 }
 
@@ -29,11 +28,6 @@ export interface LanguageContextType {
   toggleLanguage: () => void;
 }
 
-export interface FormsProps {
-  onClose: () => void;
-  setLoading: Dispatch<SetStateAction<boolean>>;
-}
-
 export interface ValidateProps {
   label: string;
   // eslint-disable-next-line no-unused-vars
@@ -41,6 +35,11 @@ export interface ValidateProps {
   // eslint-disable-next-line no-unused-vars
   onChange: (isValid: boolean) => void;
   setValue: Dispatch<SetStateAction<string>>;
+}
+
+interface registrationType {
+  id: number;
+  name: string;
 }
 
 export interface AgendaEventType {
@@ -53,36 +52,13 @@ export interface AgendaEventType {
   locationNL: string;
   descriptionMarkdownEN: string;
   descriptionMarkdownNL: string;
-  registrations: number;
+  numberOfRegistrations: number;
   maxRegistrations: number;
   startDateTime: string;
   endDateTime: string;
   registrationOpenTime: string;
   registrationCloseTime: string;
-}
-
-interface registrationType {
-  id: number;
-  name: string;
-}
-
-export interface ExpandedAgendaEventType {
-  id: number;
-  image: string;
-  titleEN: string;
-  titleNL: string;
-  category: string;
-  locationEN: string;
-  locationNL: string;
-  descriptionMarkdownEN: string;
-  descriptionMarkdownNL: string;
-  registrations: number;
-  maxRegistrations: number;
-  startDateTime: string;
-  endDateTime: string;
-  registrationOpenTime: string;
-  registrationCloseTime: string;
-  registrationsTable: registrationType[];
+  registrations: registrationType[];
 }
 
 export interface UserType {
@@ -95,3 +71,5 @@ export interface UserType {
   status: string;
   email: string;
 }
+
+export type MenuType = 'association' | 'climbing' | 'alps' | 'language' | undefined;

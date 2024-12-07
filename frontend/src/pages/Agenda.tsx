@@ -1,17 +1,10 @@
 import GenericPage from './GenericPage.tsx';
 import ContentCard from '../components/ContentCard.tsx';
 import AgendaCard from '../components/AgendaCard.tsx';
-import text from '../util.ts';
+import { text } from '../util.ts';
 import { useState } from 'react';
 import { AgendaEventType } from '../types.ts';
-import {
-  Button,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  SelectChangeEvent
-} from '@mui/material';
+import { Fab, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 
 export default function Agenda() {
@@ -33,14 +26,29 @@ export default function Agenda() {
         category: 'weekend',
         locationEN: 'Albufeira',
         locationNL: 'Albufeira',
-        descriptionMarkdownEN: 'You must register to participate!',
+        descriptionMarkdownEN:
+          'You must _register_ to participate! *This is a long message* to test if it is cut off. Because we do not want to show the whole description in this menu.',
         descriptionMarkdownNL: 'Je moet je registreren om mee te doen!',
-        registrations: 12,
+        numberOfRegistrations: 12,
         maxRegistrations: 20,
         startDateTime: '2025-03-06T00:00:00.000Z',
         endDateTime: '2025-03-08T00:00:00.000Z',
         registrationOpenTime: '2023-03-05T00:00:00.000Z',
-        registrationCloseTime: '2027-03-07T00:00:00.000Z'
+        registrationCloseTime: '2027-03-07T00:00:00.000Z',
+        registrations: [
+          {
+            id: 1,
+            name: 'Lukas Nieuweboer'
+          },
+          {
+            id: 1,
+            name: 'Asia Piotrowska'
+          },
+          {
+            id: 1,
+            name: 'Robin Put'
+          }
+        ]
       },
       {
         id: 2,
@@ -52,12 +60,26 @@ export default function Agenda() {
         locationNL: 'Albufeira',
         descriptionMarkdownEN: 'No registration required',
         descriptionMarkdownNL: 'Je hoeft je niet in te schrijven',
-        registrations: 12,
+        numberOfRegistrations: 12,
         maxRegistrations: 0,
         startDateTime: '2025-03-06T00:00:00.000Z',
         endDateTime: '2025-03-08T00:00:00.000Z',
         registrationOpenTime: '2023-03-05T00:00:00.000Z',
-        registrationCloseTime: '2027-03-07T00:00:00.000Z'
+        registrationCloseTime: '2027-03-07T00:00:00.000Z',
+        registrations: [
+          {
+            id: 1,
+            name: 'Lukas Nieuweboer'
+          },
+          {
+            id: 1,
+            name: 'Asia Piotrowska'
+          },
+          {
+            id: 1,
+            name: 'Robin Put'
+          }
+        ]
       },
       {
         id: 3,
@@ -67,14 +89,29 @@ export default function Agenda() {
         category: 'course',
         locationEN: 'RSC',
         locationNL: 'RSC',
-        descriptionMarkdownEN: 'No registration required',
+        descriptionMarkdownEN:
+          'This is a **markdown** example with a [link](https://example.com) and some _italic text_.',
         descriptionMarkdownNL: 'Je hoeft je niet in te schrijven',
-        registrations: 12,
+        numberOfRegistrations: 12,
         maxRegistrations: 20,
         startDateTime: '2025-03-06T00:00:00.000Z',
         endDateTime: '2025-03-08T00:00:00.000Z',
         registrationOpenTime: '2023-03-05T00:00:00.000Z',
-        registrationCloseTime: '2024-03-07T00:00:00.000Z'
+        registrationCloseTime: '2024-03-07T00:00:00.000Z',
+        registrations: [
+          {
+            id: 1,
+            name: 'Lukas Nieuweboer'
+          },
+          {
+            id: 1,
+            name: 'Asia Piotrowska'
+          },
+          {
+            id: 1,
+            name: 'Robin Put'
+          }
+        ]
       },
       {
         id: 4,
@@ -86,12 +123,26 @@ export default function Agenda() {
         locationNL: 'Klimhal',
         descriptionMarkdownEN: 'No registration required',
         descriptionMarkdownNL: 'Je hoeft je niet in te schrijven',
-        registrations: 20,
+        numberOfRegistrations: 20,
         maxRegistrations: 20,
         startDateTime: '2025-03-06T00:00:00.000Z',
         endDateTime: '2025-03-08T00:00:00.000Z',
         registrationOpenTime: '2023-03-05T00:00:00.000Z',
-        registrationCloseTime: '2025-03-07T00:00:00.000Z'
+        registrationCloseTime: '2025-03-07T00:00:00.000Z',
+        registrations: [
+          {
+            id: 1,
+            name: 'Lukas Nieuweboer'
+          },
+          {
+            id: 1,
+            name: 'Asia Piotrowska'
+          },
+          {
+            id: 1,
+            name: 'Robin Put'
+          }
+        ]
       },
       {
         id: 5,
@@ -103,29 +154,42 @@ export default function Agenda() {
         locationNL: 'De Yard',
         descriptionMarkdownEN: 'No registration required',
         descriptionMarkdownNL: 'Je hoeft je niet in te schrijven',
-        registrations: 12,
+        numberOfRegistrations: 12,
         maxRegistrations: 20,
         startDateTime: '2025-03-06T22:30:00.000Z',
         endDateTime: '2025-03-06T22:30:00.000Z',
         registrationOpenTime: '2024-12-23T00:00:00.000Z',
-        registrationCloseTime: '2027-03-07T00:00:00.000Z'
+        registrationCloseTime: '2027-03-07T00:00:00.000Z',
+        registrations: [
+          {
+            id: 1,
+            name: 'Lukas Nieuweboer'
+          },
+          {
+            id: 1,
+            name: 'Asia Piotrowska'
+          },
+          {
+            id: 1,
+            name: 'Robin Put'
+          }
+        ]
       }
     ]
   };
 
   return (
     <>
-      <div className="flex justify-end fixed bottom-5 right-5 z-10">
-        <Button variant="contained">
+      <div className="fixed bottom-5 right-5 z-10">
+        <Fab variant="extended" color="primary">
           <AddIcon className="mr-2" />
-          {text('Add event', 'Voeg event toe')}
-        </Button>
+          <p>{text('Add event', 'Voeg evenement toe')}</p>
+        </Fab>
       </div>
-
       <GenericPage>
         <div className="Agenda">
           <div className="grid xl:grid-cols-3 lg:grid-cols-2 grid-flow-row gap-5">
-            <ContentCard className="lg:col-span-2">
+            <ContentCard className="lg:col-span-2 p-7">
               <h1>Agenda</h1>
               <p>
                 {text(
@@ -140,7 +204,7 @@ export default function Agenda() {
                 )}
               </p>
             </ContentCard>
-            <ContentCard className="xl:col-span-1 lg:col-span-2">
+            <ContentCard className="xl:col-span-1 lg:col-span-2 p-7">
               <h2 className="mb-3">{text('Filter', 'Filteren')}</h2>
               <FormControl fullWidth>
                 <InputLabel id="select-label">{text('Category', 'Categorie')}</InputLabel>
@@ -159,14 +223,13 @@ export default function Agenda() {
                 </Select>
               </FormControl>
             </ContentCard>
-
             {exampleAPIResponse.events
               .filter(
                 (e: AgendaEventType) =>
                   selectedCategory === 'all' || e.category === selectedCategory
               )
               .map((event: AgendaEventType) => (
-                <AgendaCard {...event} key={event.id} />
+                <AgendaCard agendaEvent={event} agendaPage={true} key={event.id} />
               ))}
           </div>
         </div>
