@@ -3,7 +3,7 @@ import { Backdrop, Button, Checkbox, CircularProgress, FormControlLabel } from '
 import ValidatedPassword from './ValidatedPassword.tsx';
 import { enqueueSnackbar } from 'notistack';
 import ValidatedTextField from './ValidatedTextField';
-import { emailValidator, nameValidator, passwordValidator } from './validator.ts';
+import { emailValidator, nameValidator, passwordValidator } from '../validator.ts';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';

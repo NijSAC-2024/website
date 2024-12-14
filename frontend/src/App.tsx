@@ -3,10 +3,10 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { useThemeMode } from './providers/ThemeProvider.tsx';
 import { RouterProvider } from 'react-router-dom';
 import { SnackbarProvider } from 'notistack';
-import Success from './alerts/Success.tsx';
-import Error from './alerts/Error.tsx';
-import Warning from './alerts/Warning.tsx';
-import Info from './alerts/Info.tsx';
+import Success from './components/alerts/Success.tsx';
+import Error from './components/alerts/Error.tsx';
+import Warning from './components/alerts/Warning.tsx';
+import Info from './components/alerts/Info.tsx';
 import MainMenu from './components/menu/MainMenu.tsx';
 
 import router from './router.tsx';
@@ -14,14 +14,12 @@ import { useEffect } from 'react';
 import { useLanguage } from './providers/LanguageProvider.tsx';
 
 export default function App() {
-  const { themeCookie, toggleTheme } = useThemeMode();
+  const { isDarkMode, toggleTheme } = useThemeMode();
   const language = useLanguage();
-
-  const darkMode = themeCookie.theme;
 
   const darkTheme = createTheme({
     palette: {
-      mode: darkMode ? 'dark' : 'light'
+      mode: isDarkMode ? 'dark' : 'light'
     },
     components: {
       MuiButton: {
@@ -53,11 +51,11 @@ export default function App() {
           root: {
             '& .MuiPaper-root': {
               borderRadius: 16,
-              background: darkMode ? '#121212' : 'white',
-              borderBottom: darkMode ? '2px solid #90caf9' : '3px solid #1976d2'
+              background: isDarkMode ? '#121212' : 'white',
+              borderBottom: isDarkMode ? '2px solid #90caf9' : '3px solid #1976d2'
             },
             '& .MuiBackdrop-root': {
-              backgroundColor: darkMode ? 'rgb(0,0,0,0.5)' : 'rgb(255,255,255,0.5)'
+              backgroundColor: isDarkMode ? 'rgb(0,0,0,0.5)' : 'rgb(255,255,255,0.5)'
             }
           }
         }

@@ -1,12 +1,19 @@
 import { createContext, useContext, useMemo, ReactNode, useState } from 'react';
-import { LanguageContextType } from '../types.ts';
 // import { enqueueSnackbar } from 'notistack';
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+interface LanguageContextType {
+  language: boolean;
+  getLangCode: () => string;
+  setDutch: () => void;
+  setEnglish: () => void;
+  toggleLanguage: () => void;
+}
 
 interface LanguageProviderProps {
   children: ReactNode;
 }
+
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export default function LanguageProvider({ children }: LanguageProviderProps) {
   const [language, setLanguage] = useState<boolean>(navigator.language.slice(0, 2) !== 'nl');

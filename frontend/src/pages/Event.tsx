@@ -6,7 +6,7 @@ import { useLanguage } from '../providers/LanguageProvider.tsx';
 import { text } from '../util.ts';
 import moment from 'moment';
 import Markdown from 'react-markdown';
-import { AgendaEventType } from '../types.ts';
+import { AgendaEventType, registrationsType } from '../types.ts';
 import { Button, Fab, Table, TableBody, TableCell, TableRow } from '@mui/material';
 import router from '../router.tsx';
 
@@ -27,18 +27,21 @@ export default function Event() {
     startDateTime: '2025-03-06T00:00:00.000Z',
     endDateTime: '2025-03-08T00:00:00.000Z',
     registrationOpenTime: '2023-03-05T00:00:00.000Z',
-    registrationCloseTime: '2027-03-07T00:00:00.000Z',
+    registrationCloseTime: '2027-03-07T00:00:00.000Z'
+  };
+
+  const registrations: registrationsType = {
     registrations: [
       {
-        id: 1,
+        eid: 1,
         name: 'Lukas Nieuweboer'
       },
       {
-        id: 1,
+        eid: 2,
         name: 'Asia Piotrowska'
       },
       {
-        id: 1,
+        eid: 3,
         name: 'Robin Put'
       }
     ]
@@ -58,7 +61,7 @@ export default function Event() {
         <div className="grid xl:grid-cols-3 lg:col-span-2 grid-flow-row gap-5">
           <div className="xl:col-span-3 lg:col-span-2 mb-[-0.5rem]">
             <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">
-              <Button onClick={() => router.navigate('/agenda')}>
+              <Button color="inherit" onClick={() => router.navigate('/agenda')}>
                 {text('Back to Agenda', 'Terug naar Agenda')}
               </Button>
             </div>
@@ -75,9 +78,9 @@ export default function Event() {
 
             <Table>
               <TableBody>
-                {agendaEvent.registrations.map((registraton) => (
+                {registrations.registrations.map((registraton) => (
                   <TableRow
-                    key={registraton.id}
+                    key={registraton.eid}
                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                   >
                     <TableCell>{registraton.name}</TableCell>

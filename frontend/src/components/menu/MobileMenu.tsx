@@ -10,7 +10,7 @@ import {
   ListItemText,
   Toolbar
 } from '@mui/material';
-import logo from '../../../public/images/logo.svg';
+import logo from '/images/logo.svg';
 import router from '../../router.tsx';
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';

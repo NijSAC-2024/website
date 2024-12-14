@@ -3,6 +3,7 @@ import { text } from '../util.ts';
 import { useAuth } from '../providers/AuthProvider.tsx';
 import { AgendaEventType } from '../types.ts';
 import { useState } from 'react';
+import RegisterForm from './RegisterForm.tsx';
 
 interface RegisterButtonProps {
   agendaEvent: AgendaEventType;
@@ -21,8 +22,6 @@ export default function RegisterButton({ agendaEvent, langCode }: RegisterButton
   const registrationOpenTime = new Date(agendaEvent.registrationOpenTime);
   const registrationCloseTime = new Date(agendaEvent.registrationCloseTime);
 
-  console.log(isLoggedIn);
-
   return (
     <>
       {isLoggedIn ? (
@@ -32,25 +31,25 @@ export default function RegisterButton({ agendaEvent, langCode }: RegisterButton
           </Button>
         ) : registrationOpenTime > now ? (
           <p className="text-right">
-            {text('Registration opens at', 'Aanmeldingen openen op')}{' '}
+            {text('Registration opens at', 'Inschrijvingen openen op')}{' '}
             {registrationOpenTime.toLocaleString(langCode)}
           </p>
         ) : registrationCloseTime > now ? (
           <Button onClick={toggleDialog} variant="contained">
-            {text('Register', 'Aanmelden')}
+            {text('Register', 'Inschrijven')}
           </Button>
         ) : (
           <p className="text-right">
-            {text('Registrations closed at', 'Aanmeldingen zijn gesloten sinds')}{' '}
+            {text('Registrations closed at', 'Inschrijvingen zijn gesloten sinds')}{' '}
             {registrationCloseTime.toLocaleString(langCode)}
           </p>
         )
       ) : (
-        <p>Please log in to register.</p>
+        <p>{text('Please log in to register.', 'Login om je in te schrijven.')}</p>
       )}
       <Dialog open={registerDialogOpen} onClose={toggleDialog} fullWidth>
         <DialogContent>
-          <h1>Registration form</h1>
+          <RegisterForm agendaEvent={agendaEvent} />
         </DialogContent>
         <DialogActions>
           <Button onClick={toggleDialog}>{text('Close', 'Sluit')}</Button>

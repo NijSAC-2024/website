@@ -13,7 +13,7 @@ export default function MainMenu() {
   const isMobile = useMediaQuery('(max-width: 992px)');
 
   const toggleDropdown = () => {
-    setDropdownOpen((prev) => !prev);
+    setDropdownOpen((prevState) => !prevState);
   };
 
   const handleLoginOpen = () => {

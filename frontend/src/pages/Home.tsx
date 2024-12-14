@@ -6,7 +6,7 @@ import GenericPage from './GenericPage.tsx';
 import ContentCard from '../components/ContentCard.tsx';
 
 export default function Home() {
-  const { themeCookie, toggleTheme } = useThemeMode();
+  const { isDarkMode, toggleTheme } = useThemeMode();
 
   const handleTestToken = async () => {
     const response = await fetch('/api/whoami');
@@ -39,7 +39,7 @@ export default function Home() {
         </Button>
         <div className="grid grid-cols-3">
           <h3 className="mx-auto">{text('Light mode', 'Licht thema')}</h3>
-          <Switch className="mx-auto" checked={themeCookie.theme} onChange={toggleTheme} />
+          <Switch className="mx-auto" checked={isDarkMode} onChange={toggleTheme} />
           <h3 className="mx-auto">{text('Dark mode', 'Donker thema')}</h3>
         </div>
       </ContentCard>

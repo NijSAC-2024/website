@@ -1,4 +1,4 @@
-import logo from '../../../public/images/logo.svg';
+import logo from '/images/logo.svg';
 import router from '../../router.tsx';
 import { Button, Menu, MenuItem, Toolbar } from '@mui/material';
 import { text } from '../../util.ts';

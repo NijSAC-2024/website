@@ -15,19 +15,6 @@ export interface AuthContextType {
   logout: () => void;
 }
 
-export interface ThemeContextType {
-  themeCookie: { [x: string]: boolean };
-  toggleTheme: () => void;
-}
-
-export interface LanguageContextType {
-  language: boolean;
-  getLangCode: () => string;
-  setDutch: () => void;
-  setEnglish: () => void;
-  toggleLanguage: () => void;
-}
-
 export interface ValidateProps {
   label: string;
   // eslint-disable-next-line no-unused-vars
@@ -35,11 +22,6 @@ export interface ValidateProps {
   // eslint-disable-next-line no-unused-vars
   onChange: (isValid: boolean) => void;
   setValue: Dispatch<SetStateAction<string>>;
-}
-
-interface registrationType {
-  id: number;
-  name: string;
 }
 
 export interface AgendaEventType {
@@ -58,6 +40,14 @@ export interface AgendaEventType {
   endDateTime: string;
   registrationOpenTime: string;
   registrationCloseTime: string;
+}
+
+interface registrationType {
+  eid: number;
+  name: string;
+}
+
+export interface registrationsType {
   registrations: registrationType[];
 }
 

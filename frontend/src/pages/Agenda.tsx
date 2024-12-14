@@ -34,21 +34,7 @@ export default function Agenda() {
         startDateTime: '2025-03-06T00:00:00.000Z',
         endDateTime: '2025-03-08T00:00:00.000Z',
         registrationOpenTime: '2023-03-05T00:00:00.000Z',
-        registrationCloseTime: '2027-03-07T00:00:00.000Z',
-        registrations: [
-          {
-            id: 1,
-            name: 'Lukas Nieuweboer'
-          },
-          {
-            id: 1,
-            name: 'Asia Piotrowska'
-          },
-          {
-            id: 1,
-            name: 'Robin Put'
-          }
-        ]
+        registrationCloseTime: '2027-03-07T00:00:00.000Z'
       },
       {
         id: 2,
@@ -65,21 +51,7 @@ export default function Agenda() {
         startDateTime: '2025-03-06T00:00:00.000Z',
         endDateTime: '2025-03-08T00:00:00.000Z',
         registrationOpenTime: '2023-03-05T00:00:00.000Z',
-        registrationCloseTime: '2027-03-07T00:00:00.000Z',
-        registrations: [
-          {
-            id: 1,
-            name: 'Lukas Nieuweboer'
-          },
-          {
-            id: 1,
-            name: 'Asia Piotrowska'
-          },
-          {
-            id: 1,
-            name: 'Robin Put'
-          }
-        ]
+        registrationCloseTime: '2027-03-07T00:00:00.000Z'
       },
       {
         id: 3,
@@ -97,21 +69,7 @@ export default function Agenda() {
         startDateTime: '2025-03-06T00:00:00.000Z',
         endDateTime: '2025-03-08T00:00:00.000Z',
         registrationOpenTime: '2023-03-05T00:00:00.000Z',
-        registrationCloseTime: '2024-03-07T00:00:00.000Z',
-        registrations: [
-          {
-            id: 1,
-            name: 'Lukas Nieuweboer'
-          },
-          {
-            id: 1,
-            name: 'Asia Piotrowska'
-          },
-          {
-            id: 1,
-            name: 'Robin Put'
-          }
-        ]
+        registrationCloseTime: '2024-03-07T00:00:00.000Z'
       },
       {
         id: 4,
@@ -128,21 +86,7 @@ export default function Agenda() {
         startDateTime: '2025-03-06T00:00:00.000Z',
         endDateTime: '2025-03-08T00:00:00.000Z',
         registrationOpenTime: '2023-03-05T00:00:00.000Z',
-        registrationCloseTime: '2025-03-07T00:00:00.000Z',
-        registrations: [
-          {
-            id: 1,
-            name: 'Lukas Nieuweboer'
-          },
-          {
-            id: 1,
-            name: 'Asia Piotrowska'
-          },
-          {
-            id: 1,
-            name: 'Robin Put'
-          }
-        ]
+        registrationCloseTime: '2025-03-07T00:00:00.000Z'
       },
       {
         id: 5,
@@ -159,21 +103,7 @@ export default function Agenda() {
         startDateTime: '2025-03-06T22:30:00.000Z',
         endDateTime: '2025-03-06T22:30:00.000Z',
         registrationOpenTime: '2024-12-23T00:00:00.000Z',
-        registrationCloseTime: '2027-03-07T00:00:00.000Z',
-        registrations: [
-          {
-            id: 1,
-            name: 'Lukas Nieuweboer'
-          },
-          {
-            id: 1,
-            name: 'Asia Piotrowska'
-          },
-          {
-            id: 1,
-            name: 'Robin Put'
-          }
-        ]
+        registrationCloseTime: '2027-03-07T00:00:00.000Z'
       }
     ]
   };
@@ -211,7 +141,7 @@ export default function Agenda() {
                 <Select
                   labelId="select-label"
                   value={selectedCategory}
-                  label="Category"
+                  label={text('Category', 'Categorie')}
                   onChange={handleChange}
                   variant="outlined"
                 >

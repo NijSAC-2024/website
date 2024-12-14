@@ -21,7 +21,7 @@ export default function SingupOptions({
           'Om te registreren voor de NijSAC hebben we 3 verschillende opties, toepasbaar in verschillende situaties'
         )}
       </p>
-      <div className="grid xl:grid-cols-2 gap-5">
+      <div className="grid xl:grid-cols-2 gap-5 mb-2">
         <TextCard className="px-7 py-5 mt-5">
           <h2>{text('Member', 'Lid')}</h2>
           <h3>{text('Requirements:', 'Eisen:')}</h3>
@@ -113,7 +113,7 @@ export default function SingupOptions({
           <p>
             {text(
               "By choosing this option, you are willing to donate 20 euros per year to the NijSAC without becoming a member. You will not be able to participate in any of the NijSAC's activities.",
-              'Door voor deze optie te kiezen, bent u bereid twintig euro per jaar aan de NijSAC te doneren zonder lid te worden. U kunt dan aan geen van de activiteiten van de NijSAC deelnemen.'
+              'Door voor deze optie te kiezen, bent u bereid 20 euro per jaar aan de NijSAC te doneren zonder lid te worden. U kunt dan aan geen van de activiteiten van de NijSAC deelnemen.'
             )}
           </p>
           <div className="grid justify-items-end mt-5">

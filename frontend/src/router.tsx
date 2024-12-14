@@ -5,6 +5,7 @@ import Home from './pages/Home.tsx';
 import Agenda from './pages/Agenda.tsx';
 import Event from './pages/Event.tsx';
 import Signup from './pages/Signup.tsx';
+import TextPage from './pages/TextPage.tsx';
 
 const router = createBrowserRouter([
   {
@@ -20,6 +21,11 @@ const router = createBrowserRouter([
   {
     path: '/agenda',
     element: <Agenda />,
+    errorElement: <ErrorPage />
+  },
+  {
+    path: '/about',
+    element: <TextPage />,
     errorElement: <ErrorPage />
   },
   {

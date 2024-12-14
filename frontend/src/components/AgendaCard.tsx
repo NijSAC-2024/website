@@ -31,7 +31,7 @@ export default function AgendaCard({ agendaEvent, agendaPage }: AgendaCardProps)
             label={formatDate(agendaEvent.startDateTime, agendaEvent.endDateTime)}
             className="absolute top-5 right-5"
             color="primary"
-            sx={{ 'font-size': 18 }}
+            sx={{ fontSize: 18 }}
           />
         )}
         <img
