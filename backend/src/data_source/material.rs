@@ -1,3 +1,5 @@
+use crate::data_source::Count;
+use crate::user::UserId;
 use crate::{
     error::{AppResult, Error},
     wire::material::{Material, UserMaterial},
@@ -5,6 +7,8 @@ use crate::{
 };
 use axum::{async_trait, extract::FromRequestParts, http::request::Parts};
 use sqlx::PgPool;
+use std::convert::TryInto;
+use std::ops::Deref;
 use uuid::Uuid;
 
 pub(crate) struct MaterialStore {
@@ -62,71 +66,70 @@ impl TryFrom<PgUserMaterial> for UserMaterial {
     }
 }
 
+impl TryFrom<PgUserMaterial> for Option<UserMaterial> {
+    type Error = Error;
+
+    fn try_from(pg: PgUserMaterial) -> Result<Self, Self::Error> {
+        Ok(Some(UserMaterial {
+            user_id: pg.user_id,
+            material_id: pg.material_id,
+            material_amount: pg.material_amount,
+        }))
+    }
+}
+
 impl MaterialStore {
-    pub async fn add_user_material(
+    pub async fn update_user_material(
         &self,
         user_id: &Uuid,
         material_id: &Uuid,
         material_amount: i32,
-    ) -> AppResult<UserMaterial> {
-        sqlx::query_as!(
-            PgUserMaterial,
-            r#"
-            INSERT INTO "user_material" (user_id, material_id, material_amount)
-            VALUES ($1, $2, $3)
-            ON CONFLICT (user_id, material_id) DO UPDATE
-            SET material_amount = $3
-            RETURNING
-                user_id,
-                material_id,
-                material_amount
-            "#,
-            user_id,
-            material_id,
-            material_amount
-        )
-        .fetch_one(&self.db)
-        .await?
-        .try_into()
-    }
-
-    pub async fn update_user_material_amount(
-        &self,
-        user_id: &Uuid,
-        material_id: &Uuid,
-        new_material_amount: i32,
     ) -> AppResult<Option<UserMaterial>> {
-        if new_material_amount < 1 {
+        if material_amount < 1 {
             sqlx::query!(
                 r#"
-            DELETE FROM "user_material"
-            WHERE user_id = $1 AND material_id = $2
-            "#,
+                    DELETE FROM "user_material"
+                    WHERE user_id = $1 AND material_id = $2
+                    "#,
                 user_id,
-                material_id
+                material_id,
             )
             .execute(&self.db)
             .await?;
-
-            return Ok(None);
+            Ok(None)
+        } else {
+            sqlx::query_as!(
+                PgUserMaterial,
+                r#"
+                    INSERT INTO "user_material" (user_id, material_id, material_amount)
+                    VALUES ($1, $2, $3)
+                    ON CONFLICT (user_id, material_id) DO UPDATE
+                    SET material_amount = $3
+                    RETURNING user_id, material_id, material_amount
+                    "#,
+                user_id,
+                material_id,
+                material_amount
+            )
+            .fetch_one(&self.db)
+            .await?
+            .try_into()
         }
+    }
 
-        let updated_material = sqlx::query_as!(
-            PgUserMaterial,
+    pub async fn count(&self, user_id: &UserId) -> AppResult<Count> {
+        let count = sqlx::query_as!(
+            Count,
             r#"
-        UPDATE "user_material"
-        SET material_amount = $3
-        WHERE user_id = $1 AND material_id = $2
-        RETURNING user_id, material_id, material_amount
-        "#,
-            user_id,
-            material_id,
-            new_material_amount
+            SELECT COUNT(*) AS "count!"
+            FROM "user_material"
+            WHERE user_id = $1
+            "#,
+            user_id.deref()
         )
         .fetch_one(&self.db)
         .await?;
-
-        Ok(Some(updated_material.try_into()?))
+        Ok(count)
     }
 
     pub async fn get_user_materials(
@@ -145,6 +148,39 @@ impl MaterialStore {
             OFFSET $3
             "#,
             user_id,
+            pagination.limit,
+            pagination.offset
+        )
+        .fetch_all(&self.db)
+        .await?
+        .into_iter()
+        .map(TryInto::try_into)
+        .collect()
+    }
+
+    pub async fn count_materials(&self) -> AppResult<Count> {
+        let count = sqlx::query_as!(
+            Count,
+            r#"
+        SELECT COUNT(*) as "count!"
+        FROM "material"
+        "#
+        )
+        .fetch_one(&self.db)
+        .await?;
+        Ok(count)
+    }
+
+    pub async fn get_material_list(&self, pagination: &Pagination) -> AppResult<Vec<Material>> {
+        sqlx::query_as!(
+            PgMaterial,
+            r#"
+        SELECT material_id, name_eng, name_nl
+        FROM "material"
+        ORDER BY material_id
+        LIMIT $1
+        OFFSET $2
+        "#,
             pagination.limit,
             pagination.offset
         )

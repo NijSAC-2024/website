@@ -1,12 +1,15 @@
+use crate::api::get_user_materials;
 use crate::{
-    api::{get_all_users, register, update_user, who_am_i},
+    api::{
+        get_all_users, get_material_list, register, update_user, update_user_material, who_am_i,
+    },
     auth::{login, logout},
     get_user,
     state::AppState,
 };
 use axum::{
     extract::State,
-    routing::{get, post},
+    routing::{get, post, put},
     Json, Router,
 };
 use memory_serve::{load_assets, MemoryServe};
@@ -38,6 +41,9 @@ fn api_router() -> Router<AppState> {
         .route("/register", post(register))
         .route("/user", get(get_all_users))
         .route("/user/:id", get(get_user).put(update_user))
+        .route("/user/:id/material", get(get_material_list))
+        .route("/user/:id/getMaterial", get(get_user_materials))
+        .route("/user/:id/material/update", put(update_user_material))
 }
 
 async fn version(State(state): State<AppState>) -> Json<String> {

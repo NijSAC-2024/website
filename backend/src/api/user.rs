@@ -15,7 +15,7 @@ use axum::{
     Json,
 };
 
-fn read_access(id: &UserId, session: &Session) -> AppResult<()> {
+pub(crate) fn read_access(id: &UserId, session: &Session) -> AppResult<()> {
     if read_all_access(session).is_ok() || id == session.user_id() {
         Ok(())
     } else {
@@ -23,7 +23,7 @@ fn read_access(id: &UserId, session: &Session) -> AppResult<()> {
     }
 }
 
-fn read_all_access(session: &Session) -> AppResult<()> {
+pub(crate) fn read_all_access(session: &Session) -> AppResult<()> {
     if session.membership_status().is_member()
         && session.roles().iter().any(|role| match role {
             Role::Admin
@@ -41,12 +41,12 @@ fn read_all_access(session: &Session) -> AppResult<()> {
     }
 }
 
-enum UpdateAccess {
+pub enum UpdateAccess {
     Anything,
     Email,
 }
 
-fn update_access(id: &UserId, session: &Session) -> AppResult<UpdateAccess> {
+pub(crate) fn update_access(id: &UserId, session: &Session) -> AppResult<UpdateAccess> {
     if read_all_access(session).is_ok() {
         Ok(UpdateAccess::Anything)
     } else if id == session.user_id() {
@@ -119,3 +119,5 @@ pub(crate) async fn update_user(
 
     Ok(Json(res))
 }
+
+

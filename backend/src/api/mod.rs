@@ -1,5 +1,7 @@
+mod material;
 mod user;
 
+pub(crate) use material::*;
 pub(crate) use user::*;
 
 use crate::error::Error;
