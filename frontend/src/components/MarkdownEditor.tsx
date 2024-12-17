@@ -60,14 +60,14 @@ export default function MarkdownEditor({ initialContent = '' }: MarkdownEditorPr
 
       newCursorPosition = selectedText
         ? selectionStart + syntax.length + selectedText.length
-        : selectionStart + syntax.length + 10; // Default length for "Blockquote"/"Item"
+        : selectionStart + syntax.length + 10;
     } else if (isSpecialSyntax) {
       newContent =
         currentValue.slice(0, selectionStart) +
         (syntax === '[](url)' ? '[](url)' : '![alt text](url)') +
         currentValue.slice(selectionEnd);
 
-      newCursorPosition = selectionStart + (syntax === '[](url)' ? 6 : 15); // Position cursor in "text" or "alt text"
+      newCursorPosition = selectionStart + (syntax === '[](url)' ? 1 : 15);
     }
 
     setMarkdownContent(newContent);
