@@ -119,5 +119,3 @@ pub(crate) async fn update_user(
 
     Ok(Json(res))
 }
-
-
