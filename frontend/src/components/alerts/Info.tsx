@@ -2,9 +2,9 @@ import { forwardRef, useCallback } from 'react';
 import { useSnackbar, SnackbarContent, CustomContentProps } from 'notistack';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
-import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import InfoIcon from '@mui/icons-material/Info';
 
-const Warning = forwardRef<HTMLDivElement, CustomContentProps>(({ id, message, variant }, ref) => {
+const Info = forwardRef<HTMLDivElement, CustomContentProps>(({ id, message, variant }, ref) => {
   const { closeSnackbar } = useSnackbar();
 
   const handleDismiss = useCallback(() => {
@@ -12,10 +12,10 @@ const Warning = forwardRef<HTMLDivElement, CustomContentProps>(({ id, message, v
   }, [id, closeSnackbar]);
 
   return (
-    <SnackbarContent ref={ref} className="p-4 bg-orange-600 rounded text-white">
+    <SnackbarContent ref={ref} className="p-4 bg-blue-600 rounded-2xl text-white">
       <div className="flex justify-center w-full">
-        <WarningAmberIcon />
-        <div className="w-full ml-3">
+        <InfoIcon />
+        <div className="ml-3 w-full">
           <div className="flex justify-between w-full">
             <b>{variant.charAt(0).toUpperCase() + variant.slice(1)}</b>
             <IconButton size="small" onClick={handleDismiss}>
@@ -29,6 +29,6 @@ const Warning = forwardRef<HTMLDivElement, CustomContentProps>(({ id, message, v
   );
 });
 
-Warning.displayName = 'Warning';
+Info.displayName = 'Warning';
 
-export default Warning;
+export default Info;

@@ -1,31 +1,37 @@
 import { createContext, useContext, useMemo, ReactNode, useState } from 'react';
-import { LanguageContextType } from '../types.ts';
-import { enqueueSnackbar } from 'notistack';
+// import { enqueueSnackbar } from 'notistack';
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+interface LanguageContextType {
+  language: boolean;
+  getLangCode: () => string;
+  setDutch: () => void;
+  setEnglish: () => void;
+  toggleLanguage: () => void;
+}
 
 interface LanguageProviderProps {
   children: ReactNode;
 }
 
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+
 export default function LanguageProvider({ children }: LanguageProviderProps) {
-  const [language, setLanguage] = useState<boolean>(navigator.language.slice(0, 2) === 'en');
+  const [language, setLanguage] = useState<boolean>(navigator.language.slice(0, 2) !== 'nl');
 
   const setEnglish = () => {
     setLanguage(true);
-    enqueueSnackbar('Changed language to English.', {
-      variant: 'info'
-    });
+    // enqueueSnackbar('Changed language to English.', {
+    //   variant: 'info'
+    // });
   };
 
   const setDutch = () => {
-    enqueueSnackbar('Taal veranderd naar Nederlands.', {
-      variant: 'info'
-    });
+    // enqueueSnackbar('Taal veranderd naar Nederlands.', {
+    //   variant: 'info'
+    // });
     setLanguage(false);
   };
 
-  const getLocaleCode = () => (language ? 'en-US' : 'nl-NL');
   const getLangCode = () => (language ? 'en' : 'nl');
 
   const toggleLanguage = () => (language ? setDutch() : setEnglish());
@@ -33,7 +39,6 @@ export default function LanguageProvider({ children }: LanguageProviderProps) {
   const value = useMemo(
     () => ({
       language,
-      getLocaleCode,
       getLangCode,
       setDutch,
       setEnglish,

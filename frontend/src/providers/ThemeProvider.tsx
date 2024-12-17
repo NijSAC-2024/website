@@ -1,40 +1,49 @@
-import { createContext, useContext, useMemo, ReactNode } from 'react';
-import { ThemeContextType } from '../types.ts';
+import { createContext, useContext, useEffect, useMemo, ReactNode, useState } from 'react';
 import { useCookies } from 'react-cookie';
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
-
+interface ThemeContextType {
+  isDarkMode: boolean;
+  toggleTheme: () => void;
+}
 interface ThemeProviderProps {
   children: ReactNode;
 }
 
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+
 export default function ThemeProvider({ children }: ThemeProviderProps) {
   const [themeCookie, setThemeCookie] = useCookies(['theme']);
-  const toggleTheme = () => {
-    setThemeCookie('theme', !themeCookie.theme, { secure: true, sameSite: 'strict' });
-  };
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    if (themeCookie.theme === undefined) {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    return themeCookie.theme === 'true';
+  });
 
-  const getThemeName = () => {
-    return themeCookie.theme ? 'dark' : 'light';
+  useEffect(() => {
+    setThemeCookie('theme', isDarkMode.toString(), { secure: true, sameSite: 'strict' });
+
+    const rootElement = document.querySelector('#root');
+    if (rootElement) {
+      if (isDarkMode) {
+        rootElement.classList.add('dark');
+      } else {
+        rootElement.classList.remove('dark');
+      }
+    }
+  }, [isDarkMode, setThemeCookie]);
+
+  const toggleTheme = () => {
+    setIsDarkMode((prevMode) => !prevMode);
   };
 
   const value = useMemo(
     () => ({
-      themeCookie,
-      getThemeName,
+      isDarkMode,
       toggleTheme
     }),
-    [themeCookie]
+    [isDarkMode]
   );
-
-  const rootElement = document.querySelector('#root');
-  if (rootElement) {
-    if (getThemeName() === 'dark') {
-      rootElement.classList.add('dark'); // classList is internally a set, so it doesn't matter if we add it twice
-    } else {
-      rootElement.classList.remove('dark');
-    }
-  }
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }

@@ -2,9 +2,9 @@ import { forwardRef, useCallback } from 'react';
 import { useSnackbar, SnackbarContent, CustomContentProps } from 'notistack';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
-import ErrorIcon from '@mui/icons-material/Error';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
-const Error = forwardRef<HTMLDivElement, CustomContentProps>(({ id, message, variant }, ref) => {
+const Success = forwardRef<HTMLDivElement, CustomContentProps>(({ id, message, variant }, ref) => {
   const { closeSnackbar } = useSnackbar();
 
   const handleDismiss = useCallback(() => {
@@ -12,12 +12,14 @@ const Error = forwardRef<HTMLDivElement, CustomContentProps>(({ id, message, var
   }, [id, closeSnackbar]);
 
   return (
-    <SnackbarContent ref={ref} className="p-4 bg-red-600 rounded text-white">
+    <SnackbarContent ref={ref} className="p-4 bg-green-600 rounded-2xl text-white">
       <div className="flex justify-center w-full">
-        <ErrorIcon />
+        <CheckCircleIcon />
         <div className="w-full ml-3">
           <div className="flex justify-between w-full">
-            <b>{variant.charAt(0).toUpperCase() + variant.slice(1)}</b>
+            <div>
+              <b>{variant.charAt(0).toUpperCase() + variant.slice(1)}</b>
+            </div>
             <IconButton size="small" onClick={handleDismiss}>
               <CloseIcon className="text-white" fontSize="small" />
             </IconButton>
@@ -29,6 +31,6 @@ const Error = forwardRef<HTMLDivElement, CustomContentProps>(({ id, message, var
   );
 });
 
-Error.displayName = 'Error';
+Success.displayName = 'Success';
 
-export default Error;
+export default Success;

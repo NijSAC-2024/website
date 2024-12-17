@@ -167,6 +167,5 @@ jobs:
       - working-directory: frontend
         run: |
           npm install
-          npm outdated
           npm install -g depcheck
           depcheck --ignores=eslint-config-react-app

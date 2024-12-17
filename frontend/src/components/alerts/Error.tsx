@@ -2,9 +2,9 @@ import { forwardRef, useCallback } from 'react';
 import { useSnackbar, SnackbarContent, CustomContentProps } from 'notistack';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
-import InfoIcon from '@mui/icons-material/Info';
+import ErrorIcon from '@mui/icons-material/Error';
 
-const Info = forwardRef<HTMLDivElement, CustomContentProps>(({ id, message, variant }, ref) => {
+const Error = forwardRef<HTMLDivElement, CustomContentProps>(({ id, message, variant }, ref) => {
   const { closeSnackbar } = useSnackbar();
 
   const handleDismiss = useCallback(() => {
@@ -12,10 +12,10 @@ const Info = forwardRef<HTMLDivElement, CustomContentProps>(({ id, message, vari
   }, [id, closeSnackbar]);
 
   return (
-    <SnackbarContent ref={ref} className="p-4 bg-blue-600 rounded text-white">
+    <SnackbarContent ref={ref} className="p-4 bg-red-600 rounded-2xl text-white">
       <div className="flex justify-center w-full">
-        <InfoIcon />
-        <div className="ml-3 w-full">
+        <ErrorIcon />
+        <div className="w-full ml-3">
           <div className="flex justify-between w-full">
             <b>{variant.charAt(0).toUpperCase() + variant.slice(1)}</b>
             <IconButton size="small" onClick={handleDismiss}>
@@ -29,6 +29,6 @@ const Info = forwardRef<HTMLDivElement, CustomContentProps>(({ id, message, vari
   );
 });
 
-Info.displayName = 'Warning';
+Error.displayName = 'Error';
 
-export default Info;
+export default Error;
