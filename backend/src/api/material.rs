@@ -3,20 +3,14 @@ use crate::api::read_all_access;
 use crate::api::update_access;
 use crate::{
     api::{ApiResult, ValidatedJson, ValidatedQuery},
-    auth::{
-        session::Session,
-    },
-    data_source::{MaterialStore},
-    error::{AppResult},
+    auth::session::Session,
+    data_source::MaterialStore,
+    error::AppResult,
     material::{Material, UserMaterial},
-    user::{UserId},
+    user::UserId,
     Pagination,
 };
-use axum::{
-    extract::Path,
-    http::{HeaderMap},
-    Json,
-};
+use axum::{extract::Path, http::HeaderMap, Json};
 
 pub(crate) async fn get_user_materials(
     store: MaterialStore,
