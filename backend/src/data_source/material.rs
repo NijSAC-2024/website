@@ -1,14 +1,13 @@
-use crate::data_source::Count;
-use crate::user::UserId;
 use crate::{
+    data_source::Count,
     error::{AppResult, Error},
+    user::UserId,
     wire::material::{Material, UserMaterial},
     AppState, Pagination,
 };
 use axum::{async_trait, extract::FromRequestParts, http::request::Parts};
 use sqlx::PgPool;
-use std::convert::TryInto;
-use std::ops::Deref;
+use std::{convert::TryInto, ops::Deref};
 use uuid::Uuid;
 
 pub(crate) struct MaterialStore {
