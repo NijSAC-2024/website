@@ -3,7 +3,6 @@ use crate::{
     wire::activity::{Activity, ActivityContent, ActivityId},
     AppState,
 };
-use std::ops::Deref;
 
 use crate::{user::BasicUser, wire::activity::ActivityContentHydrated};
 use axum::{async_trait, extract::FromRequestParts, http::request::Parts};
