@@ -1,6 +1,8 @@
+mod activity;
 mod material;
 mod user;
 
+pub(crate) use activity::*;
 pub(crate) use material::*;
 pub(crate) use user::*;
 

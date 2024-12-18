@@ -1,7 +1,7 @@
 use crate::{
     api::{
-        get_all_users, get_material_list, get_user_materials, register, update_user,
-        update_user_material, who_am_i,
+        get_activity_registrations, get_all_users, get_material_list, get_user_materials, register,
+        update_user, update_user_material, who_am_i,
     },
     auth::{login, logout},
     get_user,
@@ -44,6 +44,7 @@ fn api_router() -> Router<AppState> {
         .route("/user/:id/material", get(get_material_list))
         .route("/user/:id/getMaterial", get(get_user_materials))
         .route("/user/:id/material/update", put(update_user_material))
+        .route("/activity/:id", get(get_activity_registrations))
 }
 
 async fn version(State(state): State<AppState>) -> Json<String> {

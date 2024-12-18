@@ -4,7 +4,7 @@ use validator::Validate;
 
 #[derive(Debug, Serialize, Deserialize, Validate)]
 pub struct Material {
-    pub material_id: Uuid,
+    pub material_id: Uuid, // Change to MaterialId to be the same as others
     #[validate(length(min = 1, max = 100))]
     pub name_eng: String,
     #[validate(length(min = 1, max = 100))]
@@ -13,8 +13,8 @@ pub struct Material {
 
 #[derive(Debug, Serialize, Deserialize, Validate)]
 pub struct UserMaterial {
-    pub user_id: Uuid,
-    pub material_id: Uuid,
+    pub user_id: Uuid,     // Change to UserId to be the same as others
+    pub material_id: Uuid, // Change to MaterialId to be the same as others
     #[validate(range(
         min = 0,
         max = 999_999_999,
