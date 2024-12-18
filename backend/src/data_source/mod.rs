@@ -1,3 +1,4 @@
+pub(crate) mod activity;
 mod material;
 mod user;
 

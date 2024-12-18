@@ -1,5 +1,6 @@
 use crate::auth::role::{MembershipStatus, Roles};
 use serde::{Deserialize, Serialize};
+use sqlx::{FromRow, Row};
 use std::ops::Deref;
 use time::OffsetDateTime;
 use uuid::Uuid;
@@ -125,10 +126,10 @@ pub struct RegisterNewUser {
     pub ice_contact_phone: Option<String>,
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, FromRow)]
 #[serde(rename_all = "camelCase")]
 pub struct BasicUser {
-    id: UserId,
-    first_name: String,
-    last_name: String,
+    pub(crate) id: UserId,
+    pub(crate) first_name: String,
+    pub(crate) last_name: String,
 }

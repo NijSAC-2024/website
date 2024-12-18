@@ -1,5 +1,6 @@
 create type membership_status as enum ('pending', 'member', 'extraordinary', 'non_member');
 
+
 create table "user"
 (
     id                uuid primary key,
@@ -57,16 +58,41 @@ create table location
     description text
 );
 
+create table activity
+(
+    id                 uuid primary key,
+    location_id        uuid        not null references location (id),
+    name               text        not null,
+    description        text,                              -- location also has a description
+    start_time         timestamptz not null,
+    end_time            timestamptz not null,
+    registration_start timestamptz not null,
+    registration_end   timestamptz not null,
+    allow_guest_signup boolean     not null default false,
+    created_at         timestamptz not null,
+    updated_at         timestamptz not null,
+    is_hidden          boolean     not null default false -- Maybe not needed? or when something is cancelled
+);
+
+create table activity_user
+(
+    activity_id uuid not null references activity (id) on delete cascade,
+    user_id     uuid not null references "user" (id),
+    constraint activity_user_pk
+        primary key (activity_id, user_id)
+);
+
 create table weekend_type
 (
     id          uuid primary key,
-    name        text not null,
-    description text
+    name        text not null, -- Single-pitch / Multi-pitch / Bouldering
+    description text -- Information that is required for the type of weekend
 );
 
 create table weekend
 (
     id                 uuid primary key,
+    name               text        not null,
     start              date        not null,
     "end"              date        not null,
     registration_start timestamptz not null,
