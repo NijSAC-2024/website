@@ -129,8 +129,6 @@ pub struct RegisterNewUser {
     #[validate(length(min = 1, max = 100))]
     pub important_info: Option<String>,
     pub status: MembershipStatus,
-    
-
 }
 
 #[derive(Serialize, Debug, FromRow)]
