@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT u.id as \"id: Uuid\", u.first_name, u.last_name\n            FROM activity_user au\n            JOIN \"user\" u ON au.user_id = u.id\n            WHERE au.activity_id = $1\n            ",
+  "query": "\n            SELECT u.id as \"id: Uuid\", u.first_name, u.last_name\n            FROM activity_registrations au\n            JOIN \"user\" u ON au.user_id = u.id\n            WHERE au.id = $1\n            ",
   "describe": {
     "columns": [
       {
@@ -30,5 +30,5 @@
       false
     ]
   },
-  "hash": "d6a36605730e6115ffdb55b55ade68c8465703f811576ad9de2c0379b9754424"
+  "hash": "b0e39fb32765b96e37be8b3af824c057a2e9a44686ef7ae4d7d7f34bde18034b"
 }

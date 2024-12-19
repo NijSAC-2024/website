@@ -71,9 +71,10 @@ create table activity_registrations
     status        membership_status not null,
     registered_at timestamptz       not null,
     attended      boolean           not null default false,
-    constraint activity_registrations
-        primary key (activity_id, user_id)
-            constraint unique_activity_registration unique (activity_id, user_id)
+    constraint activity_registrations_pk
+        primary key (id, user_id),
+    constraint unique_activity_registration
+        unique(id, user_id)
 );
 
 create table activity_weekend -- For extra information about a weekend
@@ -90,7 +91,7 @@ create table weekend_activity_registration
     user_id uuid not null references "user" (id) on delete cascade,
     role    text not null,
     constraint weekend_activity_registration_pk
-        primary key (activity_id, user_id)
+        primary key (id, user_id)
 );
 
 create table registration_question
@@ -110,8 +111,9 @@ create table registration_answer
     user_id     uuid        not null references "user" (id) on delete cascade,
     question_id uuid        not null references registration_question (id) on delete cascade,
     answer_text text        not null,
-    created_at  timestamptz not null
-        constraint unique_answer_per_user unique (activity_id, user_id, question_id)
+    created_at  timestamptz not null,
+        constraint unique_answer_per_user
+            unique (id, user_id, question_id)
 );
 
 create type basic_user as
@@ -122,24 +124,24 @@ create type basic_user as
     );
 
 -- Maybe keep the following to use as prefill for registrations:
--- create table "material"
--- (
---     material_id       uuid primary key,
---     name_eng text not null,
---     name_nl  text not null
--- );
---
--- create table "user_material"
--- (
---     user_id         uuid    not null,
---     material_id     uuid    not null,
---     material_amount integer not null, -- Probably want this not null, for qol?
---         constraint user_material_pk
---             primary key (user_id, material_id),
---         constraint fk_material
---             foreign key (material_id) references "material" (material_id) on delete cascade,
---         constraint fk_user
---             foreign key (user_id) references "user" (id) on delete cascade
--- );
+create table "material"
+(
+    material_id       uuid primary key,
+    name_eng text not null,
+    name_nl  text not null
+);
+
+create table "user_material"
+(
+    user_id         uuid    not null,
+    material_id     uuid    not null,
+    material_amount integer not null, -- Probably want this not null, for qol?
+        constraint user_material_pk
+            primary key (user_id, material_id),
+        constraint fk_material
+            foreign key (material_id) references "material" (material_id) on delete cascade,
+        constraint fk_user
+            foreign key (user_id) references "user" (id) on delete cascade
+);
 
 

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            UPDATE \"user\"\n            SET email = $2,\n                updated = now()\n            WHERE id = $1\n            RETURNING\n                id,\n                first_name,\n                last_name,\n                phone,\n                student_number,\n                nkbv_number,\n                sportcard_number,\n                ice_contact_name,\n                ice_contact_email,\n                ice_contact_phone,\n                roles,\n                status AS \"status: MembershipStatus\",\n                email,\n                created,\n                updated\n            ",
+  "query": "\n            UPDATE \"user\"\n            SET email = $2,\n                updated = now()\n            WHERE id = $1\n            RETURNING\n                id,\n                first_name,\n                last_name,\n                phone,\n                student_number,\n                nkbv_number,\n                sportcard_number,\n                ice_contact_name,\n                ice_contact_email,\n                ice_contact_phone,\n                important_info,\n                roles,\n                status AS \"status: MembershipStatus\",\n                email,\n                created,\n                updated\n            ",
   "describe": {
     "columns": [
       {
@@ -55,11 +55,16 @@
       },
       {
         "ordinal": 10,
+        "name": "important_info",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 11,
         "name": "roles",
         "type_info": "Jsonb"
       },
       {
-        "ordinal": 11,
+        "ordinal": 12,
         "name": "status: MembershipStatus",
         "type_info": {
           "Custom": {
@@ -76,17 +81,17 @@
         }
       },
       {
-        "ordinal": 12,
+        "ordinal": 13,
         "name": "email",
         "type_info": "Text"
       },
       {
-        "ordinal": 13,
+        "ordinal": 14,
         "name": "created",
         "type_info": "Timestamptz"
       },
       {
-        "ordinal": 14,
+        "ordinal": 15,
         "name": "updated",
         "type_info": "Timestamptz"
       }
@@ -108,6 +113,7 @@
       true,
       true,
       true,
+      true,
       false,
       false,
       false,
@@ -115,5 +121,5 @@
       false
     ]
   },
-  "hash": "f3a18618a84fcdb49cc94212a7ee3734b7e871a8e9790fabc55ce310aa6ce497"
+  "hash": "4430b677f93440463ae07e18a97d40b24d12ccbbc6cf931ec0a3445a04f0349c"
 }

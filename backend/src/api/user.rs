@@ -73,6 +73,7 @@ pub(crate) async fn register(
         ice_contact_name: None,
         ice_contact_email: None,
         ice_contact_phone: None,
+        important_info: None,
     };
 
     let user = store.create(&user).await?;

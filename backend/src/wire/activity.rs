@@ -1,4 +1,5 @@
 use crate::user::BasicUser;
+use crate::auth::role::{MembershipStatus};
 use serde::{Deserialize, Serialize};
 use std::{borrow::Cow, ops::Deref};
 use time::OffsetDateTime;
@@ -46,6 +47,15 @@ impl Deref for LocationId {
     }
 }
 
+#[derive(sqlx::Type, Serialize, Deserialize, Debug, Clone, Copy)]
+#[sqlx(type_name = "membership_status", rename_all = "snake_case")]
+#[serde(rename_all = "camelCase")]
+pub(crate) enum ActivityType {
+    Activity,
+    Course,
+    Weekend,
+}
+
 #[derive(Serialize, Debug, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct Activity<T>
@@ -67,20 +77,51 @@ where
 #[validate(schema(function = "validate_activity"))]
 pub(crate) struct ActivityContent {
     pub(crate) location_id: LocationId,
-    pub(crate) is_hidden: bool,
-    pub(crate) allow_guest_signup: bool,
+
     #[validate(length(min = 1, max = 100))]
-    pub(crate) name: String,
+    pub(crate) name_nl: String,
+
+    #[validate(length(min = 1, max = 100))]
+    pub(crate) name_eng: String,
+
     #[validate(length(min = 1, max = 5000))]
-    pub(crate) description: Option<String>,
+    pub(crate) description_nl: Option<String>,
+
+    #[validate(length(min = 1, max = 5000))]
+    pub(crate) description_eng: Option<String>,
+
     #[serde(with = "time::serde::rfc3339")]
     pub(crate) start_time: OffsetDateTime,
+
     #[serde(with = "time::serde::rfc3339")]
     pub(crate) end_time: OffsetDateTime,
+
     #[serde(with = "time::serde::rfc3339")]
     pub(crate) registration_start: OffsetDateTime,
+
     #[serde(with = "time::serde::rfc3339")]
     pub(crate) registration_end: OffsetDateTime,
+
+    #[validate(range(
+        min = 0,
+        max = 999,
+        message = "Maximum registrations is 999"
+    ))]
+    pub(crate) registration_max: Option<i32>,
+
+    #[validate(range(
+        min = 0,
+        max = 999,
+        message = "Maximum waiting list is 999"
+    ))]
+    pub(crate) waiting_list_max: Option<i32>,
+
+    pub(crate) is_hidden: bool,
+
+    pub(crate) required_membership_status: MembershipStatus,
+
+    pub(crate) activity_type: ActivityType,
+
 }
 
 fn validate_activity(activity: &ActivityContent) -> Result<(), ValidationError> {
@@ -100,19 +141,50 @@ fn validate_activity(activity: &ActivityContent) -> Result<(), ValidationError> 
 #[allow(dead_code)]
 pub(crate) struct ActivityContentHydrated {
     pub(crate) location_id: LocationId,
-    pub(crate) is_hidden: bool,
-    pub(crate) allow_guest_signup: bool,
+
     #[validate(length(min = 1, max = 100))]
-    pub(crate) name: String,
+    pub(crate) name_nl: String,
+
+    #[validate(length(min = 1, max = 100))]
+    pub(crate) name_eng: String,
+
     #[validate(length(min = 1, max = 5000))]
-    pub(crate) description: Option<String>,
+    pub(crate) description_nl: Option<String>,
+
+    #[validate(length(min = 1, max = 5000))]
+    pub(crate) description_eng: Option<String>,
+
     #[serde(with = "time::serde::rfc3339")]
     pub(crate) start_time: OffsetDateTime,
+
     #[serde(with = "time::serde::rfc3339")]
     pub(crate) end_time: OffsetDateTime,
+
     #[serde(with = "time::serde::rfc3339")]
     pub(crate) registration_start: OffsetDateTime,
+
     #[serde(with = "time::serde::rfc3339")]
     pub(crate) registration_end: OffsetDateTime,
+
+    #[validate(range(
+        min = 0,
+        max = 999,
+        message = "Maximum registrations is 999"
+    ))]
+    pub(crate) registration_max: Option<i32>,
+
+    #[validate(range(
+        min = 0,
+        max = 999,
+        message = "Maximum waiting list is 999"
+    ))]
+    pub(crate) waiting_list_max: Option<i32>,
+
+    pub(crate) is_hidden: bool,
+
+    pub(crate) required_membership_status: MembershipStatus,
+
+    pub(crate) activity_type: ActivityType,
+
     pub registrations: Vec<BasicUser>,
 }

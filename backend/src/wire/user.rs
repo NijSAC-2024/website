@@ -44,10 +44,6 @@ pub(crate) struct UserContent {
     pub first_name: String,
     #[validate(length(min = 1, max = 100))]
     pub last_name: String,
-    pub roles: Roles,
-    pub status: MembershipStatus,
-    #[validate(email)]
-    pub email: String,
     pub phone: String,
     #[validate(range(
         min = 0,
@@ -73,6 +69,12 @@ pub(crate) struct UserContent {
     pub ice_contact_email: Option<String>,
     #[validate(length(min = 1, max = 100))]
     pub ice_contact_phone: Option<String>,
+    #[validate(length(min = 1, max = 100))]
+    pub important_info: Option<String>,
+    pub roles: Roles,
+    pub status: MembershipStatus,
+    #[validate(email)]
+    pub email: String,
 }
 
 #[derive(Deserialize, Validate)]
@@ -124,6 +126,11 @@ pub struct RegisterNewUser {
     pub ice_contact_email: Option<String>,
     #[validate(length(min = 1, max = 100))]
     pub ice_contact_phone: Option<String>,
+    #[validate(length(min = 1, max = 100))]
+    pub important_info: Option<String>,
+    pub status: MembershipStatus,
+    
+
 }
 
 #[derive(Serialize, Debug, FromRow)]
