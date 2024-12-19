@@ -74,7 +74,7 @@ impl TryFrom<PgUser> for User {
                 ice_contact_name: pg.ice_contact_name,
                 ice_contact_email: pg.ice_contact_email,
                 ice_contact_phone: pg.ice_contact_phone,
-                important_info: pg.important_info
+                important_info: pg.important_info,
             },
         })
     }

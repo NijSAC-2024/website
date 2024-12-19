@@ -4,13 +4,15 @@ use crate::{
     AppState,
 };
 
-use crate::{user::BasicUser, wire::activity::ActivityContentHydrated};
+use crate::{
+    auth::role::MembershipStatus,
+    user::BasicUser,
+    wire::activity::{ActivityContentHydrated, ActivityType},
+};
 use axum::{async_trait, extract::FromRequestParts, http::request::Parts};
 use sqlx::PgPool;
 use time::OffsetDateTime;
 use uuid::Uuid;
-use crate::auth::role::MembershipStatus;
-use crate::wire::activity::ActivityType;
 
 pub(crate) struct ActivityStore {
     db: PgPool,
@@ -110,10 +112,7 @@ impl TryFrom<PgActivity> for Activity<ActivityContentHydrated> {
 }
 
 impl ActivityStore {
-    pub async fn get_registrations(
-        &self,
-        id: ActivityId,
-    ) -> Result<Vec<BasicUser>, Error> {
+    pub async fn get_registrations(&self, id: ActivityId) -> Result<Vec<BasicUser>, Error> {
         let id_uuid: Uuid = id.into();
 
         let users = sqlx::query_as!(

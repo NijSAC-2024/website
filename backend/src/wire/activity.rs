@@ -1,5 +1,4 @@
-use crate::user::BasicUser;
-use crate::auth::role::{MembershipStatus};
+use crate::{auth::role::MembershipStatus, user::BasicUser};
 use serde::{Deserialize, Serialize};
 use std::{borrow::Cow, ops::Deref};
 use time::OffsetDateTime;
@@ -102,18 +101,10 @@ pub(crate) struct ActivityContent {
     #[serde(with = "time::serde::rfc3339")]
     pub(crate) registration_end: OffsetDateTime,
 
-    #[validate(range(
-        min = 0,
-        max = 999,
-        message = "Maximum registrations is 999"
-    ))]
+    #[validate(range(min = 0, max = 999, message = "Maximum registrations is 999"))]
     pub(crate) registration_max: Option<i32>,
 
-    #[validate(range(
-        min = 0,
-        max = 999,
-        message = "Maximum waiting list is 999"
-    ))]
+    #[validate(range(min = 0, max = 999, message = "Maximum waiting list is 999"))]
     pub(crate) waiting_list_max: Option<i32>,
 
     pub(crate) is_hidden: bool,
@@ -121,7 +112,6 @@ pub(crate) struct ActivityContent {
     pub(crate) required_membership_status: MembershipStatus,
 
     pub(crate) activity_type: ActivityType,
-
 }
 
 fn validate_activity(activity: &ActivityContent) -> Result<(), ValidationError> {
@@ -166,18 +156,10 @@ pub(crate) struct ActivityContentHydrated {
     #[serde(with = "time::serde::rfc3339")]
     pub(crate) registration_end: OffsetDateTime,
 
-    #[validate(range(
-        min = 0,
-        max = 999,
-        message = "Maximum registrations is 999"
-    ))]
+    #[validate(range(min = 0, max = 999, message = "Maximum registrations is 999"))]
     pub(crate) registration_max: Option<i32>,
 
-    #[validate(range(
-        min = 0,
-        max = 999,
-        message = "Maximum waiting list is 999"
-    ))]
+    #[validate(range(min = 0, max = 999, message = "Maximum waiting list is 999"))]
     pub(crate) waiting_list_max: Option<i32>,
 
     pub(crate) is_hidden: bool,
