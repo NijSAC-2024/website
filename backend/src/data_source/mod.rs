@@ -1,6 +1,9 @@
+pub(crate) mod activity;
+mod material;
 mod user;
 
 use axum::http::HeaderMap;
+pub(crate) use material::*;
 pub(crate) use user::*;
 
 pub(crate) struct Count {

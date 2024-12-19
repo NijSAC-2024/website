@@ -1,5 +1,6 @@
 use crate::auth::role::{MembershipStatus, Roles};
 use serde::{Deserialize, Serialize};
+use sqlx::FromRow;
 use std::ops::Deref;
 use time::OffsetDateTime;
 use uuid::Uuid;
@@ -43,6 +44,33 @@ pub(crate) struct UserContent {
     pub first_name: String,
     #[validate(length(min = 1, max = 100))]
     pub last_name: String,
+    pub phone: String,
+    #[validate(range(
+        min = 0,
+        max = 999_999_999,
+        message = "Student Number must contain a maximum of 9 numbers"
+    ))]
+    pub student_number: Option<i32>,
+    #[validate(range(
+        min = 0,
+        max = 999_999_999,
+        message = "NKBV Number must contain a maximum of 9 numbers"
+    ))]
+    pub nkbv_number: Option<i32>,
+    #[validate(range(
+        min = 0,
+        max = 999_999_999,
+        message = "Sportcard Number must contain a maximum of 9 numbers"
+    ))]
+    pub sportcard_number: Option<i32>,
+    #[validate(length(min = 1, max = 100))]
+    pub ice_contact_name: Option<String>,
+    #[validate(email)]
+    pub ice_contact_email: Option<String>,
+    #[validate(length(min = 1, max = 100))]
+    pub ice_contact_phone: Option<String>,
+    #[validate(length(min = 1, max = 100))]
+    pub important_info: Option<String>,
     pub roles: Roles,
     pub status: MembershipStatus,
     #[validate(email)]
@@ -73,12 +101,40 @@ pub struct RegisterNewUser {
         message = "Password must contain between 10 and 128 characters"
     ))]
     pub password: String,
+    pub phone: String,
+    #[validate(range(
+        min = 0,
+        max = 999_999_999,
+        message = "Student Number must contain a maximum of 9 numbers"
+    ))]
+    pub student_number: Option<i32>,
+    #[validate(range(
+        min = 0,
+        max = 999_999_999,
+        message = "NKBV Number must contain a maximum of 9 numbers"
+    ))]
+    pub nkbv_number: Option<i32>,
+    #[validate(range(
+        min = 0,
+        max = 999_999_999,
+        message = "Sportcard Number must contain a maximum of 9 numbers"
+    ))]
+    pub sportcard_number: Option<i32>,
+    #[validate(length(min = 1, max = 100))]
+    pub ice_contact_name: Option<String>,
+    #[validate(email)]
+    pub ice_contact_email: Option<String>,
+    #[validate(length(min = 1, max = 100))]
+    pub ice_contact_phone: Option<String>,
+    #[validate(length(min = 1, max = 100))]
+    pub important_info: Option<String>,
+    pub status: MembershipStatus,
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, FromRow)]
 #[serde(rename_all = "camelCase")]
 pub struct BasicUser {
-    id: UserId,
-    first_name: String,
-    last_name: String,
+    pub(crate) id: UserId,
+    pub(crate) first_name: String,
+    pub(crate) last_name: String,
 }
