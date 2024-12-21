@@ -2,6 +2,7 @@ import { ReactNode } from 'react';
 import AuthProvider from './AuthProvider.tsx';
 import ThemeProvider from './ThemeProvider.tsx';
 import LanguageProvider from './LanguageProvider.tsx';
+import 'moment/locale/nl';
 
 interface AppProviderProps {
   children: ReactNode;
