@@ -29,12 +29,15 @@ export default function Agenda() {
         descriptionMarkdownEN:
           'You must _register_ to participate! *This is a long message* to test if it is cut off. Because we do not want to show the whole description in this menu.',
         descriptionMarkdownNL: 'Je moet je registreren om mee te doen!',
+        allowsRegistrations: true,
         numberOfRegistrations: 12,
         maxRegistrations: 20,
         startDateTime: '2025-03-06T00:00:00.000Z',
         endDateTime: '2025-03-08T00:00:00.000Z',
         registrationOpenTime: '2023-03-05T00:00:00.000Z',
-        registrationCloseTime: '2027-03-07T00:00:00.000Z'
+        registrationCloseTime: '2027-03-07T00:00:00.000Z',
+        registrationFieldsEN: ['How many quickdraws', 'Do you have a rope?'],
+        registrationFieldsNL: ['Hoe veel setjes', 'Heb je een touw?']
       },
       {
         id: 2,
@@ -46,12 +49,15 @@ export default function Agenda() {
         locationNL: 'Albufeira',
         descriptionMarkdownEN: 'No registration required',
         descriptionMarkdownNL: 'Je hoeft je niet in te schrijven',
+        allowsRegistrations: false,
         numberOfRegistrations: 12,
         maxRegistrations: 0,
         startDateTime: '2025-03-06T00:00:00.000Z',
         endDateTime: '2025-03-08T00:00:00.000Z',
         registrationOpenTime: '2023-03-05T00:00:00.000Z',
-        registrationCloseTime: '2027-03-07T00:00:00.000Z'
+        registrationCloseTime: '2027-03-07T00:00:00.000Z',
+        registrationFieldsEN: ['How many quickdraws', 'Do you have a rope?'],
+        registrationFieldsNL: ['Hoe veel setjes', 'Heb je een touw?']
       },
       {
         id: 3,
@@ -64,12 +70,15 @@ export default function Agenda() {
         descriptionMarkdownEN:
           'This is a **markdown** example with a [link](https://example.com) and some _italic text_.',
         descriptionMarkdownNL: 'Je hoeft je niet in te schrijven',
+        allowsRegistrations: true,
         numberOfRegistrations: 12,
         maxRegistrations: 20,
         startDateTime: '2025-03-06T00:00:00.000Z',
         endDateTime: '2025-03-08T00:00:00.000Z',
         registrationOpenTime: '2023-03-05T00:00:00.000Z',
-        registrationCloseTime: '2024-03-07T00:00:00.000Z'
+        registrationCloseTime: '2024-03-07T00:00:00.000Z',
+        registrationFieldsEN: ['How many quickdraws', 'Do you have a rope?'],
+        registrationFieldsNL: ['Hoe veel setjes', 'Heb je een touw?']
       },
       {
         id: 4,
@@ -81,12 +90,15 @@ export default function Agenda() {
         locationNL: 'Klimhal',
         descriptionMarkdownEN: 'No registration required',
         descriptionMarkdownNL: 'Je hoeft je niet in te schrijven',
+        allowsRegistrations: true,
         numberOfRegistrations: 20,
         maxRegistrations: 20,
         startDateTime: '2025-03-06T00:00:00.000Z',
         endDateTime: '2025-03-08T00:00:00.000Z',
         registrationOpenTime: '2023-03-05T00:00:00.000Z',
-        registrationCloseTime: '2025-03-07T00:00:00.000Z'
+        registrationCloseTime: '2025-03-07T00:00:00.000Z',
+        registrationFieldsEN: ['How many quickdraws', 'Do you have a rope?'],
+        registrationFieldsNL: ['Hoe veel setjes', 'Heb je een touw?']
       },
       {
         id: 5,
@@ -98,12 +110,15 @@ export default function Agenda() {
         locationNL: 'De Yard',
         descriptionMarkdownEN: 'No registration required',
         descriptionMarkdownNL: 'Je hoeft je niet in te schrijven',
+        allowsRegistrations: true,
         numberOfRegistrations: 12,
         maxRegistrations: 20,
         startDateTime: '2025-03-06T22:30:00.000Z',
         endDateTime: '2025-03-06T22:30:00.000Z',
         registrationOpenTime: '2024-12-23T00:00:00.000Z',
-        registrationCloseTime: '2027-03-07T00:00:00.000Z'
+        registrationCloseTime: '2027-03-07T00:00:00.000Z',
+        registrationFieldsEN: ['How many quickdraws', 'Do you have a rope?'],
+        registrationFieldsNL: ['Hoe veel setjes', 'Heb je een touw?']
       }
     ]
   };
@@ -143,8 +158,7 @@ export default function Agenda() {
                   value={selectedCategory}
                   label={text('Category', 'Categorie')}
                   onChange={handleChange}
-                  variant="outlined"
-                >
+                  variant="outlined">
                   <MenuItem value="all">{text('All', 'Alles')}</MenuItem>
                   <MenuItem value="activity">{text('Activities', 'Activiteiten')}</MenuItem>
                   <MenuItem value="course">{text('Courses', 'Cursussen')}</MenuItem>

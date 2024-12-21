@@ -34,12 +34,15 @@ export interface AgendaEventType {
   locationNL: string;
   descriptionMarkdownEN: string;
   descriptionMarkdownNL: string;
+  allowsRegistrations: boolean;
   numberOfRegistrations: number;
   maxRegistrations: number;
   startDateTime: string;
   endDateTime: string;
   registrationOpenTime: string;
   registrationCloseTime: string;
+  registrationFieldsEN: string[];
+  registrationFieldsNL: string[];
 }
 
 interface registrationType {

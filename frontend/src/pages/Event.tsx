@@ -9,8 +9,23 @@ import Markdown from 'react-markdown';
 import { AgendaEventType, registrationsType } from '../types.ts';
 import { Button, Fab, Table, TableBody, TableCell, TableRow } from '@mui/material';
 import router from '../router.tsx';
+import remarkGfm from 'remark-gfm';
+import { useState } from 'react';
+import EditEvent from '../components/EditEvent.tsx';
 
 export default function Event() {
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+
+  const toggleIsEditing = () => {
+    setIsEditing((prevState) => !prevState);
+  };
+
+  const handleUpdate = (updatedAgendaEvent: AgendaEventType) => {
+    //Do update to backend
+    console.log(updatedAgendaEvent);
+    toggleIsEditing();
+  };
+
   const agendaEvent: AgendaEventType = {
     id: 1,
     image: '/images/test-header-image.jpg',
@@ -22,12 +37,15 @@ export default function Event() {
     descriptionMarkdownEN:
       'You must _register_ to participate! *This is a long message* to test if it is cut off. Because we do not want to show the whole description in this menu.',
     descriptionMarkdownNL: 'Je moet je registreren om mee te doen!',
+    allowsRegistrations: true,
     numberOfRegistrations: 12,
     maxRegistrations: 20,
     startDateTime: '2025-03-06T00:00:00.000Z',
     endDateTime: '2025-03-08T00:00:00.000Z',
     registrationOpenTime: '2023-03-05T00:00:00.000Z',
-    registrationCloseTime: '2027-03-07T00:00:00.000Z'
+    registrationCloseTime: '2027-03-07T00:00:00.000Z',
+    registrationFieldsEN: ['How many quickdraws', 'Do you have a rope?'],
+    registrationFieldsNL: ['Hoe veel setjes', 'Heb je een touw?']
   };
 
   const registrations: registrationsType = {
@@ -52,7 +70,7 @@ export default function Event() {
   return (
     <>
       <div className="flex justify-end fixed bottom-5 right-5 z-10">
-        <Fab variant="extended" color="primary">
+        <Fab variant="extended" color="primary" onClick={toggleIsEditing}>
           <EditIcon className="mr-2" />
           {text('Edit event', 'Evenement bewerken')}
         </Fab>
@@ -66,29 +84,34 @@ export default function Event() {
               </Button>
             </div>
           </div>
-          <AgendaCard agendaEvent={agendaEvent} agendaPage={false} />
-          <ContentCard className="xl:col-span-2 p-7">
-            <Markdown>
-              {text(agendaEvent.descriptionMarkdownEN, agendaEvent.descriptionMarkdownNL)}
-            </Markdown>
-          </ContentCard>
+          {isEditing ? (
+            <EditEvent agendaEvent={agendaEvent} handleUpdate={handleUpdate} />
+          ) : (
+            <>
+              <AgendaCard agendaEvent={agendaEvent} agendaPage={false} />
+              <ContentCard className="xl:col-span-2 p-7">
+                <Markdown remarkPlugins={[remarkGfm]}>
+                  {text(agendaEvent.descriptionMarkdownEN, agendaEvent.descriptionMarkdownNL)}
+                </Markdown>
+              </ContentCard>
 
-          <ContentCard className="xl:col-span-3 lg:col-span-2 p-7">
-            <h1>{text('Participants', 'Deelnemers')}</h1>
-
-            <Table>
-              <TableBody>
-                {registrations.registrations.map((registraton) => (
-                  <TableRow
-                    key={registraton.eid}
-                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                  >
-                    <TableCell>{registraton.name}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </ContentCard>
+              <ContentCard className="xl:col-span-3 lg:col-span-2 p-7">
+                <h1>{text('Participants', 'Deelnemers')}</h1>
+                <Table>
+                  <TableBody>
+                    {registrations.registrations.map((registraton) => (
+                      <TableRow
+                        key={registraton.eid}
+                        sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                      >
+                        <TableCell>{registraton.name}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </ContentCard>
+            </>
+          )}
         </div>
       </GenericPage>
     </>
