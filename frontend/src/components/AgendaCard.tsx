@@ -3,7 +3,7 @@ import GroupIcon from '@mui/icons-material/Group';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import moment from 'moment';
 import { Chip } from '@mui/material';
-import { text, formatDate, truncateMarkdown } from '../util.ts';
+import { text, formatDate, truncateMarkdown, getLabel } from '../util.ts';
 import 'moment/dist/locale/nl';
 import { AgendaEventType } from '../types.ts';
 import router from '../router.tsx';
@@ -40,19 +40,33 @@ export default function AgendaCard({ agendaEvent, agendaPage }: AgendaCardProps)
           alt="not available"
         />
         <div className="p-5 pt-2.5">
-          <div className="flex justify-between space-x-2">
-            <Chip label="weekend" className="uppercase font-semibold" size="small" />
+          <div className="flex justify-between">
+            <div className="flex space-x-1">
+              <Chip
+                label={text(getLabel(agendaEvent.category).en, getLabel(agendaEvent.category).nl)}
+                className="uppercase font-semibold"
+                size="small"
+              />
+              {agendaEvent.type.map((type, index) => (
+                <Chip
+                  key={index}
+                  label={text(getLabel(type).en, getLabel(type).nl)}
+                  className="uppercase font-semibold"
+                  size="small"
+                />
+              ))}
+            </div>
             <div className="flex items-center">
               <LocationOnIcon className="text-2xl" />
-              {text(agendaEvent.locationEN, agendaEvent.locationNL)}
+              {agendaEvent.location}
             </div>
           </div>
-          <h2>{text(agendaEvent.titleEN, agendaEvent.titleNL)}</h2>
+          <h2>{text(agendaEvent.title.en, agendaEvent.title.nl)}</h2>
           {agendaPage ? (
             <Markdown>
               {text(
-                truncateMarkdown(agendaEvent.descriptionMarkdownEN, 120),
-                truncateMarkdown(agendaEvent.descriptionMarkdownNL, 120)
+                truncateMarkdown(agendaEvent.descriptionMarkdown.en, 120),
+                truncateMarkdown(agendaEvent.descriptionMarkdown.nl, 120)
               )}
             </Markdown>
           ) : (

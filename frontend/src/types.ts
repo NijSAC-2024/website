@@ -24,16 +24,23 @@ export interface ValidateProps {
   setValue: Dispatch<SetStateAction<string>>;
 }
 
+export interface LanguageType {
+  en: string;
+  nl: string;
+}
+
+export type CheckboxType = 'sp' | 'mp' | 'boulder' | 'trad' | 'education';
+
 export interface AgendaEventType {
   id: number;
   image: string;
-  titleEN: string;
-  titleNL: string;
-  category: string;
-  locationEN: string;
-  locationNL: string;
-  descriptionMarkdownEN: string;
-  descriptionMarkdownNL: string;
+  title: LanguageType;
+  category: 'activity' | 'course' | 'training' | 'weekend';
+  type: CheckboxType[];
+  location: string;
+  descriptionMarkdown: LanguageType;
+  gear: LanguageType;
+  experience: CheckboxType[];
   allowsRegistrations: boolean;
   numberOfRegistrations: number;
   maxRegistrations: number;
@@ -41,8 +48,7 @@ export interface AgendaEventType {
   endDateTime: string;
   registrationOpenTime: string;
   registrationCloseTime: string;
-  registrationFieldsEN: string[];
-  registrationFieldsNL: string[];
+  registrationFields: LanguageType[];
 }
 
 interface registrationType {
@@ -66,3 +72,33 @@ export interface UserType {
 }
 
 export type MenuType = 'association' | 'climbing' | 'alps' | 'language' | undefined;
+
+export interface CheckboxOptionType {
+  id: CheckboxType;
+  label: LanguageType;
+}
+
+export const typesOptions: CheckboxOptionType[] = [
+  { id: 'sp', label: { en: 'Single Pitch', nl: 'Single Pitch' } },
+  { id: 'mp', label: { en: 'Multi Pitch', nl: 'Multi Pitch' } },
+  { id: 'education', label: { en: 'Education', nl: 'Opleiding' } },
+  { id: 'boulder', label: { en: 'Bouldering', nl: 'Boulderen' } },
+  { id: 'trad', label: { en: 'Trad', nl: 'Trad' } }
+];
+
+export const experienceOptions: CheckboxOptionType[] = [
+  { id: 'sp', label: { en: 'Single Pitch', nl: 'Single Pitch' } },
+  { id: 'mp', label: { en: 'Multi Pitch', nl: 'Multi Pitch' } }
+];
+
+export const options = [
+  { id: 'activity', label: { en: 'Activity', nl: 'Activiteit' } },
+  { id: 'course', label: { en: 'Course', nl: 'Cursus' } },
+  { id: 'training', label: { en: 'Training', nl: 'Training' } },
+  { id: 'weekend', label: { en: 'Weekend', nl: 'Weekend' } },
+  { id: 'sp', label: { en: 'Single Pitch', nl: 'Single Pitch' } },
+  { id: 'mp', label: { en: 'Multi Pitch', nl: 'Multi Pitch' } },
+  { id: 'education', label: { en: 'Education', nl: 'Opleiding' } },
+  { id: 'boulder', label: { en: 'Bouldering', nl: 'Boulderen' } },
+  { id: 'trad', label: { en: 'Trad', nl: 'Trad' } }
+];

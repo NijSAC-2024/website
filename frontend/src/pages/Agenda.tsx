@@ -8,120 +8,38 @@ import { Fab, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } fro
 import AddIcon from '@mui/icons-material/Add';
 
 export default function Agenda() {
-  const currentDay = new Date();
-  currentDay.setHours(0, 0, 0, 0);
-
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const handleChange = (event: SelectChangeEvent) => {
     setSelectedCategory(event.target.value);
   };
 
-  const exampleAPIResponse = {
-    events: [
-      {
-        id: 1,
-        image: '/images/test-header-image.jpg',
-        titleEN: 'Albufeira',
-        titleNL: 'Albufeira',
-        category: 'weekend',
-        locationEN: 'Albufeira',
-        locationNL: 'Albufeira',
-        descriptionMarkdownEN:
-          'You must _register_ to participate! *This is a long message* to test if it is cut off. Because we do not want to show the whole description in this menu.',
-        descriptionMarkdownNL: 'Je moet je registreren om mee te doen!',
-        allowsRegistrations: true,
-        numberOfRegistrations: 12,
-        maxRegistrations: 20,
-        startDateTime: '2025-03-06T00:00:00.000Z',
-        endDateTime: '2025-03-08T00:00:00.000Z',
-        registrationOpenTime: '2023-03-05T00:00:00.000Z',
-        registrationCloseTime: '2027-03-07T00:00:00.000Z',
-        registrationFieldsEN: ['How many quickdraws', 'Do you have a rope?'],
-        registrationFieldsNL: ['Hoe veel setjes', 'Heb je een touw?']
+  const exampleAPIResponse: AgendaEventType[] = [
+    {
+      id: 5,
+      image: '/images/test-header-image.jpg',
+      title: { en: 'Albufeira', nl: 'Albufeira' },
+      category: 'activity',
+      type: ['sp'],
+      location: 'The Yard',
+      descriptionMarkdown: {
+        en: 'No registration required',
+        nl: 'Je hoeft je niet in te schrijven'
       },
-      {
-        id: 2,
-        image: '/images/test-header-image.jpg',
-        titleEN: 'Albufeira',
-        titleNL: 'Albufeira',
-        category: 'weekend',
-        locationEN: 'Albufeira',
-        locationNL: 'Albufeira',
-        descriptionMarkdownEN: 'No registration required',
-        descriptionMarkdownNL: 'Je hoeft je niet in te schrijven',
-        allowsRegistrations: false,
-        numberOfRegistrations: 12,
-        maxRegistrations: 0,
-        startDateTime: '2025-03-06T00:00:00.000Z',
-        endDateTime: '2025-03-08T00:00:00.000Z',
-        registrationOpenTime: '2023-03-05T00:00:00.000Z',
-        registrationCloseTime: '2027-03-07T00:00:00.000Z',
-        registrationFieldsEN: ['How many quickdraws', 'Do you have a rope?'],
-        registrationFieldsNL: ['Hoe veel setjes', 'Heb je een touw?']
+      gear: {
+        en: '',
+        nl: ''
       },
-      {
-        id: 3,
-        image: '/images/test-header-image.jpg',
-        titleEN: 'Albufeira',
-        titleNL: 'Albufeira',
-        category: 'course',
-        locationEN: 'RSC',
-        locationNL: 'RSC',
-        descriptionMarkdownEN:
-          'This is a **markdown** example with a [link](https://example.com) and some _italic text_.',
-        descriptionMarkdownNL: 'Je hoeft je niet in te schrijven',
-        allowsRegistrations: true,
-        numberOfRegistrations: 12,
-        maxRegistrations: 20,
-        startDateTime: '2025-03-06T00:00:00.000Z',
-        endDateTime: '2025-03-08T00:00:00.000Z',
-        registrationOpenTime: '2023-03-05T00:00:00.000Z',
-        registrationCloseTime: '2024-03-07T00:00:00.000Z',
-        registrationFieldsEN: ['How many quickdraws', 'Do you have a rope?'],
-        registrationFieldsNL: ['Hoe veel setjes', 'Heb je een touw?']
-      },
-      {
-        id: 4,
-        image: '/images/test-header-image.jpg',
-        titleEN: 'Albufeira',
-        titleNL: 'Albufeira',
-        category: 'course',
-        locationEN: 'Climbing Hall',
-        locationNL: 'Klimhal',
-        descriptionMarkdownEN: 'No registration required',
-        descriptionMarkdownNL: 'Je hoeft je niet in te schrijven',
-        allowsRegistrations: true,
-        numberOfRegistrations: 20,
-        maxRegistrations: 20,
-        startDateTime: '2025-03-06T00:00:00.000Z',
-        endDateTime: '2025-03-08T00:00:00.000Z',
-        registrationOpenTime: '2023-03-05T00:00:00.000Z',
-        registrationCloseTime: '2025-03-07T00:00:00.000Z',
-        registrationFieldsEN: ['How many quickdraws', 'Do you have a rope?'],
-        registrationFieldsNL: ['Hoe veel setjes', 'Heb je een touw?']
-      },
-      {
-        id: 5,
-        image: '/images/test-header-image.jpg',
-        titleEN: 'Albufeira',
-        titleNL: 'Albufeira',
-        category: 'activity',
-        locationEN: 'The Yard',
-        locationNL: 'De Yard',
-        descriptionMarkdownEN: 'No registration required',
-        descriptionMarkdownNL: 'Je hoeft je niet in te schrijven',
-        allowsRegistrations: true,
-        numberOfRegistrations: 12,
-        maxRegistrations: 20,
-        startDateTime: '2025-03-06T22:30:00.000Z',
-        endDateTime: '2025-03-06T22:30:00.000Z',
-        registrationOpenTime: '2024-12-23T00:00:00.000Z',
-        registrationCloseTime: '2027-03-07T00:00:00.000Z',
-        registrationFieldsEN: ['How many quickdraws', 'Do you have a rope?'],
-        registrationFieldsNL: ['Hoe veel setjes', 'Heb je een touw?']
-      }
-    ]
-  };
+      experience: ['mp'],
+      allowsRegistrations: true,
+      numberOfRegistrations: 12,
+      maxRegistrations: 20,
+      startDateTime: '2025-03-06T22:30:00.000Z',
+      endDateTime: '2025-03-06T22:30:00.000Z',
+      registrationOpenTime: '2024-12-23T00:00:00.000Z',
+      registrationCloseTime: '2027-03-07T00:00:00.000Z',
+      registrationFields: [{ en: 'How many quickdraws', nl: 'Hoeveel setjes' }]
+    }
+  ];
 
   return (
     <>
@@ -158,7 +76,8 @@ export default function Agenda() {
                   value={selectedCategory}
                   label={text('Category', 'Categorie')}
                   onChange={handleChange}
-                  variant="outlined">
+                  variant="outlined"
+                >
                   <MenuItem value="all">{text('All', 'Alles')}</MenuItem>
                   <MenuItem value="activity">{text('Activities', 'Activiteiten')}</MenuItem>
                   <MenuItem value="course">{text('Courses', 'Cursussen')}</MenuItem>
@@ -167,10 +86,10 @@ export default function Agenda() {
                 </Select>
               </FormControl>
             </ContentCard>
-            {exampleAPIResponse.events
+            {exampleAPIResponse
               .filter(
-                (e: AgendaEventType) =>
-                  selectedCategory === 'all' || e.category === selectedCategory
+                (agendaEvent: AgendaEventType) =>
+                  selectedCategory === 'all' || agendaEvent.category === selectedCategory
               )
               .map((event: AgendaEventType) => (
                 <AgendaCard agendaEvent={event} agendaPage={true} key={event.id} />

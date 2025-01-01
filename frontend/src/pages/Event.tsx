@@ -3,11 +3,11 @@ import AgendaCard from '../components/AgendaCard.tsx';
 import ContentCard from '../components/ContentCard.tsx';
 import EditIcon from '@mui/icons-material/Edit';
 import { useLanguage } from '../providers/LanguageProvider.tsx';
-import { text } from '../util.ts';
+import { getLabel, text } from '../util.ts';
 import moment from 'moment';
 import Markdown from 'react-markdown';
 import { AgendaEventType, registrationsType } from '../types.ts';
-import { Button, Fab, Table, TableBody, TableCell, TableRow } from '@mui/material';
+import { Button, Chip, Fab, Table, TableBody, TableCell, TableRow } from '@mui/material';
 import router from '../router.tsx';
 import remarkGfm from 'remark-gfm';
 import { useState } from 'react';
@@ -27,25 +27,29 @@ export default function Event() {
   };
 
   const agendaEvent: AgendaEventType = {
-    id: 1,
+    id: 5,
     image: '/images/test-header-image.jpg',
-    titleEN: 'Albufeira',
-    titleNL: 'Albufeira',
-    category: 'weekend',
-    locationEN: 'Albufeira',
-    locationNL: 'Albufeira',
-    descriptionMarkdownEN:
-      'You must _register_ to participate! *This is a long message* to test if it is cut off. Because we do not want to show the whole description in this menu.',
-    descriptionMarkdownNL: 'Je moet je registreren om mee te doen!',
+    title: { en: 'Albufeira', nl: 'Albufeira' },
+    category: 'activity',
+    type: ['sp'],
+    location: 'The Yard',
+    descriptionMarkdown: {
+      en: 'No registration required. This means that you do not have to do anything to participate in this activity. Jeeh.',
+      nl: 'Je hoeft je niet in te schrijven'
+    },
+    gear: {
+      en: 'Helmet, Rope, Safe Biner, Belaying Device, Harness',
+      nl: 'Helm, Touw, Safe Biner'
+    },
+    experience: ['mp'],
     allowsRegistrations: true,
     numberOfRegistrations: 12,
     maxRegistrations: 20,
-    startDateTime: '2025-03-06T00:00:00.000Z',
-    endDateTime: '2025-03-08T00:00:00.000Z',
-    registrationOpenTime: '2023-03-05T00:00:00.000Z',
+    startDateTime: '2025-03-06T22:30:00.000Z',
+    endDateTime: '2025-03-06T22:30:00.000Z',
+    registrationOpenTime: '2024-12-23T00:00:00.000Z',
     registrationCloseTime: '2027-03-07T00:00:00.000Z',
-    registrationFieldsEN: ['How many quickdraws', 'Do you have a rope?'],
-    registrationFieldsNL: ['Hoe veel setjes', 'Heb je een touw?']
+    registrationFields: [{ en: 'How many quickdraws', nl: 'Hoeveel setjes' }]
   };
 
   const registrations: registrationsType = {
@@ -66,6 +70,11 @@ export default function Event() {
   };
   const langCode = useLanguage().getLangCode();
   moment.locale(langCode);
+
+  const gearArray = agendaEvent.gear.en.split(',').map((enItem, index) => ({
+    en: enItem.trim(),
+    nl: agendaEvent.gear.nl.split(',')[index]?.trim() || ''
+  }));
 
   return (
     <>
@@ -89,10 +98,44 @@ export default function Event() {
           ) : (
             <>
               <AgendaCard agendaEvent={agendaEvent} agendaPage={false} />
-              <ContentCard className="xl:col-span-2 p-7">
-                <Markdown remarkPlugins={[remarkGfm]}>
-                  {text(agendaEvent.descriptionMarkdownEN, agendaEvent.descriptionMarkdownNL)}
-                </Markdown>
+              <ContentCard className="xl:col-span-2">
+                <div className="lg:min-h-[17.4rem] p-7">
+                  <Markdown remarkPlugins={[remarkGfm]}>
+                    {text(agendaEvent.descriptionMarkdown.en, agendaEvent.descriptionMarkdown.nl)}
+                  </Markdown>
+                </div>
+                <div className="flex justify-between px-7 py-3 border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
+                  <div>
+                    <b className="text-[#1976d2] dark:text-[#90caf9]">
+                      {text('Necessary Gear', 'Benodigde Uitrusting')}
+                    </b>
+                    <div className="flex flex-wrap space-x-1 mt-1">
+                      {gearArray.map((gear, index) => (
+                        <Chip
+                          key={index}
+                          label={text(gear.en, gear.nl)}
+                          className="uppercase font-semibold"
+                          size="small"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <b className="text-[#1976d2] dark:text-[#90caf9]">
+                      {text('Necessary Experience', 'Benodigde Ervaring')}
+                    </b>
+                    <div className="flex flex-wrap space-x-1 mt-1">
+                      {agendaEvent.experience.map((experience, index) => (
+                        <Chip
+                          key={index}
+                          label={text(getLabel(experience).en, getLabel(experience).nl)}
+                          className="uppercase font-semibold"
+                          size="small"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </ContentCard>
 
               <ContentCard className="xl:col-span-3 lg:col-span-2 p-7">

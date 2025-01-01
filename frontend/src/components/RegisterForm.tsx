@@ -11,11 +11,13 @@ export default function RegisterForm({ agendaEvent }: RegisterFormProps) {
     <div className="grid gap-3">
       <h1>
         {text(
-          'Registration for ' + agendaEvent.titleEN,
-          'Inschrijving voor ' + agendaEvent.titleNL
+          'Registration for ' + agendaEvent.title.en,
+          'Inschrijving voor ' + agendaEvent.title.nl
         )}
       </h1>
-      <TextField fullWidth label={text('Field 1', 'Veld 1')} />
+      {agendaEvent.registrationFields.map((field, index) => (
+        <TextField key={index} fullWidth label={text(field.en, field.nl)} />
+      ))}
       <Button variant="contained" fullWidth>
         {text('Register', 'Inschrijven')}
       </Button>

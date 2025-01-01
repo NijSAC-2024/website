@@ -1,13 +1,13 @@
-import { AgendaEventType } from '../types.ts';
-import { Fab } from '@mui/material';
+import { AgendaEventType, CheckboxType, experienceOptions, LanguageType } from '../types.ts';
+import { Fab, TextField } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import { text } from '../util.ts';
 import ContentCard from './ContentCard.tsx';
 import { useState } from 'react';
-import { Moment } from 'moment';
 import MarkdownEditor from './MarkdownEditor.tsx';
 import EditRegistrationFields from './EditRegistrationFields.tsx';
 import EditAgendaCard from './EditAgendaCard.tsx';
+import CheckboxSelect from './CheckboxSelect.tsx';
 
 interface EditEventProps {
   agendaEvent: AgendaEventType;
@@ -16,51 +16,40 @@ interface EditEventProps {
 }
 
 export default function EditEvent({ agendaEvent, handleUpdate }: EditEventProps) {
-  const [updatedAgendaEvent, setUpdatedAgendaEvent] = useState<AgendaEventType>({
-    ...agendaEvent
-  });
+  const [updatedAgendaEvent, setUpdatedAgendaEvent] = useState<AgendaEventType>({ ...agendaEvent });
 
-  const handleFieldChange = (name: keyof AgendaEventType, value: string | Moment | boolean) => {
-    setUpdatedAgendaEvent((prev) => ({
-      ...prev,
-      [name]: typeof value === 'string' || typeof value === 'boolean' ? value : value.toISOString()
-    }));
+  const updateAgendaEvent = (changes: Partial<AgendaEventType>) => {
+    setUpdatedAgendaEvent((prev) => ({ ...prev, ...changes }));
   };
 
-  const handleRegistrationFieldsChange = (langCode: 'EN' | 'NL', index: number, value: string) => {
-    setUpdatedAgendaEvent((prev) => {
-      const newFields = [...prev[`registrationFields${langCode}`]];
-      newFields[index] = value;
-      return {
-        ...prev,
-        [`registrationFields${langCode}`]: newFields
-      };
+  const handleFieldChange = (
+    name: keyof AgendaEventType,
+    value: LanguageType | string | boolean | LanguageType[] | CheckboxType[]
+  ) => {
+    updateAgendaEvent({
+      [name]: value
     });
   };
 
-  const handleAddRegistrationField = (langCode: 'EN' | 'NL') => {
-    setUpdatedAgendaEvent((prev) => ({
-      ...prev,
-      [`registrationFields${langCode}`]: [...prev[`registrationFields${langCode}`], '']
-    }));
-  };
-
-  const handleRemoveRegistrationField = (langCode: 'EN' | 'NL', index: number) => {
-    setUpdatedAgendaEvent((prev) => ({
-      ...prev,
-      [`registrationFields${langCode}`]: prev[`registrationFields${langCode}`].filter(
-        (_, idx) => idx !== index
+  const handleRegistrationFieldsChange = (langCode: 'en' | 'nl', index: number, value: string) => {
+    updateAgendaEvent({
+      registrationFields: updatedAgendaEvent.registrationFields.map((field, idx) =>
+        idx === index ? { ...field, [langCode]: value } : field
       )
-    }));
+    });
   };
 
-  const setStandardFields = (fieldsEN: string[], fieldsNL: string[]) => {
+  const handleAddRegistrationField = () =>
     setUpdatedAgendaEvent((prev) => ({
       ...prev,
-      registrationFieldsEN: fieldsEN,
-      registrationFieldsNL: fieldsNL
+      registrationFields: [...prev.registrationFields, { en: '', nl: '' }]
     }));
-  };
+
+  const handleRemoveRegistrationField = (index: number) =>
+    setUpdatedAgendaEvent((prev) => ({
+      ...prev,
+      registrationFields: prev.registrationFields.filter((_, idx) => idx !== index)
+    }));
 
   return (
     <>
@@ -78,10 +67,35 @@ export default function EditEvent({ agendaEvent, handleUpdate }: EditEventProps)
 
       <ContentCard className="xl:col-span-2">
         <MarkdownEditor
-          initialMarkdownEN={updatedAgendaEvent.descriptionMarkdownEN || ''}
-          initialMarkdownNL={updatedAgendaEvent.descriptionMarkdownNL || ''}
+          initialMarkdown={updatedAgendaEvent.descriptionMarkdown}
           handleFieldChange={handleFieldChange}
         />
+        <div className="flex gap-2 px-6">
+          <TextField
+            fullWidth
+            value={updatedAgendaEvent.gear.en}
+            label={text('Necessary Gear English ', 'Benodigd Uitrusting Engels')}
+            onChange={(e) =>
+              handleFieldChange('gear', { ...updatedAgendaEvent.gear, en: e.target.value })
+            }
+          />
+          <TextField
+            fullWidth
+            value={updatedAgendaEvent.gear.nl}
+            label={text('Necessary Gear Dutch', 'Benodigde Uitrusting Nederlands')}
+            onChange={(e) =>
+              handleFieldChange('gear', { ...updatedAgendaEvent.gear, nl: e.target.value })
+            }
+          />
+        </div>
+        <div className="grid p-6">
+          <CheckboxSelect
+            options={experienceOptions}
+            onChange={(selectedTypes) => handleFieldChange('type', selectedTypes)}
+            label={text('Necessary Experience', 'Benodigde Ervaring')}
+            initialOptions={updatedAgendaEvent.experience}
+          />
+        </div>
       </ContentCard>
 
       <ContentCard className="xl:col-span-3 lg:col-span-2">
@@ -91,7 +105,6 @@ export default function EditEvent({ agendaEvent, handleUpdate }: EditEventProps)
           handleRegistrationFieldsChange={handleRegistrationFieldsChange}
           handleAddRegistrationField={handleAddRegistrationField}
           handleRemoveRegistrationField={handleRemoveRegistrationField}
-          setStandardFields={setStandardFields}
         />
       </ContentCard>
     </>

@@ -46,6 +46,13 @@ export default function App() {
           }
         }
       },
+      MuiAutocomplete: {
+        styleOverrides: {
+          paper: {
+            borderRadius: 12
+          }
+        }
+      },
       MuiDialog: {
         styleOverrides: {
           root: {
