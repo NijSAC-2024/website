@@ -18,7 +18,7 @@ export default function Agenda() {
       id: 5,
       image: '/images/test-header-image.jpg',
       title: { en: 'Albufeira', nl: 'Albufeira' },
-      category: 'activity',
+      category: 'course',
       type: ['sp'],
       location: 'The Yard',
       descriptionMarkdown: {

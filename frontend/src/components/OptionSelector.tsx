@@ -9,28 +9,28 @@ import {
   Checkbox
 } from '@mui/material';
 import { text } from '../util.ts';
-import { CheckboxOptionType, CheckboxType } from '../types.ts';
+import { OptionsType, OptionType } from '../types.ts';
 
-interface CheckboxSelectProps {
-  options: CheckboxOptionType[];
+interface OptionSelectorProps {
+  options: OptionsType[];
   // eslint-disable-next-line no-unused-vars
-  onChange: (selectedOptions: CheckboxType[]) => void;
+  onChange: (selectedOptions: OptionType[]) => void;
   label: string;
-  initialOptions: CheckboxType[];
+  initialOptions: OptionType[];
 }
 
-export default function CheckboxSelect({
+export default function OptionSelector({
   options,
   onChange,
   label,
   initialOptions
-}: CheckboxSelectProps) {
-  const [selectedOptions, setSelectedOptions] = useState<CheckboxType[]>(initialOptions);
+}: OptionSelectorProps) {
+  const [selectedOptions, setSelectedOptions] = useState<OptionType[]>(initialOptions);
 
-  const handleChange = (value: string | CheckboxType[]) => {
+  const handleChange = (value: string | OptionType[]) => {
     const selectedValues = typeof value === 'string' ? value.split(',') : value;
-    setSelectedOptions(selectedValues as CheckboxType[]);
-    onChange(selectedValues as CheckboxType[]);
+    setSelectedOptions(selectedValues as OptionType[]);
+    onChange(selectedValues as OptionType[]);
   };
 
   return (
@@ -43,7 +43,7 @@ export default function CheckboxSelect({
         onChange={(e) => handleChange(e.target.value)}
         input={<OutlinedInput id="select-multiple-chip" label={label} />}
         renderValue={(selected) => (
-          <div className="flex flex-wrap space-x-1">
+          <div className="flex flex-wrap gap-1">
             {selected.map((id) => {
               const option = options.find((opt) => opt.id === id);
               return (

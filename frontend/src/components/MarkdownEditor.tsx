@@ -107,43 +107,11 @@ export default function MarkdownEditor({
     <>
       <TabContext value={value}>
         <TabList onChange={handleChange}>
-          <Tab label={text('Combined', 'Gecombineerd')} value="1" />
-          <Tab label={text('Edit', 'Bewerken')} value="2" />
-          <Tab label={text('Preview', 'Voorbeeld')} value="3" />
+          <Tab label={text('Edit', 'Bewerken')} value="1" />
+          <Tab label={text('Preview', 'Voorbeeld')} value="2" />
+          <Tab label={text('Combined', 'Gecombineerd')} value="3" />
         </TabList>
         <TabPanel value="1">
-          <MarkdownEditorToolbar insertMarkdown={(syntax) => insertMarkdown(syntax, 'en')} />
-          <div className="grid grid-cols-2 space-x-5 mb-4">
-            <TextField
-              multiline
-              minRows={4}
-              value={markdownContent.en}
-              onChange={(e) => handleInputChange(e, 'en')}
-              inputRef={(el) => (textareaRef.current.en = el)}
-              className="flex-1 p-2 border rounded resize-none font-mono"
-              placeholder={text('Insert English here.', 'Type hier Engels.')}
-            />
-            <TextCard className="p-4">
-              <Markdown remarkPlugins={[remarkGfm]}>{markdownContent.en}</Markdown>
-            </TextCard>
-          </div>
-          <MarkdownEditorToolbar insertMarkdown={(syntax) => insertMarkdown(syntax, 'nl')} />
-          <div className="grid grid-cols-2 space-x-5">
-            <TextField
-              multiline
-              minRows={4}
-              value={markdownContent.nl}
-              onChange={(e) => handleInputChange(e, 'nl')}
-              inputRef={(el) => (textareaRef.current.nl = el)}
-              className="flex-1 p-2 border rounded resize-none font-mono"
-              placeholder={text('Insert Dutch here.', 'Type hier Nederlands.')}
-            />
-            <TextCard className="p-4">
-              <Markdown remarkPlugins={[remarkGfm]}>{markdownContent.nl}</Markdown>
-            </TextCard>
-          </div>
-        </TabPanel>
-        <TabPanel value="2">
           <MarkdownEditorToolbar insertMarkdown={(syntax) => insertMarkdown(syntax, 'en')} />
           <div className="grid mb-4">
             <TextField
@@ -169,10 +137,42 @@ export default function MarkdownEditor({
             />
           </div>
         </TabPanel>
-        <TabPanel value="3">
+        <TabPanel value="2">
           <div className="grid space-y-5">
             <Markdown remarkPlugins={[remarkGfm]}>{markdownContent.en}</Markdown>
             <Markdown remarkPlugins={[remarkGfm]}>{markdownContent.nl}</Markdown>
+          </div>
+        </TabPanel>
+        <TabPanel value="3">
+          <MarkdownEditorToolbar insertMarkdown={(syntax) => insertMarkdown(syntax, 'en')} />
+          <div className="grid grid-cols-2 gap-2 mb-4">
+            <TextField
+              multiline
+              minRows={4}
+              value={markdownContent.en}
+              onChange={(e) => handleInputChange(e, 'en')}
+              inputRef={(el) => (textareaRef.current.en = el)}
+              className="flex-1 p-2 border rounded resize-none font-mono"
+              placeholder={text('Insert English here.', 'Type hier Engels.')}
+            />
+            <TextCard className="p-4">
+              <Markdown remarkPlugins={[remarkGfm]}>{markdownContent.en}</Markdown>
+            </TextCard>
+          </div>
+          <MarkdownEditorToolbar insertMarkdown={(syntax) => insertMarkdown(syntax, 'nl')} />
+          <div className="grid grid-cols-2 gap-2">
+            <TextField
+              multiline
+              minRows={4}
+              value={markdownContent.nl}
+              onChange={(e) => handleInputChange(e, 'nl')}
+              inputRef={(el) => (textareaRef.current.nl = el)}
+              className="flex-1 p-2 border rounded resize-none font-mono"
+              placeholder={text('Insert Dutch here.', 'Type hier Nederlands.')}
+            />
+            <TextCard className="p-4">
+              <Markdown remarkPlugins={[remarkGfm]}>{markdownContent.nl}</Markdown>
+            </TextCard>
           </div>
         </TabPanel>
       </TabContext>

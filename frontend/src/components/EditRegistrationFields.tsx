@@ -50,13 +50,13 @@ export default function EditRegistrationFields({
               <div className="flex w-full space-x-2">
                 <TextField
                   value={field.en}
-                  label={`${text('Field English', 'Veld Engels')} ${index + 1}`}
+                  label={`${text('Field', 'Veld')} ${index + 1} ${text('English', 'Engels')}`}
                   onChange={(e) => handleRegistrationFieldsChange('en', index, e.target.value)}
                   fullWidth
                 />
                 <TextField
                   value={field.nl}
-                  label={`${text('Field Dutch', 'Veld Nederlands')} ${index + 1}`}
+                  label={`${text('Field', 'Veld')} ${index + 1} ${text('Dutch', 'Nederlands')}`}
                   onChange={(e) => handleRegistrationFieldsChange('nl', index, e.target.value)}
                   fullWidth
                 />

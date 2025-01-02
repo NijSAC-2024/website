@@ -2,27 +2,23 @@ import { FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/mater
 import { text } from '../util.ts';
 import { DateTimePicker } from '@mui/x-date-pickers-pro';
 import moment from 'moment/moment';
-import {
-  AgendaEventType,
-  CheckboxOptionType,
-  CheckboxType,
-  LanguageType,
-  typesOptions
-} from '../types.ts';
-import CheckboxSelect from './CheckboxSelect.tsx';
+import { AgendaEventType, OptionsType, OptionType, LanguageType, typesOptions } from '../types.ts';
+import OptionSelector from './OptionSelector.tsx';
 
 interface EditAgendaCardProps {
   updatedAgendaEvent: AgendaEventType;
   handleFieldChange: (
+    // eslint-disable-next-line no-unused-vars
     name: keyof AgendaEventType,
-    value: LanguageType | string | CheckboxType[]
+    // eslint-disable-next-line no-unused-vars
+    value: LanguageType | string | OptionType[]
   ) => void;
 }
 export default function EditAgendaCard({
   updatedAgendaEvent,
   handleFieldChange
 }: EditAgendaCardProps) {
-  const getAllowedTypes = (): CheckboxOptionType[] => {
+  const getAllowedTypes = (): OptionsType[] => {
     switch (updatedAgendaEvent.category) {
       case 'course':
         return typesOptions.filter((type) => type.id !== 'education' && type.id !== 'boulder');
@@ -76,7 +72,7 @@ export default function EditAgendaCard({
                 <MenuItem value="weekend">{text('Weekend', 'Weekend')}</MenuItem>
               </Select>
             </FormControl>
-            <CheckboxSelect
+            <OptionSelector
               options={allowedTypes}
               onChange={(selectedTypes) => handleFieldChange('type', selectedTypes)}
               label={'Type'}

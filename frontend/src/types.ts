@@ -29,18 +29,18 @@ export interface LanguageType {
   nl: string;
 }
 
-export type CheckboxType = 'sp' | 'mp' | 'boulder' | 'trad' | 'education';
+export type OptionType = 'sp' | 'mp' | 'boulder' | 'trad' | 'education';
 
 export interface AgendaEventType {
   id: number;
   image: string;
   title: LanguageType;
   category: 'activity' | 'course' | 'training' | 'weekend';
-  type: CheckboxType[];
+  type: OptionType[];
   location: string;
   descriptionMarkdown: LanguageType;
   gear: LanguageType;
-  experience: CheckboxType[];
+  experience: OptionType[];
   allowsRegistrations: boolean;
   numberOfRegistrations: number;
   maxRegistrations: number;
@@ -73,12 +73,12 @@ export interface UserType {
 
 export type MenuType = 'association' | 'climbing' | 'alps' | 'language' | undefined;
 
-export interface CheckboxOptionType {
-  id: CheckboxType;
+export interface OptionsType {
+  id: OptionType;
   label: LanguageType;
 }
 
-export const typesOptions: CheckboxOptionType[] = [
+export const typesOptions: OptionsType[] = [
   { id: 'sp', label: { en: 'Single Pitch', nl: 'Single Pitch' } },
   { id: 'mp', label: { en: 'Multi Pitch', nl: 'Multi Pitch' } },
   { id: 'education', label: { en: 'Education', nl: 'Opleiding' } },
@@ -86,7 +86,7 @@ export const typesOptions: CheckboxOptionType[] = [
   { id: 'trad', label: { en: 'Trad', nl: 'Trad' } }
 ];
 
-export const experienceOptions: CheckboxOptionType[] = [
+export const experienceOptions: OptionsType[] = [
   { id: 'sp', label: { en: 'Single Pitch', nl: 'Single Pitch' } },
   { id: 'mp', label: { en: 'Multi Pitch', nl: 'Multi Pitch' } }
 ];
