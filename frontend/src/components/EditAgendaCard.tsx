@@ -1,9 +1,11 @@
-import { FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
+import { FormControl, InputLabel, MenuItem, Select, TextField, Fab } from '@mui/material';
 import { text } from '../util.ts';
 import { DateTimePicker } from '@mui/x-date-pickers-pro';
 import moment from 'moment/moment';
 import { AgendaEventType, OptionsType, OptionType, LanguageType, typesOptions } from '../types.ts';
 import OptionSelector from './OptionSelector.tsx';
+import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
+import { ChangeEvent } from 'react';
 
 interface EditAgendaCardProps {
   updatedAgendaEvent: AgendaEventType;
@@ -14,6 +16,7 @@ interface EditAgendaCardProps {
     value: LanguageType | string | OptionType[]
   ) => void;
 }
+
 export default function EditAgendaCard({
   updatedAgendaEvent,
   handleFieldChange
@@ -31,15 +34,41 @@ export default function EditAgendaCard({
 
   const allowedTypes = getAllowedTypes();
 
+  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (reader.result) {
+          handleFieldChange('image', reader.result.toString());
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
-    <div className="w-full rounded-2xl bg-inherit border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] flex flex-col relative">
-      <img
-        className="w-full aspect-[4/2] object-cover"
-        src={updatedAgendaEvent.image}
-        alt="Event"
-      />
+    <div className="w-full rounded-2xl bg-inherit border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] flex flex-col">
+      <div>
+        <img
+          className="w-full aspect-[4/2] object-cover"
+          src={updatedAgendaEvent.image}
+          alt="Event"
+        />
+      </div>
       <div className="p-5">
         <div className="grid space-y-5">
+          <Fab
+            component="label"
+            variant="extended"
+            color="primary"
+            aria-label={text('Change Image', 'Afbeelding Wijzigen')}
+            className="mx-auto"
+          >
+            <PhotoCameraIcon className="mr-2" />
+            {text('Upload Image', 'Afbeelding Uploaden')}
+            <input type="file" accept="image/*" hidden onChange={handleImageChange} />
+          </Fab>
           <div className="grid space-y-3">
             <TextField
               value={updatedAgendaEvent.title.en}

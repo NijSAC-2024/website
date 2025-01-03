@@ -16,23 +16,50 @@ export default function Agenda() {
   const exampleAPIResponse: AgendaEventType[] = [
     {
       id: 5,
-      image: '/images/test-header-image.jpg',
-      title: { en: 'Albufeira', nl: 'Albufeira' },
+      image:
+        'https://images.squarespace-cdn.com/content/v1/531722ebe4b01396b755c991/1489157370692-DZW7VKX7TY1KBJBQFYTW/SPA+16.03+Single+Pitch+Award+assessment+02+resized.jpg?format=1500w',
+      title: { en: 'Singlepitch Course', nl: 'Singlepitch Cursus' },
       category: 'course',
       type: ['sp'],
-      location: 'The Yard',
+      location: 'RSC',
       descriptionMarkdown: {
-        en: 'No registration required',
-        nl: 'Je hoeft je niet in te schrijven'
+        en: 'Every spring and autumn you can learn leadclimbing in the OV-Singlepitch course. In this course the student learns how to lead climb, and also to belay a lead climber. Because we give an OV (Outdoor leadclimbing) course, we try to prepare everyone to be able to practice this on the rocks. The exam is taken on a weekend outdoors in which the instructor assesses whether each participant individually masters the above techniques (you will then receive a KVB OV-Singlepitch certificate.)',
+        nl: 'Elk voor- en najaar kan je leren voorklimmen in de cursus OV-Singlepitch. In deze cursus leert de cursist voorklimmen, en tevens zekeren voorklim situatie. Om dat we een OV (Outdoor Voorklim) cursus geven proberen we iedereen klaar te stomen om dit ook op de rotsen te kunnen beoefenen. Het examen zal buiten op de rots worden afgelegd, de instructeur beoordeelt dan bij elke deelnemer individueel of de bovengenoemde technieken beheerst (hiervoor krijg je dan een pasje KVB-OV-Singlepitch.)\n'
       },
       gear: {
-        en: '',
-        nl: ''
+        en: 'HMS biner, Long slinge (120 cm; stitched), Dynamic safety line,  4 (small) screw carabiners (D-biners), Prussik rope 1 meter (5 or 6 mm)',
+        nl: 'Helm, Touw, Safe Biner'
       },
       experience: ['mp'],
       allowsRegistrations: true,
       numberOfRegistrations: 12,
       maxRegistrations: 20,
+      startDateTime: '2025-03-06T22:30:00.000Z',
+      endDateTime: '2025-03-06T22:30:00.000Z',
+      registrationOpenTime: '2024-12-23T00:00:00.000Z',
+      registrationCloseTime: '2027-03-07T00:00:00.000Z',
+      registrationFields: [{ en: 'How many quickdraws', nl: 'Hoeveel setjes' }]
+    },
+    {
+      id: 5,
+      image:
+        'https://www.climbfit.com.au/wp-content/uploads/2020/10/LRM_EXPORT_6923110695509_20190202_212254494.jpg',
+      title: { en: 'Boulder Training', nl: 'Boulder Training' },
+      category: 'training',
+      type: ['boulder'],
+      location: 'Fontainebleau',
+      descriptionMarkdown: {
+        en: "Let's go boulder",
+        nl: 'Laten we gaan boulderen.'
+      },
+      gear: {
+        en: '',
+        nl: ''
+      },
+      experience: [],
+      allowsRegistrations: true,
+      numberOfRegistrations: 10,
+      maxRegistrations: 10,
       startDateTime: '2025-03-06T22:30:00.000Z',
       endDateTime: '2025-03-06T22:30:00.000Z',
       registrationOpenTime: '2024-12-23T00:00:00.000Z',
@@ -49,7 +76,7 @@ export default function Agenda() {
           <p>{text('Add event', 'Voeg evenement toe')}</p>
         </Fab>
       </div>
-      <GenericPage>
+      <GenericPage image={'/images/test-header-image.jpg'}>
         <div className="Agenda">
           <div className="grid xl:grid-cols-3 lg:grid-cols-2 grid-flow-row gap-5">
             <ContentCard className="lg:col-span-2 p-7">

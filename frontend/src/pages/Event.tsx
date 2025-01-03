@@ -16,7 +16,8 @@ import EditEvent from '../components/EditEvent.tsx';
 export default function Event() {
   const [agendaEvent, setAgendaEvent] = useState<AgendaEventType>({
     id: 5,
-    image: '/images/test-header-image.jpg',
+    image:
+      'https://images.squarespace-cdn.com/content/v1/531722ebe4b01396b755c991/1489157370692-DZW7VKX7TY1KBJBQFYTW/SPA+16.03+Single+Pitch+Award+assessment+02+resized.jpg?format=1500w',
     title: { en: 'Singlepitch Course', nl: 'Singlepitch Cursus' },
     category: 'course',
     type: ['sp'],
@@ -73,13 +74,15 @@ export default function Event() {
 
   return (
     <>
-      <div className="flex justify-end fixed bottom-5 right-5 z-10">
-        <Fab variant="extended" color="primary" onClick={toggleIsEditing}>
-          <EditIcon className="mr-2" />
-          {text('Edit event', 'Evenement bewerken')}
-        </Fab>
-      </div>
-      <GenericPage>
+      {!isEditing && (
+        <div className="fixed bottom-5 right-5 z-10">
+          <Fab variant="extended" color="primary" onClick={toggleIsEditing}>
+            <EditIcon className="mr-2" />
+            {text('Edit event', 'Evenement bewerken')}
+          </Fab>
+        </div>
+      )}
+      <GenericPage image={agendaEvent.image}>
         <div className="grid xl:grid-cols-3 gap-5">
           <div className="xl:col-span-3 mb-[-0.5rem]">
             <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">
@@ -99,56 +102,56 @@ export default function Event() {
                     {text(agendaEvent.descriptionMarkdown.en, agendaEvent.descriptionMarkdown.nl)}
                   </Markdown>
                 </div>
-                <div className="flex justify-between px-7 py-4 border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
-                  <div>
-                    <b className="text-[#1976d2] dark:text-[#90caf9]">
-                      {text('Necessary Gear', 'Benodigde Uitrusting')}
-                    </b>
-                    <div className="flex flex-wrap gap-1 mt-1">
-                      {langCode === 'en'
-                        ? agendaEvent.gear.en
-                            .split(',')
-                            .map((item) => item.trim())
-                            .map((gear, index) => (
-                              <Chip
-                                key={index}
-                                label={gear}
-                                className="uppercase font-semibold"
-                                size="small"
-                              />
-                            ))
-                        : agendaEvent.gear.nl
-                            .split(',')
-                            .map((item) => item.trim())
-                            .map((gear, index) => (
-                              <Chip
-                                key={index}
-                                label={gear}
-                                className="uppercase font-semibold"
-                                size="small"
-                              />
-                            ))}
+                <div className="flex justify-between px-7 py-5 border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
+                  {agendaEvent.gear.en.length > 0 && agendaEvent.gear.nl.length > 0 && (
+                    <div>
+                      <b className="text-[#1976d2] dark:text-[#90caf9]">
+                        {text('Necessary Gear', 'Benodigde Uitrusting')}
+                      </b>
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {langCode === 'en'
+                          ? agendaEvent.gear.en
+                              .split(',')
+                              .map((item) => item.trim())
+                              .map((gear, index) => (
+                                <Chip
+                                  key={index}
+                                  label={gear}
+                                  className="uppercase font-semibold"
+                                  size="small"
+                                />
+                              ))
+                          : agendaEvent.gear.nl
+                              .split(',')
+                              .map((item) => item.trim())
+                              .map((gear, index) => (
+                                <Chip
+                                  key={index}
+                                  label={gear}
+                                  className="uppercase font-semibold"
+                                  size="small"
+                                />
+                              ))}
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    {agendaEvent.experience.length > 0 && (
-                      <>
-                        <b className="text-[#1976d2] dark:text-[#90caf9]">
-                          {text('Necessary Experience', 'Benodigde Ervaring')}
-                        </b>
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          {agendaEvent.experience.map((experience, index) => (
-                            <Chip
-                              key={index}
-                              label={text(getLabel(experience).en, getLabel(experience).nl)}
-                              className="uppercase font-semibold"
-                              size="small"
-                            />
-                          ))}
-                        </div>
-                      </>
-                    )}
-                  </div>
+                  )}
+                  {agendaEvent.experience.length > 0 && (
+                    <div>
+                      <b className="text-[#1976d2] dark:text-[#90caf9]">
+                        {text('Necessary Experience', 'Benodigde Ervaring')}
+                      </b>
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {agendaEvent.experience.map((experience, index) => (
+                          <Chip
+                            key={index}
+                            label={text(getLabel(experience).en, getLabel(experience).nl)}
+                            className="uppercase font-semibold"
+                            size="small"
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </ContentCard>
 
@@ -160,7 +163,8 @@ export default function Event() {
                       {registrations.registrations.map((registraton) => (
                         <TableRow
                           key={registraton.eid}
-                          sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                          sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                        >
                           <TableCell>{registraton.name}</TableCell>
                         </TableRow>
                       ))}

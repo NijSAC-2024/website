@@ -21,7 +21,7 @@ export default function AgendaCard({ agendaEvent, agendaPage }: AgendaCardProps)
   moment.locale(langCode);
 
   return (
-    <div className="w-full rounded-2xl bg-inherit border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] flex flex-col relative">
+    <div className="w-full rounded-2xl bg-inherit border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] flex flex-col relative justify-between">
       <div
         onClick={() => router.navigate('/agenda/' + agendaEvent.id)}
         className="hover:cursor-pointer"
@@ -39,7 +39,7 @@ export default function AgendaCard({ agendaEvent, agendaPage }: AgendaCardProps)
           src={agendaEvent.image}
           alt="not available"
         />
-        <div className="p-5 pt-2.5">
+        <div className="p-5 pt-2.5 grid space-y-1">
           <div className="flex justify-between">
             <div className="flex flex-wrap gap-1">
               <Chip
@@ -87,7 +87,7 @@ export default function AgendaCard({ agendaEvent, agendaPage }: AgendaCardProps)
         </div>
       </div>
       {agendaEvent.allowsRegistrations && (
-        <div className="p-5 flex justify-between items-center grow border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
+        <div className="p-5 flex justify-between items-center border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
           <div className="flex items-center">
             <GroupIcon className="mr-2" /> {agendaEvent.numberOfRegistrations}
           </div>

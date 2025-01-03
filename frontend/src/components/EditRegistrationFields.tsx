@@ -3,6 +3,7 @@ import { Collapse, Fab, Switch, TextField } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { AgendaEventType } from '../types.ts';
+import ContentCard from './ContentCard.tsx';
 
 interface EditRegistrationFieldsProps {
   updatedAgendaEvent: AgendaEventType;
@@ -23,7 +24,7 @@ export default function EditRegistrationFields({
   handleRemoveRegistrationField
 }: EditRegistrationFieldsProps) {
   return (
-    <>
+    <ContentCard className="xl:col-span-3">
       <div className="flex justify-between p-7">
         <h1>{text('Registrations', 'Inschrijvingen')}</h1>
         <div>
@@ -73,6 +74,6 @@ export default function EditRegistrationFields({
           </div>
         </div>
       </Collapse>
-    </>
+    </ContentCard>
   );
 }

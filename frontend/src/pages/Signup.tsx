@@ -34,7 +34,7 @@ export default function Signup() {
     setSelectedMembership(false);
   };
   return (
-    <GenericPage>
+    <GenericPage image={'/images/test-header-image.jpg'}>
       <ContentCard>
         <div className="px-7 pt-7 pb-5">
           <h1>{text('Register for the NijSAC', 'Inschrijven bij de NijSAC')}</h1>
