@@ -1,9 +1,9 @@
-import { text } from '../util.ts';
+import { text } from '../../util.ts';
 import { Collapse, Fab, Switch, TextField } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import { AgendaEventType } from '../types.ts';
-import ContentCard from './ContentCard.tsx';
+import { AgendaEventType } from '../../types.ts';
+import ContentCard from '../ContentCard.tsx';
 
 interface EditRegistrationFieldsProps {
   updatedAgendaEvent: AgendaEventType;

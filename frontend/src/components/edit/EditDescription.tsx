@@ -1,9 +1,9 @@
-import MarkdownEditor from './MarkdownEditor.tsx';
+import MarkdownEditor from '../MarkdownEditor.tsx';
 import { TextField } from '@mui/material';
-import { text } from '../util.ts';
-import OptionSelector from './OptionSelector.tsx';
-import { AgendaEventType, experienceOptions, LanguageType, OptionType } from '../types.ts';
-import ContentCard from './ContentCard.tsx';
+import { text } from '../../util.ts';
+import OptionSelector from '../OptionSelector.tsx';
+import { AgendaEventType, experienceOptions, LanguageType, OptionType } from '../../types.ts';
+import ContentCard from '../ContentCard.tsx';
 
 interface EditDescriptionProps {
   updatedAgendaEvent: AgendaEventType;

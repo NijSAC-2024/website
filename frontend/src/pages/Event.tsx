@@ -11,7 +11,7 @@ import { Button, Chip, Fab, Table, TableBody, TableCell, TableRow } from '@mui/m
 import router from '../router.tsx';
 import remarkGfm from 'remark-gfm';
 import { useState } from 'react';
-import EditEvent from '../components/EditEvent.tsx';
+import EditEvent from '../components/edit/EditEvent.tsx';
 
 export default function Event() {
   const [agendaEvent, setAgendaEvent] = useState<AgendaEventType>({
@@ -163,8 +163,7 @@ export default function Event() {
                       {registrations.registrations.map((registraton) => (
                         <TableRow
                           key={registraton.eid}
-                          sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                        >
+                          sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                           <TableCell>{registraton.name}</TableCell>
                         </TableRow>
                       ))}

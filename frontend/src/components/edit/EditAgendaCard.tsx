@@ -1,9 +1,15 @@
 import { FormControl, InputLabel, MenuItem, Select, TextField, Fab } from '@mui/material';
-import { text } from '../util.ts';
+import { text } from '../../util.ts';
 import { DateTimePicker } from '@mui/x-date-pickers-pro';
 import moment from 'moment/moment';
-import { AgendaEventType, OptionsType, OptionType, LanguageType, typesOptions } from '../types.ts';
-import OptionSelector from './OptionSelector.tsx';
+import {
+  AgendaEventType,
+  OptionsType,
+  OptionType,
+  LanguageType,
+  typesOptions
+} from '../../types.ts';
+import OptionSelector from '../OptionSelector.tsx';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import { ChangeEvent } from 'react';
 
@@ -63,8 +69,7 @@ export default function EditAgendaCard({
             variant="extended"
             color="primary"
             aria-label={text('Change Image', 'Afbeelding Wijzigen')}
-            className="mx-auto"
-          >
+            className="mx-auto">
             <PhotoCameraIcon className="mr-2" />
             {text('Upload Image', 'Afbeelding Uploaden')}
             <input type="file" accept="image/*" hidden onChange={handleImageChange} />
@@ -93,8 +98,7 @@ export default function EditAgendaCard({
                 value={updatedAgendaEvent.category}
                 label={text('Category', 'Categorie')}
                 variant="outlined"
-                onChange={(e) => handleFieldChange('category', e.target.value)}
-              >
+                onChange={(e) => handleFieldChange('category', e.target.value)}>
                 <MenuItem value="activity">{text('Activity', 'Activiteit')}</MenuItem>
                 <MenuItem value="course">{text('Course', 'Cursus')}</MenuItem>
                 <MenuItem value="training">{text('Training', 'Training')}</MenuItem>

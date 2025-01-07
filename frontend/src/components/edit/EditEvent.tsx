@@ -1,7 +1,7 @@
-import { AgendaEventType, OptionType, LanguageType } from '../types.ts';
+import { AgendaEventType, OptionType, LanguageType } from '../../types.ts';
 import { Fab } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
-import { text } from '../util.ts';
+import { text } from '../../util.ts';
 import { useState } from 'react';
 import EditRegistrationFields from './EditRegistrationFields.tsx';
 import EditAgendaCard from './EditAgendaCard.tsx';

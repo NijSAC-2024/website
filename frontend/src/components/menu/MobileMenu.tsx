@@ -19,6 +19,8 @@ import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import { text } from '../../util.ts';
 import { MenuType } from '../../types.ts';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
+import { useAuth } from '../../providers/AuthProvider.tsx';
+import UserMenu from './UserMenu.tsx';
 
 interface MobileMenuProps {
   handleLoginOpen: () => void;
@@ -31,6 +33,7 @@ export default function MobileMenu({
   dropdownOpen,
   toggleDropdown
 }: MobileMenuProps) {
+  const { isLoggedIn } = useAuth();
   const { setEnglish, setDutch } = useLanguage();
   const [openMenu, setOpenMenu] = useState<MenuType>(undefined);
 
@@ -59,8 +62,7 @@ export default function MobileMenu({
         in={dropdownOpen}
         timeout="auto"
         unmountOnExit
-        className="relative mt-[-6rem] text-black dark:text-white bg-white dark:bg-[#121212] z-10"
-      >
+        className="relative mt-[-6rem] text-black dark:text-white bg-white dark:bg-[#121212] z-10">
         <Toolbar className="flex justify-between items-center w-full">
           <img
             src={logo}
@@ -333,20 +335,29 @@ export default function MobileMenu({
               </ListItem>
             </List>
           </Collapse>
-          <ListItem onClick={handleLoginOpen} disablePadding>
-            <ListItemButton>
-              <ListItemText primary={text('Login', 'Login')} className="uppercase px-10" />
-              <ListItemIcon></ListItemIcon>
-            </ListItemButton>
-          </ListItem>
-          <ListItem className="px-10 pb-3 pt-2" disablePadding>
-            <Button
-              variant="contained"
-              onClick={() => router.navigate('/register').then(toggleDropdown)}
-            >
-              {text('Become a member', 'Lid worden')}
-            </Button>
-          </ListItem>
+
+          {/* Login and Signup */}
+          {!isLoggedIn ? (
+            <>
+              <ListItem onClick={handleLoginOpen} disablePadding>
+                <ListItemButton>
+                  <ListItemText primary={text('Login', 'Login')} className="uppercase px-10" />
+                  <ListItemIcon></ListItemIcon>
+                </ListItemButton>
+              </ListItem>
+              <ListItem className="px-10 pb-3 pt-2" disablePadding>
+                <Button
+                  variant="contained"
+                  onClick={() => router.navigate('/register').then(toggleDropdown)}>
+                  {text('Become a member', 'Lid worden')}
+                </Button>
+              </ListItem>
+            </>
+          ) : (
+            <div className="px-10 pb-3">
+              <UserMenu />
+            </div>
+          )}
         </List>
       </Collapse>
     </>
