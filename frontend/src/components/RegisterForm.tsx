@@ -24,15 +24,9 @@ export default function RegisterForm({ agendaEvent }: RegisterFormProps) {
       </h1>
       <p>
         <AccessAlarmIcon className=" mr-2" />
-        {text('Registrations opens at ', 'Inschrijvingen openen op ')}
+        {text('Registrations close at ', 'Inschrijvingen sluiten op ')}
         {moment(agendaEvent.registrationOpenTime).format('DD MMM HH:mm')}
       </p>
-      <p>
-        <AccessAlarmIcon className=" mr-2" />
-        {text('Registrations closes at ', 'Inschrijvingen sluiten op ')}
-        {moment(agendaEvent.registrationOpenTime).format('DD MMM HH:mm')}
-      </p>
-      <h3>{text('Registration Fields', 'Inschrijfvelden')}</h3>
       {agendaEvent.registrationFields.map((field, index) => (
         <TextField key={index} fullWidth label={text(field.en, field.nl)} />
       ))}

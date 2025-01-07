@@ -69,7 +69,8 @@ export default function EditAgendaCard({
             variant="extended"
             color="primary"
             aria-label={text('Change Image', 'Afbeelding Wijzigen')}
-            className="mx-auto">
+            className="mx-auto"
+          >
             <PhotoCameraIcon className="mr-2" />
             {text('Upload Image', 'Afbeelding Uploaden')}
             <input type="file" accept="image/*" hidden onChange={handleImageChange} />
@@ -83,7 +84,8 @@ export default function EditAgendaCard({
                 value={updatedAgendaEvent.category}
                 label={text('Category', 'Categorie')}
                 variant="outlined"
-                onChange={(e) => handleFieldChange('category', e.target.value)}>
+                onChange={(e) => handleFieldChange('category', e.target.value)}
+              >
                 <MenuItem value="activity">{text('Activity', 'Activiteit')}</MenuItem>
                 <MenuItem value="course">{text('Course', 'Cursus')}</MenuItem>
                 <MenuItem value="training">{text('Training', 'Training')}</MenuItem>

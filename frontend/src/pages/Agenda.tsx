@@ -104,7 +104,8 @@ export default function Agenda() {
                   value={selectedCategory}
                   label={text('Category', 'Categorie')}
                   onChange={handleChange}
-                  variant="outlined">
+                  variant="outlined"
+                >
                   <MenuItem value="all">{text('All', 'Alles')}</MenuItem>
                   <MenuItem value="activity">{text('Activities', 'Activiteiten')}</MenuItem>
                   <MenuItem value="course">{text('Courses', 'Cursussen')}</MenuItem>

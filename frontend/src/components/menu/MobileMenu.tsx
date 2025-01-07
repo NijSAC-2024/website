@@ -47,7 +47,7 @@ export default function MobileMenu({
 
   return (
     <>
-      <Toolbar className="flex justify-between items-center w-full z-1">
+      <Toolbar className="flex justify-between items-center w-full">
         <img
           src={logo}
           alt="Logo"

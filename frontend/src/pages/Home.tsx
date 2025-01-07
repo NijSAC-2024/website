@@ -31,7 +31,7 @@ export default function Home() {
   };
 
   return (
-    <GenericPage image={'/images/test-header-image.jpg'}>
+    <GenericPage>
       <ContentCard className="grid gap-5 p-7">
         <h2>{text('Welcome to the NijSAC website.', 'Welkom op de NijSAC website.')}</h2>
         <Button variant="contained" onClick={handleTestToken}>

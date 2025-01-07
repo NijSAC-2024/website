@@ -161,7 +161,8 @@ export default function Event() {
                       {registrations.registrations.map((registraton) => (
                         <TableRow
                           key={registraton.eid}
-                          sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                          sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                        >
                           <TableCell>{registraton.name}</TableCell>
                         </TableRow>
                       ))}

@@ -24,7 +24,8 @@ export default function AgendaCard({ agendaEvent, agendaPage }: AgendaCardProps)
     <div className="w-full rounded-2xl bg-inherit border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] flex flex-col relative justify-between">
       <div
         onClick={() => router.navigate('/agenda/' + agendaEvent.id)}
-        className="hover:cursor-pointer">
+        className="hover:cursor-pointer"
+      >
         {agendaPage && (
           <Chip
             label={formatDate(agendaEvent.startDateTime, agendaEvent.endDateTime)}

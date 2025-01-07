@@ -12,7 +12,7 @@ export default function TextPage() {
     console.log(name, value);
   };
   return (
-    <GenericPage image={'/images/test-header-image.jpg'}>
+    <GenericPage>
       <ContentCard className="p-7">
         <MarkdownEditor handleFieldChange={handleFieldChange} />
       </ContentCard>
