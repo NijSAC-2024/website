@@ -121,7 +121,7 @@ export default function MarkdownEditor({
               onChange={(e) => handleInputChange(e, 'en')}
               inputRef={(el) => (textareaRef.current.en = el)}
               className="flex-1 p-2 border rounded resize-none font-mono"
-              placeholder={text('Insert English here.', 'Type hier Engels.')}
+              placeholder={text('Insert English here', 'Type hier Engels')}
             />
           </div>
           <MarkdownEditorToolbar insertMarkdown={(syntax) => insertMarkdown(syntax, 'nl')} />
@@ -133,7 +133,7 @@ export default function MarkdownEditor({
               onChange={(e) => handleInputChange(e, 'nl')}
               inputRef={(el) => (textareaRef.current.nl = el)}
               className="flex-1 p-2 border rounded resize-none font-mono"
-              placeholder={text('Insert Dutch here.', 'Type hier Nederlands.')}
+              placeholder={text('Insert Dutch here', 'Type hier Nederlands')}
             />
           </div>
         </TabPanel>
@@ -153,7 +153,7 @@ export default function MarkdownEditor({
               onChange={(e) => handleInputChange(e, 'en')}
               inputRef={(el) => (textareaRef.current.en = el)}
               className="flex-1 p-2 border rounded resize-none font-mono"
-              placeholder={text('Insert English here.', 'Type hier Engels.')}
+              placeholder={text('Insert English here', 'Type hier Engels')}
             />
             <TextCard className="p-4">
               <Markdown remarkPlugins={[remarkGfm]}>{markdownContent.en}</Markdown>
@@ -168,7 +168,7 @@ export default function MarkdownEditor({
               onChange={(e) => handleInputChange(e, 'nl')}
               inputRef={(el) => (textareaRef.current.nl = el)}
               className="flex-1 p-2 border rounded resize-none font-mono"
-              placeholder={text('Insert Dutch here.', 'Type hier Nederlands.')}
+              placeholder={text('Insert Dutch here', 'Type hier Nederlands')}
             />
             <TextCard className="p-4">
               <Markdown remarkPlugins={[remarkGfm]}>{markdownContent.nl}</Markdown>

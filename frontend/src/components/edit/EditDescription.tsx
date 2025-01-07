@@ -31,7 +31,7 @@ export default function EditDescription({
           fullWidth
           value={updatedAgendaEvent.gear.en}
           label={text('Necessary Gear English ', 'Benodigde Uitrusting Engels')}
-          placeholder={text('Describe items separated by ,', 'Beschrijf items gesheiden door ,')}
+          placeholder={text('Separated by commas', "Gescheiden door komma's")}
           onChange={(e) =>
             handleFieldChange('gear', { ...updatedAgendaEvent.gear, en: e.target.value })
           }
@@ -40,7 +40,7 @@ export default function EditDescription({
           fullWidth
           value={updatedAgendaEvent.gear.nl}
           label={text('Necessary Gear Dutch', 'Benodigde Uitrusting Nederlands')}
-          placeholder={text('Describe items separated by ,', 'Beschrijf items gesheiden door ,')}
+          placeholder={text('Separated by commas', "Gescheiden door komma's")}
           onChange={(e) =>
             handleFieldChange('gear', { ...updatedAgendaEvent.gear, nl: e.target.value })
           }

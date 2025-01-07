@@ -9,6 +9,10 @@ export function text(english: string, dutch: string): string {
 }
 
 export function formatDate(startDateTime: string, endDateTime: string): string {
+  const { getLangCode } = useLanguage();
+  const langCode = getLangCode();
+  moment.locale(langCode);
+
   const startDate = new Date(startDateTime);
   const endDate = new Date(endDateTime);
 

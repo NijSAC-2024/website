@@ -6,6 +6,7 @@ import Agenda from './pages/Agenda.tsx';
 import Event from './pages/Event.tsx';
 import Signup from './pages/Signup.tsx';
 import TextPage from './pages/TextPage.tsx';
+import AddEvent from './components/AddEvent.tsx';
 
 const router = createBrowserRouter([
   {
@@ -26,6 +27,11 @@ const router = createBrowserRouter([
   {
     path: '/about',
     element: <TextPage />,
+    errorElement: <ErrorPage />
+  },
+  {
+    path: '/add-event',
+    element: <AddEvent />,
     errorElement: <ErrorPage />
   },
   {

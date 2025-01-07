@@ -4,14 +4,18 @@ import { useAuth } from '../providers/AuthProvider.tsx';
 import { AgendaEventType } from '../types.ts';
 import { useState } from 'react';
 import RegisterForm from './RegisterForm.tsx';
+import { useLanguage } from '../providers/LanguageProvider.tsx';
+import moment from 'moment/moment';
 
 interface RegisterButtonProps {
   agendaEvent: AgendaEventType;
-  langCode: string;
 }
 
-export default function RegisterButton({ agendaEvent, langCode }: RegisterButtonProps) {
+export default function RegisterButton({ agendaEvent }: RegisterButtonProps) {
   const { isLoggedIn } = useAuth();
+  const { getLangCode } = useLanguage();
+  const langCode = getLangCode();
+  moment.locale(langCode);
   const [registerDialogOpen, setRegisterDialogOpen] = useState<boolean>(false);
 
   const toggleDialog = () => {
@@ -30,19 +34,19 @@ export default function RegisterButton({ agendaEvent, langCode }: RegisterButton
             {text('Full', 'Vol')}
           </Button>
         ) : registrationOpenTime > now ? (
-          <p className="text-right">
-            {text('Registration opens at', 'Inschrijvingen openen op')}{' '}
-            {registrationOpenTime.toLocaleString(langCode)}
-          </p>
+          <div className="text-right grid">
+            <p>{text('Registrations open at ', 'Inschrijvingen openen op ')}</p>
+            <p>{moment(agendaEvent.registrationOpenTime).format('DD MMM HH:mm')}</p>
+          </div>
         ) : registrationCloseTime > now ? (
           <Button onClick={toggleDialog} variant="contained">
             {text('Register', 'Inschrijven')}
           </Button>
         ) : (
-          <p className="text-right">
-            {text('Registrations closed at', 'Inschrijvingen zijn gesloten sinds')}{' '}
-            {registrationCloseTime.toLocaleString(langCode)}
-          </p>
+          <div className="text-right grid">
+            <p>{text('Registrations closed at ', 'Inschrijvingen zijn gesloten sinds ')}</p>
+            <p>{moment(agendaEvent.registrationCloseTime).format('DD MMM HH:mm')}</p>
+          </div>
         )
       ) : (
         <p>{text('Please log in to register.', 'Login om je in te schrijven.')}</p>

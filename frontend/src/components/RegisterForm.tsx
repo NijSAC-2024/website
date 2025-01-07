@@ -1,12 +1,19 @@
 import { AgendaEventType } from '../types.ts';
 import { text } from '../util.ts';
 import { Button, TextField } from '@mui/material';
+import AccessAlarmIcon from '@mui/icons-material/AccessAlarm';
+import { useLanguage } from '../providers/LanguageProvider.tsx';
+import moment from 'moment';
 
 interface RegisterFormProps {
   agendaEvent: AgendaEventType;
 }
 
 export default function RegisterForm({ agendaEvent }: RegisterFormProps) {
+  const { getLangCode } = useLanguage();
+  const langCode = getLangCode();
+  moment.locale(langCode);
+
   return (
     <div className="grid gap-3">
       <h1>
@@ -15,6 +22,17 @@ export default function RegisterForm({ agendaEvent }: RegisterFormProps) {
           'Inschrijving voor ' + agendaEvent.title.nl
         )}
       </h1>
+      <p>
+        <AccessAlarmIcon className=" mr-2" />
+        {text('Registrations opens at ', 'Inschrijvingen openen op ')}
+        {moment(agendaEvent.registrationOpenTime).format('DD MMM HH:mm')}
+      </p>
+      <p>
+        <AccessAlarmIcon className=" mr-2" />
+        {text('Registrations closes at ', 'Inschrijvingen sluiten op ')}
+        {moment(agendaEvent.registrationOpenTime).format('DD MMM HH:mm')}
+      </p>
+      <h3>{text('Registration Fields', 'Inschrijfvelden')}</h3>
       {agendaEvent.registrationFields.map((field, index) => (
         <TextField key={index} fullWidth label={text(field.en, field.nl)} />
       ))}

@@ -35,7 +35,7 @@ export interface AgendaEventType {
   id: number;
   image: string;
   title: LanguageType;
-  category: 'activity' | 'course' | 'training' | 'weekend';
+  category: 'activity' | 'course' | 'training' | 'weekend' | '';
   type: OptionType[];
   location: string;
   descriptionMarkdown: LanguageType;

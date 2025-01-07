@@ -2,10 +2,13 @@ import { ReactNode } from 'react';
 
 interface GenericPageProps {
   children: ReactNode;
-  image: string;
+  image?: string;
 }
 
-export default function GenericPage({ children, image }: GenericPageProps) {
+export default function GenericPage({
+  children,
+  image = '/images/test-header-image.jpg'
+}: GenericPageProps) {
   return (
     <div className="w-full">
       <div

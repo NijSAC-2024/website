@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { AgendaEventType } from '../types.ts';
 import { Fab, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import router from '../router.tsx';
 
 export default function Agenda() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -71,12 +72,12 @@ export default function Agenda() {
   return (
     <>
       <div className="fixed bottom-5 right-5 z-10">
-        <Fab variant="extended" color="primary">
+        <Fab variant="extended" color="primary" onClick={() => router.navigate('/add-event')}>
           <AddIcon className="mr-2" />
           <p>{text('Add event', 'Voeg evenement toe')}</p>
         </Fab>
       </div>
-      <GenericPage image={'/images/test-header-image.jpg'}>
+      <GenericPage>
         <div className="Agenda">
           <div className="grid xl:grid-cols-3 lg:grid-cols-2 grid-flow-row gap-5">
             <ContentCard className="lg:col-span-2 p-7">
@@ -103,8 +104,7 @@ export default function Agenda() {
                   value={selectedCategory}
                   label={text('Category', 'Categorie')}
                   onChange={handleChange}
-                  variant="outlined"
-                >
+                  variant="outlined">
                   <MenuItem value="all">{text('All', 'Alles')}</MenuItem>
                   <MenuItem value="activity">{text('Activities', 'Activiteiten')}</MenuItem>
                   <MenuItem value="course">{text('Courses', 'Cursussen')}</MenuItem>

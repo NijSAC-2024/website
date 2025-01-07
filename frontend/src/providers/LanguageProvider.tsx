@@ -1,6 +1,6 @@
 import { createContext, useContext, useMemo, ReactNode, useState } from 'react';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
-import { LocalizationProvider } from '@mui/x-date-pickers-pro';
+import { LocalizationProvider } from '@mui/x-date-pickers';
 // import { enqueueSnackbar } from 'notistack';
 
 interface LanguageContextType {
@@ -61,7 +61,7 @@ export default function LanguageProvider({ children }: LanguageProviderProps) {
 export const useLanguage = (): LanguageContextType => {
   const context = useContext(LanguageContext);
   if (!context) {
-    throw new Error('useThemeMode must be used within a LanguageProvider');
+    throw new Error('useLanguage must be used within a LanguageProvider');
   }
   return context;
 };

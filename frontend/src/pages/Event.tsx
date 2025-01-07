@@ -74,27 +74,25 @@ export default function Event() {
 
   return (
     <>
-      {!isEditing && (
-        <div className="fixed bottom-5 right-5 z-10">
-          <Fab variant="extended" color="primary" onClick={toggleIsEditing}>
-            <EditIcon className="mr-2" />
-            {text('Edit event', 'Evenement bewerken')}
-          </Fab>
-        </div>
-      )}
-      <GenericPage image={agendaEvent.image}>
-        <div className="grid xl:grid-cols-3 gap-5">
-          <div className="xl:col-span-3 mb-[-0.5rem]">
-            <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">
-              <Button color="inherit" onClick={() => router.navigate('/agenda')}>
-                {text('Back to Agenda', 'Terug naar Agenda')}
-              </Button>
-            </div>
+      {isEditing ? (
+        <EditEvent agendaEvent={agendaEvent} handleUpdate={handleUpdate} />
+      ) : (
+        <>
+          <div className="fixed bottom-5 right-5 z-10">
+            <Fab variant="extended" color="primary" onClick={toggleIsEditing}>
+              <EditIcon className="mr-2" />
+              {text('Edit event', 'Evenement bewerken')}
+            </Fab>
           </div>
-          {isEditing ? (
-            <EditEvent agendaEvent={agendaEvent} handleUpdate={handleUpdate} />
-          ) : (
-            <>
+          <GenericPage image={agendaEvent.image}>
+            <div className="grid xl:grid-cols-3 gap-5">
+              <div className="xl:col-span-3 mb-[-0.5rem]">
+                <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">
+                  <Button color="inherit" onClick={() => router.navigate('/agenda')}>
+                    {text('Back to Agenda', 'Terug naar Agenda')}
+                  </Button>
+                </div>
+              </div>
               <AgendaCard agendaEvent={agendaEvent} agendaPage={false} />
               <ContentCard className="xl:col-span-2 flex flex-col justify-between">
                 <div className="p-7">
@@ -103,7 +101,7 @@ export default function Event() {
                   </Markdown>
                 </div>
                 <div className="flex justify-between px-7 py-5 border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
-                  {agendaEvent.gear.en.length > 0 && agendaEvent.gear.nl.length > 0 && (
+                  {(agendaEvent.gear.en.length > 0 || agendaEvent.gear.nl.length > 0) && (
                     <div>
                       <b className="text-[#1976d2] dark:text-[#90caf9]">
                         {text('Necessary Gear', 'Benodigde Uitrusting')}
@@ -171,10 +169,10 @@ export default function Event() {
                   </Table>
                 </ContentCard>
               )}
-            </>
-          )}
-        </div>
-      </GenericPage>
+            </div>
+          </GenericPage>
+        </>
+      )}
     </>
   );
 }

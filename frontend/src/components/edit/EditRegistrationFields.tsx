@@ -4,6 +4,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { AgendaEventType } from '../../types.ts';
 import ContentCard from '../ContentCard.tsx';
+import { DateTimePicker } from '@mui/x-date-pickers';
+import moment from 'moment';
 
 interface EditRegistrationFieldsProps {
   updatedAgendaEvent: AgendaEventType;
@@ -23,6 +25,11 @@ export default function EditRegistrationFields({
   handleAddRegistrationField,
   handleRemoveRegistrationField
 }: EditRegistrationFieldsProps) {
+  const handleToggleRegistrations = () => {
+    handleFieldChange('allowsRegistrations', !updatedAgendaEvent.allowsRegistrations);
+    handleFieldChange('registrationOpenTime', updatedAgendaEvent.startDateTime);
+    handleFieldChange('registrationCloseTime', updatedAgendaEvent.endDateTime);
+  };
   return (
     <ContentCard className="xl:col-span-3">
       <div className="flex justify-between p-7">
@@ -31,9 +38,7 @@ export default function EditRegistrationFields({
           {text('Allow registrations', 'Open voor inschrijvingen')}
           <Switch
             checked={updatedAgendaEvent.allowsRegistrations}
-            onChange={() =>
-              handleFieldChange('allowsRegistrations', !updatedAgendaEvent.allowsRegistrations)
-            }
+            onChange={handleToggleRegistrations}
           />
         </div>
       </div>
@@ -45,6 +50,18 @@ export default function EditRegistrationFields({
             value={updatedAgendaEvent.maxRegistrations || ''}
             onChange={(e) => handleFieldChange('maxRegistrations', e.target.value)}
           />
+          <div className="grid xl:grid-cols-2 gap-3">
+            <DateTimePicker
+              label={text('Start Date Registrations', 'Start Datum Inschrijvingen')}
+              value={moment(updatedAgendaEvent.registrationOpenTime)}
+              onChange={(date) => handleFieldChange('registrationOpenTime', date!.toISOString())}
+            />
+            <DateTimePicker
+              label={text('End Date Registrations', 'Eind Datum Inschrijvingen')}
+              value={moment(updatedAgendaEvent.registrationCloseTime)}
+              onChange={(date) => handleFieldChange('registrationCloseTime', date!.toISOString())}
+            />
+          </div>
           <h3>{text('Registration Fields', 'Inschrijfvelden')}</h3>
           {updatedAgendaEvent.registrationFields.map((field, index) => (
             <div key={index} className="flex items-center space-x-2">

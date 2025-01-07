@@ -1,6 +1,6 @@
 import { FormControl, InputLabel, MenuItem, Select, TextField, Fab } from '@mui/material';
 import { text } from '../../util.ts';
-import { DateTimePicker } from '@mui/x-date-pickers-pro';
+import { DateTimePicker } from '@mui/x-date-pickers';
 import moment from 'moment/moment';
 import {
   AgendaEventType,
@@ -74,22 +74,7 @@ export default function EditAgendaCard({
             {text('Upload Image', 'Afbeelding Uploaden')}
             <input type="file" accept="image/*" hidden onChange={handleImageChange} />
           </Fab>
-          <div className="grid space-y-3">
-            <TextField
-              value={updatedAgendaEvent.title.en}
-              label={text('Title English', 'Titel Engels')}
-              onChange={(e) =>
-                handleFieldChange('title', { ...updatedAgendaEvent.title, en: e.target.value })
-              }
-            />
-            <TextField
-              value={updatedAgendaEvent.title.nl}
-              label={text('Title Dutch', 'Titel Nederlands')}
-              onChange={(e) =>
-                handleFieldChange('title', { ...updatedAgendaEvent.title, nl: e.target.value })
-              }
-            />
-          </div>
+
           <div className="grid space-y-3">
             <FormControl fullWidth>
               <InputLabel id="select-label">{text('Category', 'Categorie')}</InputLabel>
@@ -110,6 +95,22 @@ export default function EditAgendaCard({
               onChange={(selectedTypes) => handleFieldChange('type', selectedTypes)}
               label={'Type'}
               initialOptions={updatedAgendaEvent.type}
+            />
+          </div>
+          <div className="grid space-y-3">
+            <TextField
+              value={updatedAgendaEvent.title.en}
+              label={text('Title English', 'Titel Engels')}
+              onChange={(e) =>
+                handleFieldChange('title', { ...updatedAgendaEvent.title, en: e.target.value })
+              }
+            />
+            <TextField
+              value={updatedAgendaEvent.title.nl}
+              label={text('Title Dutch', 'Titel Nederlands')}
+              onChange={(e) =>
+                handleFieldChange('title', { ...updatedAgendaEvent.title, nl: e.target.value })
+              }
             />
           </div>
           <div className="grid space-y-3">

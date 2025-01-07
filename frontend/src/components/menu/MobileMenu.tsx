@@ -62,7 +62,8 @@ export default function MobileMenu({
         in={dropdownOpen}
         timeout="auto"
         unmountOnExit
-        className="relative mt-[-6rem] text-black dark:text-white bg-white dark:bg-[#121212] z-10">
+        className="relative mt-[-6rem] text-black dark:text-white bg-white dark:bg-[#121212] z-10"
+      >
         <Toolbar className="flex justify-between items-center w-full">
           <img
             src={logo}
@@ -348,7 +349,8 @@ export default function MobileMenu({
               <ListItem className="px-10 pb-3 pt-2" disablePadding>
                 <Button
                   variant="contained"
-                  onClick={() => router.navigate('/register').then(toggleDropdown)}>
+                  onClick={() => router.navigate('/register').then(toggleDropdown)}
+                >
                   {text('Become a member', 'Lid worden')}
                 </Button>
               </ListItem>

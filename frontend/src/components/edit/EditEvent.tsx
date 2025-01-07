@@ -1,11 +1,13 @@
 import { AgendaEventType, OptionType, LanguageType } from '../../types.ts';
-import { Fab } from '@mui/material';
+import { Button, Fab } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import { text } from '../../util.ts';
 import { useState } from 'react';
 import EditRegistrationFields from './EditRegistrationFields.tsx';
 import EditAgendaCard from './EditAgendaCard.tsx';
 import EditDescription from './EditDescription.tsx';
+import router from '../../router.tsx';
+import GenericPage from '../../pages/GenericPage.tsx';
 
 interface EditEventProps {
   agendaEvent: AgendaEventType;
@@ -50,31 +52,40 @@ export default function EditEvent({ agendaEvent, handleUpdate }: EditEventProps)
     }));
 
   return (
-    <>
-      <div className="fixed bottom-5 right-5 z-10">
-        <Fab variant="extended" color="primary" onClick={() => handleUpdate(updatedAgendaEvent)}>
-          <SaveIcon className="mr-2" />
-          {text('Save Event', 'Evenement opslaan')}
-        </Fab>
+    <GenericPage image={updatedAgendaEvent.image}>
+      <div className="grid xl:grid-cols-3 gap-5">
+        <div className="xl:col-span-3 mb-[-0.5rem]">
+          <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">
+            <Button color="inherit" onClick={() => router.navigate('/agenda')}>
+              {text('Back to Agenda', 'Terug naar Agenda')}
+            </Button>
+          </div>
+        </div>
+        <div className="fixed bottom-5 right-5 z-10">
+          <Fab variant="extended" color="primary" onClick={() => handleUpdate(updatedAgendaEvent)}>
+            <SaveIcon className="mr-2" />
+            {text('Save Event', 'Evenement opslaan')}
+          </Fab>
+        </div>
+
+        <EditAgendaCard
+          updatedAgendaEvent={updatedAgendaEvent}
+          handleFieldChange={handleFieldChange}
+        />
+
+        <EditDescription
+          updatedAgendaEvent={updatedAgendaEvent}
+          handleFieldChange={handleFieldChange}
+        />
+
+        <EditRegistrationFields
+          updatedAgendaEvent={updatedAgendaEvent}
+          handleFieldChange={handleFieldChange}
+          handleRegistrationFieldsChange={handleRegistrationFieldsChange}
+          handleAddRegistrationField={handleAddRegistrationField}
+          handleRemoveRegistrationField={handleRemoveRegistrationField}
+        />
       </div>
-
-      <EditAgendaCard
-        updatedAgendaEvent={updatedAgendaEvent}
-        handleFieldChange={handleFieldChange}
-      />
-
-      <EditDescription
-        updatedAgendaEvent={updatedAgendaEvent}
-        handleFieldChange={handleFieldChange}
-      />
-
-      <EditRegistrationFields
-        updatedAgendaEvent={updatedAgendaEvent}
-        handleFieldChange={handleFieldChange}
-        handleRegistrationFieldsChange={handleRegistrationFieldsChange}
-        handleAddRegistrationField={handleAddRegistrationField}
-        handleRemoveRegistrationField={handleRemoveRegistrationField}
-      />
-    </>
+    </GenericPage>
   );
 }

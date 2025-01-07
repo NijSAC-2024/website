@@ -13,12 +13,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export default function ThemeProvider({ children }: ThemeProviderProps) {
   const [themeCookie, setThemeCookie] = useCookies(['theme']);
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
-    if (themeCookie.theme === undefined) {
-      return window.matchMedia('(prefers-color-scheme: dark)').matches;
-    }
-    return themeCookie.theme === 'true';
-  });
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(themeCookie.theme);
 
   useEffect(() => {
     setThemeCookie('theme', isDarkMode.toString(), { secure: true, sameSite: 'strict' });
@@ -31,7 +26,7 @@ export default function ThemeProvider({ children }: ThemeProviderProps) {
         rootElement.classList.remove('dark');
       }
     }
-  }, [isDarkMode, setThemeCookie]);
+  }, [isDarkMode]);
 
   const toggleTheme = () => {
     setIsDarkMode((prevMode) => !prevMode);

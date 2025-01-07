@@ -16,22 +16,21 @@ interface AgendaCardProps {
 }
 
 export default function AgendaCard({ agendaEvent, agendaPage }: AgendaCardProps) {
-  const language = useLanguage();
-  const langCode = language.getLangCode();
+  const { getLangCode } = useLanguage();
+  const langCode = getLangCode();
   moment.locale(langCode);
 
   return (
     <div className="w-full rounded-2xl bg-inherit border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] flex flex-col relative justify-between">
       <div
         onClick={() => router.navigate('/agenda/' + agendaEvent.id)}
-        className="hover:cursor-pointer"
-      >
+        className="hover:cursor-pointer">
         {agendaPage && (
           <Chip
             label={formatDate(agendaEvent.startDateTime, agendaEvent.endDateTime)}
-            className="absolute top-5 right-5"
+            className="absolute uppercase font-semibold top-5 right-5"
             color="primary"
-            sx={{ fontSize: 18 }}
+            sx={{ fontSize: 16 }}
           />
         )}
         <img
@@ -39,7 +38,7 @@ export default function AgendaCard({ agendaEvent, agendaPage }: AgendaCardProps)
           src={agendaEvent.image}
           alt="not available"
         />
-        <div className="p-5 pt-2.5 grid space-y-1">
+        <div className="p-5 grid space-y-1">
           <div className="flex justify-between">
             <div className="flex flex-wrap gap-1">
               <Chip
@@ -91,7 +90,7 @@ export default function AgendaCard({ agendaEvent, agendaPage }: AgendaCardProps)
           <div className="flex items-center">
             <GroupIcon className="mr-2" /> {agendaEvent.numberOfRegistrations}
           </div>
-          <RegisterButton agendaEvent={agendaEvent} langCode={langCode} />
+          <RegisterButton agendaEvent={agendaEvent} />
         </div>
       )}
     </div>
