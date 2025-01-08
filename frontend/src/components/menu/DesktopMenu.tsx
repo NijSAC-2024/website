@@ -29,6 +29,11 @@ export default function DesktopMenu({ handleLoginOpen }: DesktopMenuProps) {
     setOpenMenu(undefined);
   };
 
+  const navigateSubmenu = (address: string) => {
+    router.navigate(address);
+    handleMenuClose();
+  };
+
   return (
     <Toolbar className="flex justify-between w-[80%] max-w-[1000px] mx-auto">
       <div className="flex items-center">
@@ -73,7 +78,7 @@ export default function DesktopMenu({ handleLoginOpen }: DesktopMenuProps) {
             {text('Outdoor Climbing', 'Buiten Klimmen')}
           </MenuItem>
           <MenuItem onClick={handleMenuClose}>{text('Climbing Areas', 'Klimgebieden')}</MenuItem>
-          <MenuItem onClick={handleMenuClose}>
+          <MenuItem onClick={() => navigateSubmenu('/material-rental')}>
             {text('Material Rental', 'Materiaalverhuur')}
           </MenuItem>
         </Menu>

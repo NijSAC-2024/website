@@ -13,6 +13,12 @@ export default function AuthProvider({ children }: AuthProviderProps) {
 
   const [user, setUser] = useState<UserType | undefined>(undefined);
 
+  const [authOpen, setAuthOpen] = useState<boolean>(false);
+
+  const toggleAuthOpen = () => {
+    setAuthOpen((prevState) => !prevState);
+  };
+
   const checkAuth = async () => {
     try {
       const response = await fetch('/api/whoami', {
@@ -57,7 +63,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoggedIn, checkAuth, logout }}>
+    <AuthContext.Provider value={{ user, isLoggedIn, checkAuth, logout, authOpen, toggleAuthOpen }}>
       {children}
     </AuthContext.Provider>
   );

@@ -28,6 +28,7 @@ export default function EditDescription({
       </div>
       <div className="grid xl:grid-cols-2 gap-3 px-7 py-5 border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
         <TextField
+          multiline
           fullWidth
           value={updatedAgendaEvent.gear.en}
           label={text('Necessary Gear English ', 'Benodigde Uitrusting Engels')}
@@ -37,6 +38,7 @@ export default function EditDescription({
           }
         />
         <TextField
+          multiline
           fullWidth
           value={updatedAgendaEvent.gear.nl}
           label={text('Necessary Gear Dutch', 'Benodigde Uitrusting Nederlands')}

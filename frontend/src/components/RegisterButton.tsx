@@ -12,7 +12,7 @@ interface RegisterButtonProps {
 }
 
 export default function RegisterButton({ agendaEvent }: RegisterButtonProps) {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, toggleAuthOpen } = useAuth();
   const { getLangCode } = useLanguage();
   const langCode = getLangCode();
   moment.locale(langCode);
@@ -28,28 +28,26 @@ export default function RegisterButton({ agendaEvent }: RegisterButtonProps) {
 
   return (
     <>
-      {isLoggedIn ? (
-        agendaEvent.numberOfRegistrations === agendaEvent.maxRegistrations ? (
-          <Button variant="contained" disabled>
-            {text('Full', 'Vol')}
-          </Button>
-        ) : registrationOpenTime > now ? (
-          <div className="text-right grid">
-            <p>{text('Registrations open at ', 'Inschrijvingen openen op ')}</p>
-            <p>{moment(agendaEvent.registrationOpenTime).format('DD MMM HH:mm')}</p>
-          </div>
-        ) : registrationCloseTime > now ? (
-          <Button onClick={toggleDialog} variant="contained">
-            {text('Register', 'Inschrijven')}
-          </Button>
-        ) : (
-          <div className="text-right grid">
-            <p>{text('Registrations closed at ', 'Inschrijvingen zijn gesloten sinds ')}</p>
-            <p>{moment(agendaEvent.registrationCloseTime).format('DD MMM HH:mm')}</p>
-          </div>
-        )
+      {agendaEvent.numberOfRegistrations === agendaEvent.maxRegistrations ? (
+        <Button variant="contained" disabled>
+          {text('Full', 'Vol')}
+        </Button>
+      ) : registrationOpenTime > now ? (
+        <div className="text-right grid">
+          <p>{text('Registrations open at ', 'Inschrijvingen openen op ')}</p>
+          <p>{moment(agendaEvent.registrationOpenTime).format('DD MMM HH:mm')}</p>
+        </div>
+      ) : registrationCloseTime > now ? (
+        <Button onClick={isLoggedIn ? toggleDialog : toggleAuthOpen} variant="contained">
+          {isLoggedIn
+            ? text('Register', 'Inschrijven')
+            : text('Login to register', 'Login om je in te schrijven')}
+        </Button>
       ) : (
-        <p>{text('Please log in to register.', 'Login om je in te schrijven.')}</p>
+        <div className="text-right grid">
+          <p>{text('Registrations closed at ', 'Inschrijvingen zijn gesloten sinds ')}</p>
+          <p>{moment(agendaEvent.registrationCloseTime).format('DD MMM HH:mm')}</p>
+        </div>
       )}
       <Dialog open={registerDialogOpen} onClose={toggleDialog} fullWidth>
         <DialogContent>

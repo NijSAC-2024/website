@@ -5,22 +5,16 @@ import { text } from '../../util.ts';
 
 import DesktopMenu from './DesktopMenu.tsx';
 import MobileMenu from './MobileMenu.tsx';
+import { useAuth } from '../../providers/AuthProvider.tsx';
 
 export default function MainMenu() {
-  const [authOpen, setAuthOpen] = useState<boolean>(false);
+  const { authOpen, toggleAuthOpen } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
   const [offset, setOffset] = useState<number>(window.scrollY);
   const isMobile = useMediaQuery('(max-width: 992px)');
 
   const toggleDropdown = () => {
     setDropdownOpen((prevState) => !prevState);
-  };
-
-  const handleLoginOpen = () => {
-    setAuthOpen(true);
-  };
-  const handleClose = () => {
-    setAuthOpen(false);
   };
 
   useEffect(() => {
@@ -41,20 +35,20 @@ export default function MainMenu() {
       >
         {isMobile ? (
           <MobileMenu
-            handleLoginOpen={handleLoginOpen}
+            handleLoginOpen={toggleAuthOpen}
             dropdownOpen={dropdownOpen}
             toggleDropdown={toggleDropdown}
           />
         ) : (
-          <DesktopMenu handleLoginOpen={handleLoginOpen} />
+          <DesktopMenu handleLoginOpen={toggleAuthOpen} />
         )}
       </div>
-      <Dialog open={authOpen} onClose={handleClose} fullWidth>
+      <Dialog open={authOpen} onClose={toggleAuthOpen} fullWidth>
         <DialogContent>
-          <LoginForm onClose={handleClose} />
+          <LoginForm onClose={toggleAuthOpen} />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>{text('Close', 'Sluit')}</Button>
+          <Button onClick={toggleAuthOpen}>{text('Close', 'Sluit')}</Button>
         </DialogActions>
       </Dialog>
     </>
