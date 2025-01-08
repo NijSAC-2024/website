@@ -1,5 +1,6 @@
 import { useLanguage } from './providers/LanguageProvider.tsx';
 import moment from 'moment/moment';
+import { LanguageType, options } from './types.ts';
 
 export function text(english: string, dutch: string): string {
   const { language } = useLanguage();
@@ -8,6 +9,10 @@ export function text(english: string, dutch: string): string {
 }
 
 export function formatDate(startDateTime: string, endDateTime: string): string {
+  const { getLangCode } = useLanguage();
+  const langCode = getLangCode();
+  moment.locale(langCode);
+
   const startDate = new Date(startDateTime);
   const endDate = new Date(endDateTime);
 
@@ -40,4 +45,9 @@ export function truncateMarkdown(markdown: string, maxLength: number): string {
     );
   }
   return truncated.trim() + '…';
+}
+
+export function getLabel(id: string): LanguageType {
+  const categoryOption = options.find((option) => option.id === id);
+  return categoryOption ? categoryOption.label : { en: id, nl: id };
 }

@@ -51,6 +51,7 @@ export default function App() {
           root: {
             '& .MuiPaper-root': {
               borderRadius: 16,
+              padding: '0.6rem',
               background: isDarkMode ? '#121212' : 'white',
               borderBottom: isDarkMode ? '2px solid #90caf9' : '3px solid #1976d2'
             },
