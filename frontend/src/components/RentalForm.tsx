@@ -109,8 +109,8 @@ export default function RentalForm({
               const { ...optionProps } = props;
               return (
                 <li {...optionProps}>
-                  {option.name.en}
-                  <b>{`€${option.price} ${option.remark?.en || ''}`}</b>
+                  <p>{option.name.en}</p>
+                  <b className="ml-1">{`€${option.price} ${option.remark?.en || ''}`}</b>
                 </li>
               );
             }}
@@ -127,8 +127,8 @@ export default function RentalForm({
               const { ...optionProps } = props;
               return (
                 <li {...optionProps}>
-                  {option.name.nl}
-                  <b>{`€${option.price} ${option.remark?.nl || ''}`}</b>
+                  <p>{option.name.nl}</p>
+                  <b className="ml-1">{`€${option.price} ${option.remark?.nl || ''}`}</b>
                 </li>
               );
             }}
