@@ -1,4 +1,3 @@
-import logo from '/images/logo.svg';
 import router from '../../router.tsx';
 import { Button, Menu, MenuItem, Toolbar } from '@mui/material';
 import { text } from '../../util.ts';
@@ -30,15 +29,14 @@ export default function DesktopMenu({ handleLoginOpen }: DesktopMenuProps) {
   };
 
   const navigateSubmenu = (address: string) => {
-    router.navigate(address);
-    handleMenuClose();
+    router.navigate(address).then(handleMenuClose);
   };
 
   return (
     <Toolbar className="flex justify-between w-[80%] max-w-[1000px] mx-auto">
       <div className="flex items-center">
         <img
-          src={logo}
+          src={'/images/logo.svg'}
           alt="Logo"
           className="hover:opacity-50 hover:cursor-pointer h-24 mr-4"
           onClick={() => router.navigate('/')}

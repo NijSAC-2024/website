@@ -1,4 +1,4 @@
-import { FormControl, InputLabel, MenuItem, Select, TextField, Fab } from '@mui/material';
+import { FormControl, InputLabel, MenuItem, Select, TextField, Button } from '@mui/material';
 import { text } from '../../util.ts';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import moment from 'moment/moment';
@@ -64,9 +64,9 @@ export default function EditAgendaCard({
       </div>
       <div className="p-5">
         <div className="grid space-y-5">
-          <Fab
+          <Button
             component="label"
-            variant="extended"
+            variant="contained"
             color="primary"
             aria-label={text('Change Image', 'Afbeelding Wijzigen')}
             className="mx-auto"
@@ -74,9 +74,9 @@ export default function EditAgendaCard({
             <PhotoCameraIcon className="mr-2" />
             {text('Upload Image', 'Afbeelding Uploaden')}
             <input type="file" accept="image/*" hidden onChange={handleImageChange} />
-          </Fab>
+          </Button>
 
-          <div className="grid space-y-3">
+          <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
             <FormControl fullWidth>
               <InputLabel id="select-label">{text('Category', 'Categorie')}</InputLabel>
               <Select
@@ -99,7 +99,7 @@ export default function EditAgendaCard({
               initialOptions={updatedAgendaEvent.type}
             />
           </div>
-          <div className="grid space-y-3">
+          <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
             <TextField
               value={updatedAgendaEvent.title.en}
               label={text('Title English', 'Titel Engels')}
@@ -115,21 +115,19 @@ export default function EditAgendaCard({
               }
             />
           </div>
-          <div className="grid space-y-3">
-            <TextField
-              value={updatedAgendaEvent.location}
-              label={text('Location', 'Locatie')}
-              onChange={(e) => handleFieldChange('location', e.target.value)}
-            />
-          </div>
-          <div className="grid space-y-3">
+          <TextField
+            value={updatedAgendaEvent.location}
+            label={text('Location', 'Locatie')}
+            onChange={(e) => handleFieldChange('location', e.target.value)}
+          />
+          <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
             <DateTimePicker
-              label={text('Start Date', 'Start Datum')}
+              label={text('Start Date', 'Startdatum')}
               value={moment(updatedAgendaEvent.startDateTime)}
               onChange={(date) => handleFieldChange('startDateTime', date!.toISOString())}
             />
             <DateTimePicker
-              label={text('End Date', 'Eind Datum')}
+              label={text('End Date', 'Einddatum')}
               value={moment(updatedAgendaEvent.endDateTime)}
               onChange={(date) => handleFieldChange('endDateTime', date!.toISOString())}
             />

@@ -87,9 +87,9 @@ export default function RentalForm({
 
   return (
     <div className="grid space-y-5">
-      <h2>{text('Rental Form', 'Huurformulier')}</h2>
+      <h2>{text('Rental Request', 'Huuraanvraag')}</h2>
       <div className="grid space-y-3">
-        <div className="flex gap-3">
+        <div className="grid grid-cols-2 gap-3">
           <DatePicker
             label={text('Start Date', 'Startdatum')}
             value={moment(reservation.startDate)}
@@ -139,7 +139,7 @@ export default function RentalForm({
           />
         )}
         <Button variant="contained" onClick={handleAddItem} disabled={!selectedItem} fullWidth>
-          {text('Add to reservation', 'Toevoegen aan reservering')}
+          {text('Add to request', 'Toevoegen aan aanvraag')}
         </Button>
       </div>
       <div className="grid space-y-2">
@@ -163,14 +163,16 @@ export default function RentalForm({
                     <IconButton
                       color="primary"
                       onClick={() => handleAmountChange(item.name.en, false)}
-                      size="small">
+                      size="small"
+                    >
                       <RemoveIcon />
                     </IconButton>
                     {item.amount}
                     <IconButton
                       color="primary"
                       onClick={() => handleAmountChange(item.name.en, true)}
-                      size="small">
+                      size="small"
+                    >
                       <AddIcon />
                     </IconButton>
                   </div>
@@ -202,13 +204,14 @@ export default function RentalForm({
           fullWidth
           variant="contained"
           onClick={() => handleReservationSubmit(reservation)}
-          disabled={reservation.items.length === 0}>
-          {text('Submit Reservation', 'Verstuur Reservering')}
+          disabled={reservation.items.length === 0}
+        >
+          {text('Submit request', 'Verstuur aanvraag')}
         </Button>
         <p>
           {text(
-            '*Note that your reservation still has to be accepted by the Climbing Commissioner. You can see your reservations and their status on your profile page.',
-            '*Merk op dat de reservering eerst nog moet worden goedgekeurd door de klimcommissaris. Je kan je reserveringen en hun status zien op je profiel pagina.'
+            '*Note that your request still has to be accepted by the Climbing Commissioner. You can see your requests and their status on your account page.',
+            '*Merk op dat de aanvraag eerst nog moet worden goedgekeurd door de klimcommissaris. Je kan je aanvragen en hun status zien op je account pagina.'
           )}
         </p>
       </div>

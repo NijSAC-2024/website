@@ -6,7 +6,7 @@ import Agenda from './pages/Agenda.tsx';
 import Event from './pages/Event.tsx';
 import Signup from './pages/Signup.tsx';
 import TextPage from './pages/TextPage.tsx';
-import AddEvent from './components/AddEvent.tsx';
+import AddEvent from './pages/AddEvent.tsx';
 import MaterialRental from './pages/MaterialRental.tsx';
 
 const router = createBrowserRouter([

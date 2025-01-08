@@ -12,8 +12,10 @@ import router from '../router.tsx';
 import remarkGfm from 'remark-gfm';
 import { useState } from 'react';
 import EditEvent from '../components/edit/EditEvent.tsx';
+import { useAuth } from '../providers/AuthProvider.tsx';
 
 export default function Event() {
+  const { isLoggedIn } = useAuth();
   const [agendaEvent, setAgendaEvent] = useState<AgendaEventType>({
     id: 5,
     image:
@@ -153,7 +155,7 @@ export default function Event() {
                 </div>
               </ContentCard>
 
-              {agendaEvent.allowsRegistrations && (
+              {agendaEvent.allowsRegistrations && isLoggedIn && (
                 <ContentCard className="xl:col-span-3 p-7">
                   <h1>{text('Participants', 'Deelnemers')}</h1>
                   <Table>

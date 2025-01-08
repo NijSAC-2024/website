@@ -64,7 +64,7 @@ export default function MaterialRental() {
           <p>
             {text(
               "The NijSAC has an extensive material depot that contains both summer and winter material. As a NijSAC member or extraordinary member it is possible to rent material from this. Priority is given in this order. You can fill in a rental request and (unless otherwise stated) pick the material up and return it to the mathok. In addition, the NijSAC also rents topo's, guides and maps. See below for all possibilities.",
-              "De NijSAC beschikt over een uitgebreid materiaal voorraad met zowel zomer- als wintermateriaal. Als NijSAC-lid of buitengewoon lid is het mogelijk om hier materiaal van te huren. In deze volgorde wordt prioriteit gegeven. U kunt een huuraanvraag indienden en (tenzij anders vermeld) het materiaal ophalen en terugbrengen bij het mathok. Daarnaast verhuurt de NijSAC ook topo's, gidsen en kaarten. Zie hieronder alle mogelijkheden."
+              "De NijSAC beschikt over een uitgebreid materiaal voorraad met zowel zomer- als wintermateriaal. Als NijSAC-lid of buitengewoon lid is het mogelijk om hier materiaal van te huren. In deze volgorde wordt prioriteit gegeven. U kunt een huuraanvraag indienen en (tenzij anders vermeld) het materiaal ophalen en terugbrengen bij het mathok. Daarnaast verhuurt de NijSAC ook topo's, gidsen en kaarten. Zie onder voor alle mogelijkheden."
             )}
           </p>
 
@@ -106,10 +106,11 @@ export default function MaterialRental() {
             <Button
               fullWidth
               onClick={isLoggedIn ? toggleDialog : toggleAuthOpen}
-              variant="contained">
+              variant="contained"
+            >
               {isLoggedIn
-                ? text('Make Reservation', 'Reservering Maken')
-                : text('Login to make a reservation', 'Login om een reservering te maken')}
+                ? text('Make Request', 'Dien aanvraag in')
+                : text('Login to make a request', 'Login om een aanvraag in te dienen')}
             </Button>
           </div>
           <div className="mt-5">
@@ -130,7 +131,8 @@ export default function MaterialRental() {
                 {rentOptions.map((row) => (
                   <TableRow
                     key={row.name.en}
-                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                  >
                     <TableCell component="th" scope="row">
                       {text(row.name.en, row.name.nl)}
                     </TableCell>

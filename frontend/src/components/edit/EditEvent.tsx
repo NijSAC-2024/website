@@ -3,7 +3,7 @@ import { Button, Fab } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import { text } from '../../util.ts';
 import { useState } from 'react';
-import EditRegistrationFields from './EditRegistrationFields.tsx';
+import EditRegistrations from './EditRegistrations.tsx';
 import EditAgendaCard from './EditAgendaCard.tsx';
 import EditDescription from './EditDescription.tsx';
 import router from '../../router.tsx';
@@ -78,7 +78,7 @@ export default function EditEvent({ agendaEvent, handleUpdate }: EditEventProps)
           handleFieldChange={handleFieldChange}
         />
 
-        <EditRegistrationFields
+        <EditRegistrations
           updatedAgendaEvent={updatedAgendaEvent}
           handleFieldChange={handleFieldChange}
           handleRegistrationFieldsChange={handleRegistrationFieldsChange}
