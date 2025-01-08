@@ -143,19 +143,22 @@ export default function RentalForm({
         </Button>
       </div>
       <div className="grid space-y-2">
-        <h3>{text('Selected Items', 'Geselecteerde Artikelen')}</h3>
         <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>{text('Material', 'Materiaal')}</TableCell>
-              <TableCell>{text('Price/Day', 'Prijs/Dag')}</TableCell>
-              <TableCell>{text('Amount', 'Aantal')}</TableCell>
-              <TableCell>{text('Total/Day', 'Totaal/Dag')}</TableCell>
-            </TableRow>
-          </TableHead>
+          {reservation.items.length > 0 && (
+            <TableHead>
+              <TableRow>
+                <TableCell>{text('Material', 'Materiaal')}</TableCell>
+                <TableCell>{text('Price/Day', 'Prijs/Dag')}</TableCell>
+                <TableCell>{text('Amount', 'Aantal')}</TableCell>
+                <TableCell>{text('Total/Day', 'Totaal/Dag')}</TableCell>
+              </TableRow>
+            </TableHead>
+          )}
           <TableBody>
             {reservation.items.map((item) => (
-              <TableRow key={item.name.en}>
+              <TableRow
+                key={item.name.en}
+                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                 <TableCell>{text(item.name.en, item.name.nl)}</TableCell>
                 <TableCell>{`€ ${item.price}`}</TableCell>
                 <TableCell>
@@ -163,16 +166,14 @@ export default function RentalForm({
                     <IconButton
                       color="primary"
                       onClick={() => handleAmountChange(item.name.en, false)}
-                      size="small"
-                    >
+                      size="small">
                       <RemoveIcon />
                     </IconButton>
                     {item.amount}
                     <IconButton
                       color="primary"
                       onClick={() => handleAmountChange(item.name.en, true)}
-                      size="small"
-                    >
+                      size="small">
                       <AddIcon />
                     </IconButton>
                   </div>
@@ -204,8 +205,7 @@ export default function RentalForm({
           fullWidth
           variant="contained"
           onClick={() => handleReservationSubmit(reservation)}
-          disabled={reservation.items.length === 0}
-        >
+          disabled={reservation.items.length === 0}>
           {text('Submit request', 'Verstuur aanvraag')}
         </Button>
         <p>

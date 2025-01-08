@@ -60,7 +60,7 @@ export default function MaterialRental() {
     <>
       <GenericPage>
         <ContentCard className="p-7">
-          <h1>{text('Material Rental', 'Materiaal Verhuur')}</h1>
+          <h1>{text('Material Rental', 'Materiaalverhuur')}</h1>
           <p>
             {text(
               "The NijSAC has an extensive material depot that contains both summer and winter material. As a NijSAC member or extraordinary member it is possible to rent material from this. Priority is given in this order. You can fill in a rental request and (unless otherwise stated) pick the material up and return it to the mathok. In addition, the NijSAC also rents topo's, guides and maps. See below for all possibilities.",
@@ -83,19 +83,19 @@ export default function MaterialRental() {
                 '. Een korte samenvatting van de huurvoorwaarden:'
               )}
             </p>
-            <li>
+            <li className="ml-5">
               {text(
                 'The treasurer sends the rent to be transferred via an invoice.',
                 'De penningmeester verstuurt de over te dragen huur via een factuur.'
               )}
             </li>
-            <li>
+            <li className="ml-5">
               {text(
                 'The rented property is collected and returned to the Climbing Commissioner. The tenant is responsible for this.',
                 'Het gehuurde wordt opgehaald en teruggegeven aan de klimcommissaris. De huurder is hiervoor verantwoordelijk.'
               )}
             </li>
-            <li>
+            <li className="ml-5">
               {text(
                 'Return the materials quickly after use. Return it as it was rented. If material is returned too late, is lost or damaged due to carelessness, the amount due will be recovered from the tenants. Any damage will be noted in advance.',
                 'Breng de materialen na gebruik snel terug. Breng het terug zoals het werd verhuurd. Indien materiaal te laat wordt ingeleverd, door onzorgvuldigheid verloren gaat of beschadigd raakt, wordt het verschuldigde bedrag op de huurders verhaald. Eventuele schade wordt vooraf vermeld.'
@@ -106,8 +106,7 @@ export default function MaterialRental() {
             <Button
               fullWidth
               onClick={isLoggedIn ? toggleDialog : toggleAuthOpen}
-              variant="contained"
-            >
+              variant="contained">
               {isLoggedIn
                 ? text('Make Request', 'Dien aanvraag in')
                 : text('Login to make a request', 'Login om een aanvraag in te dienen')}
@@ -131,8 +130,7 @@ export default function MaterialRental() {
                 {rentOptions.map((row) => (
                   <TableRow
                     key={row.name.en}
-                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                  >
+                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                     <TableCell component="th" scope="row">
                       {text(row.name.en, row.name.nl)}
                     </TableCell>
