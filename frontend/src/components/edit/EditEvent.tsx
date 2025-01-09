@@ -54,7 +54,7 @@ export default function EditEvent({ agendaEvent, handleUpdate }: EditEventProps)
 
   return (
     <GenericPage image={updatedAgendaEvent.image}>
-      <div className="grid xl:grid-cols-3 gap-5">
+      <div className="grid xl:grid-cols-3 gap-5 mt-[-9.3rem]">
         <div className="xl:col-span-3 mb-[-0.5rem]">
           <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">
             <Button color="inherit" onClick={() => router.navigate('/agenda')}>
@@ -75,8 +75,7 @@ export default function EditEvent({ agendaEvent, handleUpdate }: EditEventProps)
               moment(updatedAgendaEvent.endDateTime).isBefore(
                 moment(updatedAgendaEvent.startDateTime)
               )
-            }
-          >
+            }>
             <SaveIcon className="mr-2" />
             {text('Save Event', 'Evenement opslaan')}
           </Fab>
