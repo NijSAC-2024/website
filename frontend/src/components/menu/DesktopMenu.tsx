@@ -133,6 +133,7 @@ export default function DesktopMenu({ handleLoginOpen }: DesktopMenuProps) {
             Nederlands
           </MenuItem>
         </Menu>
+
         {/* Login+Become Member / Logout */}
         {!isLoggedIn ? (
           <>

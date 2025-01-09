@@ -3,15 +3,16 @@ import ContentCard from '../components/ContentCard.tsx';
 import AgendaCard from '../components/AgendaCard.tsx';
 import { text } from '../util.ts';
 import { useState } from 'react';
-import { AgendaEventType } from '../types.ts';
-import { Fab, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import { AgendaEventType, CategoryType } from '../types.ts';
+import { Fab, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import router from '../router.tsx';
+import moment from 'moment/moment';
 
 export default function Agenda() {
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const handleChange = (event: SelectChangeEvent) => {
-    setSelectedCategory(event.target.value);
+  const [selectedCategory, setSelectedCategory] = useState<CategoryType>('all');
+  const handleChange = (category: CategoryType) => {
+    setSelectedCategory(category);
   };
 
   const exampleAPIResponse: AgendaEventType[] = [
@@ -35,8 +36,8 @@ export default function Agenda() {
       allowsRegistrations: true,
       numberOfRegistrations: 12,
       maxRegistrations: 20,
-      startDateTime: '2025-03-06T22:30:00.000Z',
-      endDateTime: '2025-03-06T22:30:00.000Z',
+      startDateTime: '2025-03-06T08:30:00.000Z',
+      endDateTime: '2025-04-06T09:30:00.000Z',
       registrationOpenTime: '2024-12-23T00:00:00.000Z',
       registrationCloseTime: '2027-03-07T00:00:00.000Z',
       registrationFields: [{ en: 'How many quickdraws', nl: 'Hoeveel setjes' }]
@@ -62,7 +63,7 @@ export default function Agenda() {
       numberOfRegistrations: 10,
       maxRegistrations: 10,
       startDateTime: '2025-03-06T22:30:00.000Z',
-      endDateTime: '2025-03-06T22:30:00.000Z',
+      endDateTime: '2025-03-08T22:30:00.000Z',
       registrationOpenTime: '2024-12-23T00:00:00.000Z',
       registrationCloseTime: '2027-03-07T00:00:00.000Z',
       registrationFields: [{ en: 'How many quickdraws', nl: 'Hoeveel setjes' }]
@@ -103,7 +104,7 @@ export default function Agenda() {
                   labelId="select-label"
                   value={selectedCategory}
                   label={text('Category', 'Categorie')}
-                  onChange={handleChange}
+                  onChange={(e) => handleChange(e.target.value as CategoryType)}
                   variant="outlined"
                 >
                   <MenuItem value="all">{text('All', 'Alles')}</MenuItem>
@@ -118,6 +119,10 @@ export default function Agenda() {
               .filter(
                 (agendaEvent: AgendaEventType) =>
                   selectedCategory === 'all' || agendaEvent.category === selectedCategory
+              )
+              .sort(
+                (a: AgendaEventType, b: AgendaEventType) =>
+                  moment(a.startDateTime).valueOf() - moment(b.startDateTime).valueOf()
               )
               .map((event: AgendaEventType) => (
                 <AgendaCard agendaEvent={event} agendaPage={true} key={event.id} />

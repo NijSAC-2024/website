@@ -1,5 +1,3 @@
-import { Dispatch, SetStateAction } from 'react';
-
 export interface User {
   id: number;
   email: string;
@@ -23,7 +21,8 @@ export interface ValidateProps {
   validator: (value: string) => string | false;
   // eslint-disable-next-line no-unused-vars
   onChange: (isValid: boolean) => void;
-  setValue: Dispatch<SetStateAction<string>>;
+  // eslint-disable-next-line no-unused-vars
+  setValue: (value: string) => void;
 }
 
 export interface LanguageType {
@@ -38,11 +37,13 @@ export interface LanguageType {
   nl: string;
 }
 
+export type CategoryType = 'activity' | 'course' | 'training' | 'weekend' | '' | 'all';
+
 export interface AgendaEventType {
   id: number;
   image: string;
   title: LanguageType;
-  category: 'activity' | 'course' | 'training' | 'weekend' | '';
+  category: CategoryType;
   type: OptionType[];
   location: string;
   descriptionMarkdown: LanguageType;
@@ -89,7 +90,7 @@ export interface ReservationType {
   startDate: string;
   endDate: string;
   items: ReservationItemType[];
-  remark?: string;
+  remarks?: string;
 }
 
 export interface ReservationItemType {
@@ -118,7 +119,7 @@ export const experienceOptions: OptionsType[] = [
   { id: 'mp', label: { en: 'Multi Pitch', nl: 'Multi Pitch' } }
 ];
 
-export const options = [
+export const eventOptions = [
   { id: 'activity', label: { en: 'Activity', nl: 'Activiteit' } },
   { id: 'course', label: { en: 'Course', nl: 'Cursus' } },
   { id: 'training', label: { en: 'Training', nl: 'Training' } },

@@ -8,6 +8,7 @@ import EditAgendaCard from './EditAgendaCard.tsx';
 import EditDescription from './EditDescription.tsx';
 import router from '../../router.tsx';
 import GenericPage from '../../pages/GenericPage.tsx';
+import moment from 'moment';
 
 interface EditEventProps {
   agendaEvent: AgendaEventType;
@@ -62,7 +63,20 @@ export default function EditEvent({ agendaEvent, handleUpdate }: EditEventProps)
           </div>
         </div>
         <div className="fixed bottom-5 right-5 z-10">
-          <Fab variant="extended" color="primary" onClick={() => handleUpdate(updatedAgendaEvent)}>
+          <Fab
+            variant="extended"
+            color="primary"
+            onClick={() => handleUpdate(updatedAgendaEvent)}
+            disabled={
+              !updatedAgendaEvent.title.en ||
+              !updatedAgendaEvent.title.nl ||
+              !updatedAgendaEvent.location ||
+              !updatedAgendaEvent.category ||
+              moment(updatedAgendaEvent.endDateTime).isBefore(
+                moment(updatedAgendaEvent.startDateTime)
+              )
+            }
+          >
             <SaveIcon className="mr-2" />
             {text('Save Event', 'Evenement opslaan')}
           </Fab>

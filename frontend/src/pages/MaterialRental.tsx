@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import { rentOptions, ReservationItemType, ReservationType } from '../types.ts';
 import { useState } from 'react';
-import RentalForm from '../components/RentalForm.tsx';
+import RentalForm from '../components/rental/RentalForm.tsx';
 import { useAuth } from '../providers/AuthProvider.tsx';
 
 export default function MaterialRental() {
@@ -83,19 +83,19 @@ export default function MaterialRental() {
                 '. Een korte samenvatting van de huurvoorwaarden:'
               )}
             </p>
-            <li className="ml-5">
+            <li>
               {text(
                 'The treasurer sends the rent to be transferred via an invoice.',
                 'De penningmeester verstuurt de over te dragen huur via een factuur.'
               )}
             </li>
-            <li className="ml-5">
+            <li>
               {text(
                 'The rented property is collected and returned to the Climbing Commissioner. The tenant is responsible for this.',
                 'Het gehuurde wordt opgehaald en teruggegeven aan de klimcommissaris. De huurder is hiervoor verantwoordelijk.'
               )}
             </li>
-            <li className="ml-5">
+            <li>
               {text(
                 'Return the materials quickly after use. Return it as it was rented. If material is returned too late, is lost or damaged due to carelessness, the amount due will be recovered from the tenants. Any damage will be noted in advance.',
                 'Breng de materialen na gebruik snel terug. Breng het terug zoals het werd verhuurd. Indien materiaal te laat wordt ingeleverd, door onzorgvuldigheid verloren gaat of beschadigd raakt, wordt het verschuldigde bedrag op de huurders verhaald. Eventuele schade wordt vooraf vermeld.'
@@ -106,7 +106,8 @@ export default function MaterialRental() {
             <Button
               fullWidth
               onClick={isLoggedIn ? toggleDialog : toggleAuthOpen}
-              variant="contained">
+              variant="contained"
+            >
               {isLoggedIn
                 ? text('Make Request', 'Dien aanvraag in')
                 : text('Login to make a request', 'Login om een aanvraag in te dienen')}
@@ -130,12 +131,13 @@ export default function MaterialRental() {
                 {rentOptions.map((row) => (
                   <TableRow
                     key={row.name.en}
-                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                  >
                     <TableCell component="th" scope="row">
                       {text(row.name.en, row.name.nl)}
                     </TableCell>
                     <TableCell>
-                      {'€ ' + row.price + ' ' + text(row.remark?.en || '', row.remark?.nl || '')}
+                      {'€' + row.price + ' ' + text(row.remark?.en || '', row.remark?.nl || '')}
                     </TableCell>
                   </TableRow>
                 ))}

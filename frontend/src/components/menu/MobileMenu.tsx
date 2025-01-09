@@ -343,7 +343,7 @@ export default function MobileMenu({
             </List>
           </Collapse>
 
-          {/* Login and Signup */}
+          {/* Login+Become Member / Logout */}
           {!isLoggedIn ? (
             <>
               <ListItem onClick={handleLoginOpen} disablePadding>

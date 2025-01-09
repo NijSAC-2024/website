@@ -78,11 +78,11 @@ export default function EditAgendaCard({
 
           <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
             <FormControl fullWidth>
-              <InputLabel id="select-label">{text('Category', 'Categorie')}</InputLabel>
+              <InputLabel id="select-label">{text('Category*', 'Categorie*')}</InputLabel>
               <Select
                 labelId="select-label"
                 value={updatedAgendaEvent.category}
-                label={text('Category', 'Categorie')}
+                label={text('Category*', 'Categorie*')}
                 variant="outlined"
                 onChange={(e) => handleFieldChange('category', e.target.value)}
               >
@@ -102,14 +102,14 @@ export default function EditAgendaCard({
           <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
             <TextField
               value={updatedAgendaEvent.title.en}
-              label={text('Title English', 'Titel Engels')}
+              label={text('Title English*', 'Titel Engels*')}
               onChange={(e) =>
                 handleFieldChange('title', { ...updatedAgendaEvent.title, en: e.target.value })
               }
             />
             <TextField
               value={updatedAgendaEvent.title.nl}
-              label={text('Title Dutch', 'Titel Nederlands')}
+              label={text('Title Dutch*', 'Titel Nederlands*')}
               onChange={(e) =>
                 handleFieldChange('title', { ...updatedAgendaEvent.title, nl: e.target.value })
               }
@@ -117,17 +117,17 @@ export default function EditAgendaCard({
           </div>
           <TextField
             value={updatedAgendaEvent.location}
-            label={text('Location', 'Locatie')}
+            label={text('Location*', 'Locatie*')}
             onChange={(e) => handleFieldChange('location', e.target.value)}
           />
           <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
             <DateTimePicker
-              label={text('Start Date', 'Startdatum')}
+              label={text('Start Date*', 'Startdatum*')}
               value={moment(updatedAgendaEvent.startDateTime)}
               onChange={(date) => handleFieldChange('startDateTime', date!.toISOString())}
             />
             <DateTimePicker
-              label={text('End Date', 'Einddatum')}
+              label={text('End Date*', 'Einddatum*')}
               value={moment(updatedAgendaEvent.endDateTime)}
               onChange={(date) => handleFieldChange('endDateTime', date!.toISOString())}
             />
