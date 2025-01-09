@@ -32,17 +32,17 @@ export default function ItemsTable({ reservation, onAmountChange }: ItemsTablePr
   };
   const calculateItemTotal = (price: number, days: number, remark?: { en: string; nl: string }) => {
     if (remark?.en.includes('per month after 1 month')) {
-      const months = days / 30;
+      const months = Math.max(Math.round(days / 30), 1);
       if (months > 1) {
-        return 5 * months - 1;
+        return 5 * (months - 1);
       } else return 0;
     } else if (remark?.en.includes('per month')) {
-      const months = days / 30;
+      const months = Math.max(Math.round(days / 30), 1);
       return price * months;
     } else if (remark?.en.includes('for max. 6 months')) {
-      return 5;
+      return price;
     } else if (remark?.en.includes('per week')) {
-      const weeks = days / 7;
+      const weeks = Math.max(Math.round(days / 7), 1);
       return price * weeks;
     } else {
       return price * days;
@@ -77,16 +77,14 @@ export default function ItemsTable({ reservation, onAmountChange }: ItemsTablePr
                   <IconButton
                     color="primary"
                     onClick={() => onAmountChange(item.name.en, false)}
-                    size="small"
-                  >
+                    size="small">
                     <RemoveIcon />
                   </IconButton>
                   {item.amount}
                   <IconButton
                     color="primary"
                     onClick={() => onAmountChange(item.name.en, true)}
-                    size="small"
-                  >
+                    size="small">
                     <AddIcon />
                   </IconButton>
                 </div>
