@@ -77,14 +77,16 @@ export default function ItemsTable({ reservation, onAmountChange }: ItemsTablePr
                   <IconButton
                     color="primary"
                     onClick={() => onAmountChange(item.name.en, false)}
-                    size="small">
+                    size="small"
+                  >
                     <RemoveIcon />
                   </IconButton>
                   {item.amount}
                   <IconButton
                     color="primary"
                     onClick={() => onAmountChange(item.name.en, true)}
-                    size="small">
+                    size="small"
+                  >
                     <AddIcon />
                   </IconButton>
                 </div>

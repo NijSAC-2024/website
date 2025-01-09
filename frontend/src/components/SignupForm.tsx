@@ -1,5 +1,5 @@
 import { ReactNode, useRef, useState } from 'react';
-import { Backdrop, Button, Checkbox, CircularProgress, FormControlLabel } from '@mui/material';
+import { Button, Checkbox, FormControlLabel } from '@mui/material';
 import ValidatedPassword from './ValidatedPassword.tsx';
 import { enqueueSnackbar } from 'notistack';
 import ValidatedTextField from './ValidatedTextField';
@@ -9,6 +9,7 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import router from '../router.tsx';
 import { text } from '../util.ts';
+import { apiFetch } from '../api.ts';
 
 const steps = ['Personal', 'Education', 'Financial', 'Emergency contact', 'Overview'];
 
@@ -18,7 +19,6 @@ export default function SignupForm() {
   const [firstName, setFirstName] = useState<string>('');
   const [lastName, setLastName] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
 
   const formValid = useRef({
     email: false,
@@ -41,32 +41,25 @@ export default function SignupForm() {
       return;
     }
 
-    try {
-      setLoading(true);
-      const response = await fetch('/api/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, firstName, lastName, password })
-      });
+    const { error } = await apiFetch<void>('/api/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, firstName, lastName, password })
+    });
 
-      switch (response.status) {
-        case 201: {
-          await response.json();
-          enqueueSnackbar(`Created account: ${firstName} ${lastName}`, { variant: 'success' });
-          await router.navigate('/');
-          break;
-        }
-        case 409:
+    if (error) {
+      switch (error.message) {
+        case 'Conflict':
           enqueueSnackbar('Email is already in use.', { variant: 'error' });
           break;
         default:
-          enqueueSnackbar('Something went wrong. Please try again later.', { variant: 'error' });
+          enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
       }
-    } catch (error) {
-      enqueueSnackbar(String(error), { variant: 'error' });
-    } finally {
-      setLoading(false);
+      return;
     }
+
+    enqueueSnackbar(`Created account: ${firstName} ${lastName}`, { variant: 'success' });
+    await router.navigate('/');
   };
 
   return (
@@ -129,9 +122,6 @@ export default function SignupForm() {
           )}
         </div>
       </div>
-      <Backdrop open={loading}>
-        <CircularProgress />
-      </Backdrop>
     </>
   );
 }

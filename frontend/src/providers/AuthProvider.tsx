@@ -1,6 +1,7 @@
 import { createContext, useContext, ReactNode, useState } from 'react';
 import { AuthContextType, UserType } from '../types.ts';
 import { enqueueSnackbar } from 'notistack';
+import { apiFetch } from '../api.ts';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -20,43 +21,27 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   };
 
   const checkAuth = async () => {
-    try {
-      const response = await fetch('/api/whoami', {
-        method: 'GET',
-        credentials: 'include'
-      });
+    const { error, data } = await apiFetch<UserType>('/api/whoami');
 
-      if (response.ok) {
-        const body = await response.json();
-        setUser(body);
-        setIsLoggedIn(true);
-      } else {
-        setIsLoggedIn(false);
-      }
-    } catch (error) {
-      enqueueSnackbar(String(error), {
-        variant: 'error'
-      });
+    if (!error) {
+      setUser(data);
+      setIsLoggedIn(true);
+    } else {
       setIsLoggedIn(false);
     }
   };
 
   const logout = async () => {
-    try {
-      const response = await fetch('/api/logout', {
-        method: 'GET',
-        credentials: 'include'
-      });
+    const { error } = await apiFetch<void>('/api/logout', { method: 'GET' });
 
-      if (response.ok) {
-        setIsLoggedIn(false);
-        setUser(undefined);
-        enqueueSnackbar('You logged out.', {
-          variant: 'success'
-        });
-      }
-    } catch (error) {
-      enqueueSnackbar(String(error), {
+    if (!error) {
+      setIsLoggedIn(false);
+      setUser(undefined);
+      enqueueSnackbar('You logged out.', {
+        variant: 'success'
+      });
+    } else {
+      enqueueSnackbar(`${error.message}: ${error.reference}`, {
         variant: 'error'
       });
     }

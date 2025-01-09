@@ -75,7 +75,8 @@ export default function EditEvent({ agendaEvent, handleUpdate }: EditEventProps)
               moment(updatedAgendaEvent.endDateTime).isBefore(
                 moment(updatedAgendaEvent.startDateTime)
               )
-            }>
+            }
+          >
             <SaveIcon className="mr-2" />
             {text('Save Event', 'Evenement opslaan')}
           </Fab>

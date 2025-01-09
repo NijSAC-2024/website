@@ -55,7 +55,7 @@ export default function SingupOptions({
           <Divider />
           <p className="mt-3">
             {text(
-              'A membership costs 40 euros per year',
+              'A membership costs 40 euros per year.',
               'Een lidmaatschap kost 40 euro per jaar.'
             )}
           </p>
@@ -98,7 +98,7 @@ export default function SingupOptions({
           <Divider />
           <p className="mt-3">
             {text(
-              'A extraordinary membership costs 50 euros per year',
+              'A extraordinary membership costs 50 euros per year.',
               'Een buitegewoon lidmaatschap kost 50 euro per jaar.'
             )}
           </p>

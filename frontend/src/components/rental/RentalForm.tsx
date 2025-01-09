@@ -114,8 +114,8 @@ export default function RentalForm({
         </Button>
         <p>
           {text(
-            '*Note that your request still has to be accepted by the Climbing Commissioner. You can see your requests and their status on your account page.',
-            '*Merk op dat de aanvraag eerst nog moet worden goedgekeurd door de klimcommissaris. Je kan je aanvragen en hun status zien op je account pagina.'
+            '*Note that your request still has to be accepted by the Matcie. You can see your requests and their status on your account page.',
+            '*Merk op dat de aanvraag eerst nog moet worden goedgekeurd door de Matcie. Je kan je aanvragen en hun status zien op je account pagina.'
           )}
         </p>
       </div>

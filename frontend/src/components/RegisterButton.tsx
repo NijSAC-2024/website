@@ -41,7 +41,7 @@ export default function RegisterButton({ agendaEvent }: RegisterButtonProps) {
         <Button onClick={isLoggedIn ? toggleDialog : toggleAuthOpen} variant="contained">
           {isLoggedIn
             ? text('Register', 'Inschrijven')
-            : text('Login to register', 'Login om je in te schrijven')}
+            : text('Login to register', 'Login om in te schrijven')}
         </Button>
       ) : (
         <div className="text-right grid">
