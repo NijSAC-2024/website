@@ -13,7 +13,13 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export default function ThemeProvider({ children }: ThemeProviderProps) {
   const [themeCookie, setThemeCookie] = useCookies(['theme']);
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(themeCookie.theme);
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    if (themeCookie.theme) {
+      return themeCookie.theme;
+    } else {
+      return false;
+    }
+  });
 
   useEffect(() => {
     setThemeCookie('theme', isDarkMode.toString(), { secure: true, sameSite: 'strict' });
