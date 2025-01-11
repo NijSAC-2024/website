@@ -17,7 +17,7 @@ export default function Agenda() {
 
   const exampleAPIResponse: AgendaEventType[] = [
     {
-      id: 5,
+      id: 4,
       image:
         'https://images.squarespace-cdn.com/content/v1/531722ebe4b01396b755c991/1489157370692-DZW7VKX7TY1KBJBQFYTW/SPA+16.03+Single+Pitch+Award+assessment+02+resized.jpg?format=1500w',
       title: { en: 'Singlepitch Course', nl: 'Singlepitch Cursus' },

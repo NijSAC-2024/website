@@ -101,7 +101,7 @@ export default function AgendaCard({ agendaEvent, agendaPage }: AgendaCardProps)
               />
               {agendaEvent.type.map((type, index) => (
                 <Chip
-                  key={index}
+                  key={`${agendaEvent.id}-${index}`}
                   label={text(getLabel(type))}
                   className="uppercase font-semibold"
                   size="small"
