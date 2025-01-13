@@ -69,8 +69,15 @@ export default function RentalForm({
 
   return (
     <div className="grid space-y-5">
-      <h2>{text('Rental Request', 'Huuraanvraag')}</h2>
-
+      <div className="grid space-y-1">
+        <h2>{text('Rental Request', 'Huuraanvraag')}</h2>
+        <p>
+          {text(
+            'Select your preferred usage dates. Once your request is approved, you can coordinate with the Matcie to agree on the pick-up and drop-off dates.',
+            'Selecteer de gewenste gebruiksdata. Zodra je aanvraag is goedgekeurd, kun je contact opnemen met de Matcie om de ophaal- en retourdata af te stemmen.'
+          )}
+        </p>
+      </div>
       <div className="grid space-y-3">
         <div className="grid grid-cols-2 gap-3">
           <DatePicker
@@ -110,12 +117,12 @@ export default function RentalForm({
             moment(reservation.endDate).isBefore(moment(reservation.startDate))
           }
         >
-          {text('Submit request', 'Verstuur aanvraag')}
+          {text('Submit request*', 'Verstuur aanvraag*')}
         </Button>
         <p>
           {text(
-            '*Note that your request still has to be accepted by the Matcie. You can see your requests and their status on your account page.',
-            '*Merk op dat de aanvraag eerst nog moet worden goedgekeurd door de Matcie. Je kan je aanvragen en hun status zien op je account pagina.'
+            '* Please note that your request still needs to be approved by the Matcie. You can view your requests and their status on your account page.',
+            '* Let op: je aanvraag moet nog worden goedgekeurd door de Matcie. Je kunt je aanvragen en de status ervan bekijken op je accountpagina.'
           )}
         </p>
       </div>

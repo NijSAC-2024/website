@@ -55,7 +55,7 @@ export default function ItemsTable({ reservation, onAmountChange }: ItemsTablePr
   };
 
   return (
-    <div className="grid space-y-2">
+    <div className="grid space-y-4">
       <Table>
         {reservation.items.length > 0 && (
           <TableHead>
@@ -71,35 +71,33 @@ export default function ItemsTable({ reservation, onAmountChange }: ItemsTablePr
           {reservation.items.map((item: ReservationItemType) => (
             <TableRow key={item.name.en}>
               <TableCell>{text(item.name.en, item.name.nl)}</TableCell>
-              <TableCell>{`€${item.price}/${text(findInterval(findRemark(item.name)))}`}</TableCell>
+              <TableCell>{`€${item.price.toFixed(2)}/${text(findInterval(findRemark(item.name)))}`}</TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
                   <IconButton
                     color="primary"
                     onClick={() => onAmountChange(item.name.en, false)}
-                    size="small"
-                  >
+                    size="small">
                     <RemoveIcon />
                   </IconButton>
                   {item.amount}
                   <IconButton
                     color="primary"
                     onClick={() => onAmountChange(item.name.en, true)}
-                    size="small"
-                  >
+                    size="small">
                     <AddIcon />
                   </IconButton>
                 </div>
               </TableCell>
-              <TableCell>{`€${item.price * item.amount}/${text(findInterval(findRemark(item.name)))}`}</TableCell>
+              <TableCell>{`€${(item.price * item.amount).toFixed(2)}/${text(findInterval(findRemark(item.name)))}`}</TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
       <h4>
         {text(
-          'Total Price for ' + calculateDays() + ' day(s):',
-          'Totale Prijs voor ' + calculateDays() + ' dag(en):'
+          'Total price for ' + calculateDays() + ' day(s):',
+          'Totale prijs voor ' + calculateDays() + ' dag(en):'
         )}
         {` €${reservation.items
           .reduce((sum, item) => {
