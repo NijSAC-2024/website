@@ -81,13 +81,13 @@ pub(crate) struct ActivityContent {
     pub(crate) name_nl: String,
 
     #[validate(length(min = 1, max = 100))]
-    pub(crate) name_eng: String,
+    pub(crate) name_en: String,
 
     #[validate(length(min = 1, max = 5000))]
     pub(crate) description_nl: Option<String>,
 
     #[validate(length(min = 1, max = 5000))]
-    pub(crate) description_eng: Option<String>,
+    pub(crate) description_en: Option<String>,
 
     #[serde(with = "time::serde::rfc3339")]
     pub(crate) start_time: OffsetDateTime,
@@ -109,7 +109,7 @@ pub(crate) struct ActivityContent {
 
     pub(crate) is_hidden: bool,
 
-    pub(crate) required_membership_status: MembershipStatus,
+    pub(crate) required_membership_status: Vec<MembershipStatus>,
 
     pub(crate) activity_type: ActivityType,
 }
@@ -130,19 +130,19 @@ fn validate_activity(activity: &ActivityContent) -> Result<(), ValidationError> 
 #[serde(rename_all = "camelCase")]
 #[allow(dead_code)]
 pub(crate) struct ActivityContentHydrated {
-    pub(crate) location_id: LocationId,
+    pub(crate) location: Location,
 
     #[validate(length(min = 1, max = 100))]
     pub(crate) name_nl: String,
 
     #[validate(length(min = 1, max = 100))]
-    pub(crate) name_eng: String,
+    pub(crate) name_en: String,
 
     #[validate(length(min = 1, max = 5000))]
     pub(crate) description_nl: Option<String>,
 
     #[validate(length(min = 1, max = 5000))]
-    pub(crate) description_eng: Option<String>,
+    pub(crate) description_en: Option<String>,
 
     #[serde(with = "time::serde::rfc3339")]
     pub(crate) start_time: OffsetDateTime,
@@ -164,9 +164,30 @@ pub(crate) struct ActivityContentHydrated {
 
     pub(crate) is_hidden: bool,
 
-    pub(crate) required_membership_status: MembershipStatus,
+    pub(crate) required_membership_status: Vec<MembershipStatus>,
 
     pub(crate) activity_type: ActivityType,
 
-    pub registrations: Vec<BasicUser>,
+    pub registrations: Vec<Registration>,
+}
+
+#[derive(Serialize, Debug)]
+pub(crate) struct Registration {
+    pub user: BasicUser,
+    pub answers: Vec<Answer>,
+}
+
+#[derive(Serialize, Debug)]
+pub(crate) struct Answer {
+    pub question_id: Uuid,
+    pub answer: String,
+}
+
+#[derive(Serialize, Debug)]
+pub(crate) struct Location {
+    pub id: Uuid,
+    pub name_nl: String,
+    pub name_en: String,
+    pub description_nl: Option<String>,
+    pub description_en: Option<String>,
 }

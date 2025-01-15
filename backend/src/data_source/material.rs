@@ -31,7 +31,7 @@ impl FromRequestParts<AppState> for MaterialStore {
 #[derive(Debug)]
 pub struct PgMaterial {
     pub material_id: Uuid,
-    pub name_eng: String,
+    pub name_en: String,
     pub name_nl: String,
 }
 
@@ -47,7 +47,7 @@ impl TryFrom<PgMaterial> for Material {
     fn try_from(pg: PgMaterial) -> Result<Self, Self::Error> {
         Ok(Self {
             material_id: pg.material_id,
-            name_eng: pg.name_eng,
+            name_en: pg.name_en,
             name_nl: pg.name_nl,
         })
     }
@@ -174,7 +174,7 @@ impl MaterialStore {
         sqlx::query_as!(
             PgMaterial,
             r#"
-        SELECT material_id, name_eng, name_nl
+        SELECT material_id, name_en, name_nl
         FROM "material"
         ORDER BY material_id
         LIMIT $1

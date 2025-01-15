@@ -6,6 +6,7 @@ create table "user"
 (
     id                uuid primary key,
     first_name        text              not null,
+    infix             text,
     last_name         text              not null,
     phone             text              not null,
     student_number    integer,
@@ -83,20 +84,10 @@ create table activity_weekend -- For extra information about a weekend
     description_en text
 );
 
-create table activity_registration_question
-(
-    question_id uuid not null,
-    activity_id uuid not null,
-    "order"     int  not null,
-    constraint unambiguous_order
-        unique (activity_id, "order"),
-    constraint pk_activity_registration_question
-        primary key (question_id, activity_id)
-);
-
 create table registration_question
 (
     id               uuid primary key,
+    activity_id      uuid          not null references activity (id) on delete cascade,
     question_type    question_type not null,
     question_text_nl text          not null,
     question_text_en text          not null,
@@ -121,6 +112,7 @@ create type basic_user as
 (
     id         uuid,
     first_name text,
+    infix      text,
     last_name  text
 );
 

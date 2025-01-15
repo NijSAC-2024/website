@@ -4,6 +4,7 @@ use crate::{
     AppState,
 };
 
+use crate::wire::activity::{Location, Registration};
 use crate::{
     auth::role::MembershipStatus,
     user::BasicUser,
@@ -36,10 +37,14 @@ impl FromRequestParts<AppState> for ActivityStore {
 struct PgActivity {
     id: Uuid,
     location_id: Uuid,
+    location_name_en: String,
+    location_name_nl: String,
+    location_description_nl: Option<String>,
+    location_description_en: Option<String>,
     name_nl: String,
-    name_eng: String,
+    name_en: String,
     description_nl: Option<String>,
-    description_eng: Option<String>,
+    description_en: Option<String>,
     start_time: OffsetDateTime,
     end_time: OffsetDateTime,
     registration_start: OffsetDateTime,
@@ -50,7 +55,7 @@ struct PgActivity {
     created_at: OffsetDateTime,
     updated_at: OffsetDateTime,
     is_hidden: bool,
-    required_membership_status: MembershipStatus,
+    required_membership_status: Vec<MembershipStatus>,
     activity_type: ActivityType,
 }
 
@@ -65,9 +70,9 @@ impl TryFrom<PgActivity> for Activity<ActivityContent> {
             content: ActivityContent {
                 location_id: pg.location_id.into(),
                 name_nl: pg.name_nl,
-                name_eng: pg.name_eng,
+                name_en: pg.name_en,
                 description_nl: pg.description_nl,
-                description_eng: pg.description_eng,
+                description_en: pg.description_en,
                 start_time: pg.start_time,
                 end_time: pg.end_time,
                 registration_start: pg.registration_start,
@@ -91,11 +96,17 @@ impl TryFrom<PgActivity> for Activity<ActivityContentHydrated> {
             created: pg.created_at,
             updated: pg.updated_at,
             content: ActivityContentHydrated {
-                location_id: pg.location_id.into(),
+                location: Location {
+                    id: pg.location_id,
+                    name_nl: pg.location_name_nl,
+                    name_en: pg.location_name_en,
+                    description_nl: pg.location_description_nl,
+                    description_en: pg.location_description_en,
+                },
                 name_nl: pg.name_nl,
-                name_eng: pg.name_eng,
+                name_en: pg.name_en,
                 description_nl: pg.description_nl,
-                description_eng: pg.description_eng,
+                description_en: pg.description_en,
                 start_time: pg.start_time,
                 end_time: pg.end_time,
                 registration_start: pg.registration_start,
@@ -111,6 +122,12 @@ impl TryFrom<PgActivity> for Activity<ActivityContentHydrated> {
     }
 }
 
+struct PgRegistration {
+    user_id: Uuid,
+    first_name: String,
+    last_name: String,
+}
+
 impl ActivityStore {
     pub async fn get_registrations(&self, id: ActivityId) -> Result<Vec<BasicUser>, Error> {
         let id_uuid: Uuid = id.into();
@@ -119,15 +136,15 @@ impl ActivityStore {
             BasicUser,
             r#"
             SELECT u.id as "id: Uuid", u.first_name, u.last_name
-            FROM activity_registrations au
-            JOIN "user" u ON au.user_id = u.id
-            WHERE au.id = $1
+            FROM activity_registrations ar
+                JOIN "user" u ON ar.user_id = u.id
+            WHERE ar.user_id = $1
             "#,
             id_uuid
         )
         .fetch_all(&self.db)
         .await?;
-
-        Ok(users)
+        
+        
     }
 }

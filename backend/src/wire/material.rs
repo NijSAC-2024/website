@@ -6,7 +6,7 @@ use validator::Validate;
 pub struct Material {
     pub material_id: Uuid, // Change to MaterialId to be the same as others
     #[validate(length(min = 1, max = 100))]
-    pub name_eng: String,
+    pub name_en: String,
     #[validate(length(min = 1, max = 100))]
     pub name_nl: String,
 }
