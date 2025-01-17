@@ -4,6 +4,7 @@ use crate::{
 use axum::response::IntoResponse;
 use axum_extra::extract::{cookie::Cookie, CookieJar};
 use sqlx::PgPool;
+use tracing::trace;
 
 pub(crate) mod role;
 pub(crate) mod session;
@@ -15,6 +16,7 @@ pub(crate) async fn login(
     jar: CookieJar,
     ValidatedJson(credentials): ValidatedJson<UserCredentials>,
 ) -> Result<impl IntoResponse, Error> {
+    trace!("Login attempt for user {}", credentials.email);
     let session = Session::new(credentials, &db).await?;
     Ok(jar.add(session.into_cookie()))
 }

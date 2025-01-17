@@ -1,11 +1,11 @@
 use serde::{Deserialize, Serialize};
 
-pub(crate) type Roles = Vec<Role>;
+pub type Roles = Vec<Role>;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
-pub(crate) enum Role {
+pub enum Role {
     Admin,
 
     Treasurer,
@@ -21,7 +21,7 @@ pub(crate) enum Role {
 #[derive(sqlx::Type, Serialize, Deserialize, Debug, Clone, Copy)]
 #[sqlx(type_name = "membership_status", rename_all = "snake_case")]
 #[serde(rename_all = "camelCase")]
-pub(crate) enum MembershipStatus {
+pub enum MembershipStatus {
     Pending,
     Member,
     Extraordinary,
@@ -29,7 +29,7 @@ pub(crate) enum MembershipStatus {
 }
 
 impl MembershipStatus {
-    pub(crate) fn is_member(&self) -> bool {
+    pub fn is_member(&self) -> bool {
         match self {
             MembershipStatus::Pending | MembershipStatus::NonMember => false,
             MembershipStatus::Member | MembershipStatus::Extraordinary => true,

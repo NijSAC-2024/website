@@ -40,6 +40,8 @@ pub enum Error {
     Conflict(Box<dyn DatabaseError>),
     #[error("Foreign key error")]
     ForeignKeyConstraintViolated(Box<dyn DatabaseError>),
+    #[error("Some unforeseen error occurred")]
+    Other(String),
 }
 impl From<sqlx::Error> for Error {
     fn from(value: sqlx::Error) -> Self {
@@ -152,6 +154,14 @@ impl IntoResponse for Error {
                 Problem {
                     message: "Foreign key violation".to_string(),
                     status: StatusCode::UNPROCESSABLE_ENTITY,
+                    reference,
+                }
+            }
+            Error::Other(err) => {
+                info!(%reference, "Unforeseen error: {err}");
+                Problem {
+                    message: "An unforeseen error occurred".to_string(),
+                    status: StatusCode::INTERNAL_SERVER_ERROR,
                     reference,
                 }
             }

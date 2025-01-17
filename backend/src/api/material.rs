@@ -1,5 +1,7 @@
+use crate::auth::role::Role;
+use crate::error::Error;
 use crate::{
-    api::{read_access, read_all_access, update_access, ApiResult, ValidatedJson, ValidatedQuery},
+    api::{ApiResult, ValidatedJson, ValidatedQuery},
     auth::session::Session,
     data_source::MaterialStore,
     error::AppResult,
@@ -9,13 +11,42 @@ use crate::{
 };
 use axum::{extract::Path, http::HeaderMap, Json};
 
-pub(crate) async fn get_user_materials(
+// TODO this needs some rework
+
+fn read_all_access(session: &Session) -> AppResult<()> {
+    if session.membership_status().is_member()
+        && session.roles().iter().any(|role| match role {
+            Role::Admin
+            | Role::Treasurer
+            | Role::Secretary
+            | Role::Chair
+            | Role::ViceChair
+            | Role::ClimbingCommissar => true,
+            Role::ActivityCommissionMember => false,
+        })
+    {
+        Ok(())
+    } else {
+        Err(Error::Unauthorized)
+    }
+}
+
+
+fn update_access(id: &UserId, session: &Session) -> AppResult<()> {
+    if read_all_access(session).is_ok() || id == session.user_id() {
+        Ok(())
+    } else {
+        Err(Error::Unauthorized)
+    }
+}
+
+pub async fn get_user_materials(
     store: MaterialStore,
     Path(user_id): Path<UserId>,
     session: Session,
     ValidatedQuery(pagination): ValidatedQuery<Pagination>,
 ) -> AppResult<(HeaderMap, Json<Vec<UserMaterial>>)> {
-    read_access(&user_id, &session)?;
+    update_access(&user_id, &session)?;
 
     let total = store.count(&user_id).await?;
     Ok((
@@ -24,7 +55,7 @@ pub(crate) async fn get_user_materials(
     ))
 }
 
-pub(crate) async fn update_user_material(
+pub async fn update_user_material(
     store: MaterialStore,
     session: Session,
     ValidatedJson(update_data): ValidatedJson<UserMaterial>,
@@ -41,7 +72,7 @@ pub(crate) async fn update_user_material(
     Ok(Json(res))
 }
 
-pub(crate) async fn get_material_list(
+pub async fn get_material_list(
     store: MaterialStore,
     session: Session,
     ValidatedQuery(pagination): ValidatedQuery<Pagination>,

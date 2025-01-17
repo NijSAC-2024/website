@@ -126,7 +126,7 @@ pub struct RegisterNewUser {
     pub ice_contact_email: Option<String>,
     #[validate(length(min = 1, max = 100))]
     pub ice_contact_phone: Option<String>,
-    #[validate(length(min = 1, max = 100))]
+    #[validate(length(min = 1, max = 10000))]
     pub important_info: Option<String>,
     pub status: MembershipStatus,
 }
@@ -134,7 +134,9 @@ pub struct RegisterNewUser {
 #[derive(Serialize, Debug, FromRow)]
 #[serde(rename_all = "camelCase")]
 pub struct BasicUser {
-    pub(crate) id: UserId,
-    pub(crate) first_name: String,
-    pub(crate) last_name: String,
+    pub user_id: UserId,
+    pub first_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub infix: Option<String>,
+    pub last_name: String,
 }

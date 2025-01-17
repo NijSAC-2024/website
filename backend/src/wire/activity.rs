@@ -1,14 +1,18 @@
+use crate::error::Error;
+use crate::wire::location::Location;
 use crate::{auth::role::MembershipStatus, user::BasicUser};
 use serde::{Deserialize, Serialize};
+use std::str::FromStr;
 use std::{borrow::Cow, ops::Deref};
+use strum_macros::IntoStaticStr;
 use time::OffsetDateTime;
 use uuid::Uuid;
 use validator::{Validate, ValidationError};
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Copy, Clone)]
 #[serde(transparent)]
 pub struct ActivityId(Uuid);
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Copy, Clone)]
 #[serde(transparent)]
 pub struct LocationId(Uuid);
 
@@ -46,13 +50,30 @@ impl Deref for LocationId {
     }
 }
 
-#[derive(sqlx::Type, Serialize, Deserialize, Debug, Clone, Copy)]
-#[sqlx(type_name = "membership_status", rename_all = "snake_case")]
+#[derive(sqlx::Type, Serialize, Deserialize, Debug, Clone, Copy, IntoStaticStr)]
 #[serde(rename_all = "camelCase")]
-pub(crate) enum ActivityType {
+pub enum ActivityType {
     Activity,
     Course,
     Weekend,
+}
+
+impl FromStr for ActivityType {
+    // TODO proper error
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(match s.to_lowercase().as_str() {
+            "activity" => ActivityType::Activity,
+            "course" => ActivityType::Course,
+            "weekend" => ActivityType::Weekend,
+            _ => {
+                return Err(Error::Other(format!(
+                    "Invalid activity type {s}: Must be one of activity, course, or weekend"
+                )))
+            }
+        })
+    }
 }
 
 #[derive(Serialize, Debug, Validate)]
@@ -61,63 +82,80 @@ pub struct Activity<T>
 where
     T: Validate,
 {
-    pub(crate) id: ActivityId,
+    pub id: ActivityId,
     #[serde(with = "time::serde::rfc3339")]
-    pub(crate) created: OffsetDateTime,
+    pub created: OffsetDateTime,
     #[serde(with = "time::serde::rfc3339")]
-    pub(crate) updated: OffsetDateTime,
+    pub updated: OffsetDateTime,
+    pub registration_count: i64,
+    pub waiting_list_count: i64,
     #[serde(flatten)]
     #[validate(nested)]
-    pub(crate) content: T,
+    pub content: ActivityContent<T>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Validate)]
 #[serde(rename_all = "camelCase")]
-#[validate(schema(function = "validate_activity"))]
-pub(crate) struct ActivityContent {
-    pub(crate) location_id: LocationId,
-
+pub struct ActivityContent<T>
+where
+    T: Validate,
+{
     #[validate(length(min = 1, max = 100))]
-    pub(crate) name_nl: String,
-
+    pub name_nl: String,
     #[validate(length(min = 1, max = 100))]
-    pub(crate) name_en: String,
-
-    #[validate(length(min = 1, max = 5000))]
-    pub(crate) description_nl: Option<String>,
-
-    #[validate(length(min = 1, max = 5000))]
-    pub(crate) description_en: Option<String>,
-
+    pub name_en: String,
+    #[validate(length(min = 1, max = 50000))]
+    pub description_nl: Option<String>,
+    #[validate(length(min = 1, max = 50000))]
+    pub description_en: Option<String>,
+    #[validate(nested)]
+    pub dates: Vec<Date>,
     #[serde(with = "time::serde::rfc3339")]
-    pub(crate) start_time: OffsetDateTime,
-
+    pub registration_start: OffsetDateTime,
     #[serde(with = "time::serde::rfc3339")]
-    pub(crate) end_time: OffsetDateTime,
-
-    #[serde(with = "time::serde::rfc3339")]
-    pub(crate) registration_start: OffsetDateTime,
-
-    #[serde(with = "time::serde::rfc3339")]
-    pub(crate) registration_end: OffsetDateTime,
-
+    pub registration_end: OffsetDateTime,
     #[validate(range(min = 0, max = 999, message = "Maximum registrations is 999"))]
-    pub(crate) registration_max: Option<i32>,
-
+    pub registration_max: Option<i32>,
     #[validate(range(min = 0, max = 999, message = "Maximum waiting list is 999"))]
-    pub(crate) waiting_list_max: Option<i32>,
-
-    pub(crate) is_hidden: bool,
-
-    pub(crate) required_membership_status: Vec<MembershipStatus>,
-
-    pub(crate) activity_type: ActivityType,
+    pub waiting_list_max: Option<i32>,
+    pub is_hidden: bool,
+    pub required_membership_status: Option<Vec<MembershipStatus>>,
+    pub activity_type: ActivityType,
+    pub questions: Vec<Question>,
+    pub metadata: serde_json::Value,
+    #[serde(flatten)]
+    #[validate(nested)]
+    pub(crate) details: T,
+}
+#[derive(Serialize, Deserialize, Debug, Validate)]
+pub struct Hydrated {
+    pub location: Location,
 }
 
-fn validate_activity(activity: &ActivityContent) -> Result<(), ValidationError> {
-    if activity.start_time > activity.end_time {
+#[derive(Serialize, Deserialize, Debug, Validate)]
+pub struct IdOnly {
+    pub location_id: LocationId,
+}
+
+#[derive(Serialize, Deserialize, Debug, Validate)]
+#[validate(schema(function = "validate_date"))]
+pub struct Date {
+    #[serde(with = "time::serde::rfc3339")]
+    pub start: OffsetDateTime,
+    #[serde(with = "time::serde::rfc3339")]
+    pub end: OffsetDateTime,
+}
+
+fn validate_date(activity: &Date) -> Result<(), ValidationError> {
+    if activity.start > activity.end {
         Err(ValidationError::new("date").with_message(Cow::Borrowed("Start cannot be after end")))
-    } else if activity.registration_start > activity.registration_end {
+    } else {
+        Ok(())
+    }
+}
+
+fn validate_activity<T: Validate>(activity: &ActivityContent<T>) -> Result<(), ValidationError> {
+    if activity.registration_start > activity.registration_end {
         Err(ValidationError::new("date").with_message(Cow::Borrowed(
             "registration start cannot be later than registration end",
         )))
@@ -126,68 +164,44 @@ fn validate_activity(activity: &ActivityContent) -> Result<(), ValidationError> 
     }
 }
 
-#[derive(Serialize, Debug, Validate)]
-#[serde(rename_all = "camelCase")]
-#[allow(dead_code)]
-pub(crate) struct ActivityContentHydrated {
-    pub(crate) location: Location,
-
-    #[validate(length(min = 1, max = 100))]
-    pub(crate) name_nl: String,
-
-    #[validate(length(min = 1, max = 100))]
-    pub(crate) name_en: String,
-
-    #[validate(length(min = 1, max = 5000))]
-    pub(crate) description_nl: Option<String>,
-
-    #[validate(length(min = 1, max = 5000))]
-    pub(crate) description_en: Option<String>,
-
-    #[serde(with = "time::serde::rfc3339")]
-    pub(crate) start_time: OffsetDateTime,
-
-    #[serde(with = "time::serde::rfc3339")]
-    pub(crate) end_time: OffsetDateTime,
-
-    #[serde(with = "time::serde::rfc3339")]
-    pub(crate) registration_start: OffsetDateTime,
-
-    #[serde(with = "time::serde::rfc3339")]
-    pub(crate) registration_end: OffsetDateTime,
-
-    #[validate(range(min = 0, max = 999, message = "Maximum registrations is 999"))]
-    pub(crate) registration_max: Option<i32>,
-
-    #[validate(range(min = 0, max = 999, message = "Maximum waiting list is 999"))]
-    pub(crate) waiting_list_max: Option<i32>,
-
-    pub(crate) is_hidden: bool,
-
-    pub(crate) required_membership_status: Vec<MembershipStatus>,
-
-    pub(crate) activity_type: ActivityType,
-
-    pub registrations: Vec<Registration>,
-}
-
 #[derive(Serialize, Debug)]
-pub(crate) struct Registration {
+pub struct Registration {
+    #[serde(flatten)]
     pub user: BasicUser,
+    pub attended: Option<bool>,
     pub answers: Vec<Answer>,
+    #[serde(with = "time::serde::rfc3339")]
+    pub created: OffsetDateTime,
+    #[serde(with = "time::serde::rfc3339")]
+    pub updated: OffsetDateTime
 }
 
-#[derive(Serialize, Debug)]
-pub(crate) struct Answer {
+#[derive(Deserialize, Debug)]
+pub struct NewRegistration {
+    pub answers: Vec<Answer>
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Answer {
     pub question_id: Uuid,
     pub answer: String,
 }
 
-#[derive(Serialize, Debug)]
-pub(crate) struct Location {
-    pub id: Uuid,
-    pub name_nl: String,
-    pub name_en: String,
-    pub description_nl: Option<String>,
-    pub description_en: Option<String>,
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Question {
+    id: Uuid,
+    question_nl: String,
+    question_en: String,
+    question_type: QuestionType,
+    required: bool,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "snake_case")]
+pub enum QuestionType {
+    ShortText,
+    LongText,
+    Number,
+    Time,
+    MultipleChoice(Vec<String>),
 }
