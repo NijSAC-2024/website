@@ -29,7 +29,7 @@ export default function ItemSelection({
             return (
               <li {...optionProps}>
                 <p>{option.name.en}</p>
-                <b className="ml-1">{`€${option.price} ${option.remark?.en || ''}`}</b>
+                <b className="ml-1">{`€${option.price.toFixed(2)} ${option.remark?.en || ''}`}</b>
               </li>
             );
           }}

@@ -83,24 +83,26 @@ export default function MaterialRental() {
                 '. Een korte samenvatting van de huurvoorwaarden:'
               )}
             </p>
-            <li>
-              {text(
-                'The treasurer sends the rent to be transferred via an invoice.',
-                'De penningmeester verstuurt de over te dragen huur via een factuur.'
-              )}
-            </li>
-            <li>
-              {text(
-                'The rented property is collected and returned to the Climbing Commissioner. The tenant is responsible for this.',
-                'Het gehuurde wordt opgehaald en teruggegeven aan de klimcommissaris. De huurder is hiervoor verantwoordelijk.'
-              )}
-            </li>
-            <li>
-              {text(
-                'Return the materials quickly after use. Return it as it was rented. If material is returned too late, is lost or damaged due to carelessness, the amount due will be recovered from the tenants. Any damage will be noted in advance.',
-                'Breng de materialen na gebruik snel terug. Breng het terug zoals het werd verhuurd. Indien materiaal te laat wordt ingeleverd, door onzorgvuldigheid verloren gaat of beschadigd raakt, wordt het verschuldigde bedrag op de huurders verhaald. Eventuele schade wordt vooraf vermeld.'
-              )}
-            </li>
+            <ul className="list-disc ml-5">
+              <li>
+                {text(
+                  'The treasurer sends the rent to be transferred via an invoice.',
+                  'De penningmeester verstuurt de over te dragen huur via een factuur.'
+                )}
+              </li>
+              <li>
+                {text(
+                  'The rented property is collected and returned to the Climbing Commissioner. The tenant is responsible for this.',
+                  'Het gehuurde wordt opgehaald en teruggegeven aan de klimcommissaris. De huurder is hiervoor verantwoordelijk.'
+                )}
+              </li>
+              <li>
+                {text(
+                  'Return the materials quickly after use. Return it as it was rented. If material is returned too late, is lost or damaged due to carelessness, the amount due will be recovered from the tenants. Any damage will be noted in advance.',
+                  'Breng de materialen na gebruik snel terug. Breng het terug zoals het werd verhuurd. Indien materiaal te laat wordt ingeleverd, door onzorgvuldigheid verloren gaat of beschadigd raakt, wordt het verschuldigde bedrag op de huurders verhaald. Eventuele schade wordt vooraf vermeld.'
+                )}
+              </li>
+            </ul>
           </div>
           <div className="mt-5">
             <Button
