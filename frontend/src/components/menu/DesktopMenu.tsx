@@ -1,4 +1,3 @@
-import logo from '/images/logo.svg';
 import router from '../../router.tsx';
 import { Button, Menu, MenuItem, Toolbar } from '@mui/material';
 import { text } from '../../util.ts';
@@ -29,11 +28,15 @@ export default function DesktopMenu({ handleLoginOpen }: DesktopMenuProps) {
     setOpenMenu(undefined);
   };
 
+  const navigateSubmenu = (address: string) => {
+    router.navigate(address).then(handleMenuClose);
+  };
+
   return (
     <Toolbar className="flex justify-between w-[80%] max-w-[1000px] mx-auto">
       <div className="flex items-center">
         <img
-          src={logo}
+          src={'/images/logo.svg'}
           alt="Logo"
           className="hover:opacity-50 hover:cursor-pointer h-24 mr-4"
           onClick={() => router.navigate('/')}
@@ -73,7 +76,7 @@ export default function DesktopMenu({ handleLoginOpen }: DesktopMenuProps) {
             {text('Outdoor Climbing', 'Buiten Klimmen')}
           </MenuItem>
           <MenuItem onClick={handleMenuClose}>{text('Climbing Areas', 'Klimgebieden')}</MenuItem>
-          <MenuItem onClick={handleMenuClose}>
+          <MenuItem onClick={() => navigateSubmenu('/material-rental')}>
             {text('Material Rental', 'Materiaalverhuur')}
           </MenuItem>
         </Menu>
@@ -130,6 +133,7 @@ export default function DesktopMenu({ handleLoginOpen }: DesktopMenuProps) {
             Nederlands
           </MenuItem>
         </Menu>
+
         {/* Login+Become Member / Logout */}
         {!isLoggedIn ? (
           <>

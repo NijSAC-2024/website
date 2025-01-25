@@ -3,11 +3,12 @@ import { Button, Fab } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import { text } from '../../util.ts';
 import { useState } from 'react';
-import EditRegistrationFields from './EditRegistrationFields.tsx';
+import EditRegistrations from './EditRegistrations.tsx';
 import EditAgendaCard from './EditAgendaCard.tsx';
 import EditDescription from './EditDescription.tsx';
 import router from '../../router.tsx';
 import GenericPage from '../../pages/GenericPage.tsx';
+import moment from 'moment';
 
 interface EditEventProps {
   agendaEvent: AgendaEventType;
@@ -53,7 +54,7 @@ export default function EditEvent({ agendaEvent, handleUpdate }: EditEventProps)
 
   return (
     <GenericPage image={updatedAgendaEvent.image}>
-      <div className="grid xl:grid-cols-3 gap-5">
+      <div className="grid xl:grid-cols-3 gap-5 mt-[-9.3rem]">
         <div className="xl:col-span-3 mb-[-0.5rem]">
           <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">
             <Button color="inherit" onClick={() => router.navigate('/agenda')}>
@@ -62,7 +63,20 @@ export default function EditEvent({ agendaEvent, handleUpdate }: EditEventProps)
           </div>
         </div>
         <div className="fixed bottom-5 right-5 z-10">
-          <Fab variant="extended" color="primary" onClick={() => handleUpdate(updatedAgendaEvent)}>
+          <Fab
+            variant="extended"
+            color="primary"
+            onClick={() => handleUpdate(updatedAgendaEvent)}
+            disabled={
+              !updatedAgendaEvent.title.en ||
+              !updatedAgendaEvent.title.nl ||
+              !updatedAgendaEvent.location ||
+              !updatedAgendaEvent.category ||
+              moment(updatedAgendaEvent.endDateTime).isBefore(
+                moment(updatedAgendaEvent.startDateTime)
+              )
+            }
+          >
             <SaveIcon className="mr-2" />
             {text('Save Event', 'Evenement opslaan')}
           </Fab>
@@ -78,7 +92,7 @@ export default function EditEvent({ agendaEvent, handleUpdate }: EditEventProps)
           handleFieldChange={handleFieldChange}
         />
 
-        <EditRegistrationFields
+        <EditRegistrations
           updatedAgendaEvent={updatedAgendaEvent}
           handleFieldChange={handleFieldChange}
           handleRegistrationFieldsChange={handleRegistrationFieldsChange}

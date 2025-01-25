@@ -26,36 +26,43 @@ export default function SingupOptions({
           <h2>{text('Member', 'Lid')}</h2>
           <h3>{text('Requirements:', 'Eisen:')}</h3>
           <div className="p-3">
-            <li>
-              {text(
-                'You are enrolled as student  or PhD at the Radboud University or Hogeschool van Arnhem en Nijmegen, or graduated at most a year ago at one of these educational institutions.',
-                'Je bent ingeschreven als student of doet een PhD aan Radboud Universiteit of de Hogeschool van Arnhem en Nijmegen, of je bent maximaal een jaar geleden van één van deze twee instanties afgestudeerd.'
-              )}
-            </li>
-            <li>{text('You are a member of the NKBV.', 'Je bent NKBV-lid.')}</li>
-            <li>
-              {text('You are insured for mountain sports.', 'Je bent verzekerd voor bergsporten.')}
-            </li>
+            <ul className="list-disc ml-2">
+              <li>
+                {text(
+                  'You are enrolled as student  or PhD at the Radboud University or Hogeschool van Arnhem en Nijmegen, or graduated at most a year ago at one of these educational institutions.',
+                  'Je bent ingeschreven als student of doet een PhD aan Radboud Universiteit of de Hogeschool van Arnhem en Nijmegen, of je bent maximaal een jaar geleden van één van deze twee instanties afgestudeerd.'
+                )}
+              </li>
+              <li>{text('You are a member of the NKBV.', 'Je bent NKBV-lid.')}</li>
+              <li>
+                {text(
+                  'You are insured for mountain sports.',
+                  'Je bent verzekerd voor bergsporten.'
+                )}
+              </li>
+            </ul>
           </div>
           <Divider />
           <div className="p-3">
-            <li>
-              {text(
-                'You own a yearly sports card at the Radboud Sports Center.',
-                'Je bezit een sportkaart voor het Radboud Sport Centrum.'
-              )}
-            </li>
-            <li>
-              {text(
-                'You are able to join in the NijSAC courses at the RSC.',
-                'Je mag meedoen aan NijSAC cursussen op het RSC.'
-              )}
-            </li>
+            <ul className="list-disc ml-2">
+              <li>
+                {text(
+                  'You own a yearly sports card at the Radboud Sports Center.',
+                  'Je bezit een sportkaart voor het Radboud Sport Centrum.'
+                )}
+              </li>
+              <li>
+                {text(
+                  'You are able to join in the NijSAC courses at the RSC.',
+                  'Je mag meedoen aan NijSAC cursussen op het RSC.'
+                )}
+              </li>
+            </ul>
           </div>
           <Divider />
           <p className="mt-3">
             {text(
-              'A membership costs 40 euros per year',
+              'A membership costs 40 euros per year.',
               'Een lidmaatschap kost 40 euro per jaar.'
             )}
           </p>
@@ -69,36 +76,43 @@ export default function SingupOptions({
           <h2>{text('Extraordinary Member', 'Buitengewoon Lid')}</h2>
           <h3>{text('Requirements:', 'Eisen:')}</h3>
           <div className="p-3">
-            <li>
-              {text(
-                'You are enrolled as student or PhD at the Radboud University or Hogeschool van Arnhem en Nijmegen, or graduated at most a year ago at one of these educational institutions.',
-                'Je bent ingeschreven als student of doet een PhD aan Radboud Universiteit of de Hogeschool van Arnhem en Nijmegen, of je bent maximaal een jaar geleden van één van deze twee instanties afgestudeerd.'
-              )}
-            </li>
-            <li>{text('You are a member of the NKBV.', 'Je bent NKBV-lid.')}</li>
-            <li>
-              {text('You are insured for mountain sports.', 'Je bent verzekerd voor bergsporten.')}
-            </li>
+            <ul className="list-disc ml-2">
+              <li>
+                {text(
+                  'You are enrolled as student or PhD at the Radboud University or Hogeschool van Arnhem en Nijmegen, or graduated at most a year ago at one of these educational institutions.',
+                  'Je bent ingeschreven als student of doet een PhD aan Radboud Universiteit of de Hogeschool van Arnhem en Nijmegen, of je bent maximaal een jaar geleden van één van deze twee instanties afgestudeerd.'
+                )}
+              </li>
+              <li>{text('You are a member of the NKBV.', 'Je bent NKBV-lid.')}</li>
+              <li>
+                {text(
+                  'You are insured for mountain sports.',
+                  'Je bent verzekerd voor bergsporten.'
+                )}
+              </li>
+            </ul>
           </div>
           <Divider />
           <div className="p-3">
-            <li>
-              {text(
-                'You do not own a yearly sports card at the Radboud Sports Center.',
-                'Je bezit geen sportkaart voor het Radboud Sport Centrum.'
-              )}
-            </li>
-            <li>
-              {text(
-                'You are not able to join in the NijSAC courses at the RSC.',
-                'Je mag niet meedoen aan NijSAC cursussen op het RSC.'
-              )}
-            </li>
+            <ul className="list-disc ml-2">
+              <li>
+                {text(
+                  'You do not own a yearly sports card at the Radboud Sports Center.',
+                  'Je bezit geen sportkaart voor het Radboud Sport Centrum.'
+                )}
+              </li>
+              <li>
+                {text(
+                  'You are not able to join in the NijSAC courses at the RSC.',
+                  'Je mag niet meedoen aan NijSAC cursussen op het RSC.'
+                )}
+              </li>
+            </ul>
           </div>
           <Divider />
           <p className="mt-3">
             {text(
-              'A extraordinary membership costs 50 euros per year',
+              'A extraordinary membership costs 50 euros per year.',
               'Een buitegewoon lidmaatschap kost 50 euro per jaar.'
             )}
           </p>

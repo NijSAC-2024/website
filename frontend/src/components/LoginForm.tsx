@@ -5,7 +5,7 @@ import { enqueueSnackbar } from 'notistack';
 import ValidatedTextField from './ValidatedTextField';
 import { emailValidator, noneValidator } from '../validator.ts';
 import { text } from '../util.ts';
-import { login } from '../api.ts';
+import { apiFetch } from '../api.ts';
 
 interface LoginFormProps {
   onClose: () => void;
@@ -24,15 +24,19 @@ export default function LoginForm({ onClose }: LoginFormProps) {
       });
       return;
     }
-    const { error } = await login(email, password);
+    const { error } = await apiFetch<void>('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
 
     if (error) {
-      switch (error) {
+      switch (error.message) {
         case 'Unauthorized':
           enqueueSnackbar('Incorrect email or password.', { variant: 'error' });
           break;
         default:
-          enqueueSnackbar('Something went wrong. Please try again later.', {
+          enqueueSnackbar(`${error.message}: ${error.reference}`, {
             variant: 'error'
           });
       }
@@ -45,7 +49,7 @@ export default function LoginForm({ onClose }: LoginFormProps) {
   return (
     <>
       <div className="grid gap-4">
-        <p className="text-3xl mt-2">{text('Login', 'Inloggen')}</p>
+        <h1>{text('Login', 'Inloggen')}</h1>
         <div className="grid gap-2.5">
           <ValidatedTextField
             label={'Email'}

@@ -1,6 +1,6 @@
 import { AgendaEventType } from '../types.ts';
 import router from '../router.tsx';
-import EditEvent from './edit/EditEvent.tsx';
+import EditEvent from '../components/edit/EditEvent.tsx';
 
 export default function AddEvent() {
   const handleUpdate = (updatedAgendaEvent: AgendaEventType) => {

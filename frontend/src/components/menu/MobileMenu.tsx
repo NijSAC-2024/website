@@ -10,7 +10,6 @@ import {
   ListItemText,
   Toolbar
 } from '@mui/material';
-import logo from '/images/logo.svg';
 import router from '../../router.tsx';
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -45,14 +44,21 @@ export default function MobileMenu({
     }
   };
 
+  const navigateSubmenu = (address: string) => {
+    router
+      .navigate(address)
+      .then(toggleDropdown)
+      .then(() => setOpenMenu(undefined));
+  };
+
   return (
     <>
       <Toolbar className="flex justify-between items-center w-full">
         <img
-          src={logo}
+          src={'/images/logo.svg'}
           alt="Logo"
           className="hover:opacity-50 hover:cursor-pointer h-24"
-          onClick={() => router.navigate('/').then(() => (dropdownOpen ? toggleDropdown() : null))}
+          onClick={() => router.navigate('/').then(dropdownOpen ? toggleDropdown : null)}
         />
         <IconButton size="large" color="inherit" onClick={toggleDropdown}>
           {dropdownOpen ? <CloseIcon fontSize="large" /> : <MenuIcon fontSize="large" />}
@@ -66,7 +72,7 @@ export default function MobileMenu({
       >
         <Toolbar className="flex justify-between items-center w-full">
           <img
-            src={logo}
+            src={'/images/logo.svg'}
             alt="Logo"
             className="hover:opacity-50 hover:cursor-pointer h-24"
             onClick={() => router.navigate('/').then(toggleDropdown)}
@@ -191,7 +197,7 @@ export default function MobileMenu({
                 </ListItemButton>
               </ListItem>
               <ListItem disablePadding>
-                <ListItemButton>
+                <ListItemButton onClick={() => navigateSubmenu('/material-rental')}>
                   <ListItemText
                     primary={
                       <p className="text-[#1976d2] dark:text-[#90caf9] px-14 text-sm">
@@ -337,7 +343,7 @@ export default function MobileMenu({
             </List>
           </Collapse>
 
-          {/* Login and Signup */}
+          {/* Login+Become Member / Logout */}
           {!isLoggedIn ? (
             <>
               <ListItem onClick={handleLoginOpen} disablePadding>
@@ -356,7 +362,7 @@ export default function MobileMenu({
               </ListItem>
             </>
           ) : (
-            <div className="px-10 pb-3">
+            <div className="px-12 pb-3">
               <UserMenu />
             </div>
           )}

@@ -1,53 +1,23 @@
 import { useLanguage } from './providers/LanguageProvider.tsx';
-import moment from 'moment/moment';
-import { LanguageType, options } from './types.ts';
+import { LanguageType, eventOptions } from './types.ts';
 
-export function text(english: string, dutch: string): string {
+// eslint-disable-next-line no-unused-vars
+export function text(english: string, dutch: string): string;
+// eslint-disable-next-line no-unused-vars
+export function text(languageType: LanguageType): string;
+export function text(arg1: string | LanguageType, arg2?: string): string {
   const { language } = useLanguage();
 
-  return language ? english : dutch;
-}
-
-export function formatDate(startDateTime: string, endDateTime: string): string {
-  const { getLangCode } = useLanguage();
-  const langCode = getLangCode();
-  moment.locale(langCode);
-
-  const startDate = new Date(startDateTime);
-  const endDate = new Date(endDateTime);
-
-  const startDay = startDate.getDay() + 1;
-  const endDay = endDate.getDay() + 1;
-  const startMonth = startDate.getMonth() + 1;
-  const endMonth = endDate.getMonth() + 1;
-
-  if (startDay === endDay) {
-    return moment(startDateTime).format('DD MMM HH:mm');
-  } else if (startMonth === endMonth) {
-    return moment(startDateTime).format('DD') + '-' + moment(endDateTime).format('DD MMM');
-  } else {
-    return moment(startDateTime).format('DD MMM') + '-' + moment(endDateTime).format('DD MMM');
+  if (typeof arg1 === 'string' && typeof arg2 === 'string') {
+    return language ? arg1 : arg2;
+  } else if (typeof arg1 === 'object' && arg1 !== null) {
+    return language ? arg1.en : arg1.nl;
   }
-}
 
-export function truncateMarkdown(markdown: string, maxLength: number): string {
-  if (markdown.length <= maxLength) return markdown;
-
-  let truncated = markdown.slice(0, maxLength);
-  const lastCut = Math.max(truncated.lastIndexOf(' '), truncated.lastIndexOf('\n'));
-  truncated = lastCut > -1 ? truncated.slice(0, lastCut) : truncated;
-
-  const unmatchedTags = (truncated.match(/(\*\*|\*|_|`)/g) || []).length % 2;
-  if (unmatchedTags) {
-    truncated = truncated.slice(
-      0,
-      truncated.lastIndexOf((truncated.match(/(\*\*|\*|_|`)/g) || []).pop()!)
-    );
-  }
-  return truncated.trim() + '…';
+  throw new Error('Invalid arguments provided to text function');
 }
 
 export function getLabel(id: string): LanguageType {
-  const categoryOption = options.find((option) => option.id === id);
+  const categoryOption = eventOptions.find((option) => option.id === id);
   return categoryOption ? categoryOption.label : { en: id, nl: id };
 }

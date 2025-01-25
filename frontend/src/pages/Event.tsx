@@ -1,17 +1,16 @@
 import GenericPage from './GenericPage.tsx';
 import AgendaCard from '../components/AgendaCard.tsx';
-import ContentCard from '../components/ContentCard.tsx';
 import EditIcon from '@mui/icons-material/Edit';
 import { useLanguage } from '../providers/LanguageProvider.tsx';
-import { getLabel, text } from '../util.ts';
+import { text } from '../util.ts';
 import moment from 'moment';
-import Markdown from 'react-markdown';
-import { AgendaEventType, registrationsType } from '../types.ts';
-import { Button, Chip, Fab, Table, TableBody, TableCell, TableRow } from '@mui/material';
+import { AgendaEventType } from '../types.ts';
+import { Button, Fab } from '@mui/material';
 import router from '../router.tsx';
-import remarkGfm from 'remark-gfm';
 import { useState } from 'react';
 import EditEvent from '../components/edit/EditEvent.tsx';
+import RegistrationsCard from '../components/event/RegistrationsCard.tsx';
+import DescriptionCard from '../components/event/DescriptionCard.tsx';
 
 export default function Event() {
   const [agendaEvent, setAgendaEvent] = useState<AgendaEventType>({
@@ -27,43 +26,24 @@ export default function Event() {
       nl: 'Elk voor- en najaar kan je leren voorklimmen in de cursus OV-Singlepitch. In deze cursus leert de cursist voorklimmen, en tevens zekeren voorklim situatie. Om dat we een OV (Outdoor Voorklim) cursus geven proberen we iedereen klaar te stomen om dit ook op de rotsen te kunnen beoefenen. Het examen zal buiten op de rots worden afgelegd, de instructeur beoordeelt dan bij elke deelnemer individueel of de bovengenoemde technieken beheerst (hiervoor krijg je dan een pasje KVB-OV-Singlepitch.)\n'
     },
     gear: {
-      en: 'HMS biner, Long slinge (120 cm; stitched), Dynamic safety line,  4 (small) screw carabiners (D-biners), Prussik rope 1 meter (5 or 6 mm)',
+      en: 'Helmet, Rope, Safe Biner',
       nl: 'Helm, Touw, Safe Biner'
     },
     experience: ['mp'],
     allowsRegistrations: true,
     numberOfRegistrations: 12,
     maxRegistrations: 20,
-    startDateTime: '2025-03-06T22:30:00.000Z',
-    endDateTime: '2025-03-06T22:30:00.000Z',
+    startDateTime: '2025-03-06T08:30:00.000Z',
+    endDateTime: '2025-04-06T09:30:00.000Z',
     registrationOpenTime: '2024-12-23T00:00:00.000Z',
     registrationCloseTime: '2027-03-07T00:00:00.000Z',
     registrationFields: [{ en: 'How many quickdraws', nl: 'Hoeveel setjes' }]
   });
 
-  const registrations: registrationsType = {
-    registrations: [
-      {
-        eid: 1,
-        name: 'Lukas Nieuweboer'
-      },
-      {
-        eid: 2,
-        name: 'Asia Piotrowska'
-      },
-      {
-        eid: 3,
-        name: 'Robin Put'
-      }
-    ]
-  };
-
   const [isEditing, setIsEditing] = useState<boolean>(false);
-
   const toggleIsEditing = () => {
     setIsEditing((prevState) => !prevState);
   };
-
   const handleUpdate = (updatedAgendaEvent: AgendaEventType) => {
     //Send to backend
     setAgendaEvent(updatedAgendaEvent);
@@ -85,7 +65,7 @@ export default function Event() {
             </Fab>
           </div>
           <GenericPage image={agendaEvent.image}>
-            <div className="grid xl:grid-cols-3 gap-5">
+            <div className="grid xl:grid-cols-3 gap-5 mt-[-9.3rem]">
               <div className="xl:col-span-3 mb-[-0.5rem]">
                 <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">
                   <Button color="inherit" onClick={() => router.navigate('/agenda')}>
@@ -94,82 +74,8 @@ export default function Event() {
                 </div>
               </div>
               <AgendaCard agendaEvent={agendaEvent} agendaPage={false} />
-              <ContentCard className="xl:col-span-2 flex flex-col justify-between">
-                <div className="p-7">
-                  <Markdown remarkPlugins={[remarkGfm]}>
-                    {text(agendaEvent.descriptionMarkdown.en, agendaEvent.descriptionMarkdown.nl)}
-                  </Markdown>
-                </div>
-                <div className="flex justify-between px-7 py-5 border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
-                  {(agendaEvent.gear.en.length > 0 || agendaEvent.gear.nl.length > 0) && (
-                    <div>
-                      <b className="text-[#1976d2] dark:text-[#90caf9]">
-                        {text('Necessary Gear', 'Benodigde Uitrusting')}
-                      </b>
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {langCode === 'en'
-                          ? agendaEvent.gear.en
-                              .split(',')
-                              .map((item) => item.trim())
-                              .map((gear, index) => (
-                                <Chip
-                                  key={index}
-                                  label={gear}
-                                  className="uppercase font-semibold"
-                                  size="small"
-                                />
-                              ))
-                          : agendaEvent.gear.nl
-                              .split(',')
-                              .map((item) => item.trim())
-                              .map((gear, index) => (
-                                <Chip
-                                  key={index}
-                                  label={gear}
-                                  className="uppercase font-semibold"
-                                  size="small"
-                                />
-                              ))}
-                      </div>
-                    </div>
-                  )}
-                  {agendaEvent.experience.length > 0 && (
-                    <div>
-                      <b className="text-[#1976d2] dark:text-[#90caf9]">
-                        {text('Necessary Experience', 'Benodigde Ervaring')}
-                      </b>
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {agendaEvent.experience.map((experience, index) => (
-                          <Chip
-                            key={index}
-                            label={text(getLabel(experience).en, getLabel(experience).nl)}
-                            className="uppercase font-semibold"
-                            size="small"
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </ContentCard>
-
-              {agendaEvent.allowsRegistrations && (
-                <ContentCard className="xl:col-span-3 p-7">
-                  <h1>{text('Participants', 'Deelnemers')}</h1>
-                  <Table>
-                    <TableBody>
-                      {registrations.registrations.map((registraton) => (
-                        <TableRow
-                          key={registraton.eid}
-                          sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                        >
-                          <TableCell>{registraton.name}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </ContentCard>
-              )}
+              <DescriptionCard agendaEvent={agendaEvent} />
+              <RegistrationsCard agendaEvent={agendaEvent} />
             </div>
           </GenericPage>
         </>

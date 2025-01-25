@@ -1,6 +1,7 @@
 import { createContext, useContext, ReactNode, useState } from 'react';
 import { AuthContextType, UserType } from '../types.ts';
 import { enqueueSnackbar } from 'notistack';
+import { apiFetch } from '../api.ts';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -13,51 +14,41 @@ export default function AuthProvider({ children }: AuthProviderProps) {
 
   const [user, setUser] = useState<UserType | undefined>(undefined);
 
-  const checkAuth = async () => {
-    try {
-      const response = await fetch('/api/whoami', {
-        method: 'GET',
-        credentials: 'include'
-      });
+  const [authOpen, setAuthOpen] = useState<boolean>(false);
 
-      if (response.ok) {
-        const body = await response.json();
-        setUser(body);
-        setIsLoggedIn(true);
-      } else {
-        setIsLoggedIn(false);
-      }
-    } catch (error) {
-      enqueueSnackbar(String(error), {
-        variant: 'error'
-      });
+  const toggleAuthOpen = () => {
+    setAuthOpen((prevState) => !prevState);
+  };
+
+  const checkAuth = async () => {
+    const { error, data } = await apiFetch<UserType>('/api/whoami');
+
+    if (!error) {
+      setUser(data);
+      setIsLoggedIn(true);
+    } else {
       setIsLoggedIn(false);
     }
   };
 
   const logout = async () => {
-    try {
-      const response = await fetch('/api/logout', {
-        method: 'GET',
-        credentials: 'include'
-      });
+    const { error } = await apiFetch<void>('/api/logout', { method: 'GET' });
 
-      if (response.ok) {
-        setIsLoggedIn(false);
-        setUser(undefined);
-        enqueueSnackbar('You logged out.', {
-          variant: 'success'
-        });
-      }
-    } catch (error) {
-      enqueueSnackbar(String(error), {
+    if (!error) {
+      setIsLoggedIn(false);
+      setUser(undefined);
+      enqueueSnackbar('You logged out.', {
+        variant: 'success'
+      });
+    } else {
+      enqueueSnackbar(`${error.message}: ${error.reference}`, {
         variant: 'error'
       });
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoggedIn, checkAuth, logout }}>
+    <AuthContext.Provider value={{ user, isLoggedIn, checkAuth, logout, authOpen, toggleAuthOpen }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,13 +1,19 @@
 /* global RequestInit */
 import { enqueueSnackbar } from 'notistack';
-import { UserType } from './types.ts';
+import { text } from './util.ts';
+
+interface errorType {
+  message: string;
+  status: number;
+  reference: string;
+}
 
 interface ApiResponse<T> {
   data?: T;
-  error?: string;
+  error?: errorType;
 }
 
-async function apiFetch<T>(url: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
+export async function apiFetch<T>(url: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
   try {
     const response = await fetch(url, {
       credentials: 'include',
@@ -15,25 +21,31 @@ async function apiFetch<T>(url: string, options: RequestInit = {}): Promise<ApiR
     });
 
     if (!response.ok) {
-      const error = await response.text();
+      const errorText = await response.text();
+      let error: errorType;
+
+      try {
+        error = JSON.parse(errorText);
+      } catch {
+        error = {
+          message: text('An unexpected error occurred', 'Er is een onverwachte fout opgetreden'),
+          status: response.status,
+          reference: `URL: ${url}`
+        };
+      }
+
       return { error };
     }
 
     const data: T = await response.json();
     return { data };
   } catch (error) {
-    enqueueSnackbar(String(error), { variant: 'error' });
-    return { error: 'Network error occurred.' };
+    const networkError: errorType = {
+      message: String(error),
+      status: 0,
+      reference: `URL: ${url}`
+    };
+    enqueueSnackbar(networkError.message, { variant: 'error' });
+    return { error: networkError };
   }
 }
-
-export const checkAuth = () => apiFetch<UserType>('/api/whoami');
-
-export const login = (email: string, password: string) =>
-  apiFetch<void>('/api/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password })
-  });
-
-export const logout = () => apiFetch<void>('/api/logout', { method: 'GET' });
