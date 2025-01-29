@@ -133,17 +133,20 @@ where
     pub(crate) details: T,
 }
 #[derive(Serialize, Deserialize, Debug, Validate)]
+#[serde(rename_all = "camelCase")]
 pub struct Hydrated {
     pub location: Location,
 }
 
 #[derive(Serialize, Deserialize, Debug, Validate)]
+#[serde(rename_all = "camelCase")]
 pub struct IdOnly {
     pub location_id: LocationId,
 }
 
 #[derive(Serialize, Deserialize, Debug, Validate)]
 #[validate(schema(function = "validate_date"))]
+#[serde(rename_all = "camelCase")]
 pub struct Date {
     #[serde(with = "time::serde::rfc3339")]
     pub start: OffsetDateTime,
@@ -171,6 +174,7 @@ fn validate_activity<T: Validate>(activity: &ActivityContent<T>) -> Result<(), V
 
 #[skip_serializing_none]
 #[derive(Serialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct Registration {
     #[serde(flatten)]
     pub user: BasicUser,
@@ -184,6 +188,7 @@ pub struct Registration {
 }
 
 #[derive(Deserialize, Debug, Validate)]
+#[serde(rename_all = "camelCase")]
 pub struct NewRegistration {
     pub answers: Vec<Answer>,
     pub attended: Option<bool>,
@@ -191,12 +196,14 @@ pub struct NewRegistration {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct Answer {
     pub question_id: Uuid,
     pub answer: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct Question {
     pub id: Uuid,
     pub question_nl: String,
@@ -206,7 +213,7 @@ pub struct Question {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(rename_all = "snake_case")]
+#[serde(rename_all = "camelCase")]
 pub enum QuestionType {
     ShortText,
     LongText,
