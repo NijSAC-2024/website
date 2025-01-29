@@ -15,14 +15,17 @@ use time::OffsetDateTime;
 
 fn update_all_full_activity_access(session: &Session) -> AppResult<()> {
     if session.membership_status().is_member()
-        && session.roles().iter().any(|role| match role {
-            Role::Admin
-            | Role::Treasurer
-            | Role::Secretary
-            | Role::Chair
-            | Role::ViceChair
-            | Role::ClimbingCommissar => true,
-            Role::ActivityCommissionMember => false,
+        && session.roles().iter().any(|role| {
+            matches!(
+                role,
+                Role::Admin
+                    | Role::Treasurer
+                    | Role::Secretary
+                    | Role::Chair
+                    | Role::ViceChair
+                    | Role::ActivityCommissionMember
+                    | Role::ClimbingCommissar
+            )
         })
     {
         Ok(())
@@ -67,8 +70,26 @@ pub async fn get_activity_registrations(
 pub async fn get_activity(
     store: ActivityStore,
     Path(id): Path<ActivityId>,
+    session: Option<Session>,
 ) -> ApiResult<Activity<Hydrated>> {
-    Ok(Json(store.get_activity_hydrated(&id).await?))
+    if let Some(session) = session {
+        if update_all_full_activity_access(&session).is_ok() {
+            return Ok(Json(store.get_activity_hydrated(&id, true).await?));
+        }
+    }
+    Ok(Json(store.get_activity_hydrated(&id, false).await?))
+}
+
+pub async fn get_activities(
+    store: ActivityStore,
+    session: Option<Session>,
+) -> ApiResult<Vec<Activity<Hydrated>>> {
+    if let Some(session) = session {
+        if update_all_full_activity_access(&session).is_ok() {
+            return Ok(Json(store.get_activities(true).await?));
+        }
+    }
+    Ok(Json(store.get_activities(false).await?))
 }
 
 pub async fn create_activity(
@@ -78,6 +99,25 @@ pub async fn create_activity(
 ) -> ApiResult<Activity<Hydrated>> {
     update_all_full_activity_access(&session)?;
     Ok(Json(store.new_activity(new, session.user_id()).await?))
+}
+
+pub async fn update_activity(
+    store: ActivityStore,
+    session: Session,
+    Path(id): Path<ActivityId>,
+    ValidatedJson(updated): ValidatedJson<ActivityContent<IdOnly>>,
+) -> ApiResult<Activity<Hydrated>> {
+    update_all_full_activity_access(&session)?;
+    Ok(Json(store.update_activity(&id, updated).await?))
+}
+
+pub async fn delete_activity(
+    store: ActivityStore,
+    session: Session,
+    Path(id): Path<ActivityId>,
+) -> Result<(), Error> {
+    update_all_full_activity_access(&session)?;
+    store.delete_activity(&id).await
 }
 
 pub async fn get_registration(
@@ -97,7 +137,7 @@ pub async fn create_registration(
 ) -> ApiResult<Registration> {
     update_single_full_registration_access(&user_id, &session)?;
 
-    let activity = store.get_activity_hydrated(&activity_id).await?;
+    let activity = store.get_activity_hydrated(&activity_id, true).await?;
     if update_all_full_activity_access(&session).is_err()
         && activity.content.registration_end < OffsetDateTime::now_utc()
     {
@@ -125,7 +165,7 @@ pub async fn update_registration(
 ) -> ApiResult<Registration> {
     update_single_full_registration_access(&user_id, &session)?;
 
-    let activity = store.get_activity_hydrated(&activity_id).await?;
+    let activity = store.get_activity_hydrated(&activity_id, true).await?;
     let registration = store.get_registration(&activity_id, &user_id).await?;
 
     ensure_correct_waiting_list_position(&activity, &mut updated, &session, Some(&registration))?;

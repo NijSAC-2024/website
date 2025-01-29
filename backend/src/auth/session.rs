@@ -9,7 +9,10 @@ use crate::{
     AppState,
 };
 use argon2::{password_hash, Argon2, PasswordHash, PasswordVerifier};
-use axum::{extract::FromRequestParts, http::request::Parts};
+use axum::{
+    extract::{FromRequestParts, OptionalFromRequestParts},
+    http::request::Parts,
+};
 use axum_extra::extract::{cookie::Cookie, CookieJar};
 use rand::distr::{Alphanumeric, SampleString};
 use sqlx::PgPool;
@@ -193,5 +196,25 @@ impl FromRequestParts<AppState> for Session {
             .value();
 
         Session::get(session_cookie, state.pool()).await
+    }
+}
+
+impl OptionalFromRequestParts<AppState> for Session {
+    type Rejection = Error;
+
+    async fn from_request_parts(
+        parts: &mut Parts,
+        state: &AppState,
+    ) -> Result<Option<Self>, Self::Rejection> {
+        let jar = CookieJar::from_request_parts(parts, state)
+            .await
+            .map_err(|_| Self::Rejection::BadRequest("Cannot decode cookies"))?;
+
+        let session_cookie = match jar.get(COOKIE_NAME) {
+            None => return Ok(None),
+            Some(c) => c.value(),
+        };
+
+        Ok(Some(Session::get(session_cookie, state.pool()).await?))
     }
 }

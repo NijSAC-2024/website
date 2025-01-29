@@ -221,27 +221,9 @@ impl ActivityStore {
             **created_by
         ).execute(&mut *tx).await?;
 
-        let (start, end) = activity.dates.into_iter().fold(
-            (Vec::new(), Vec::new()),
-            |(mut start, mut end), date| {
-                start.push(date.start);
-                end.push(date.end);
-                (start, end)
-            },
-        );
+        Self::add_dates_to_activity(&mut *tx, &activity_id.into(), &activity.dates).await?;
 
-        sqlx::query!(
-            r#"
-            INSERT INTO date (activity_id, start, "end") VALUES ($1, unnest($2::timestamptz[]), unnest($3::timestamptz[]))
-            "#,
-            activity_id,
-            &start,
-            &end
-        )
-            .execute(&mut *tx)
-            .await?;
-
-        let activity = Self::get_activity(&mut *tx, &activity_id.into())
+        let activity = Self::get_activity(&mut *tx, &activity_id.into(), true)
             .await
             .map_err(|err| Error::Internal(format!("{err:?}")))?;
 
@@ -253,11 +235,16 @@ impl ActivityStore {
     pub async fn get_activity_hydrated(
         &self,
         id: &ActivityId,
+        display_hidden: bool,
     ) -> Result<Activity<Hydrated>, Error> {
-        Self::get_activity(&self.db, id).await
+        Self::get_activity(&self.db, id, display_hidden).await
     }
 
-    async fn get_activity<'c, E>(db: E, id: &ActivityId) -> Result<Activity<Hydrated>, Error>
+    async fn get_activity<'c, E>(
+        db: E,
+        id: &ActivityId,
+        display_hidden: bool,
+    ) -> Result<Activity<Hydrated>, Error>
     where
         E: Executor<'c, Database = Postgres>,
     {
@@ -293,14 +280,172 @@ impl ActivityStore {
                 JOIN location l ON a.location_id = l.id
                 JOIN date d ON a.id = d.activity_id 
                 LEFT JOIN activity_registration r ON r.activity_id = a.id
-            WHERE a.id = $1
+            WHERE a.id = $1 AND 
+                  (NOT a.is_hidden OR $2)
             GROUP BY a.id, l.id
             "#,
-            **id
+            **id,
+            display_hidden
         )
             .fetch_one(db)
             .await?
             .try_into()
+    }
+
+    pub async fn get_activities(
+        &self,
+        display_hidden: bool,
+    ) -> Result<Vec<Activity<Hydrated>>, Error> {
+        sqlx::query_as!(
+            PgActivity,
+            r#"
+            SELECT a.id,
+                   l.id as location_id,
+                   l.name_en as location_name_en,
+                   l.name_nl as location_name_nl,
+                   l.description_nl as location_description_nl,
+                   l.description_en as location_description_en,
+                   a.name_nl,
+                   a.name_en,
+                   a.description_nl,
+                   a.description_en,
+                   array_agg(d.start) as start,
+                   array_agg(d."end") as "end",
+                   a.registration_start,
+                   a.registration_end,
+                   a.registration_max,
+                   a.waiting_list_max,
+                   a.is_hidden,
+                   a.required_membership_status as "required_membership_status:Vec<MembershipStatus>",
+                   a.activity_type,
+                   a.questions,
+                   a.metadata,
+                   count(r.user_id) FILTER ( WHERE r.waiting_list_position IS NULL ) as "registration_count!",
+                   count(r.user_id) FILTER ( WHERE r.waiting_list_position IS NOT NULL ) as "waiting_list_count!",
+                   a.created,
+                   a.updated
+            FROM activity a
+                JOIN location l ON a.location_id = l.id
+                JOIN date d ON a.id = d.activity_id 
+                LEFT JOIN activity_registration r ON r.activity_id = a.id
+            WHERE NOT a.is_hidden OR $1
+            GROUP BY a.id, l.id
+            "#,
+            display_hidden
+        )
+            .fetch_all(&self.db)
+            .await?
+            .into_iter()
+            .map(TryInto::try_into)
+            .collect()
+    }
+
+    pub async fn update_activity(
+        &self,
+        id: &ActivityId,
+        updated: ActivityContent<IdOnly>,
+    ) -> Result<Activity<Hydrated>, Error> {
+        let mut tx = self.db.begin().await?;
+
+        sqlx::query!(
+            r#"
+            UPDATE activity SET
+                  location_id = $2,
+                  name_nl = $3,
+                  name_en = $4,
+                  description_nl = $5,
+                  description_en = $6,
+                  registration_start = $7,
+                  registration_end = $8,
+                  registration_max = $9,
+                  waiting_list_max = $10,
+                  is_hidden = $11,
+                  required_membership_status = $12::membership_status[],
+                  activity_type = $13,
+                  questions = $14,
+                  metadata = $15,
+                  updated = now()
+            WHERE id = $1
+            "#,
+            **id,
+            *updated.details.location_id,
+            updated.name_nl,
+            updated.name_en,
+            updated.description_nl,
+            updated.description_en,
+            updated.registration_start,
+            updated.registration_end,
+            updated.registration_max,
+            updated.waiting_list_max,
+            updated.is_hidden,
+            updated.required_membership_status as Option<Vec<MembershipStatus>>,
+            Into::<&str>::into(updated.activity_type),
+            serde_json::to_value(updated.questions)?,
+            updated.metadata,
+        )
+        .execute(&mut *tx)
+        .await?;
+
+        sqlx::query!(
+            r#"
+            DELETE FROM date WHERE activity_id = $1
+            "#,
+            **id
+        )
+        .execute(&mut *tx)
+        .await?;
+
+        Self::add_dates_to_activity(&mut *tx, id, &updated.dates).await?;
+
+        let activity = Self::get_activity(&mut *tx, id, true)
+            .await
+            .map_err(|err| Error::Internal(format!("{err:?}")))?;
+
+        tx.commit().await?;
+
+        Ok(activity)
+    }
+
+    async fn add_dates_to_activity<'c, E>(
+        db: E,
+        activity_id: &ActivityId,
+        dates: &[Date],
+    ) -> Result<(), Error>
+    where
+        E: Executor<'c, Database = Postgres>,
+    {
+        let (start, end) =
+            dates
+                .iter()
+                .fold((Vec::new(), Vec::new()), |(mut start, mut end), date| {
+                    start.push(date.start);
+                    end.push(date.end);
+                    (start, end)
+                });
+
+        sqlx::query!(
+            r#"
+            INSERT INTO date (activity_id, start, "end") VALUES ($1, unnest($2::timestamptz[]), unnest($3::timestamptz[]))
+            "#,
+            **activity_id,
+            &start,
+            &end
+        )
+            .execute(db)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn delete_activity(&self, id: &ActivityId) -> Result<(), Error> {
+        sqlx::query!(
+            r#"
+            DELETE FROM activity WHERE id = $1
+            "#,
+            **id
+        )
+        .execute(&self.db)
+        .await?;
+        Ok(())
     }
 
     /// Moves a registration from the waiting list to a regular registration
