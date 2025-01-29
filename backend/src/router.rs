@@ -1,9 +1,9 @@
 use crate::{
     api::{
-        create_activity, create_registration, delete_registration, get_activity,
-        get_activity_registrations, get_all_users, get_material_list, get_registration,
-        get_user_materials, register, update_registration, update_user, update_user_material,
-        who_am_i,
+        create_activity, create_registration, delete_activity, delete_registration, get_activities,
+        get_activity, get_activity_registrations, get_all_users, get_material_list,
+        get_registration, get_user_materials, register, update_activity, update_registration,
+        update_user, update_user_material, who_am_i,
     },
     auth::{login, logout},
     get_user,
@@ -46,8 +46,13 @@ fn api_router() -> Router<AppState> {
         .route("/user/{:id}/material", get(get_material_list))
         .route("/user/{:id}/getMaterial", get(get_user_materials))
         .route("/user/{:id}/material/update", put(update_user_material))
-        .route("/activity", post(create_activity))
-        .route("/activity/{:id}", get(get_activity))
+        .route("/activity", get(get_activities).post(create_activity))
+        .route(
+            "/activity/{:id}",
+            get(get_activity)
+                .put(update_activity)
+                .delete(delete_activity),
+        )
         .route(
             "/activity/{:id}/registration",
             get(get_activity_registrations),

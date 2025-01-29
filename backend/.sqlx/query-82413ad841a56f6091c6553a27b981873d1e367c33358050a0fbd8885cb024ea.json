@@ -1,0 +1,185 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT a.id,\n                   l.id as location_id,\n                   l.name_en as location_name_en,\n                   l.name_nl as location_name_nl,\n                   l.description_nl as location_description_nl,\n                   l.description_en as location_description_en,\n                   a.name_nl,\n                   a.name_en,\n                   a.description_nl,\n                   a.description_en,\n                   array_agg(d.start) as start,\n                   array_agg(d.\"end\") as \"end\",\n                   a.registration_start,\n                   a.registration_end,\n                   a.registration_max,\n                   a.waiting_list_max,\n                   a.is_hidden,\n                   a.required_membership_status as \"required_membership_status:Vec<MembershipStatus>\",\n                   a.activity_type,\n                   a.questions,\n                   a.metadata,\n                   count(r.user_id) FILTER ( WHERE r.waiting_list_position IS NULL ) as \"registration_count!\",\n                   count(r.user_id) FILTER ( WHERE r.waiting_list_position IS NOT NULL ) as \"waiting_list_count!\",\n                   a.created,\n                   a.updated\n            FROM activity a\n                JOIN location l ON a.location_id = l.id\n                JOIN date d ON a.id = d.activity_id \n                LEFT JOIN activity_registration r ON r.activity_id = a.id\n            WHERE NOT a.is_hidden OR $1\n            GROUP BY a.id, l.id\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "location_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "location_name_en",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "location_name_nl",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "location_description_nl",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "location_description_en",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "name_nl",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "name_en",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "description_nl",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 9,
+        "name": "description_en",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 10,
+        "name": "start",
+        "type_info": "TimestamptzArray"
+      },
+      {
+        "ordinal": 11,
+        "name": "end",
+        "type_info": "TimestamptzArray"
+      },
+      {
+        "ordinal": 12,
+        "name": "registration_start",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 13,
+        "name": "registration_end",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 14,
+        "name": "registration_max",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 15,
+        "name": "waiting_list_max",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 16,
+        "name": "is_hidden",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 17,
+        "name": "required_membership_status:Vec<MembershipStatus>",
+        "type_info": {
+          "Custom": {
+            "name": "membership_status[]",
+            "kind": {
+              "Array": {
+                "Custom": {
+                  "name": "membership_status",
+                  "kind": {
+                    "Enum": [
+                      "pending",
+                      "member",
+                      "extraordinary",
+                      "non_member"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "ordinal": 18,
+        "name": "activity_type",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 19,
+        "name": "questions",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 20,
+        "name": "metadata",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 21,
+        "name": "registration_count!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 22,
+        "name": "waiting_list_count!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 23,
+        "name": "created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 24,
+        "name": "updated",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Bool"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      true,
+      true,
+      null,
+      null,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      null,
+      null,
+      false,
+      false
+    ]
+  },
+  "hash": "82413ad841a56f6091c6553a27b981873d1e367c33358050a0fbd8885cb024ea"
+}
