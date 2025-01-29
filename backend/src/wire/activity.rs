@@ -178,7 +178,7 @@ pub struct Registration {
     pub updated: OffsetDateTime
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Validate)]
 pub struct NewRegistration {
     pub answers: Vec<Answer>
 }
@@ -191,11 +191,11 @@ pub struct Answer {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Question {
-    id: Uuid,
-    question_nl: String,
-    question_en: String,
-    question_type: QuestionType,
-    required: bool,
+    pub id: Uuid,
+    pub question_nl: String,
+    pub question_en: String,
+    pub question_type: QuestionType,
+    pub required: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

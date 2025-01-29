@@ -1,4 +1,4 @@
-use crate::activity::{Activity, ActivityContent, Hydrated, IdOnly, NewRegistration, Registration};
+use crate::activity::{Activity, ActivityContent, Answer, Hydrated, IdOnly, NewRegistration, Question, Registration};
 use crate::api::ValidatedJson;
 use crate::auth::role::Role;
 use crate::error::{AppResult, Error};
@@ -92,11 +92,12 @@ pub async fn create_registration(
     Path((activity_id, user_id)): Path<(ActivityId, UserId)>,
     ValidatedJson(new): ValidatedJson<NewRegistration>,
 ) -> ApiResult<Registration> {
+    let activity = store.get_activity_hydrated(activity_id).await?;
+    
     let waiting_list_pos = if update_all_full_activity_access(&session).is_ok() {
         // TODO does not allow to force someone on the wait list
         None
     } else if update_single_full_registration_access(&user_id, &session).is_ok() {
-        let activity = store.get_activity_hydrated(activity_id).await?;
         if activity.content.registration_end < OffsetDateTime::now_utc() {
             Err(Error::BadRequest(
                 "Registration deadline has already passed",
@@ -105,7 +106,7 @@ pub async fn create_registration(
         if let Some(waiting_list_max) = activity.content.waiting_list_max {
             if waiting_list_max <= activity.waiting_list_count as i32 {
                 Err(Error::BadRequest(
-                    "Registrations and waiting list is already full",
+                    "Registrations and waiting list are already full",
                 ))?
             } else {
                 Some((activity.waiting_list_count + 1) as i32)
@@ -122,10 +123,23 @@ pub async fn create_registration(
     } else {
         Err(Error::Unauthorized)?
     };
+    
+    if !check_required_questions_answered(&activity.content.questions, &new.answers){
+        Err(Error::BadRequest("Missing answer for required question"))?
+    };
 
     Ok(Json(
         store
             .new_registration(activity_id, user_id, waiting_list_pos, new)
             .await?,
     ))
+}
+
+fn check_required_questions_answered(questions: &[Question], answers: &[Answer]) -> bool {
+    for question in questions {
+        if question.required && !answers.iter().any(|a| a.question_id == question.id){
+            return false
+        }
+    }
+    true
 }

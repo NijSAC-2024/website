@@ -15,7 +15,7 @@ use axum::{
 use memory_serve::{load_assets, MemoryServe};
 use tower_http::{trace, trace::TraceLayer};
 use tracing::Level;
-use crate::api::{create_activity, get_activity_registrations};
+use crate::api::{create_activity, create_registration, get_activity_registrations, get_registration};
 
 pub fn create_router(state: AppState) -> Router {
     let memory_router = MemoryServe::new(load_assets!("../frontend/dist"))
@@ -47,7 +47,8 @@ fn api_router() -> Router<AppState> {
         .route("/user/:id/material/update", put(update_user_material))
         .route("/activity", post(create_activity))
         .route("/activity/:id", get(get_activity))
-        .route("/activity/:id/registrations", get(get_activity_registrations))
+        .route("/activity/:id/registration", get(get_activity_registrations))
+        .route("/activity/:activity_id/registration/:user_id", get(get_registration).post(create_registration))
 }
 
 async fn version(State(state): State<AppState>) -> Json<String> {
