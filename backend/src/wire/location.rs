@@ -4,6 +4,7 @@ use uuid::Uuid;
 
 #[skip_serializing_none]
 #[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct Location {
     pub id: Uuid,
     pub name_nl: String,

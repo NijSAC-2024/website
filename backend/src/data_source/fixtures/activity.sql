@@ -1,5 +1,5 @@
 INSERT INTO activity (id, location_id, name_nl, name_en, description_nl, description_en,
-                      registration_start, registration_end, registration_max, waiting_list_max, created_by, 
+                      registration_start, registration_end, registration_max, waiting_list_max, created_by,
                       created, updated, activity_type, questions, metadata)
 VALUES ('24e2256c-4612-4774-a8ce-168c7817fbd4',
         '774f958d-4504-46a7-b3bf-c29fde52e332',
@@ -18,9 +18,9 @@ VALUES ('24e2256c-4612-4774-a8ce-168c7817fbd4',
         '[
           {
             "id": "24e2256c-4612-4774-a8ce-168c7817fbd4",
-            "question_en": "What is your favorite color?",
-            "question_nl": "Wat is je favoriete kleur?",
-            "question_type": "short_text",
+            "questionEn": "What is your favorite color?",
+            "questionNl": "Wat is je favoriete kleur?",
+            "questionType": "shortText",
             "required": true
           }
         ]',
