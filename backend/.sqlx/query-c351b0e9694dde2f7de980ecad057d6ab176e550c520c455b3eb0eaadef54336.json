@@ -1,0 +1,48 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO activity (\n                                  id,\n                                  location_id,\n                                  name_nl,\n                                  name_en,\n                                  description_nl,\n                                  description_en,\n                                  registration_start,\n                                  registration_end,\n                                  registration_max,\n                                  waiting_list_max,\n                                  is_hidden,\n                                  required_membership_status,\n                                  activity_type,\n                                  questions,\n                                  metadata,\n                                  created_by,\n                                  created,\n                                  updated)\n            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12::membership_status[], $13, $14, $15, $16, now(), now())\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Timestamptz",
+        "Timestamptz",
+        "Int4",
+        "Int4",
+        "Bool",
+        {
+          "Custom": {
+            "name": "membership_status[]",
+            "kind": {
+              "Array": {
+                "Custom": {
+                  "name": "membership_status",
+                  "kind": {
+                    "Enum": [
+                      "pending",
+                      "member",
+                      "extraordinary",
+                      "non_member"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "Text",
+        "Jsonb",
+        "Jsonb",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "c351b0e9694dde2f7de980ecad057d6ab176e550c520c455b3eb0eaadef54336"
+}

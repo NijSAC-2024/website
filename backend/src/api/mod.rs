@@ -1,10 +1,13 @@
+mod activity;
+mod material;
 mod user;
 
+pub(crate) use activity::*;
+pub(crate) use material::*;
 pub(crate) use user::*;
 
 use crate::error::Error;
 use axum::{
-    async_trait,
     extract::{
         rejection::{JsonRejection, QueryRejection},
         FromRequest, FromRequestParts, Query, Request,
@@ -37,7 +40,6 @@ pub(crate) struct ValidatedJson<T>(pub T);
 #[derive(Debug, Clone)]
 pub(crate) struct ValidatedQuery<T>(pub T);
 
-#[async_trait]
 impl<T, S> FromRequest<S> for ValidatedJson<T>
 where
     T: DeserializeOwned + Validate,
@@ -53,7 +55,6 @@ where
     }
 }
 
-#[async_trait]
 impl<T, S> FromRequestParts<S> for ValidatedQuery<T>
 where
     T: DeserializeOwned + Validate,

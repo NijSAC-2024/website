@@ -1,5 +1,5 @@
 use crate::error::{AppResult, Error};
-use axum::{async_trait, extract::FromRequestParts, http::request::Parts};
+use axum::{extract::FromRequestParts, http::request::Parts};
 use sqlx::{postgres::PgPoolOptions, PgPool};
 use std::{env, ops::Deref, sync::Arc};
 
@@ -54,7 +54,6 @@ impl Deref for AppState {
     }
 }
 
-#[async_trait]
 impl FromRequestParts<AppState> for PgPool {
     type Rejection = Error;
 

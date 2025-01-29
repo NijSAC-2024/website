@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE activity_registration\n            SET answers = $1,\n                attended = $2,\n                updated = now()\n            WHERE activity_id = $3\n              AND user_id = $4\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Jsonb",
+        "Bool",
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "7879e5962b4ca73c9b025a0c95f0e8abcbdaf8b404c8634265150b8a371528e6"
+}

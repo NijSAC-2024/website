@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                UPDATE activity_registration\n                SET waiting_list_position = waiting_list_position - 1\n                WHERE activity_id = $1\n                  AND waiting_list_position > $2\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "a0f0f1d707d10ba9f30d9f4278791efab02e851bb44eef798601bcfc267dc048"
+}

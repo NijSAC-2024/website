@@ -1,0 +1,40 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT u.id as user_id, u.first_name, u.infix, u.last_name\n            FROM activity_registration ar\n                JOIN \"user\" u ON ar.user_id = u.id\n            WHERE ar.activity_id = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "user_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "first_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "infix",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "last_name",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "23978a345e15d972e86cedb575a6d708419d3bf373ff91622098de6124107dea"
+}

@@ -1,0 +1,35 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT material_id, name_en, name_nl\n        FROM \"material\"\n        ORDER BY material_id\n        LIMIT $1\n        OFFSET $2\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "material_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "name_en",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "name_nl",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "1cfc5a3c4f7a940a54e3299eb9f93fe397eec2fc7d2e557bed0706ff8c839a36"
+}

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT COUNT(*) AS \"count!\" FROM \"weekend\"\n            ",
+  "query": "\n        SELECT COUNT(*) as \"count!\"\n        FROM \"material\"\n        ",
   "describe": {
     "columns": [
       {
@@ -16,5 +16,5 @@
       null
     ]
   },
-  "hash": "445e0704ff94ee15412a4c9b4640a505dc749f5e594565b28592517fa83f9863"
+  "hash": "a1792c44611d54a8ce5aed5ec83d6e07a4aee9704abc48ce82b79caba30fe54e"
 }
