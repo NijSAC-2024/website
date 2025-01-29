@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT material_id, name_eng, name_nl\n        FROM \"material\"\n        ORDER BY material_id\n        LIMIT $1\n        OFFSET $2\n        ",
+  "query": "\n        SELECT material_id, name_en, name_nl\n        FROM \"material\"\n        ORDER BY material_id\n        LIMIT $1\n        OFFSET $2\n        ",
   "describe": {
     "columns": [
       {
@@ -10,7 +10,7 @@
       },
       {
         "ordinal": 1,
-        "name": "name_eng",
+        "name": "name_en",
         "type_info": "Text"
       },
       {
@@ -31,5 +31,5 @@
       false
     ]
   },
-  "hash": "70be8377b40bca48bfe713d9aef65c9fff8f36c38dee55a065d5764b866f47d0"
+  "hash": "1cfc5a3c4f7a940a54e3299eb9f93fe397eec2fc7d2e557bed0706ff8c839a36"
 }

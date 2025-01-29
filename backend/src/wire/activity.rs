@@ -56,6 +56,7 @@ pub enum ActivityType {
     Activity,
     Course,
     Weekend,
+    Training
 }
 
 impl FromStr for ActivityType {
@@ -67,6 +68,7 @@ impl FromStr for ActivityType {
             "activity" => ActivityType::Activity,
             "course" => ActivityType::Course,
             "weekend" => ActivityType::Weekend,
+            "training" => ActivityType::Training,
             _ => {
                 return Err(Error::Other(format!(
                     "Invalid activity type {s}: Must be one of activity, course, or weekend"
