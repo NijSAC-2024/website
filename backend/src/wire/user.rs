@@ -1,5 +1,6 @@
 use crate::auth::role::{MembershipStatus, Roles};
 use serde::{Deserialize, Serialize};
+use serde_with::skip_serializing_none;
 use sqlx::FromRow;
 use std::ops::Deref;
 use time::OffsetDateTime;
@@ -37,6 +38,7 @@ pub struct User {
     pub(crate) content: UserContent,
 }
 
+#[skip_serializing_none]
 #[derive(Serialize, Deserialize, Debug, Validate)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct UserContent {
@@ -86,7 +88,7 @@ pub struct UserCredentials {
     pub password: String,
 }
 
-#[derive(Serialize, Deserialize, Validate)]
+#[derive(Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct RegisterNewUser {
     #[validate(length(min = 1, max = 100))]
@@ -131,6 +133,7 @@ pub struct RegisterNewUser {
     pub status: MembershipStatus,
 }
 
+#[skip_serializing_none]
 #[derive(Serialize, Debug, FromRow)]
 #[serde(rename_all = "camelCase")]
 pub struct BasicUser {

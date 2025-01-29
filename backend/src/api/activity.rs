@@ -1,10 +1,13 @@
-use crate::activity::{Activity, ActivityContent, Answer, Hydrated, IdOnly, NewRegistration, Question, Registration};
-use crate::api::ValidatedJson;
-use crate::auth::role::Role;
-use crate::error::{AppResult, Error};
-use crate::user::UserId;
 use crate::{
-    api::ApiResult, auth::session::Session, data_source::activity::ActivityStore,
+    activity::{
+        Activity, ActivityContent, Answer, Hydrated, IdOnly, NewRegistration, Question,
+        Registration,
+    },
+    api::{ApiResult, ValidatedJson},
+    auth::{role::Role, session::Session},
+    data_source::activity::ActivityStore,
+    error::{AppResult, Error},
+    user::UserId,
     wire::activity::ActivityId,
 };
 use axum::{extract::Path, Json};
@@ -93,7 +96,7 @@ pub async fn create_registration(
     ValidatedJson(new): ValidatedJson<NewRegistration>,
 ) -> ApiResult<Registration> {
     let activity = store.get_activity_hydrated(activity_id).await?;
-    
+
     let waiting_list_pos = if update_all_full_activity_access(&session).is_ok() {
         // TODO does not allow to force someone on the wait list
         None
@@ -123,8 +126,8 @@ pub async fn create_registration(
     } else {
         Err(Error::Unauthorized)?
     };
-    
-    if !check_required_questions_answered(&activity.content.questions, &new.answers){
+
+    if !check_required_questions_answered(&activity.content.questions, &new.answers) {
         Err(Error::BadRequest("Missing answer for required question"))?
     };
 
@@ -137,8 +140,8 @@ pub async fn create_registration(
 
 fn check_required_questions_answered(questions: &[Question], answers: &[Answer]) -> bool {
     for question in questions {
-        if question.required && !answers.iter().any(|a| a.question_id == question.id){
-            return false
+        if question.required && !answers.iter().any(|a| a.question_id == question.id) {
+            return false;
         }
     }
     true

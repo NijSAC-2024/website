@@ -1,9 +1,9 @@
-use crate::error::Error;
-use crate::wire::location::Location;
-use crate::{auth::role::MembershipStatus, user::BasicUser};
+use crate::{
+    auth::role::MembershipStatus, error::Error, user::BasicUser, wire::location::Location,
+};
 use serde::{Deserialize, Serialize};
-use std::str::FromStr;
-use std::{borrow::Cow, ops::Deref};
+use serde_with::skip_serializing_none;
+use std::{borrow::Cow, ops::Deref, str::FromStr};
 use strum_macros::IntoStaticStr;
 use time::OffsetDateTime;
 use uuid::Uuid;
@@ -56,7 +56,7 @@ pub enum ActivityType {
     Activity,
     Course,
     Weekend,
-    Training
+    Training,
 }
 
 impl FromStr for ActivityType {
@@ -78,6 +78,7 @@ impl FromStr for ActivityType {
     }
 }
 
+#[skip_serializing_none]
 #[derive(Serialize, Debug, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct Activity<T>
@@ -96,8 +97,10 @@ where
     pub content: ActivityContent<T>,
 }
 
+#[skip_serializing_none]
 #[derive(Serialize, Deserialize, Debug, Validate)]
 #[serde(rename_all = "camelCase")]
+#[validate(schema(function = "validate_activity"))]
 pub struct ActivityContent<T>
 where
     T: Validate,
@@ -166,6 +169,7 @@ fn validate_activity<T: Validate>(activity: &ActivityContent<T>) -> Result<(), V
     }
 }
 
+#[skip_serializing_none]
 #[derive(Serialize, Debug)]
 pub struct Registration {
     #[serde(flatten)]
@@ -175,12 +179,12 @@ pub struct Registration {
     #[serde(with = "time::serde::rfc3339")]
     pub created: OffsetDateTime,
     #[serde(with = "time::serde::rfc3339")]
-    pub updated: OffsetDateTime
+    pub updated: OffsetDateTime,
 }
 
 #[derive(Deserialize, Debug, Validate)]
 pub struct NewRegistration {
-    pub answers: Vec<Answer>
+    pub answers: Vec<Answer>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

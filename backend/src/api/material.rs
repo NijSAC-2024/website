@@ -1,10 +1,8 @@
-use crate::auth::role::Role;
-use crate::error::Error;
 use crate::{
     api::{ApiResult, ValidatedJson, ValidatedQuery},
-    auth::session::Session,
+    auth::{role::Role, session::Session},
     data_source::MaterialStore,
-    error::AppResult,
+    error::{AppResult, Error},
     material::{Material, UserMaterial},
     user::UserId,
     Pagination,
@@ -30,7 +28,6 @@ fn read_all_access(session: &Session) -> AppResult<()> {
         Err(Error::Unauthorized)
     }
 }
-
 
 fn update_access(id: &UserId, session: &Session) -> AppResult<()> {
     if read_all_access(session).is_ok() || id == session.user_id() {

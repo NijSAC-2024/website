@@ -4,11 +4,13 @@ use crate::{
     AppState,
 };
 
-use crate::activity::{Answer, Date, Hydrated, NewRegistration, Registration};
-use crate::location::Location;
-use crate::user::UserId;
-use crate::wire::activity::IdOnly;
-use crate::{auth::role::MembershipStatus, user::BasicUser};
+use crate::{
+    activity::{Answer, Date, Hydrated, NewRegistration, Registration},
+    auth::role::MembershipStatus,
+    location::Location,
+    user::{BasicUser, UserId},
+    wire::activity::IdOnly,
+};
 use axum::{extract::FromRequestParts, http::request::Parts};
 use sqlx::{Executor, PgPool, Postgres};
 use time::OffsetDateTime;
@@ -234,13 +236,14 @@ impl ActivityStore {
             .execute(&mut *tx)
             .await?;
 
-        let activity = Self::get_activity(&mut *tx, activity_id.into()).await?;
+        let activity = Self::get_activity(&mut *tx, activity_id.into())
+            .await
+            .map_err(|err| Error::Internal(format!("{err:?}")))?;
 
         tx.commit().await?;
 
         Ok(activity)
     }
-    
 
     pub async fn get_activity_hydrated(&self, id: ActivityId) -> Result<Activity<Hydrated>, Error> {
         Self::get_activity(&self.db, id).await
@@ -250,6 +253,7 @@ impl ActivityStore {
     where
         E: Executor<'c, Database = Postgres>,
     {
+        dbg!(&id);
         sqlx::query_as!(
             PgActivity,
             r#"
@@ -281,7 +285,7 @@ impl ActivityStore {
             FROM activity a
                 JOIN location l ON a.location_id = l.id
                 JOIN date d ON a.id = d.activity_id 
-                JOIN activity_registration r ON r.activity_id = a.id
+                LEFT JOIN activity_registration r ON r.activity_id = a.id
             WHERE a.id = $1
             GROUP BY a.id, l.id
             "#,

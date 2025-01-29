@@ -20,7 +20,7 @@ VALUES ('24e2256c-4612-4774-a8ce-168c7817fbd4',
             "question_en": "What is your favorite color?",
             "question_nl": "Wat is je favoriete kleur?",
             "question_type": "short_text",
-            "required": false
+            "required": true
           }
         ]',
         '[]');
