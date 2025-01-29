@@ -9,9 +9,9 @@ use crate::{
     AppState,
 };
 use argon2::{password_hash, Argon2, PasswordHash, PasswordVerifier};
-use axum::{async_trait, extract::FromRequestParts, http::request::Parts};
+use axum::{extract::FromRequestParts, http::request::Parts};
 use axum_extra::extract::{cookie::Cookie, CookieJar};
-use rand::distributions::{Alphanumeric, DistString};
+use rand::distr::{Alphanumeric, SampleString};
 use sqlx::PgPool;
 use time::OffsetDateTime;
 use tracing::trace;
@@ -129,7 +129,7 @@ impl Session {
                 _ => Error::Argon2(err),
             })?;
 
-        let cookie_value = Alphanumeric.sample_string(&mut rand::thread_rng(), 32);
+        let cookie_value = Alphanumeric.sample_string(&mut rand::rng(), 32);
 
         let session = sqlx::query_as!(
             PgSession,
@@ -176,7 +176,6 @@ impl Session {
     }
 }
 
-#[async_trait]
 impl FromRequestParts<AppState> for Session {
     type Rejection = Error;
 

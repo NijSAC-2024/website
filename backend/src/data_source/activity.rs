@@ -9,7 +9,7 @@ use crate::location::Location;
 use crate::user::UserId;
 use crate::wire::activity::IdOnly;
 use crate::{auth::role::MembershipStatus, user::BasicUser};
-use axum::{async_trait, extract::FromRequestParts, http::request::Parts};
+use axum::{extract::FromRequestParts, http::request::Parts};
 use sqlx::{Executor, PgPool, Postgres};
 use time::OffsetDateTime;
 use uuid::Uuid;
@@ -19,7 +19,6 @@ pub(crate) struct ActivityStore {
     db: PgPool,
 }
 
-#[async_trait]
 impl FromRequestParts<AppState> for ActivityStore {
     type Rejection = Error;
 

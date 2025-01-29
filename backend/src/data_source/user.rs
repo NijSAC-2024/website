@@ -9,7 +9,7 @@ use argon2::{
     password_hash::{rand_core::OsRng, SaltString},
     Argon2, PasswordHasher,
 };
-use axum::{async_trait, extract::FromRequestParts, http::request::Parts};
+use axum::{extract::FromRequestParts, http::request::Parts};
 use sqlx::PgPool;
 use std::ops::Deref;
 use time::OffsetDateTime;
@@ -19,7 +19,6 @@ pub(crate) struct UserStore {
     db: PgPool,
 }
 
-#[async_trait]
 impl FromRequestParts<AppState> for UserStore {
     type Rejection = Error;
 

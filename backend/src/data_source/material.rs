@@ -5,7 +5,7 @@ use crate::{
     wire::material::{Material, UserMaterial},
     AppState, Pagination,
 };
-use axum::{async_trait, extract::FromRequestParts, http::request::Parts};
+use axum::{extract::FromRequestParts, http::request::Parts};
 use sqlx::PgPool;
 use std::{convert::TryInto, ops::Deref};
 use uuid::Uuid;
@@ -14,7 +14,6 @@ pub(crate) struct MaterialStore {
     db: PgPool,
 }
 
-#[async_trait]
 impl FromRequestParts<AppState> for MaterialStore {
     type Rejection = Error;
 

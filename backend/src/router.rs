@@ -41,14 +41,14 @@ fn api_router() -> Router<AppState> {
         .route("/logout", get(logout))
         .route("/register", post(register))
         .route("/user", get(get_all_users))
-        .route("/user/:id", get(get_user).put(update_user))
-        .route("/user/:id/material", get(get_material_list))
-        .route("/user/:id/getMaterial", get(get_user_materials))
-        .route("/user/:id/material/update", put(update_user_material))
+        .route("/user/{:id}", get(get_user).put(update_user))
+        .route("/user/{:id}/material", get(get_material_list))
+        .route("/user/{:id}/getMaterial", get(get_user_materials))
+        .route("/user/{:id}/material/update", put(update_user_material))
         .route("/activity", post(create_activity))
-        .route("/activity/:id", get(get_activity))
-        .route("/activity/:id/registration", get(get_activity_registrations))
-        .route("/activity/:activity_id/registration/:user_id", get(get_registration).post(create_registration))
+        .route("/activity/{:id}", get(get_activity))
+        .route("/activity/{:id}/registration", get(get_activity_registrations))
+        .route("/activity/{:activity_id}/registration/{:user_id}", get(get_registration).post(create_registration))
 }
 
 async fn version(State(state): State<AppState>) -> Json<String> {
