@@ -138,6 +138,20 @@ pub async fn update_registration(
     ))
 }
 
+pub async fn delete_registration(
+    store: ActivityStore,
+    session: Session,
+    Path((activity_id, user_id)): Path<(ActivityId, UserId)>,
+) -> Result<(), Error> {
+    if update_all_full_activity_access(&session).is_ok()
+        || update_single_full_registration_access(&user_id, &session).is_ok()
+    {
+        store.delete_registration(activity_id, user_id).await
+    } else {
+        Err(Error::Unauthorized)
+    }
+}
+
 fn check_required_questions_answered(questions: &[Question], answers: &[Answer]) -> bool {
     for question in questions {
         if question.required && !answers.iter().any(|a| a.question_id == question.id) {

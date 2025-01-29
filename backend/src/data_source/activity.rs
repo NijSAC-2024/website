@@ -297,11 +297,13 @@ impl ActivityStore {
             .try_into()
     }
 
+    /// Moves a registration from the waiting list to a regular registration
+    /// and returns the old waiting list position (None if it wasn't on the waiting list)
     async fn remove_from_waiting_list(
         tx: &mut PgConnection,
         activity_id: ActivityId,
         user_id: UserId,
-    ) -> Result<(), Error> {
+    ) -> Result<Option<i32>, Error> {
         struct Position {
             pos: Option<i32>,
         }
@@ -335,8 +337,10 @@ impl ActivityStore {
                 *activity_id,
                 pos
             ).execute(&mut *tx).await?;
+            Ok(Some(pos))
+        }else {
+            Ok(None)
         }
-        Ok(())
     }
 
     async fn update_waiting_list_position(
@@ -361,7 +365,8 @@ impl ActivityStore {
             return Ok(());
         }
         if new_waiting_list_pos.is_none() {
-            return Self::remove_from_waiting_list(tx, activity_id, user_id).await;
+            Self::remove_from_waiting_list(tx, activity_id, user_id).await?;
+            return Ok(());
         }
 
         struct Count {
@@ -391,7 +396,8 @@ impl ActivityStore {
             sqlx::query!(
                 r#"
             UPDATE activity_registration
-            SET waiting_list_position = $3
+            SET waiting_list_position = $3,
+                updated = now()
             WHERE activity_id = $1
               AND user_id = $2
             "#,
@@ -540,5 +546,55 @@ impl ActivityStore {
         tx.commit().await?;
 
         self.get_registration(activity_id, user_id).await
+    }
+
+    pub async fn delete_registration(
+        &self,
+        activity_id: ActivityId,
+        user_id: UserId,
+    ) -> Result<(), Error> {
+        let mut tx = self.db.begin().await?;
+
+        if Self::remove_from_waiting_list(&mut tx, activity_id, user_id)
+            .await?
+            .is_none()
+        {
+            sqlx::query!(
+                r#"
+                UPDATE activity_registration
+                SET waiting_list_position = null
+                WHERE activity_id = $1
+                  AND waiting_list_position = 0
+                "#,
+                *activity_id
+            )
+            .execute(&mut *tx)
+            .await?;
+
+            sqlx::query!(
+                r#"
+                UPDATE activity_registration
+                SET waiting_list_position = waiting_list_position - 1
+                WHERE activity_id = $1
+                "#,
+                *activity_id
+            )
+            .execute(&mut *tx)
+            .await?;
+        }
+
+        sqlx::query!(
+            r#"
+            DELETE FROM activity_registration WHERE activity_id = $1 and user_id = $2
+            "#,
+            *activity_id,
+            *user_id,
+        )
+        .execute(&mut *tx)
+        .await?;
+
+        tx.commit().await?;
+
+        Ok(())
     }
 }
