@@ -9,10 +9,10 @@ use time::OffsetDateTime;
 use uuid::Uuid;
 use validator::{Validate, ValidationError};
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Copy, Clone)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
 #[serde(transparent)]
 pub struct ActivityId(Uuid);
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Copy, Clone)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
 #[serde(transparent)]
 pub struct LocationId(Uuid);
 

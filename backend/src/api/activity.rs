@@ -53,9 +53,9 @@ pub async fn get_activity_registrations(
     session: Session,
 ) -> ApiResult<serde_json::Value> {
     let res = if update_all_full_activity_access(&session).is_ok() {
-        serde_json::to_value(store.get_registrations_detailed(id).await?)?
+        serde_json::to_value(store.get_registrations_detailed(&id).await?)?
     } else if read_all_basic_registrations_access(&session).is_ok() {
-        serde_json::to_value(store.get_registered_users(id).await?)?
+        serde_json::to_value(store.get_registered_users(&id).await?)?
     } else {
         Err(Error::Unauthorized)?
     };
@@ -68,7 +68,7 @@ pub async fn get_activity(
     store: ActivityStore,
     Path(id): Path<ActivityId>,
 ) -> ApiResult<Activity<Hydrated>> {
-    Ok(Json(store.get_activity_hydrated(id).await?))
+    Ok(Json(store.get_activity_hydrated(&id).await?))
 }
 
 pub async fn create_activity(
@@ -77,7 +77,7 @@ pub async fn create_activity(
     ValidatedJson(new): ValidatedJson<ActivityContent<IdOnly>>,
 ) -> ApiResult<Activity<Hydrated>> {
     update_all_full_activity_access(&session)?;
-    Ok(Json(store.new_activity(new).await?))
+    Ok(Json(store.new_activity(new, session.user_id()).await?))
 }
 
 pub async fn get_registration(
@@ -86,7 +86,7 @@ pub async fn get_registration(
     Path((activity_id, user_id)): Path<(ActivityId, UserId)>,
 ) -> ApiResult<Registration> {
     update_single_full_registration_access(&user_id, &session)?;
-    Ok(Json(store.get_registration(activity_id, user_id).await?))
+    Ok(Json(store.get_registration(&activity_id, &user_id).await?))
 }
 
 pub async fn create_registration(
@@ -97,7 +97,7 @@ pub async fn create_registration(
 ) -> ApiResult<Registration> {
     update_single_full_registration_access(&user_id, &session)?;
 
-    let activity = store.get_activity_hydrated(activity_id).await?;
+    let activity = store.get_activity_hydrated(&activity_id).await?;
     if update_all_full_activity_access(&session).is_err()
         && activity.content.registration_end < OffsetDateTime::now_utc()
     {
@@ -113,7 +113,7 @@ pub async fn create_registration(
     };
 
     Ok(Json(
-        store.new_registration(activity_id, user_id, new).await?,
+        store.new_registration(&activity_id, &user_id, new).await?,
     ))
 }
 
@@ -125,15 +125,15 @@ pub async fn update_registration(
 ) -> ApiResult<Registration> {
     update_single_full_registration_access(&user_id, &session)?;
 
-    let activity = store.get_activity_hydrated(activity_id).await?;
-    let registration = store.get_registration(activity_id, user_id).await?;
+    let activity = store.get_activity_hydrated(&activity_id).await?;
+    let registration = store.get_registration(&activity_id, &user_id).await?;
 
     ensure_correct_waiting_list_position(&activity, &mut updated, &session, Some(&registration))?;
     ensure_attendance_update_full_access_only(&registration, &mut updated, &session);
 
     Ok(Json(
         store
-            .update_registration(activity_id, user_id, updated)
+            .update_registration(&activity_id, &user_id, updated)
             .await?,
     ))
 }
@@ -146,7 +146,7 @@ pub async fn delete_registration(
     if update_all_full_activity_access(&session).is_ok()
         || update_single_full_registration_access(&user_id, &session).is_ok()
     {
-        store.delete_registration(activity_id, user_id).await
+        store.delete_registration(&activity_id, &user_id).await
     } else {
         Err(Error::Unauthorized)
     }

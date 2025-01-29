@@ -7,7 +7,7 @@ use time::OffsetDateTime;
 use uuid::Uuid;
 use validator::Validate;
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, Copy)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
 #[serde(transparent)]
 pub struct UserId(Uuid);
 

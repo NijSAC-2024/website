@@ -174,6 +174,7 @@ impl ActivityStore {
     pub async fn new_activity(
         &self,
         activity: ActivityContent<IdOnly>,
+        created_by: &UserId,
     ) -> Result<Activity<Hydrated>, Error> {
         let activity_id = Uuid::now_v7();
 
@@ -197,9 +198,10 @@ impl ActivityStore {
                                   activity_type,
                                   questions,
                                   metadata,
+                                  created_by,
                                   created,
                                   updated)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12::membership_status[], $13, $14, $15, now(), now())
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12::membership_status[], $13, $14, $15, $16, now(), now())
             "#,
             activity_id,
             *activity.details.location_id,
@@ -215,7 +217,8 @@ impl ActivityStore {
             activity.required_membership_status as Option<Vec<MembershipStatus>>,
             Into::<&str>::into(activity.activity_type),
             serde_json::to_value(activity.questions)?,
-            activity.metadata
+            activity.metadata,
+            **created_by
         ).execute(&mut *tx).await?;
 
         let (start, end) = activity.dates.into_iter().fold(
@@ -238,7 +241,7 @@ impl ActivityStore {
             .execute(&mut *tx)
             .await?;
 
-        let activity = Self::get_activity(&mut *tx, activity_id.into())
+        let activity = Self::get_activity(&mut *tx, &activity_id.into())
             .await
             .map_err(|err| Error::Internal(format!("{err:?}")))?;
 
@@ -247,11 +250,14 @@ impl ActivityStore {
         Ok(activity)
     }
 
-    pub async fn get_activity_hydrated(&self, id: ActivityId) -> Result<Activity<Hydrated>, Error> {
+    pub async fn get_activity_hydrated(
+        &self,
+        id: &ActivityId,
+    ) -> Result<Activity<Hydrated>, Error> {
         Self::get_activity(&self.db, id).await
     }
 
-    async fn get_activity<'c, E>(db: E, id: ActivityId) -> Result<Activity<Hydrated>, Error>
+    async fn get_activity<'c, E>(db: E, id: &ActivityId) -> Result<Activity<Hydrated>, Error>
     where
         E: Executor<'c, Database = Postgres>,
     {
@@ -290,7 +296,7 @@ impl ActivityStore {
             WHERE a.id = $1
             GROUP BY a.id, l.id
             "#,
-            *id
+            **id
         )
             .fetch_one(db)
             .await?
@@ -301,8 +307,8 @@ impl ActivityStore {
     /// and returns the old waiting list position (None if it wasn't on the waiting list)
     async fn remove_from_waiting_list(
         tx: &mut PgConnection,
-        activity_id: ActivityId,
-        user_id: UserId,
+        activity_id: &ActivityId,
+        user_id: &UserId,
     ) -> Result<Option<i32>, Error> {
         struct Position {
             pos: Option<i32>,
@@ -313,8 +319,8 @@ impl ActivityStore {
             r#"
             SELECT waiting_list_position as pos FROM activity_registration WHERE activity_id = $1 AND user_id = $2
             "#,
-            *activity_id,
-            *user_id
+            **activity_id,
+            **user_id
         ).fetch_one(&mut *tx).await? {
             sqlx::query!(
                 r#"
@@ -323,8 +329,8 @@ impl ActivityStore {
                 WHERE activity_id = $1
                   AND user_id = $2
                 "#,
-                *activity_id,
-                *user_id
+                **activity_id,
+                **user_id
             ).execute(&mut *tx).await?;
 
             sqlx::query!(
@@ -334,7 +340,7 @@ impl ActivityStore {
                 WHERE activity_id = $1
                   AND waiting_list_position > $2
                 "#,
-                *activity_id,
+                **activity_id,
                 pos
             ).execute(&mut *tx).await?;
             Ok(Some(pos))
@@ -345,8 +351,8 @@ impl ActivityStore {
 
     async fn update_waiting_list_position(
         tx: &mut PgConnection,
-        activity_id: ActivityId,
-        user_id: UserId,
+        activity_id: &ActivityId,
+        user_id: &UserId,
         new_waiting_list_pos: Option<i32>,
     ) -> Result<(), Error> {
         struct Position {
@@ -358,8 +364,8 @@ impl ActivityStore {
             r#"
             SELECT waiting_list_position as pos FROM activity_registration WHERE activity_id = $1 AND user_id = $2
             "#,
-            *activity_id,
-            *user_id
+            **activity_id,
+            **user_id
         ).fetch_one(&mut *tx).await?;
         if pos == new_waiting_list_pos {
             return Ok(());
@@ -384,7 +390,7 @@ impl ActivityStore {
             WHERE a.id = $1
             GROUP BY a.id
             "#,
-            *activity_id
+            **activity_id
         )
         .fetch_one(&mut *tx)
         .await?;
@@ -401,8 +407,8 @@ impl ActivityStore {
             WHERE activity_id = $1
               AND user_id = $2
             "#,
-                *activity_id,
-                *user_id,
+                **activity_id,
+                **user_id,
                 new_waiting_list_pos
             )
             .execute(&mut *tx)
@@ -416,7 +422,7 @@ impl ActivityStore {
         Ok(())
     }
 
-    pub async fn get_registered_users(&self, id: ActivityId) -> Result<Vec<BasicUser>, Error> {
+    pub async fn get_registered_users(&self, id: &ActivityId) -> Result<Vec<BasicUser>, Error> {
         Ok(sqlx::query_as!(
             BasicUser,
             r#"
@@ -425,7 +431,7 @@ impl ActivityStore {
                 JOIN "user" u ON ar.user_id = u.id
             WHERE ar.activity_id = $1
             "#,
-            *id
+            **id
         )
         .fetch_all(&self.db)
         .await?)
@@ -433,7 +439,7 @@ impl ActivityStore {
 
     pub async fn get_registrations_detailed(
         &self,
-        id: ActivityId,
+        id: &ActivityId,
     ) -> Result<Vec<Registration>, Error> {
         sqlx::query_as!(
             PgRegistration,
@@ -451,7 +457,7 @@ impl ActivityStore {
                 JOIN "user" u ON ar.user_id = u.id
             WHERE ar.activity_id = $1
             "#,
-            *id
+            **id
         )
         .fetch_all(&self.db)
         .await?
@@ -462,8 +468,8 @@ impl ActivityStore {
 
     pub async fn get_registration(
         &self,
-        activity_id: ActivityId,
-        user_id: UserId,
+        activity_id: &ActivityId,
+        user_id: &UserId,
     ) -> Result<Registration, Error> {
         sqlx::query_as!(
             PgRegistration,
@@ -482,8 +488,8 @@ impl ActivityStore {
             WHERE ar.activity_id = $1
               AND user_id = $2
             "#,
-            *activity_id,
-            *user_id
+            **activity_id,
+            **user_id
         )
         .fetch_one(&self.db)
         .await?
@@ -492,8 +498,8 @@ impl ActivityStore {
 
     pub async fn new_registration(
         &self,
-        activity_id: ActivityId,
-        user_id: UserId,
+        activity_id: &ActivityId,
+        user_id: &UserId,
         new: NewRegistration,
     ) -> Result<Registration, Error> {
         sqlx::query!(
@@ -501,8 +507,8 @@ impl ActivityStore {
             INSERT INTO activity_registration (activity_id, user_id, waiting_list_position, answers, created, updated)
             VALUES ($1, $2, $3, $4, now(), now())
             "#,
-            *activity_id,
-            *user_id,
+            **activity_id,
+            **user_id,
             new.waiting_list_position,
             serde_json::to_value(new.answers)?
         )
@@ -513,8 +519,8 @@ impl ActivityStore {
 
     pub async fn update_registration(
         &self,
-        activity_id: ActivityId,
-        user_id: UserId,
+        activity_id: &ActivityId,
+        user_id: &UserId,
         updated: NewRegistration,
     ) -> Result<Registration, Error> {
         let mut tx = self.db.begin().await?;
@@ -529,8 +535,8 @@ impl ActivityStore {
             "#,
             serde_json::to_value(updated.answers)?,
             updated.attended,
-            *activity_id,
-            *user_id
+            **activity_id,
+            **user_id
         )
         .execute(&mut *tx)
         .await?;
@@ -550,8 +556,8 @@ impl ActivityStore {
 
     pub async fn delete_registration(
         &self,
-        activity_id: ActivityId,
-        user_id: UserId,
+        activity_id: &ActivityId,
+        user_id: &UserId,
     ) -> Result<(), Error> {
         let mut tx = self.db.begin().await?;
 
@@ -566,7 +572,7 @@ impl ActivityStore {
                 WHERE activity_id = $1
                   AND waiting_list_position = 0
                 "#,
-                *activity_id
+                **activity_id
             )
             .execute(&mut *tx)
             .await?;
@@ -577,7 +583,7 @@ impl ActivityStore {
                 SET waiting_list_position = waiting_list_position - 1
                 WHERE activity_id = $1
                 "#,
-                *activity_id
+                **activity_id
             )
             .execute(&mut *tx)
             .await?;
@@ -587,8 +593,8 @@ impl ActivityStore {
             r#"
             DELETE FROM activity_registration WHERE activity_id = $1 and user_id = $2
             "#,
-            *activity_id,
-            *user_id,
+            **activity_id,
+            **user_id,
         )
         .execute(&mut *tx)
         .await?;

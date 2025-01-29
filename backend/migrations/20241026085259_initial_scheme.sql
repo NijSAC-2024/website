@@ -73,6 +73,7 @@ create table activity --Activity base
     -- example scheme:
     -- { "weekend_type": "single_pitch" }
     metadata                   jsonb       not null, -- if no metadata is given, use an empty object
+    created_by                 uuid        not null references "user" (id),
     created                    timestamptz not null,
     updated                    timestamptz not null
 );
