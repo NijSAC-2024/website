@@ -175,6 +175,7 @@ pub struct Registration {
     #[serde(flatten)]
     pub user: BasicUser,
     pub attended: Option<bool>,
+    pub waiting_list_position: Option<i32>,
     pub answers: Vec<Answer>,
     #[serde(with = "time::serde::rfc3339")]
     pub created: OffsetDateTime,
@@ -185,6 +186,8 @@ pub struct Registration {
 #[derive(Deserialize, Debug, Validate)]
 pub struct NewRegistration {
     pub answers: Vec<Answer>,
+    pub attended: Option<bool>,
+    pub waiting_list_position: Option<i32>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

@@ -5,14 +5,14 @@ use crate::{
 };
 
 use crate::{
-    activity::{Answer, Date, Hydrated, NewRegistration, Registration},
+    activity::{Date, Hydrated, NewRegistration, Registration},
     auth::role::MembershipStatus,
     location::Location,
     user::{BasicUser, UserId},
     wire::activity::IdOnly,
 };
 use axum::{extract::FromRequestParts, http::request::Parts};
-use sqlx::{Executor, PgPool, Postgres};
+use sqlx::{Executor, PgConnection, PgPool, Postgres};
 use time::OffsetDateTime;
 use uuid::Uuid;
 use validator::Validate;
@@ -91,7 +91,7 @@ impl TryFrom<PgActivity> for IdOnly {
 
 impl<T> TryFrom<PgActivity> for Activity<T>
 where
-    T: TryFrom<PgActivity, Error = Error>,
+    T: TryFrom<PgActivity, Error=Error>,
     T: Validate,
 {
     type Error = Error;
@@ -144,6 +144,7 @@ struct PgRegistration {
     infix: Option<String>,
     last_name: String,
     attended: Option<bool>,
+    waiting_list_position: Option<i32>,
     answers: serde_json::Value,
     created: OffsetDateTime,
     updated: OffsetDateTime,
@@ -161,6 +162,7 @@ impl TryFrom<PgRegistration> for Registration {
                 last_name: pg.last_name,
             },
             attended: pg.attended,
+            waiting_list_position: pg.waiting_list_position,
             answers: serde_json::from_value(pg.answers)?,
             created: pg.created,
             updated: pg.updated,
@@ -251,9 +253,8 @@ impl ActivityStore {
 
     async fn get_activity<'c, E>(db: E, id: ActivityId) -> Result<Activity<Hydrated>, Error>
     where
-        E: Executor<'c, Database = Postgres>,
+        E: Executor<'c, Database=Postgres>,
     {
-        dbg!(&id);
         sqlx::query_as!(
             PgActivity,
             r#"
@@ -296,6 +297,101 @@ impl ActivityStore {
             .try_into()
     }
 
+    async fn remove_from_waiting_list(tx: &mut PgConnection, activity_id: ActivityId, user_id: UserId) -> Result<(), Error>
+    {
+        struct Position {
+            pos: Option<i32>,
+        }
+
+        if let Position { pos: Some(pos) } = sqlx::query_as!(
+            Position,
+            r#"
+            SELECT waiting_list_position as pos FROM activity_registration WHERE activity_id = $1 AND user_id = $2
+            "#,
+            *activity_id,
+            *user_id
+        ).fetch_one(&mut *tx).await? {
+            sqlx::query!(
+                r#"
+                UPDATE activity_registration
+                SET waiting_list_position = null
+                WHERE activity_id = $1
+                  AND user_id = $2
+                "#,
+                *activity_id,
+                *user_id
+            ).execute(&mut *tx).await?;
+
+            sqlx::query!(
+                r#"
+                UPDATE activity_registration
+                SET waiting_list_position = waiting_list_position - 1
+                WHERE activity_id = $1
+                  AND waiting_list_position > $2
+                "#,
+                *activity_id,
+                pos
+            ).execute(&mut *tx).await?;
+        }
+        Ok(())
+    }
+
+    async fn update_waiting_list_position(tx: &mut PgConnection, activity_id: ActivityId, user_id: UserId, new_waiting_list_pos: Option<i32>) -> Result<(), Error> {
+        struct Position {
+            pos: Option<i32>,
+        }
+
+        let Position { pos } = sqlx::query_as!(
+            Position,
+            r#"
+            SELECT waiting_list_position as pos FROM activity_registration WHERE activity_id = $1 AND user_id = $2
+            "#,
+            *activity_id,
+            *user_id
+        ).fetch_one(&mut *tx).await?;
+        if pos == new_waiting_list_pos {
+            return Ok(())
+        }
+        if new_waiting_list_pos.is_none() {
+            return Self::remove_from_waiting_list(tx, activity_id, user_id).await;
+        }
+
+        struct Count {
+            count: i64,
+        }
+
+        let Count{count: waiting_list_count} = sqlx::query_as!(
+            Count,
+            r#"
+            SELECT count(r.user_id) FILTER ( WHERE r.waiting_list_position IS NOT NULL ) as "count!"
+            FROM activity a
+                LEFT JOIN activity_registration r ON r.activity_id = a.id
+            WHERE a.id = $1
+            GROUP BY a.id
+            "#,
+            *activity_id
+        ).fetch_one(&mut *tx).await?;
+
+        if new_waiting_list_pos == Some((waiting_list_count - 1) as i32) || new_waiting_list_pos == Some(0) {
+            Self::remove_from_waiting_list(tx, activity_id, user_id).await?;
+            sqlx::query!(
+            r#"
+            UPDATE activity_registration
+            SET waiting_list_position = $3
+            WHERE activity_id = $1
+              AND user_id = $2
+            "#,
+            *activity_id,
+            *user_id,
+            new_waiting_list_pos
+            ).execute(&mut *tx).await?;
+        } else {
+            Err(Error::BadRequest("Cannot move to arbitrary position of waiting list."))?
+        };
+
+        Ok(())
+    }
+
     pub async fn get_registered_users(&self, id: ActivityId) -> Result<Vec<BasicUser>, Error> {
         Ok(sqlx::query_as!(
             BasicUser,
@@ -307,8 +403,8 @@ impl ActivityStore {
             "#,
             *id
         )
-        .fetch_all(&self.db)
-        .await?)
+            .fetch_all(&self.db)
+            .await?)
     }
 
     pub async fn get_registrations_detailed(
@@ -318,7 +414,15 @@ impl ActivityStore {
         sqlx::query_as!(
             PgRegistration,
             r#"
-            SELECT user_id, u.first_name, u.infix, u.last_name, answers, attended, u.created, u.updated
+            SELECT user_id,
+                   u.first_name,
+                   u.infix,
+                   u.last_name,
+                   answers,
+                   attended,
+                   waiting_list_position,
+                   u.created,
+                   u.updated
             FROM activity_registration ar
                 JOIN "user" u ON ar.user_id = u.id
             WHERE ar.activity_id = $1
@@ -340,7 +444,15 @@ impl ActivityStore {
         sqlx::query_as!(
             PgRegistration,
             r#"
-            SELECT user_id, u.first_name, u.infix, u.last_name, answers, attended, u.created, u.updated
+            SELECT user_id,
+                   u.first_name,
+                   u.infix,
+                   u.last_name,
+                   answers,
+                   attended,
+                   waiting_list_position,
+                   u.created,
+                   u.updated
             FROM activity_registration ar
                 JOIN "user" u ON ar.user_id = u.id
             WHERE ar.activity_id = $1
@@ -355,7 +467,6 @@ impl ActivityStore {
         &self,
         activity_id: ActivityId,
         user_id: UserId,
-        waiting_list_pos: Option<i32>,
         new: NewRegistration,
     ) -> Result<Registration, Error> {
         sqlx::query!(
@@ -365,57 +476,42 @@ impl ActivityStore {
             "#,
             *activity_id,
             *user_id,
-            waiting_list_pos,
+            new.waiting_list_position,
             serde_json::to_value(new.answers)?
         )
-        .execute(&self.db)
-        .await?;
+            .execute(&self.db)
+            .await?;
         self.get_registration(activity_id, user_id).await
     }
 
-    pub async fn update_registration_answers(
+    pub async fn update_registration(
         &self,
         activity_id: ActivityId,
         user_id: UserId,
-        answers: Vec<Answer>,
+        updated: NewRegistration,
     ) -> Result<Registration, Error> {
+        let mut tx = self.db.begin().await?;
         sqlx::query!(
             r#"
             UPDATE activity_registration
             SET answers = $1,
+                attended = $2,
                 updated = now()
-            WHERE activity_id = $2
-              AND user_id = $3
+            WHERE activity_id = $3
+              AND user_id = $4
             "#,
-            serde_json::to_value(answers)?,
+            serde_json::to_value(updated.answers)?,
+            updated.attended,
             *activity_id,
             *user_id
         )
-        .execute(&self.db)
-        .await?;
-        self.get_registration(activity_id, user_id).await
-    }
+            .execute(&mut *tx)
+            .await?;
 
-    pub async fn update_registration_attendance(
-        &self,
-        activity_id: ActivityId,
-        user_id: UserId,
-        attended: Option<bool>,
-    ) -> Result<Registration, Error> {
-        sqlx::query!(
-            r#"
-            UPDATE activity_registration
-            SET attended = $1,
-                updated = now()
-            WHERE activity_id = $2
-              AND user_id = $3
-            "#,
-            attended,
-            *activity_id,
-            *user_id
-        )
-        .execute(&self.db)
-        .await?;
+        Self::update_waiting_list_position(&mut *tx, activity_id, user_id.clone(), updated.waiting_list_position).await?;
+
+        tx.commit().await?;
+
         self.get_registration(activity_id, user_id).await
     }
 }

@@ -1,3 +1,4 @@
+use crate::api::update_registration;
 use crate::{
     api::{
         create_activity, create_registration, get_activity, get_activity_registrations,
@@ -53,7 +54,9 @@ fn api_router() -> Router<AppState> {
         )
         .route(
             "/activity/{:activity_id}/registration/{:user_id}",
-            get(get_registration).post(create_registration),
+            get(get_registration)
+                .post(create_registration)
+                .put(update_registration),
         )
 }
 

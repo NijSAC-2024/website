@@ -101,12 +101,14 @@ create table activity_registration
     -- if no answers are given, use an empty array
     answers               jsonb       not null,
     attended              boolean,
-    -- null means not on the waiting list but regularly registered
+    -- null means not on the waiting list but regularly registered, 0 is the first list position
     waiting_list_position integer,
     created               timestamptz not null,
     updated               timestamptz not null,
     constraint activity_registration_pk
-        primary key (activity_id, user_id)
+        primary key (activity_id, user_id),
+    constraint consistent_waiting_list
+        unique (activity_id, waiting_list_position)
 );
 
 create type basic_user as

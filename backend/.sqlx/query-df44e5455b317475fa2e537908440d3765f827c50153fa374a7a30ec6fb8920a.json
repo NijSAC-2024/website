@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT user_id, u.first_name, u.infix, u.last_name, answers, attended, u.created, u.updated\n            FROM activity_registration ar\n                JOIN \"user\" u ON ar.user_id = u.id\n            WHERE ar.activity_id = $1\n              AND user_id = $2\n            ",
+  "query": "\n            SELECT user_id,\n                   u.first_name,\n                   u.infix,\n                   u.last_name,\n                   answers,\n                   attended,\n                   waiting_list_position,\n                   u.created,\n                   u.updated\n            FROM activity_registration ar\n                JOIN \"user\" u ON ar.user_id = u.id\n            WHERE ar.activity_id = $1\n              AND user_id = $2\n            ",
   "describe": {
     "columns": [
       {
@@ -35,11 +35,16 @@
       },
       {
         "ordinal": 6,
+        "name": "waiting_list_position",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 7,
         "name": "created",
         "type_info": "Timestamptz"
       },
       {
-        "ordinal": 7,
+        "ordinal": 8,
         "name": "updated",
         "type_info": "Timestamptz"
       }
@@ -57,9 +62,10 @@
       false,
       false,
       true,
+      true,
       false,
       false
     ]
   },
-  "hash": "acd83df6ff779e0d1b6641ca1a00377d256808b6e30f0a345d1dec4393d44f9b"
+  "hash": "df44e5455b317475fa2e537908440d3765f827c50153fa374a7a30ec6fb8920a"
 }
