@@ -1,9 +1,8 @@
-use crate::api::update_registration;
 use crate::{
     api::{
         create_activity, create_registration, get_activity, get_activity_registrations,
         get_all_users, get_material_list, get_registration, get_user_materials, register,
-        update_user, update_user_material, who_am_i,
+        update_registration, update_user, update_user_material, who_am_i,
     },
     auth::{login, logout},
     get_user,

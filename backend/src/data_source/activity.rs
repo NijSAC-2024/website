@@ -91,7 +91,7 @@ impl TryFrom<PgActivity> for IdOnly {
 
 impl<T> TryFrom<PgActivity> for Activity<T>
 where
-    T: TryFrom<PgActivity, Error=Error>,
+    T: TryFrom<PgActivity, Error = Error>,
     T: Validate,
 {
     type Error = Error;
@@ -253,7 +253,7 @@ impl ActivityStore {
 
     async fn get_activity<'c, E>(db: E, id: ActivityId) -> Result<Activity<Hydrated>, Error>
     where
-        E: Executor<'c, Database=Postgres>,
+        E: Executor<'c, Database = Postgres>,
     {
         sqlx::query_as!(
             PgActivity,
@@ -297,8 +297,11 @@ impl ActivityStore {
             .try_into()
     }
 
-    async fn remove_from_waiting_list(tx: &mut PgConnection, activity_id: ActivityId, user_id: UserId) -> Result<(), Error>
-    {
+    async fn remove_from_waiting_list(
+        tx: &mut PgConnection,
+        activity_id: ActivityId,
+        user_id: UserId,
+    ) -> Result<(), Error> {
         struct Position {
             pos: Option<i32>,
         }
@@ -336,7 +339,12 @@ impl ActivityStore {
         Ok(())
     }
 
-    async fn update_waiting_list_position(tx: &mut PgConnection, activity_id: ActivityId, user_id: UserId, new_waiting_list_pos: Option<i32>) -> Result<(), Error> {
+    async fn update_waiting_list_position(
+        tx: &mut PgConnection,
+        activity_id: ActivityId,
+        user_id: UserId,
+        new_waiting_list_pos: Option<i32>,
+    ) -> Result<(), Error> {
         struct Position {
             pos: Option<i32>,
         }
@@ -350,7 +358,7 @@ impl ActivityStore {
             *user_id
         ).fetch_one(&mut *tx).await?;
         if pos == new_waiting_list_pos {
-            return Ok(())
+            return Ok(());
         }
         if new_waiting_list_pos.is_none() {
             return Self::remove_from_waiting_list(tx, activity_id, user_id).await;
@@ -360,7 +368,9 @@ impl ActivityStore {
             count: i64,
         }
 
-        let Count{count: waiting_list_count} = sqlx::query_as!(
+        let Count {
+            count: waiting_list_count,
+        } = sqlx::query_as!(
             Count,
             r#"
             SELECT count(r.user_id) FILTER ( WHERE r.waiting_list_position IS NOT NULL ) as "count!"
@@ -370,23 +380,31 @@ impl ActivityStore {
             GROUP BY a.id
             "#,
             *activity_id
-        ).fetch_one(&mut *tx).await?;
+        )
+        .fetch_one(&mut *tx)
+        .await?;
 
-        if new_waiting_list_pos == Some((waiting_list_count - 1) as i32) || new_waiting_list_pos == Some(0) {
+        if new_waiting_list_pos == Some((waiting_list_count - 1) as i32)
+            || new_waiting_list_pos == Some(0)
+        {
             Self::remove_from_waiting_list(tx, activity_id, user_id).await?;
             sqlx::query!(
-            r#"
+                r#"
             UPDATE activity_registration
             SET waiting_list_position = $3
             WHERE activity_id = $1
               AND user_id = $2
             "#,
-            *activity_id,
-            *user_id,
-            new_waiting_list_pos
-            ).execute(&mut *tx).await?;
+                *activity_id,
+                *user_id,
+                new_waiting_list_pos
+            )
+            .execute(&mut *tx)
+            .await?;
         } else {
-            Err(Error::BadRequest("Cannot move to arbitrary position of waiting list."))?
+            Err(Error::BadRequest(
+                "Cannot move to arbitrary position of waiting list.",
+            ))?
         };
 
         Ok(())
@@ -403,8 +421,8 @@ impl ActivityStore {
             "#,
             *id
         )
-            .fetch_all(&self.db)
-            .await?)
+        .fetch_all(&self.db)
+        .await?)
     }
 
     pub async fn get_registrations_detailed(
@@ -429,11 +447,11 @@ impl ActivityStore {
             "#,
             *id
         )
-            .fetch_all(&self.db)
-            .await?
-            .into_iter()
-            .map(TryInto::try_into)
-            .collect::<Result<Vec<Registration>, Error>>()
+        .fetch_all(&self.db)
+        .await?
+        .into_iter()
+        .map(TryInto::try_into)
+        .collect::<Result<Vec<Registration>, Error>>()
     }
 
     pub async fn get_registration(
@@ -460,7 +478,10 @@ impl ActivityStore {
             "#,
             *activity_id,
             *user_id
-        ).fetch_one(&self.db).await?.try_into()
+        )
+        .fetch_one(&self.db)
+        .await?
+        .try_into()
     }
 
     pub async fn new_registration(
@@ -505,10 +526,16 @@ impl ActivityStore {
             *activity_id,
             *user_id
         )
-            .execute(&mut *tx)
-            .await?;
+        .execute(&mut *tx)
+        .await?;
 
-        Self::update_waiting_list_position(&mut *tx, activity_id, user_id.clone(), updated.waiting_list_position).await?;
+        Self::update_waiting_list_position(
+            &mut tx,
+            activity_id,
+            user_id,
+            updated.waiting_list_position,
+        )
+        .await?;
 
         tx.commit().await?;
 
