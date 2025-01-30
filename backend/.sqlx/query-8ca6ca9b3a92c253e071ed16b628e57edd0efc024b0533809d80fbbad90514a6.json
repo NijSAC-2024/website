@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT a.id,\n                   l.id as location_id,\n                   l.name_en as location_name_en,\n                   l.name_nl as location_name_nl,\n                   l.description_nl as location_description_nl,\n                   l.description_en as location_description_en,\n                   a.name_nl,\n                   a.name_en,\n                   a.image,\n                   a.description_nl,\n                   a.description_en,\n                   array_agg(d.start) as start,\n                   array_agg(d.\"end\") as \"end\",\n                   a.registration_start,\n                   a.registration_end,\n                   a.registration_max,\n                   a.waiting_list_max,\n                   a.is_hidden,\n                   a.required_membership_status as \"required_membership_status:Vec<MembershipStatus>\",\n                   a.activity_type,\n                   a.questions,\n                   a.metadata,\n                   count(r.user_id) FILTER ( WHERE r.waiting_list_position IS NULL ) as \"registration_count!\",\n                   count(r.user_id) FILTER ( WHERE r.waiting_list_position IS NOT NULL ) as \"waiting_list_count!\",\n                   a.created,\n                   a.updated\n            FROM activity a\n                JOIN location l ON a.location_id = l.id\n                JOIN date d ON a.id = d.activity_id \n                LEFT JOIN activity_registration r ON r.activity_id = a.id\n            WHERE NOT a.is_hidden OR $1\n            GROUP BY a.id, l.id\n            ",
+  "query": "\n            SELECT a.id,\n                   l.id as location_id,\n                   l.name_en as location_name_en,\n                   l.name_nl as location_name_nl,\n                   l.description_nl as location_description_nl,\n                   l.description_en as location_description_en,\n                   a.name_nl,\n                   a.name_en,\n                   a.image,\n                   a.description_nl,\n                   a.description_en,\n                   array_agg(d.start) as start,\n                   array_agg(d.\"end\") as \"end\",\n                   a.registration_start,\n                   a.registration_end,\n                   a.registration_max,\n                   a.waiting_list_max,\n                   a.is_published,\n                   a.required_membership_status as \"required_membership_status:Vec<MembershipStatus>\",\n                   a.activity_type,\n                   a.questions,\n                   a.metadata,\n                   count(r.user_id) FILTER ( WHERE r.waiting_list_position IS NULL ) as \"registration_count!\",\n                   count(r.user_id) FILTER ( WHERE r.waiting_list_position IS NOT NULL ) as \"waiting_list_count!\",\n                   a.created,\n                   a.updated\n            FROM activity a\n                JOIN location l ON a.location_id = l.id\n                JOIN date d ON a.id = d.activity_id \n                LEFT JOIN activity_registration r ON r.activity_id = a.id\n            WHERE a.id = $1 AND \n                  (a.is_published OR $2)\n            GROUP BY a.id, l.id\n            ",
   "describe": {
     "columns": [
       {
@@ -90,7 +90,7 @@
       },
       {
         "ordinal": 17,
-        "name": "is_hidden",
+        "name": "is_published",
         "type_info": "Bool"
       },
       {
@@ -155,6 +155,7 @@
     ],
     "parameters": {
       "Left": [
+        "Uuid",
         "Bool"
       ]
     },
@@ -187,5 +188,5 @@
       false
     ]
   },
-  "hash": "b3318b41a43e88c2a39312e933058ec4bf45d03b9fd3887111c881aa5de14441"
+  "hash": "8ca6ca9b3a92c253e071ed16b628e57edd0efc024b0533809d80fbbad90514a6"
 }

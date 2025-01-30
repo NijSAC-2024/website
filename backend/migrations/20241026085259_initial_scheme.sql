@@ -69,7 +69,7 @@ create table activity --Activity base
     registration_end           timestamptz not null,
     registration_max           integer     not null,
     waiting_list_max           integer     not null,
-    is_hidden                  boolean     not null default false,
+    is_published               boolean     not null default true,
     -- Courses only members, climbing activities only extraordinary, activities only donors, some for all
     -- Null means that everyone, also externals can participate
     required_membership_status membership_status[]  default '{"member"}',
