@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            UPDATE activity SET\n                  location_id = $2,\n                  name_nl = $3,\n                  name_en = $4,\n                  description_nl = $5,\n                  description_en = $6,\n                  registration_start = $7,\n                  registration_end = $8,\n                  registration_max = $9,\n                  waiting_list_max = $10,\n                  is_hidden = $11,\n                  required_membership_status = $12::membership_status[],\n                  activity_type = $13,\n                  questions = $14,\n                  metadata = $15,\n                  updated = now()\n            WHERE id = $1\n            ",
+  "query": "\n            UPDATE activity SET\n                  location_id = $2,\n                  name_nl = $3,\n                  name_en = $4,\n                  image = $5,\n                  description_nl = $6,\n                  description_en = $7,\n                  registration_start = $8,\n                  registration_end = $9,\n                  registration_max = $10,\n                  waiting_list_max = $11,\n                  is_hidden = $12,\n                  required_membership_status = $13::membership_status[],\n                  activity_type = $14,\n                  questions = $15,\n                  metadata = $16,\n                  updated = now()\n            WHERE id = $1\n            ",
   "describe": {
     "columns": [],
     "parameters": {
@@ -9,6 +9,7 @@
         "Uuid",
         "Text",
         "Text",
+        "Uuid",
         "Text",
         "Text",
         "Timestamptz",
@@ -43,5 +44,5 @@
     },
     "nullable": []
   },
-  "hash": "c8b63e3c4f1e6b6c6aba7f7995d4318e9161c7add04117b3e06698acdea9572d"
+  "hash": "3234a37fd7263eee128c1b99313738f0d03bc905e4cbabd6c3061e4fe0d01790"
 }

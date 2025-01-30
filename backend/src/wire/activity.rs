@@ -1,5 +1,6 @@
 use crate::{
-    auth::role::MembershipStatus, error::Error, user::BasicUser, wire::location::Location,
+    auth::role::MembershipStatus, error::Error, file::FileId, user::BasicUser,
+    wire::location::Location,
 };
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
@@ -109,6 +110,7 @@ where
     pub name_nl: String,
     #[validate(length(min = 1, max = 100))]
     pub name_en: String,
+    pub image: Option<FileId>,
     #[validate(length(min = 1, max = 50000))]
     pub description_nl: Option<String>,
     #[validate(length(min = 1, max = 50000))]
