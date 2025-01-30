@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            UPDATE \"user\"\n            SET first_name = $2,\n                last_name = $3,\n                phone = $4,\n                student_number = $5,\n                nkbv_number = $6,\n                sportcard_number = $7,\n                ice_contact_name = $8,\n                ice_contact_email = $9,\n                ice_contact_phone = $10,\n                important_info = $11,\n                roles = $12,\n                status = $13,\n                email = $14,\n                updated = now()\n            WHERE id = $1\n            RETURNING\n                id,\n                first_name,\n                last_name,\n                phone,\n                student_number,\n                nkbv_number,\n                sportcard_number,\n                ice_contact_name,\n                ice_contact_email,\n                ice_contact_phone,\n                important_info,\n                roles,\n                status AS \"status: MembershipStatus\",\n                email,\n                created,\n                updated\n            ",
+  "query": "\n            UPDATE \"user\"\n            SET phone = $2,\n                student_number = $3,\n                nkbv_number = $4,\n                sportcard_number = $5,\n                ice_contact_name = $6,\n                ice_contact_email = $7,\n                ice_contact_phone = $8,\n                important_info = $9,\n                email = $10,\n                updated = now()\n            WHERE id = $1\n            RETURNING\n                id,\n                first_name,\n                infix,\n                last_name,\n                phone,\n                student_number,\n                nkbv_number,\n                sportcard_number,\n                ice_contact_name,\n                ice_contact_email,\n                ice_contact_phone,\n                important_info,\n                roles,\n                status AS \"status: MembershipStatus\",\n                email,\n                created,\n                updated\n            ",
   "describe": {
     "columns": [
       {
@@ -15,56 +15,61 @@
       },
       {
         "ordinal": 2,
-        "name": "last_name",
+        "name": "infix",
         "type_info": "Text"
       },
       {
         "ordinal": 3,
-        "name": "phone",
+        "name": "last_name",
         "type_info": "Text"
       },
       {
         "ordinal": 4,
+        "name": "phone",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
         "name": "student_number",
         "type_info": "Int4"
       },
       {
-        "ordinal": 5,
+        "ordinal": 6,
         "name": "nkbv_number",
         "type_info": "Int4"
       },
       {
-        "ordinal": 6,
+        "ordinal": 7,
         "name": "sportcard_number",
         "type_info": "Int4"
       },
       {
-        "ordinal": 7,
+        "ordinal": 8,
         "name": "ice_contact_name",
         "type_info": "Text"
       },
       {
-        "ordinal": 8,
+        "ordinal": 9,
         "name": "ice_contact_email",
         "type_info": "Text"
       },
       {
-        "ordinal": 9,
+        "ordinal": 10,
         "name": "ice_contact_phone",
         "type_info": "Text"
       },
       {
-        "ordinal": 10,
+        "ordinal": 11,
         "name": "important_info",
         "type_info": "Text"
       },
       {
-        "ordinal": 11,
+        "ordinal": 12,
         "name": "roles",
         "type_info": "Jsonb"
       },
       {
-        "ordinal": 12,
+        "ordinal": 13,
         "name": "status: MembershipStatus",
         "type_info": {
           "Custom": {
@@ -81,17 +86,17 @@
         }
       },
       {
-        "ordinal": 13,
+        "ordinal": 14,
         "name": "email",
         "type_info": "Text"
       },
       {
-        "ordinal": 14,
+        "ordinal": 15,
         "name": "created",
         "type_info": "Timestamptz"
       },
       {
-        "ordinal": 15,
+        "ordinal": 16,
         "name": "updated",
         "type_info": "Timestamptz"
       }
@@ -100,8 +105,6 @@
       "Left": [
         "Uuid",
         "Text",
-        "Text",
-        "Text",
         "Int4",
         "Int4",
         "Int4",
@@ -109,26 +112,13 @@
         "Text",
         "Text",
         "Text",
-        "Jsonb",
-        {
-          "Custom": {
-            "name": "membership_status",
-            "kind": {
-              "Enum": [
-                "pending",
-                "member",
-                "extraordinary",
-                "non_member"
-              ]
-            }
-          }
-        },
         "Text"
       ]
     },
     "nullable": [
       false,
       false,
+      true,
       false,
       false,
       true,
@@ -145,5 +135,5 @@
       false
     ]
   },
-  "hash": "854aabceb224a3322c047c924424d4f1993fa8f9bcf7238e3e085438d52dac60"
+  "hash": "b555332a18c024341a01eda83a6a2f22718edb4e00474c11b2fc30928c659255"
 }

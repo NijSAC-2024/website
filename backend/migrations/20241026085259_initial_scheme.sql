@@ -22,12 +22,16 @@ create table "user"
     updated           timestamptz       not null
 );
 
+insert into "user" (id, first_name, last_name, phone, roles, status, email, created, updated)
+values ('00000000-0000-0000-0000-000000000000', 'Deleted', 'User', '+00000', '[]', 'non_member', 'deleted@user.com',
+        now(), now());
+
 create table session
 (
     cookie_value text primary key,
     user_id      uuid        not null
         constraint session_user_fk
-            references "user" (id),
+            references "user" (id) on delete cascade,
     expiration   timestamptz not null
 );
 

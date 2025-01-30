@@ -66,7 +66,8 @@ pub async fn get_activity_registrations(
     Ok(Json(res))
 }
 
-/// Public endpoint, no login required
+/// Partially public endpoint, no login required.
+/// If logged in with sufficient rights, one can see hidden activities.
 pub async fn get_activity(
     store: ActivityStore,
     Path(id): Path<ActivityId>,
@@ -80,6 +81,8 @@ pub async fn get_activity(
     Ok(Json(store.get_activity_hydrated(&id, false).await?))
 }
 
+/// Partially public endpoint, no login required.
+/// If logged in with sufficient rights, one can see hidden activities.
 pub async fn get_activities(
     store: ActivityStore,
     session: Option<Session>,
@@ -115,7 +118,7 @@ pub async fn delete_activity(
     store: ActivityStore,
     session: Session,
     Path(id): Path<ActivityId>,
-) -> Result<(), Error> {
+) -> AppResult<()> {
     update_all_full_activity_access(&session)?;
     store.delete_activity(&id).await
 }
@@ -182,7 +185,7 @@ pub async fn delete_registration(
     store: ActivityStore,
     session: Session,
     Path((activity_id, user_id)): Path<(ActivityId, UserId)>,
-) -> Result<(), Error> {
+) -> AppResult<()> {
     if update_all_full_activity_access(&session).is_ok()
         || update_single_full_registration_access(&user_id, &session).is_ok()
     {
