@@ -12,7 +12,7 @@ use tracing::{error, info, trace, warn};
 use uuid::Uuid;
 use validator::ValidationErrors;
 
-pub(crate) type AppResult<T> = Result<T, Error>;
+pub type AppResult<T> = Result<T, Error>;
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {

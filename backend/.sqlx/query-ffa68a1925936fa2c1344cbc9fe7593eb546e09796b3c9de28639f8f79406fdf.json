@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE activity_registration\n            SET user_id = '00000000-0000-0000-0000-000000000000' -- deleted user\n            WHERE user_id = $1\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "ffa68a1925936fa2c1344cbc9fe7593eb546e09796b3c9de28639f8f79406fdf"
+}

@@ -7,6 +7,7 @@ use crate::{
 use crate::{
     activity::{Date, Hydrated, NewRegistration, Registration},
     auth::role::MembershipStatus,
+    error::AppResult,
     location::Location,
     user::{BasicUser, UserId},
     wire::activity::IdOnly,
@@ -153,7 +154,7 @@ struct PgRegistration {
 impl TryFrom<PgRegistration> for Registration {
     type Error = Error;
 
-    fn try_from(pg: PgRegistration) -> Result<Self, Self::Error> {
+    fn try_from(pg: PgRegistration) -> AppResult<Self> {
         Ok(Self {
             user: BasicUser {
                 user_id: pg.user_id.into(),
@@ -175,7 +176,7 @@ impl ActivityStore {
         &self,
         activity: ActivityContent<IdOnly>,
         created_by: &UserId,
-    ) -> Result<Activity<Hydrated>, Error> {
+    ) -> AppResult<Activity<Hydrated>> {
         let activity_id = Uuid::now_v7();
 
         let mut tx = self.db.begin().await?;
@@ -236,7 +237,7 @@ impl ActivityStore {
         &self,
         id: &ActivityId,
         display_hidden: bool,
-    ) -> Result<Activity<Hydrated>, Error> {
+    ) -> AppResult<Activity<Hydrated>> {
         Self::get_activity(&self.db, id, display_hidden).await
     }
 
@@ -244,7 +245,7 @@ impl ActivityStore {
         db: E,
         id: &ActivityId,
         display_hidden: bool,
-    ) -> Result<Activity<Hydrated>, Error>
+    ) -> AppResult<Activity<Hydrated>>
     where
         E: Executor<'c, Database = Postgres>,
     {
@@ -292,10 +293,7 @@ impl ActivityStore {
             .try_into()
     }
 
-    pub async fn get_activities(
-        &self,
-        display_hidden: bool,
-    ) -> Result<Vec<Activity<Hydrated>>, Error> {
+    pub async fn get_activities(&self, display_hidden: bool) -> AppResult<Vec<Activity<Hydrated>>> {
         sqlx::query_as!(
             PgActivity,
             r#"
@@ -344,7 +342,7 @@ impl ActivityStore {
         &self,
         id: &ActivityId,
         updated: ActivityContent<IdOnly>,
-    ) -> Result<Activity<Hydrated>, Error> {
+    ) -> AppResult<Activity<Hydrated>> {
         let mut tx = self.db.begin().await?;
 
         sqlx::query!(
@@ -410,7 +408,7 @@ impl ActivityStore {
         db: E,
         activity_id: &ActivityId,
         dates: &[Date],
-    ) -> Result<(), Error>
+    ) -> AppResult<()>
     where
         E: Executor<'c, Database = Postgres>,
     {
@@ -436,7 +434,7 @@ impl ActivityStore {
         Ok(())
     }
 
-    pub async fn delete_activity(&self, id: &ActivityId) -> Result<(), Error> {
+    pub async fn delete_activity(&self, id: &ActivityId) -> AppResult<()> {
         sqlx::query!(
             r#"
             DELETE FROM activity WHERE id = $1
@@ -454,7 +452,7 @@ impl ActivityStore {
         tx: &mut PgConnection,
         activity_id: &ActivityId,
         user_id: &UserId,
-    ) -> Result<Option<i32>, Error> {
+    ) -> AppResult<Option<i32>> {
         struct Position {
             pos: Option<i32>,
         }
@@ -499,7 +497,7 @@ impl ActivityStore {
         activity_id: &ActivityId,
         user_id: &UserId,
         new_waiting_list_pos: Option<i32>,
-    ) -> Result<(), Error> {
+    ) -> AppResult<()> {
         struct Position {
             pos: Option<i32>,
         }
@@ -567,7 +565,7 @@ impl ActivityStore {
         Ok(())
     }
 
-    pub async fn get_registered_users(&self, id: &ActivityId) -> Result<Vec<BasicUser>, Error> {
+    pub async fn get_registered_users(&self, id: &ActivityId) -> AppResult<Vec<BasicUser>> {
         Ok(sqlx::query_as!(
             BasicUser,
             r#"
@@ -585,7 +583,7 @@ impl ActivityStore {
     pub async fn get_registrations_detailed(
         &self,
         id: &ActivityId,
-    ) -> Result<Vec<Registration>, Error> {
+    ) -> AppResult<Vec<Registration>> {
         sqlx::query_as!(
             PgRegistration,
             r#"
@@ -615,7 +613,7 @@ impl ActivityStore {
         &self,
         activity_id: &ActivityId,
         user_id: &UserId,
-    ) -> Result<Registration, Error> {
+    ) -> AppResult<Registration> {
         sqlx::query_as!(
             PgRegistration,
             r#"
@@ -646,7 +644,7 @@ impl ActivityStore {
         activity_id: &ActivityId,
         user_id: &UserId,
         new: NewRegistration,
-    ) -> Result<Registration, Error> {
+    ) -> AppResult<Registration> {
         sqlx::query!(
             r#"
             INSERT INTO activity_registration (activity_id, user_id, waiting_list_position, answers, created, updated)
@@ -667,7 +665,7 @@ impl ActivityStore {
         activity_id: &ActivityId,
         user_id: &UserId,
         updated: NewRegistration,
-    ) -> Result<Registration, Error> {
+    ) -> AppResult<Registration> {
         let mut tx = self.db.begin().await?;
         sqlx::query!(
             r#"
@@ -703,7 +701,7 @@ impl ActivityStore {
         &self,
         activity_id: &ActivityId,
         user_id: &UserId,
-    ) -> Result<(), Error> {
+    ) -> AppResult<()> {
         let mut tx = self.db.begin().await?;
 
         if Self::remove_from_waiting_list(&mut tx, activity_id, user_id)

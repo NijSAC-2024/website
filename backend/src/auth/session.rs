@@ -8,7 +8,7 @@ use crate::{
     wire::user::UserCredentials,
     AppState,
 };
-use argon2::{password_hash, Argon2, PasswordHash, PasswordVerifier};
+use argon2::PasswordHash;
 use axum::{
     extract::{FromRequestParts, OptionalFromRequestParts},
     http::request::Parts,
@@ -125,12 +125,7 @@ impl Session {
         let pw_hash = pw_hash.ok_or(Error::Unauthorized)?;
 
         let parsed_hash = PasswordHash::new(&pw_hash).map_err(Error::Argon2)?;
-        Argon2::default()
-            .verify_password(credentials.password.as_bytes(), &parsed_hash)
-            .map_err(|err| match err {
-                password_hash::Error::Password => Error::Unauthorized,
-                _ => Error::Argon2(err),
-            })?;
+        credentials.verify_pwd(&parsed_hash)?;
 
         let cookie_value = Alphanumeric.sample_string(&mut rand::rng(), 32);
 

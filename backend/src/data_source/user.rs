@@ -2,12 +2,9 @@ use crate::{
     auth::role::MembershipStatus,
     data_source::Count,
     error::{AppResult, Error},
+    user::BasicUser,
     wire::user::{User, UserContent, UserId},
     AppState, Pagination,
-};
-use argon2::{
-    password_hash::{rand_core::OsRng, SaltString},
-    Argon2, PasswordHasher,
 };
 use axum::{extract::FromRequestParts, http::request::Parts};
 use sqlx::PgPool;
@@ -36,6 +33,7 @@ impl FromRequestParts<AppState> for UserStore {
 struct PgUser {
     id: Uuid,
     first_name: String,
+    infix: Option<String>,
     last_name: String,
     phone: String,
     student_number: Option<i32>,
@@ -62,6 +60,7 @@ impl TryFrom<PgUser> for User {
             updated: pg.updated,
             content: UserContent {
                 first_name: pg.first_name,
+                infix: pg.infix,
                 last_name: pg.last_name,
                 roles: serde_json::from_value(pg.roles)?,
                 status: pg.status,
@@ -99,6 +98,7 @@ impl UserStore {
             INSERT INTO "user"
             (id,
              first_name,
+             infix,
              last_name,
              phone,
              student_number,
@@ -125,13 +125,15 @@ impl UserStore {
                     $10,
                     $11,
                     $12,
-                    $13::membership_status,
-                    $14,
+                    $13,
+                    $14::membership_status,
+                    $15,
                     now(),
                     now())
             RETURNING
                 id,
                 first_name,
+                infix,
                 last_name,
                 phone,
                 student_number,
@@ -149,6 +151,7 @@ impl UserStore {
             "#,
             Uuid::now_v7(),
             new.first_name,
+            new.infix,
             new.last_name,
             new.phone,
             new.student_number,
@@ -174,6 +177,7 @@ impl UserStore {
             SELECT 
                 id,
                 first_name,
+                infix,
                 last_name,
                 phone,
                 student_number,
@@ -197,13 +201,14 @@ impl UserStore {
         .try_into()
     }
 
-    pub async fn get_all(&self, pagination: &Pagination) -> AppResult<Vec<User>> {
+    pub async fn get_all_detailed(&self, pagination: &Pagination) -> AppResult<Vec<User>> {
         sqlx::query_as!(
             PgUser,
             r#"
             SELECT 
                 id,
                 first_name,
+                infix,
                 last_name,
                 phone,
                 student_number,
@@ -219,6 +224,7 @@ impl UserStore {
                 created,
                 updated
             FROM "user"
+            WHERE id != '00000000-0000-0000-0000-000000000000'
             ORDER BY last_name
             LIMIT $1
             OFFSET $2
@@ -233,29 +239,53 @@ impl UserStore {
         .collect()
     }
 
+    pub async fn get_all_basic_info(&self, pagination: &Pagination) -> AppResult<Vec<BasicUser>> {
+        Ok(sqlx::query_as!(
+            BasicUser,
+            r#"
+            SELECT 
+                id as user_id,
+                first_name,
+                infix,
+                last_name
+            FROM "user"
+            WHERE id != '00000000-0000-0000-0000-000000000000'
+            ORDER BY last_name
+            LIMIT $1
+            OFFSET $2
+            "#,
+            pagination.limit,
+            pagination.offset
+        )
+        .fetch_all(&self.db)
+        .await?)
+    }
+
     pub async fn update(&self, id: &UserId, user: UserContent) -> AppResult<User> {
         sqlx::query_as!(
             PgUser,
             r#"
             UPDATE "user"
             SET first_name = $2,
-                last_name = $3,
-                phone = $4,
-                student_number = $5,
-                nkbv_number = $6,
-                sportcard_number = $7,
-                ice_contact_name = $8,
-                ice_contact_email = $9,
-                ice_contact_phone = $10,
-                important_info = $11,
-                roles = $12,
-                status = $13,
-                email = $14,
+                infix = $3,
+                last_name = $4,
+                phone = $5,
+                student_number = $6,
+                nkbv_number = $7,
+                sportcard_number = $8,
+                ice_contact_name = $9,
+                ice_contact_email = $10,
+                ice_contact_phone = $11,
+                important_info = $12,
+                roles = $13,
+                status = $14,
+                email = $15,
                 updated = now()
             WHERE id = $1
             RETURNING
                 id,
                 first_name,
+                infix,
                 last_name,
                 phone,
                 student_number,
@@ -273,6 +303,7 @@ impl UserStore {
             "#,
             id.deref(),
             user.first_name,
+            user.infix,
             user.last_name,
             user.phone,
             user.student_number,
@@ -291,17 +322,26 @@ impl UserStore {
         .try_into()
     }
 
-    pub async fn update_email(&self, id: &UserId, email: &str) -> AppResult<User> {
+    pub async fn self_update(&self, id: &UserId, user: UserContent) -> AppResult<User> {
         sqlx::query_as!(
             PgUser,
             r#"
             UPDATE "user"
-            SET email = $2,
+            SET phone = $2,
+                student_number = $3,
+                nkbv_number = $4,
+                sportcard_number = $5,
+                ice_contact_name = $6,
+                ice_contact_email = $7,
+                ice_contact_phone = $8,
+                important_info = $9,
+                email = $10,
                 updated = now()
             WHERE id = $1
             RETURNING
                 id,
                 first_name,
+                infix,
                 last_name,
                 phone,
                 student_number,
@@ -318,26 +358,22 @@ impl UserStore {
                 updated
             "#,
             id.deref(),
-            email,
+            user.phone,
+            user.student_number,
+            user.nkbv_number,
+            user.sportcard_number,
+            user.ice_contact_name,
+            user.ice_contact_email,
+            user.ice_contact_phone,
+            user.important_info,
+            user.email,
         )
         .fetch_one(&self.db)
         .await?
         .try_into()
     }
 
-    pub async fn update_pwd(&self, id: &UserId, new_pw: Option<&str>) -> AppResult<()> {
-        let pwd_hash = match new_pw {
-            Some(pwd) => {
-                let salt = SaltString::generate(&mut OsRng);
-                let hash = Argon2::default()
-                    .hash_password(pwd.as_bytes(), &salt)
-                    .map_err(Error::Argon2)?
-                    .to_string();
-                Some(hash)
-            }
-            None => None,
-        };
-
+    pub async fn update_pwd(&self, id: &UserId, new_pwd_hash: Option<&str>) -> AppResult<()> {
         sqlx::query!(
             r#"
             UPDATE "user" 
@@ -346,11 +382,49 @@ impl UserStore {
             WHERE id = $1
             "#,
             id.deref(),
-            pwd_hash,
+            new_pwd_hash,
         )
         .execute(&self.db)
         .await?;
 
+        Ok(())
+    }
+
+    pub async fn delete(&self, id: &UserId) -> AppResult<()> {
+        let mut tx = self.db.begin().await?;
+
+        sqlx::query!(
+            r#"
+            UPDATE activity
+            SET created_by = '00000000-0000-0000-0000-000000000000' -- deleted user
+            WHERE created_by = $1
+            "#,
+            **id
+        )
+        .execute(&mut *tx)
+        .await?;
+
+        sqlx::query!(
+            r#"
+            UPDATE activity_registration
+            SET user_id = '00000000-0000-0000-0000-000000000000' -- deleted user
+            WHERE user_id = $1
+            "#,
+            **id
+        )
+        .execute(&mut *tx)
+        .await?;
+
+        sqlx::query!(
+            r#"
+            DELETE FROM "user" WHERE id = $1
+            "#,
+            **id
+        )
+        .execute(&mut *tx)
+        .await?;
+
+        tx.commit().await?;
         Ok(())
     }
 }
