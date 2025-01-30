@@ -48,6 +48,8 @@ pub enum Error {
     Storage(#[from] object_store::Error),
     #[error("Storage error")]
     Path(#[from] object_store::path::Error),
+    #[error("Image error")]
+    Image(#[from] image::ImageError),
 }
 impl From<sqlx::Error> for Error {
     fn from(value: sqlx::Error) -> Self {
@@ -192,6 +194,14 @@ impl IntoResponse for Error {
                 Problem {
                     message: "Storage error".to_string(),
                     status: StatusCode::INTERNAL_SERVER_ERROR,
+                    reference,
+                }
+            }
+            Error::Image(err) => {
+                info!(%reference, "Image error: {err:?}");
+                Problem {
+                    message: "Image error".to_string(),
+                    status: StatusCode::BAD_REQUEST,
                     reference,
                 }
             }
