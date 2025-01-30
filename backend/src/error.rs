@@ -44,6 +44,10 @@ pub enum Error {
     Other(String),
     #[error("Internal server error")]
     Internal(String),
+    #[error("Storage error")]
+    Storage(#[from] object_store::Error),
+    #[error("Storage error")]
+    Path(#[from] object_store::path::Error),
 }
 impl From<sqlx::Error> for Error {
     fn from(value: sqlx::Error) -> Self {
@@ -171,6 +175,22 @@ impl IntoResponse for Error {
                 info!(%reference, "Internal Server Error: {err}");
                 Problem {
                     message: "Internal Server Error".to_string(),
+                    status: StatusCode::INTERNAL_SERVER_ERROR,
+                    reference,
+                }
+            }
+            Error::Storage(err) => {
+                info!(%reference, "Storage error: {err:?}");
+                Problem {
+                    message: "Storage error".to_string(),
+                    status: StatusCode::INTERNAL_SERVER_ERROR,
+                    reference,
+                }
+            }
+            Error::Path(err) => {
+                info!(%reference, "Storage error: {err:?}");
+                Problem {
+                    message: "Storage error".to_string(),
                     status: StatusCode::INTERNAL_SERVER_ERROR,
                     reference,
                 }

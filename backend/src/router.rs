@@ -6,11 +6,12 @@ use crate::{
         update_registration, update_user, update_user_material, who_am_i,
     },
     auth::{login, logout},
-    get_user,
+    get_file_content, get_file_metadata, get_files, get_user,
     state::AppState,
+    upload,
 };
 use axum::{
-    extract::State,
+    extract::{DefaultBodyLimit, State},
     routing::{get, post, put},
     Json, Router,
 };
@@ -41,6 +42,12 @@ fn api_router() -> Router<AppState> {
         .route("/login", post(login))
         .route("/logout", get(logout))
         .route("/register", post(register))
+        // The `POST /file` endpoint has a size limit of 50 MB,
+        // instead of the default 2MB other endpoints have
+        .route("/file", post(upload).layer(DefaultBodyLimit::max(52428800)))
+        .route("/file", get(get_files))
+        .route("/file/{:id}", get(get_file_content))
+        .route("/file/{:id}/metadata", get(get_file_metadata))
         .route("/user", get(get_all_users))
         .route(
             "/user/{:id}",

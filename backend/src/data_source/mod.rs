@@ -1,12 +1,14 @@
 pub(crate) mod activity;
+mod file;
 mod material;
 mod user;
 
 use axum::http::HeaderMap;
-pub(crate) use material::*;
-pub(crate) use user::*;
+pub use file::*;
+pub use material::*;
+pub use user::*;
 
-pub(crate) struct Count {
+pub struct Count {
     count: i64,
 }
 

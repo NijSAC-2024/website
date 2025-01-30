@@ -23,8 +23,8 @@ fn update_all_full_activity_access(session: &Session) -> AppResult<()> {
                     | Role::Secretary
                     | Role::Chair
                     | Role::ViceChair
-                    | Role::ActivityCommissionMember
                     | Role::ClimbingCommissar
+                    | Role::ActivityCommissionMember
             )
         })
     {
