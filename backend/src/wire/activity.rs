@@ -125,7 +125,7 @@ where
     pub registration_max: Option<i32>,
     #[validate(range(min = 0, max = 999, message = "Maximum waiting list is 999"))]
     pub waiting_list_max: Option<i32>,
-    pub is_hidden: bool,
+    pub is_published: bool,
     pub required_membership_status: Option<Vec<MembershipStatus>>,
     pub activity_type: ActivityType,
     pub questions: Vec<Question>,

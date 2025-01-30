@@ -54,7 +54,7 @@ struct PgActivity {
     registration_end: OffsetDateTime,
     registration_max: Option<i32>,
     waiting_list_max: Option<i32>,
-    is_hidden: bool,
+    is_published: bool,
     required_membership_status: Option<Vec<MembershipStatus>>,
     activity_type: String,
     questions: serde_json::Value,
@@ -129,7 +129,7 @@ where
                 registration_end: pg.registration_end,
                 registration_max: pg.registration_max,
                 waiting_list_max: pg.waiting_list_max,
-                is_hidden: pg.is_hidden,
+                is_published: pg.is_published,
                 required_membership_status: pg.required_membership_status,
                 activity_type: pg.activity_type.parse()?,
                 dates,
@@ -197,7 +197,7 @@ impl ActivityStore {
                                   registration_end,
                                   registration_max,
                                   waiting_list_max,
-                                  is_hidden,
+                                  is_published,
                                   required_membership_status,
                                   activity_type,
                                   questions,
@@ -218,7 +218,7 @@ impl ActivityStore {
             activity.registration_end,
             activity.registration_max,
             activity.waiting_list_max,
-            activity.is_hidden,
+            activity.is_published,
             activity.required_membership_status as Option<Vec<MembershipStatus>>,
             Into::<&str>::into(activity.activity_type),
             serde_json::to_value(activity.questions)?,
@@ -273,7 +273,7 @@ impl ActivityStore {
                    a.registration_end,
                    a.registration_max,
                    a.waiting_list_max,
-                   a.is_hidden,
+                   a.is_published,
                    a.required_membership_status as "required_membership_status:Vec<MembershipStatus>",
                    a.activity_type,
                    a.questions,
@@ -287,7 +287,7 @@ impl ActivityStore {
                 JOIN date d ON a.id = d.activity_id 
                 LEFT JOIN activity_registration r ON r.activity_id = a.id
             WHERE a.id = $1 AND 
-                  (NOT a.is_hidden OR $2)
+                  (a.is_published OR $2)
             GROUP BY a.id, l.id
             "#,
             **id,
@@ -319,7 +319,7 @@ impl ActivityStore {
                    a.registration_end,
                    a.registration_max,
                    a.waiting_list_max,
-                   a.is_hidden,
+                   a.is_published,
                    a.required_membership_status as "required_membership_status:Vec<MembershipStatus>",
                    a.activity_type,
                    a.questions,
@@ -332,7 +332,7 @@ impl ActivityStore {
                 JOIN location l ON a.location_id = l.id
                 JOIN date d ON a.id = d.activity_id 
                 LEFT JOIN activity_registration r ON r.activity_id = a.id
-            WHERE NOT a.is_hidden OR $1
+            WHERE a.is_published OR $1
             GROUP BY a.id, l.id
             "#,
             display_hidden
@@ -364,7 +364,7 @@ impl ActivityStore {
                   registration_end = $9,
                   registration_max = $10,
                   waiting_list_max = $11,
-                  is_hidden = $12,
+                  is_published = $12,
                   required_membership_status = $13::membership_status[],
                   activity_type = $14,
                   questions = $15,
@@ -383,7 +383,7 @@ impl ActivityStore {
             updated.registration_end,
             updated.registration_max,
             updated.waiting_list_max,
-            updated.is_hidden,
+            updated.is_published,
             updated.required_membership_status as Option<Vec<MembershipStatus>>,
             Into::<&str>::into(updated.activity_type),
             serde_json::to_value(updated.questions)?,
