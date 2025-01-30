@@ -1,5 +1,6 @@
 use crate::error::{AppResult, Error};
 use axum::{extract::FromRequestParts, http::request::Parts};
+use object_store::{memory::InMemory, ObjectStore};
 use sqlx::{postgres::PgPoolOptions, PgPool};
 use std::{env, ops::Deref, sync::Arc};
 
@@ -21,6 +22,7 @@ impl Config {
 #[derive(Clone)]
 pub struct AppState {
     pool: PgPool,
+    object_store: Arc<dyn ObjectStore>,
     config: Arc<Config>,
 }
 
@@ -33,14 +35,23 @@ impl AppState {
         &self.pool
     }
 
+    pub fn object_store(&self) -> Arc<dyn ObjectStore> {
+        Arc::clone(&self.object_store)
+    }
+
     pub async fn new() -> AppResult<Self> {
         let config = Config::from_env()?;
         let pool = PgPoolOptions::new()
             .max_connections(5)
             .connect(&config.database_url)
             .await?;
+
+        // TODO use a proper storage layer
+        let object_store = InMemory::new();
+
         Ok(Self {
             pool,
+            object_store: Arc::new(object_store),
             config: Arc::new(config),
         })
     }

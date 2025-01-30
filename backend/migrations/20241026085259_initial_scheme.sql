@@ -35,6 +35,16 @@ create table session
     expiration   timestamptz not null
 );
 
+create table file
+(
+    id                uuid        not null primary key,
+    original_filename text        not null,
+    mime_type         text,
+    size              integer     not null,
+    created_by        uuid        not null references "user" (id),
+    created           timestamptz not null
+);
+
 create table location
 (
     id             uuid primary key,
@@ -52,6 +62,7 @@ create table activity --Activity base
     location_id                uuid        not null references location (id),
     name_nl                    text        not null,
     name_en                    text        not null,
+    image                      uuid references file (id),
     description_nl             text,
     description_en             text,                 -- location also has its own description
     registration_start         timestamptz not null,
@@ -144,5 +155,3 @@ create table "user_material"
     constraint fk_user
         foreign key (user_id) references "user" (id) on delete cascade
 );
-
-

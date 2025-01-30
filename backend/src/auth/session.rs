@@ -20,7 +20,7 @@ use time::OffsetDateTime;
 use tracing::trace;
 use uuid::Uuid;
 
-pub(crate) struct Session {
+pub struct Session {
     user_id: UserId,
     cookie_value: String,
     roles: Roles,

@@ -18,7 +18,7 @@ use time::OffsetDateTime;
 use uuid::Uuid;
 use validator::Validate;
 
-pub(crate) struct ActivityStore {
+pub struct ActivityStore {
     db: PgPool,
 }
 

@@ -12,7 +12,7 @@ use std::ops::Deref;
 use time::OffsetDateTime;
 use uuid::Uuid;
 
-pub(crate) struct UserStore {
+pub struct UserStore {
     db: PgPool,
 }
 

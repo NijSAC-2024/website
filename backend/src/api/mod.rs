@@ -1,10 +1,12 @@
 mod activity;
+mod file;
 mod material;
 mod user;
 
-pub(crate) use activity::*;
-pub(crate) use material::*;
-pub(crate) use user::*;
+pub use activity::*;
+pub use file::*;
+pub use material::*;
+pub use user::*;
 
 use crate::error::Error;
 use axum::{
@@ -24,10 +26,10 @@ type ApiResult<T> = Result<Json<T>, Error>;
 pub struct Pagination {
     #[serde(default = "get_50")]
     #[validate(range(min = 1, max = 50))]
-    pub(crate) limit: i64,
+    pub limit: i64,
     #[serde(default)]
     #[validate(range(min = 0))]
-    pub(crate) offset: i64,
+    pub offset: i64,
 }
 
 fn get_50() -> i64 {
@@ -35,10 +37,10 @@ fn get_50() -> i64 {
 }
 
 #[derive(Debug, Clone)]
-pub(crate) struct ValidatedJson<T>(pub T);
+pub struct ValidatedJson<T>(pub T);
 
 #[derive(Debug, Clone)]
-pub(crate) struct ValidatedQuery<T>(pub T);
+pub struct ValidatedQuery<T>(pub T);
 
 impl<T, S> FromRequest<S> for ValidatedJson<T>
 where

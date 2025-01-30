@@ -10,7 +10,7 @@ use sqlx::PgPool;
 use std::{convert::TryInto, ops::Deref};
 use uuid::Uuid;
 
-pub(crate) struct MaterialStore {
+pub struct MaterialStore {
     db: PgPool,
 }
 
