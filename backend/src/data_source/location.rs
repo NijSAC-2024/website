@@ -1,4 +1,5 @@
 use crate::{
+    data_source::Count,
     error::{AppResult, Error},
     location::{Location, LocationContent, LocationId, UsedBy},
     AppState, LocationFilter,
@@ -54,6 +55,18 @@ impl From<PgLocation> for Location {
 }
 
 impl LocationStore {
+    pub async fn count(&self, filter: &LocationFilter) -> AppResult<Count> {
+        Ok(sqlx::query_as!(
+            Count,
+            r#"
+            SELECT COUNT(*) AS "count!" FROM location WHERE reusable = $1
+            "#,
+            filter.reusable
+        )
+        .fetch_one(&self.db)
+        .await?)
+    }
+
     pub async fn create(&self, new: LocationContent) -> AppResult<Location> {
         let id = Uuid::now_v7();
 

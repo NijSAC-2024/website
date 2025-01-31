@@ -131,8 +131,12 @@ pub async fn get_files(
     store: FileStore,
     session: Session,
     ValidatedQuery(pagination): ValidatedQuery<Pagination>,
-) -> ApiResult<Vec<FileMetadata>> {
+) -> AppResult<(HeaderMap, Json<Vec<FileMetadata>>)> {
     upload_access(&session)?;
+    let total = store.count().await?;
 
-    Ok(Json(store.get_all_metadata(pagination).await?))
+    Ok((
+        total.as_header(),
+        Json(store.get_all_metadata(pagination).await?),
+    ))
 }
