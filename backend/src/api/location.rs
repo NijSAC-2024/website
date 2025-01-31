@@ -8,6 +8,7 @@ use crate::{
 };
 use axum::{
     extract::{Path, Query},
+    http::HeaderMap,
     Json,
 };
 use serde::Deserialize;
@@ -51,7 +52,7 @@ pub async fn get_locations(
     store: LocationStore,
     Query(mut filter): Query<LocationFilter>,
     session: Option<Session>,
-) -> ApiResult<Vec<Location>> {
+) -> AppResult<(HeaderMap, Json<Vec<Location>>)> {
     match session {
         None => filter.reusable = Some(true),
         Some(session) => {
@@ -60,7 +61,9 @@ pub async fn get_locations(
             }
         }
     }
-    Ok(Json(store.get_all(&filter).await?))
+    let total = store.count(&filter).await?;
+
+    Ok((total.as_header(), Json(store.get_all(&filter).await?)))
 }
 
 pub async fn create_location(

@@ -1,4 +1,5 @@
 use crate::{
+    data_source::Count,
     error::{AppResult, Error},
     file::{FileId, FileMetadata},
     user::UserId,
@@ -61,6 +62,17 @@ impl TryFrom<PgFileMetadata> for FileMetadata {
 }
 
 impl FileStore {
+    pub async fn count(&self) -> AppResult<Count> {
+        Ok(sqlx::query_as!(
+            Count,
+            r#"
+            SELECT COUNT(*) AS "count!" FROM file
+            "#
+        )
+        .fetch_one(&self.db)
+        .await?)
+    }
+
     pub async fn create(
         &self,
         original_filename: &str,
