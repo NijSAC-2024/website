@@ -1,10 +1,12 @@
 pub(crate) mod activity;
 mod file;
+mod location;
 mod material;
 mod user;
 
 use axum::http::HeaderMap;
 pub use file::*;
+pub use location::*;
 pub use material::*;
 pub use user::*;
 

@@ -1,0 +1,66 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT * FROM location\n            WHERE ($1::bool IS NULL OR ($1 AND reusable) OR (NOT $1 AND NOT reusable))\n            ORDER BY reusable, updated\n            LIMIT $2 OFFSET $3\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "name_nl",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "name_en",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "description_nl",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "description_en",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "reusable",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 6,
+        "name": "created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "updated",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Bool",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "5287025a12478ed142bd37fa041a39ae8461513fcb91a3e8fca46ede6f2300ce"
+}

@@ -1,6 +1,6 @@
 use crate::{
-    auth::role::MembershipStatus, error::Error, file::FileId, user::BasicUser,
-    wire::location::Location,
+    auth::role::MembershipStatus, error::Error, file::FileId, location::LocationId,
+    user::BasicUser, wire::location::Location,
 };
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
@@ -13,9 +13,6 @@ use validator::{Validate, ValidationError};
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
 #[serde(transparent)]
 pub struct ActivityId(Uuid);
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
-#[serde(transparent)]
-pub struct LocationId(Uuid);
 
 impl From<Uuid> for ActivityId {
     fn from(id: Uuid) -> Self {
@@ -34,20 +31,6 @@ impl Deref for ActivityId {
 impl From<ActivityId> for Uuid {
     fn from(activity_id: ActivityId) -> Self {
         activity_id.0
-    }
-}
-
-impl From<Uuid> for LocationId {
-    fn from(id: Uuid) -> Self {
-        Self(id)
-    }
-}
-
-impl Deref for LocationId {
-    type Target = Uuid;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
     }
 }
 
@@ -134,7 +117,7 @@ where
     #[validate(nested)]
     pub(crate) details: T,
 }
-#[derive(Serialize, Deserialize, Debug, Validate)]
+#[derive(Serialize, Debug, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct Hydrated {
     pub location: Location,

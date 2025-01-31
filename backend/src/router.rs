@@ -6,9 +6,10 @@ use crate::{
         update_registration, update_user, update_user_material, who_am_i,
     },
     auth::{login, logout},
-    get_file_content, get_file_metadata, get_files, get_user,
+    create_location, delete_location, get_file_content, get_file_metadata, get_files, get_location,
+    get_locations, get_user, location_used_by,
     state::AppState,
-    upload,
+    update_location, upload,
 };
 use axum::{
     extract::{DefaultBodyLimit, State},
@@ -75,6 +76,14 @@ fn api_router() -> Router<AppState> {
                 .put(update_registration)
                 .delete(delete_registration),
         )
+        .route("/location", get(get_locations).post(create_location))
+        .route(
+            "/location/{:id}",
+            get(get_location)
+                .put(update_location)
+                .delete(delete_location),
+        )
+        .route("/location/{:id}/used_by", get(location_used_by))
 }
 
 async fn version(State(state): State<AppState>) -> Json<String> {
