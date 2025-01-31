@@ -8,7 +8,7 @@ use crate::{
     activity::{Date, Hydrated, NewRegistration, Registration},
     auth::role::MembershipStatus,
     error::AppResult,
-    location::Location,
+    location::{Location, LocationContent},
     user::{BasicUser, UserId},
     wire::activity::IdOnly,
 };
@@ -41,8 +41,11 @@ struct PgActivity {
     location_id: Uuid,
     location_name_en: String,
     location_name_nl: String,
+    location_reusable: bool,
     location_description_nl: Option<String>,
     location_description_en: Option<String>,
+    location_created: OffsetDateTime,
+    location_updated: OffsetDateTime,
     name_nl: String,
     name_en: String,
     image: Option<Uuid>,
@@ -71,11 +74,16 @@ impl TryFrom<PgActivity> for Hydrated {
     fn try_from(pg: PgActivity) -> Result<Self, Self::Error> {
         Ok(Self {
             location: Location {
-                id: pg.location_id,
-                name_nl: pg.location_name_nl,
-                name_en: pg.location_name_en,
-                description_nl: pg.location_description_nl,
-                description_en: pg.location_description_en,
+                id: pg.location_id.into(),
+                created: pg.location_created,
+                updated: pg.location_updated,
+                content: LocationContent {
+                    name_nl: pg.location_name_nl,
+                    name_en: pg.location_name_en,
+                    reusable: pg.location_reusable,
+                    description_nl: pg.location_description_nl,
+                    description_en: pg.location_description_en,
+                },
             },
         })
     }
@@ -262,6 +270,9 @@ impl ActivityStore {
                    l.name_nl as location_name_nl,
                    l.description_nl as location_description_nl,
                    l.description_en as location_description_en,
+                   l.reusable as location_reusable,
+                   l.created as location_created,
+                   l.updated as location_updated,
                    a.name_nl,
                    a.name_en,
                    a.image,
@@ -308,6 +319,9 @@ impl ActivityStore {
                    l.name_nl as location_name_nl,
                    l.description_nl as location_description_nl,
                    l.description_en as location_description_en,
+                   l.reusable as location_reusable,
+                   l.created as location_created,
+                   l.updated as location_updated,
                    a.name_nl,
                    a.name_en,
                    a.image,

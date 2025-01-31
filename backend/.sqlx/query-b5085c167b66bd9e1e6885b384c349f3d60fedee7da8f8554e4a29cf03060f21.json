@@ -1,0 +1,69 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE location\n            SET name_nl = $2,\n                name_en = $3,\n                description_nl = $4,\n                description_en = $5,\n                reusable = $6,\n                updated = now()\n            WHERE id = $1\n            RETURNING *\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "name_nl",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "name_en",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "description_nl",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "description_en",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "reusable",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 6,
+        "name": "created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "updated",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Bool"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "b5085c167b66bd9e1e6885b384c349f3d60fedee7da8f8554e4a29cf03060f21"
+}

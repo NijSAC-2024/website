@@ -1,14 +1,11 @@
 mod activity;
 mod file;
+mod location;
 mod material;
 mod user;
 
-pub use activity::*;
-pub use file::*;
-pub use material::*;
-pub use user::*;
-
 use crate::error::Error;
+pub use activity::*;
 use axum::{
     extract::{
         rejection::{JsonRejection, QueryRejection},
@@ -17,16 +14,24 @@ use axum::{
     http::request::Parts,
     Json,
 };
+pub use file::*;
+pub use location::*;
+pub use material::*;
 use serde::{de::DeserializeOwned, Deserialize};
+use serde_with::{serde_as, DisplayFromStr};
+pub use user::*;
 use validator::Validate;
 
 type ApiResult<T> = Result<Json<T>, Error>;
 
+#[serde_as]
 #[derive(Deserialize, Debug, Validate)]
 pub struct Pagination {
+    #[serde_as(as = "DisplayFromStr")]
     #[serde(default = "get_50")]
     #[validate(range(min = 1, max = 50))]
     pub limit: i64,
+    #[serde_as(as = "DisplayFromStr")]
     #[serde(default)]
     #[validate(range(min = 0))]
     pub offset: i64,

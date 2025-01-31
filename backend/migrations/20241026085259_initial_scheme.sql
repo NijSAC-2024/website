@@ -52,6 +52,7 @@ create table location
     name_en        text        not null,
     description_nl text,
     description_en text,
+    reusable       bool        not null,
     created        timestamptz not null,
     updated        timestamptz not null
 );
@@ -78,15 +79,15 @@ create table activity --Activity base
     -- [
     --   {
     --     "id": "24e2256c-4612-4774-a8ce-168c7817fbd4",
-    --     "question_en": "What is your favorite color?",
-    --     "question_nl": "Wat is je favoriete kleur?",
-    --     "type": "short_text",
+    --     "questionEn": "What is your favorite color?",
+    --     "questionNl": "Wat is je favoriete kleur?",
+    --     "type": "shortText",
     --     "required": false
     --   }
     -- ]
     questions                  jsonb       not null, -- if no questions are asked, use an empty array
     -- example scheme:
-    -- { "weekend_type": "single_pitch" }
+    -- { "weekendType": "singlePitch" }
     metadata                   jsonb       not null, -- if no metadata is given, use an empty object
     created_by                 uuid        not null references "user" (id),
     created                    timestamptz not null,
@@ -110,7 +111,7 @@ create table activity_registration
     -- Answers to the questions. Example scheme:
     -- [
     --   {
-    --     "question_id": "24e2256c-4612-4774-a8ce-168c7817fbd4",
+    --     "questionId": "24e2256c-4612-4774-a8ce-168c7817fbd4",
     --     "answer": "blue"
     --   }
     -- ]
