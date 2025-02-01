@@ -87,7 +87,7 @@ export default function AgendaCard({ agendaEvent, agendaPage }: AgendaCardProps)
           sx={{ fontSize: 16 }}
         />
         <img
-          className="w-full aspect-[4/2] object-cover"
+          className="w-full aspect-4/2 object-cover"
           src={agendaEvent.image}
           alt="not available"
         />

@@ -57,7 +57,7 @@ export default function EditAgendaCard({
     <div className="w-full rounded-2xl bg-inherit border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] flex flex-col">
       <div>
         <img
-          className="w-full aspect-[4/2] object-cover"
+          className="w-full aspect-4/2 object-cover"
           src={updatedAgendaEvent.image}
           alt="Event"
         />
