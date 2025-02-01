@@ -1,12 +1,3 @@
-export interface AuthContextType {
-  user: UserType | undefined;
-  isLoggedIn: boolean;
-  checkAuth: () => void;
-  logout: () => void;
-  authOpen: boolean;
-  toggleAuthOpen: () => void;
-}
-
 export interface ValidateProps {
   label: string;
   // eslint-disable-next-line no-unused-vars
@@ -17,22 +8,22 @@ export interface ValidateProps {
   setValue: (value: string) => void;
 }
 
-export interface LanguageType {
-  en: string;
-  nl: string;
-}
-
 export type OptionType = 'sp' | 'mp' | 'boulder' | 'trad' | 'education';
 
+export type CategoryType = 'activity' | 'course' | 'training' | 'weekend' | '';
+
 export interface LanguageType {
   en: string;
   nl: string;
 }
 
-export type CategoryType = 'activity' | 'course' | 'training' | 'weekend' | '' | 'all';
+export interface DateType {
+  startDateTime: string;
+  endDateTime: string;
+}
 
-export interface AgendaEventType {
-  id: number;
+export interface EventType {
+  id: string;
   image: string;
   title: LanguageType;
   category: CategoryType;
@@ -44,11 +35,17 @@ export interface AgendaEventType {
   allowsRegistrations: boolean;
   numberOfRegistrations: number;
   maxRegistrations: number;
-  startDateTime: string;
-  endDateTime: string;
-  registrationOpenTime: string;
-  registrationCloseTime: string;
-  registrationFields: LanguageType[];
+  dates: DateType[];
+  registrationOpenTime?: string;
+  registrationCloseTime?: string;
+  registrationQuestions: QuestionType[];
+}
+
+export interface QuestionType {
+  id?: string;
+  question: LanguageType;
+  questionType?: string;
+  required: boolean;
 }
 
 interface registrationType {
@@ -60,14 +57,25 @@ export interface registrationsType {
   registrations: registrationType[];
 }
 
+export type MembershipStatus = 'pending' | 'member' | 'extraordinary' | ' non_member';
+
 export interface UserType {
   id: string;
   created: string;
   updated: string;
   firstName: string;
+  infix: string;
   lastName: string;
-  roles: string[];
-  status: string;
+  phone: string;
+  studentNumber: string;
+  nkbvNumber: number;
+  sportcardNumber: number;
+  iceContactName: string;
+  iceContactEmail: null;
+  iceContactPhone: null;
+  importantInfo: null;
+  roles: [];
+  status: MembershipStatus;
   email: string;
 }
 

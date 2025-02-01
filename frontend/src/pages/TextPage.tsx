@@ -1,6 +1,6 @@
 import GenericPage from './GenericPage.tsx';
 import ContentCard from '../components/ContentCard.tsx';
-import MarkdownEditor from '../components/MarkdownEditor.tsx';
+import MarkdownEditor from '../components/markdown/MarkdownEditor.tsx';
 import { AgendaEventType, LanguageType } from '../types.ts';
 import { Moment } from 'moment';
 

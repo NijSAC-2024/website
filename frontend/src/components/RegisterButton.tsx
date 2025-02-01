@@ -1,17 +1,29 @@
 import { Button, Dialog, DialogActions, DialogContent } from '@mui/material';
 import { text } from '../util.ts';
 import { useAuth } from '../providers/AuthProvider.tsx';
-import { AgendaEventType } from '../types.ts';
+import { LanguageType, QuestionType } from '../types.ts';
 import { useState } from 'react';
 import RegisterForm from './RegisterForm.tsx';
 import { useLanguage } from '../providers/LanguageProvider.tsx';
 import moment from 'moment/moment';
 
 interface RegisterButtonProps {
-  agendaEvent: AgendaEventType;
+  numberOfRegistrations: number;
+  maxRegistrations: number;
+  registrationOpenTime: string;
+  registrationCloseTime: string;
+  registrationQuestions: QuestionType[];
+  title: LanguageType;
 }
 
-export default function RegisterButton({ agendaEvent }: RegisterButtonProps) {
+export default function RegisterButton({
+  numberOfRegistrations,
+  maxRegistrations,
+  registrationOpenTime,
+  registrationCloseTime,
+  registrationQuestions,
+  title
+}: RegisterButtonProps) {
   const { isLoggedIn, toggleAuthOpen } = useAuth();
   const { getLangCode } = useLanguage();
   const langCode = getLangCode();
@@ -23,21 +35,21 @@ export default function RegisterButton({ agendaEvent }: RegisterButtonProps) {
   };
 
   const now = new Date();
-  const registrationOpenTime = new Date(agendaEvent.registrationOpenTime);
-  const registrationCloseTime = new Date(agendaEvent.registrationCloseTime);
+  const openTime = new Date(registrationOpenTime);
+  const closeTime = new Date(registrationCloseTime);
 
   return (
     <>
-      {agendaEvent.numberOfRegistrations === agendaEvent.maxRegistrations ? (
+      {numberOfRegistrations === maxRegistrations ? (
         <Button variant="contained" disabled>
           {text('Full', 'Vol')}
         </Button>
-      ) : registrationOpenTime > now ? (
+      ) : openTime > now ? (
         <div className="text-right grid">
           <p>{text('Registrations open at ', 'Inschrijvingen openen op ')}</p>
-          <p>{moment(agendaEvent.registrationOpenTime).format('DD MMM HH:mm')}</p>
+          <p>{moment(registrationOpenTime).format('DD MMM HH:mm')}</p>
         </div>
-      ) : registrationCloseTime > now ? (
+      ) : closeTime > now ? (
         <Button onClick={isLoggedIn ? toggleDialog : toggleAuthOpen} variant="contained">
           {isLoggedIn
             ? text('Register', 'Inschrijven')
@@ -46,12 +58,16 @@ export default function RegisterButton({ agendaEvent }: RegisterButtonProps) {
       ) : (
         <div className="text-right grid">
           <p>{text('Registrations closed at ', 'Inschrijvingen zijn gesloten sinds ')}</p>
-          <p>{moment(agendaEvent.registrationCloseTime).format('DD MMM HH:mm')}</p>
+          <p>{moment(registrationCloseTime).format('DD MMM HH:mm')}</p>
         </div>
       )}
       <Dialog open={registerDialogOpen} onClose={toggleDialog} fullWidth>
         <DialogContent>
-          <RegisterForm agendaEvent={agendaEvent} />
+          <RegisterForm
+            registrationQuestions={registrationQuestions}
+            title={title}
+            registrationCloseTime={registrationCloseTime}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={toggleDialog}>{text('Close', 'Sluit')}</Button>

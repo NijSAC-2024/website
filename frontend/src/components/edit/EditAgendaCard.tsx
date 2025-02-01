@@ -1,45 +1,52 @@
-import { FormControl, InputLabel, MenuItem, Select, TextField, Button } from '@mui/material';
+import { FormControl, InputLabel, MenuItem, Select, TextField, Button, Fab } from '@mui/material';
 import { text } from '../../util.ts';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import moment from 'moment/moment';
 import {
-  AgendaEventType,
-  OptionsType,
+  EventType,
   OptionType,
   LanguageType,
-  typesOptions
+  typesOptions,
+  CategoryType,
+  DateType
 } from '../../types.ts';
 import OptionSelector from '../OptionSelector.tsx';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import { ChangeEvent } from 'react';
+import AddIcon from '@mui/icons-material/Add';
 
 interface EditAgendaCardProps {
-  updatedAgendaEvent: AgendaEventType;
+  category: CategoryType;
+  image: string;
+  type: OptionType[];
+  title: LanguageType;
+  dates: DateType[];
+  location: string;
   handleFieldChange: (
     // eslint-disable-next-line no-unused-vars
-    name: keyof AgendaEventType,
+    name: keyof EventType,
     // eslint-disable-next-line no-unused-vars
     value: LanguageType | string | OptionType[]
   ) => void;
+  // eslint-disable-next-line no-unused-vars
+  handleDateChange: (index: number, startDate: boolean, value: string) => void;
+  handleAddDate: () => void;
+  // eslint-disable-next-line no-unused-vars
+  handleRemoveDate: (index: number) => void;
 }
 
 export default function EditAgendaCard({
-  updatedAgendaEvent,
-  handleFieldChange
+  category,
+  image,
+  type,
+  title,
+  dates,
+  location,
+  handleFieldChange,
+  handleDateChange,
+  handleAddDate,
+  handleRemoveDate
 }: EditAgendaCardProps) {
-  const getAllowedTypes = (): OptionsType[] => {
-    switch (updatedAgendaEvent.category) {
-      case 'course':
-        return typesOptions.filter((type) => type.id !== 'education' && type.id !== 'boulder');
-      case 'training':
-        return typesOptions.filter((type) => type.id !== 'education');
-      default:
-        return typesOptions;
-    }
-  };
-
-  const allowedTypes = getAllowedTypes();
-
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -56,21 +63,16 @@ export default function EditAgendaCard({
   return (
     <div className="w-full rounded-2xl bg-inherit border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] flex flex-col">
       <div>
-        <img
-          className="w-full aspect-4/2 object-cover"
-          src={updatedAgendaEvent.image}
-          alt="Event"
-        />
+        <img className="w-full aspect-4/2 object-cover" src={image} alt="Event" />
       </div>
       <div className="p-5">
-        <div className="grid space-y-5">
+        <div className="grid gap-5">
           <Button
             component="label"
             variant="contained"
             color="primary"
             aria-label={text('Change Image', 'Afbeelding Wijzigen')}
-            className="mx-auto"
-          >
+            className="mx-auto">
             <PhotoCameraIcon className="mr-2" />
             {text('Upload Image', 'Afbeelding Uploaden')}
             <input type="file" accept="image/*" hidden onChange={handleImageChange} />
@@ -81,11 +83,10 @@ export default function EditAgendaCard({
               <InputLabel id="select-label">{text('Category*', 'Categorie*')}</InputLabel>
               <Select
                 labelId="select-label"
-                value={updatedAgendaEvent.category}
+                value={category}
                 label={text('Category*', 'Categorie*')}
                 variant="outlined"
-                onChange={(e) => handleFieldChange('category', e.target.value)}
-              >
+                onChange={(e) => handleFieldChange('category', e.target.value)}>
                 <MenuItem value="activity">{text('Activity', 'Activiteit')}</MenuItem>
                 <MenuItem value="course">{text('Course', 'Cursus')}</MenuItem>
                 <MenuItem value="training">{text('Training', 'Training')}</MenuItem>
@@ -93,44 +94,45 @@ export default function EditAgendaCard({
               </Select>
             </FormControl>
             <OptionSelector
-              options={allowedTypes}
+              options={typesOptions}
               onChange={(selectedTypes) => handleFieldChange('type', selectedTypes)}
               label={'Type'}
-              initialOptions={updatedAgendaEvent.type}
+              initialOptions={type}
             />
           </div>
           <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
             <TextField
-              value={updatedAgendaEvent.title.en}
+              value={title.en}
               label={text('Title English*', 'Titel Engels*')}
-              onChange={(e) =>
-                handleFieldChange('title', { ...updatedAgendaEvent.title, en: e.target.value })
-              }
+              onChange={(e) => handleFieldChange('title', { ...title, en: e.target.value })}
             />
             <TextField
-              value={updatedAgendaEvent.title.nl}
+              value={title.nl}
               label={text('Title Dutch*', 'Titel Nederlands*')}
-              onChange={(e) =>
-                handleFieldChange('title', { ...updatedAgendaEvent.title, nl: e.target.value })
-              }
+              onChange={(e) => handleFieldChange('title', { ...title, nl: e.target.value })}
             />
           </div>
           <TextField
-            value={updatedAgendaEvent.location}
+            value={location}
             label={text('Location*', 'Locatie*')}
             onChange={(e) => handleFieldChange('location', e.target.value)}
           />
           <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
             <DateTimePicker
               label={text('Start Date*', 'Startdatum*')}
-              value={moment(updatedAgendaEvent.startDateTime)}
-              onChange={(date) => handleFieldChange('startDateTime', date!.toISOString())}
+              value={moment(dates[0].startDateTime)}
+              onChange={(date) => handleFieldChange('dates', date!.toISOString())}
             />
             <DateTimePicker
               label={text('End Date*', 'Einddatum*')}
-              value={moment(updatedAgendaEvent.endDateTime)}
-              onChange={(date) => handleFieldChange('endDateTime', date!.toISOString())}
+              value={moment(dates[0].endDateTime)}
+              onChange={(date) => handleFieldChange('dates', date!.toISOString())}
             />
+          </div>
+          <div className="flex justify-center">
+            <Fab size="small" color="primary" onClick={() => handleAddDate()}>
+              <AddIcon />
+            </Fab>
           </div>
         </div>
       </div>

@@ -1,28 +1,32 @@
-import MarkdownEditor from '../MarkdownEditor.tsx';
+import MarkdownEditor from '../markdown/MarkdownEditor.tsx';
 import { TextField } from '@mui/material';
 import { text } from '../../util.ts';
 import OptionSelector from '../OptionSelector.tsx';
-import { AgendaEventType, experienceOptions, LanguageType, OptionType } from '../../types.ts';
+import { EventType, experienceOptions, LanguageType, OptionType } from '../../types.ts';
 import ContentCard from '../ContentCard.tsx';
 
 interface EditDescriptionProps {
-  updatedAgendaEvent: AgendaEventType;
+  descriptionMarkdown: LanguageType;
+  gear: LanguageType;
+  experience: OptionType[];
   handleFieldChange: (
     // eslint-disable-next-line no-unused-vars
-    name: keyof AgendaEventType,
+    name: keyof EventType,
     // eslint-disable-next-line no-unused-vars
     value: LanguageType | string | OptionType[]
   ) => void;
 }
 export default function EditDescription({
-  updatedAgendaEvent,
+  descriptionMarkdown,
+  gear,
+  experience,
   handleFieldChange
 }: EditDescriptionProps) {
   return (
     <ContentCard className="xl:col-span-2 flex flex-col justify-between">
       <div>
         <MarkdownEditor
-          initialMarkdown={updatedAgendaEvent.descriptionMarkdown}
+          initialMarkdown={descriptionMarkdown}
           handleFieldChange={handleFieldChange}
         />
       </div>
@@ -30,29 +34,25 @@ export default function EditDescription({
         <TextField
           multiline
           fullWidth
-          value={updatedAgendaEvent.gear.en}
+          value={gear.en}
           label={text('Necessary Gear English ', 'Benodigde Uitrusting Engels')}
           placeholder={text('Separated by commas', "Gescheiden door komma's")}
-          onChange={(e) =>
-            handleFieldChange('gear', { ...updatedAgendaEvent.gear, en: e.target.value })
-          }
+          onChange={(e) => handleFieldChange('gear', { ...gear, en: e.target.value })}
         />
         <TextField
           multiline
           fullWidth
-          value={updatedAgendaEvent.gear.nl}
+          value={gear.nl}
           label={text('Necessary Gear Dutch', 'Benodigde Uitrusting Nederlands')}
           placeholder={text('Separated by commas', "Gescheiden door komma's")}
-          onChange={(e) =>
-            handleFieldChange('gear', { ...updatedAgendaEvent.gear, nl: e.target.value })
-          }
+          onChange={(e) => handleFieldChange('gear', { ...gear, nl: e.target.value })}
         />
         <div className="xl:col-span-2 grid">
           <OptionSelector
             options={experienceOptions}
             onChange={(selectedTypes) => handleFieldChange('experience', selectedTypes)}
             label={text('Necessary Experience', 'Benodigde Ervaring')}
-            initialOptions={updatedAgendaEvent.experience}
+            initialOptions={experience}
           />
         </div>
       </div>

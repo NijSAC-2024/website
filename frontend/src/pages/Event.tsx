@@ -1,10 +1,10 @@
 import GenericPage from './GenericPage.tsx';
-import AgendaCard from '../components/AgendaCard.tsx';
+import EventCard from '../components/event/EventCard.tsx';
 import EditIcon from '@mui/icons-material/Edit';
 import { useLanguage } from '../providers/LanguageProvider.tsx';
 import { text } from '../util.ts';
 import moment from 'moment';
-import { AgendaEventType } from '../types.ts';
+import { EventType } from '../types.ts';
 import { Button, Fab } from '@mui/material';
 import router from '../router.tsx';
 import { useState } from 'react';
@@ -13,8 +13,8 @@ import RegistrationsCard from '../components/event/RegistrationsCard.tsx';
 import DescriptionCard from '../components/event/DescriptionCard.tsx';
 
 export default function Event() {
-  const [agendaEvent, setAgendaEvent] = useState<AgendaEventType>({
-    id: 5,
+  const [event, setEvent] = useState<EventType>({
+    id: '5',
     image:
       'https://images.squarespace-cdn.com/content/v1/531722ebe4b01396b755c991/1489157370692-DZW7VKX7TY1KBJBQFYTW/SPA+16.03+Single+Pitch+Award+assessment+02+resized.jpg?format=1500w',
     title: { en: 'Singlepitch Course', nl: 'Singlepitch Cursus' },
@@ -33,20 +33,21 @@ export default function Event() {
     allowsRegistrations: true,
     numberOfRegistrations: 12,
     maxRegistrations: 20,
-    startDateTime: '2025-03-06T08:30:00.000Z',
-    endDateTime: '2025-04-06T09:30:00.000Z',
+    dates: [{ startDateTime: '2025-03-06T08:30:00.000Z', endDateTime: '2025-04-06T09:30:00.000Z' }],
     registrationOpenTime: '2024-12-23T00:00:00.000Z',
     registrationCloseTime: '2027-03-07T00:00:00.000Z',
-    registrationFields: [{ en: 'How many quickdraws', nl: 'Hoeveel setjes' }]
+    registrationQuestions: [
+      { question: { en: 'How many quickdraws', nl: 'Hoeveel setjes' }, required: true }
+    ]
   });
 
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const toggleIsEditing = () => {
     setIsEditing((prevState) => !prevState);
   };
-  const handleUpdate = (updatedAgendaEvent: AgendaEventType) => {
+  const handleUpdate = (updatedEvent: EventType) => {
     //Send to backend
-    setAgendaEvent(updatedAgendaEvent);
+    setEvent(updatedEvent);
     toggleIsEditing();
   };
   const langCode = useLanguage().getLangCode();
@@ -55,7 +56,7 @@ export default function Event() {
   return (
     <>
       {isEditing ? (
-        <EditEvent agendaEvent={agendaEvent} handleUpdate={handleUpdate} />
+        <EditEvent event={event} handleUpdate={handleUpdate} />
       ) : (
         <>
           <div className="fixed bottom-5 right-5 z-10">
@@ -64,7 +65,7 @@ export default function Event() {
               {text('Edit event', 'Evenement bewerken')}
             </Fab>
           </div>
-          <GenericPage image={agendaEvent.image}>
+          <GenericPage image={event.image}>
             <div className="grid xl:grid-cols-3 gap-5 mt-[-9.3rem]">
               <div className="xl:col-span-3 mb-[-0.5rem]">
                 <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">
@@ -73,9 +74,9 @@ export default function Event() {
                   </Button>
                 </div>
               </div>
-              <AgendaCard agendaEvent={agendaEvent} agendaPage={false} />
-              <DescriptionCard agendaEvent={agendaEvent} />
-              <RegistrationsCard agendaEvent={agendaEvent} />
+              <EventCard event={event} agendaPage={false} />
+              <DescriptionCard event={event} />
+              <RegistrationsCard event={event} />
             </div>
           </GenericPage>
         </>

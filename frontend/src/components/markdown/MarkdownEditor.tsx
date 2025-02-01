@@ -1,17 +1,17 @@
 import { ChangeEvent, SyntheticEvent, useRef, useState } from 'react';
 import Markdown from 'react-markdown';
 import { Tab, TextField } from '@mui/material';
-import TextCard from './TextCard.tsx';
+import TextCard from '../TextCard.tsx';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import MarkdownEditorToolbar from './MarkdownEditorToolbar.tsx';
-import { text } from '../util.ts';
+import { text } from '../../util.ts';
 import remarkGfm from 'remark-gfm';
-import { AgendaEventType, LanguageType } from '../types.ts';
+import { EventType, LanguageType } from '../../types.ts';
 
 interface MarkdownEditorProps {
   initialMarkdown?: LanguageType;
   // eslint-disable-next-line no-unused-vars
-  handleFieldChange: (name: keyof AgendaEventType, value: LanguageType) => void;
+  handleFieldChange: (name: keyof EventType, value: LanguageType) => void;
 }
 
 export default function MarkdownEditor({
@@ -138,7 +138,7 @@ export default function MarkdownEditor({
           </div>
         </TabPanel>
         <TabPanel value="2">
-          <div className="grid space-y-5">
+          <div className="grid gap-5">
             <Markdown remarkPlugins={[remarkGfm]}>{markdownContent.en}</Markdown>
             <Markdown remarkPlugins={[remarkGfm]}>{markdownContent.nl}</Markdown>
           </div>

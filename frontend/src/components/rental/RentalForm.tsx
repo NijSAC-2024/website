@@ -68,8 +68,8 @@ export default function RentalForm({
   };
 
   return (
-    <div className="grid space-y-5">
-      <div className="grid space-y-1">
+    <div className="grid gap-5">
+      <div className="grid gap-1">
         <h2>{text('Rental Request', 'Huuraanvraag')}</h2>
         <p>
           {text(
@@ -78,7 +78,7 @@ export default function RentalForm({
           )}
         </p>
       </div>
-      <div className="grid space-y-3">
+      <div className="grid gap-3">
         <div className="grid grid-cols-2 gap-3">
           <DatePicker
             label={text('Start Date', 'Startdatum')}
@@ -107,7 +107,7 @@ export default function RentalForm({
         onChange={(e) => handleReservationChange('remarks', e.target.value)}
       />
 
-      <div className="grid space-y-3">
+      <div className="grid gap-3">
         <Button
           fullWidth
           variant="contained"

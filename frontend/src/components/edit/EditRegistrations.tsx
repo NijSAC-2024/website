@@ -1,34 +1,51 @@
 import { text } from '../../util.ts';
-import { Collapse, Fab, Switch, TextField } from '@mui/material';
+import { Checkbox, Collapse, Fab, Switch, TextField } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import { AgendaEventType } from '../../types.ts';
+import { EventType, LanguageType, QuestionType } from '../../types.ts';
 import ContentCard from '../ContentCard.tsx';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import moment from 'moment';
 
-interface EditRegistrationFieldsProps {
-  updatedAgendaEvent: AgendaEventType;
+interface EditRegistrationProps {
+  allowsRegistrations: boolean;
+  startDateTime: string;
+  maxRegistrations: number;
+  registrationOpenTime?: string;
+  registrationCloseTime?: string;
+  registrationQuestions: QuestionType[];
   // eslint-disable-next-line no-unused-vars
-  handleFieldChange: (name: keyof AgendaEventType, value: string | boolean) => void;
+  handleFieldChange: (name: keyof EventType, value: string | boolean) => void;
+  handleRegistrationQuestionChange: (
+    // eslint-disable-next-line no-unused-vars
+    index: number,
+    // eslint-disable-next-line no-unused-vars
+    name: keyof QuestionType,
+    // eslint-disable-next-line no-unused-vars
+    value: LanguageType | boolean
+  ) => void;
+  handleAddRegistrationQuestion: () => void;
   // eslint-disable-next-line no-unused-vars
-  handleRegistrationFieldsChange: (langCode: 'en' | 'nl', index: number, value: string) => void;
-  handleAddRegistrationField: () => void;
-  // eslint-disable-next-line no-unused-vars
-  handleRemoveRegistrationField: (index: number) => void;
+  handleRemoveRegistrationQuestion: (index: number) => void;
 }
 
 export default function EditRegistrations({
-  updatedAgendaEvent,
+  allowsRegistrations,
+  startDateTime,
+  maxRegistrations,
+  registrationOpenTime,
+  registrationCloseTime,
+  registrationQuestions,
   handleFieldChange,
-  handleRegistrationFieldsChange,
-  handleAddRegistrationField,
-  handleRemoveRegistrationField
-}: EditRegistrationFieldsProps) {
+  handleRegistrationQuestionChange,
+  handleAddRegistrationQuestion,
+  handleRemoveRegistrationQuestion
+}: EditRegistrationProps) {
   const handleToggleRegistrations = () => {
-    handleFieldChange('allowsRegistrations', !updatedAgendaEvent.allowsRegistrations);
-    handleFieldChange('registrationOpenTime', updatedAgendaEvent.startDateTime);
-    handleFieldChange('registrationCloseTime', updatedAgendaEvent.endDateTime);
+    const now = new Date();
+    handleFieldChange('allowsRegistrations', !allowsRegistrations);
+    handleFieldChange('registrationOpenTime', now.toISOString());
+    handleFieldChange('registrationCloseTime', startDateTime);
   };
   return (
     <ContentCard className="xl:col-span-3">
@@ -36,63 +53,74 @@ export default function EditRegistrations({
         <h1>{text('Registrations', 'Inschrijvingen')}</h1>
         <div>
           {text('Allow registrations', 'Open voor inschrijvingen')}
-          <Switch
-            checked={updatedAgendaEvent.allowsRegistrations}
-            onChange={handleToggleRegistrations}
-          />
+          <Switch checked={allowsRegistrations} onChange={handleToggleRegistrations} />
         </div>
       </div>
-      <Collapse in={updatedAgendaEvent.allowsRegistrations} timeout="auto" unmountOnExit>
-        <div className="grid p-7 space-y-3 border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
+      <Collapse in={allowsRegistrations} timeout="auto" unmountOnExit>
+        <div className="grid p-7 gap-3 border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
           <TextField
             type="number"
             label={text('Maximum Registrations', 'Maximaal Aantal Inschrijvingen')}
-            value={updatedAgendaEvent.maxRegistrations || ''}
+            value={maxRegistrations || ''}
             onChange={(e) => handleFieldChange('maxRegistrations', e.target.value)}
           />
           <div className="grid grid-cols-2 gap-3">
             <DateTimePicker
               label={text('Start Date Registrations', 'Startdatum Inschrijvingen')}
-              value={moment(updatedAgendaEvent.registrationOpenTime)}
+              value={moment(registrationOpenTime)}
               onChange={(date) => handleFieldChange('registrationOpenTime', date!.toISOString())}
             />
             <DateTimePicker
               label={text('End Date Registrations', 'Einddatum Inschrijvingen')}
-              value={moment(updatedAgendaEvent.registrationCloseTime)}
+              value={moment(registrationCloseTime)}
               onChange={(date) => handleFieldChange('registrationCloseTime', date!.toISOString())}
             />
           </div>
           <div>
-            <h3>{text('Registration Fields', 'Inschrijfvelden')}</h3>
-            {updatedAgendaEvent.registrationFields.length === 0 ? (
-              <p>{text('No fields yet.', 'Nog geen velden.')}</p>
+            <div className="flex justify-between">
+              <h3>{text('Registration Fields', 'Inschrijfvelden')}</h3>
+              {registrationQuestions.length !== 0 && <p>Required Delete</p>}
+            </div>
+            {registrationQuestions.length === 0 ? (
+              <p>{text('No questions yet.', 'Nog geen vragen.')}</p>
             ) : (
               <div className="mt-3 grid gap-2">
-                {updatedAgendaEvent.registrationFields.map((field, index) => (
-                  <div key={index} className="flex items-center space-x-2 z-0">
-                    <div className="flex w-full space-x-2">
+                {registrationQuestions.map((question, index) => (
+                  <div key={index} className="flex items-center gap-5 z-0">
+                    <div className="flex w-full gap-2">
                       <TextField
-                        value={field.en}
+                        value={question.question.en}
                         label={`${text('Field', 'Veld')} ${index + 1} ${text('English', 'Engels')}`}
                         onChange={(e) =>
-                          handleRegistrationFieldsChange('en', index, e.target.value)
+                          handleRegistrationQuestionChange(index, 'question', {
+                            en: e.target.value,
+                            nl: question.question.nl
+                          })
                         }
                         fullWidth
                       />
                       <TextField
-                        value={field.nl}
+                        value={question.question.nl}
                         label={`${text('Field', 'Veld')} ${index + 1} ${text('Dutch', 'Nederlands')}`}
                         onChange={(e) =>
-                          handleRegistrationFieldsChange('nl', index, e.target.value)
+                          handleRegistrationQuestionChange(index, 'question', {
+                            en: question.question.en,
+                            nl: e.target.value
+                          })
                         }
                         fullWidth
                       />
                     </div>
+                    <Checkbox
+                      checked={question.required}
+                      onChange={() =>
+                        handleRegistrationQuestionChange(index, 'required', !question.required)
+                      }
+                    />
                     <Fab
                       size="small"
                       color="error"
-                      onClick={() => handleRemoveRegistrationField(index)}
-                    >
+                      onClick={() => handleRemoveRegistrationQuestion(index)}>
                       <DeleteIcon />
                     </Fab>
                   </div>
@@ -101,7 +129,7 @@ export default function EditRegistrations({
             )}
           </div>
           <div className="flex justify-center">
-            <Fab size="small" color="primary" onClick={() => handleAddRegistrationField()}>
+            <Fab size="small" color="primary" onClick={() => handleAddRegistrationQuestion()}>
               <AddIcon />
             </Fab>
           </div>

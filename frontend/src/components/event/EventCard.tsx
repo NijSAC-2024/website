@@ -1,21 +1,21 @@
-import { useLanguage } from '../providers/LanguageProvider.tsx';
+import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import GroupIcon from '@mui/icons-material/Group';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import moment from 'moment';
 import { Chip } from '@mui/material';
-import { text, getLabel } from '../util.ts';
+import { text, getLabel } from '../../util.ts';
 import 'moment/dist/locale/nl';
-import { AgendaEventType } from '../types.ts';
-import router from '../router.tsx';
+import { EventType } from '../../types.ts';
+import router from '../../router.tsx';
 import Markdown from 'react-markdown';
-import RegisterButton from './RegisterButton.tsx';
+import RegisterButton from '../RegisterButton.tsx';
 
 interface AgendaCardProps {
-  agendaEvent: AgendaEventType;
+  event: EventType;
   agendaPage: boolean;
 }
 
-export default function AgendaCard({ agendaEvent, agendaPage }: AgendaCardProps) {
+export default function EventCard({ event, agendaPage }: AgendaCardProps) {
   const { getLangCode } = useLanguage();
   const langCode = getLangCode();
   moment.locale(langCode);
@@ -76,32 +76,25 @@ export default function AgendaCard({ agendaEvent, agendaPage }: AgendaCardProps)
 
   return (
     <div className="w-full rounded-2xl bg-inherit border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] flex flex-col relative justify-between">
-      <div
-        onClick={() => router.navigate('/agenda/' + agendaEvent.id)}
-        className="hover:cursor-pointer"
-      >
+      <div onClick={() => router.navigate('/agenda/' + event.id)} className="hover:cursor-pointer">
         <Chip
-          label={formatDate(agendaEvent.startDateTime, agendaEvent.endDateTime)}
+          label={formatDate(event.dates[0].startDateTime, event.dates[0].endDateTime)}
           className="absolute uppercase font-semibold top-5 right-5"
           color="primary"
           sx={{ fontSize: 16 }}
         />
-        <img
-          className="w-full aspect-4/2 object-cover"
-          src={agendaEvent.image}
-          alt="not available"
-        />
+        <img className="w-full aspect-[4/2] object-cover" src={event.image} alt="not available" />
         <div className="p-5 grid space-y-1">
           <div className="flex justify-between">
             <div className="flex flex-wrap gap-1">
               <Chip
-                label={text(getLabel(agendaEvent.category))}
+                label={text(getLabel(event.category))}
                 className="uppercase font-semibold"
                 size="small"
               />
-              {agendaEvent.type.map((type, index) => (
+              {event.type.map((type, index) => (
                 <Chip
-                  key={`${agendaEvent.id}-${index}`}
+                  key={`${event.id}-${index}`}
                   label={text(getLabel(type))}
                   className="uppercase font-semibold"
                   size="small"
@@ -110,26 +103,37 @@ export default function AgendaCard({ agendaEvent, agendaPage }: AgendaCardProps)
             </div>
             <div className="flex items-center">
               <LocationOnIcon className="text-2xl" />
-              {agendaEvent.location}
+              {event.location}
             </div>
           </div>
-          <h2>{text(agendaEvent.title.en, agendaEvent.title.nl)}</h2>
+          <h2>{text(event.title.en, event.title.nl)}</h2>
           {agendaPage && (
             <Markdown>
               {text(
-                truncateMarkdown(agendaEvent.descriptionMarkdown.en, 120),
-                truncateMarkdown(agendaEvent.descriptionMarkdown.nl, 120)
+                truncateMarkdown(event.descriptionMarkdown.en, 120),
+                truncateMarkdown(event.descriptionMarkdown.nl, 120)
               )}
             </Markdown>
           )}
         </div>
       </div>
-      {agendaEvent.allowsRegistrations && (
+      {event.registrationOpenTime && event.registrationCloseTime && (
         <div className="p-5 flex justify-between items-center border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
           <div className="flex items-center">
-            <GroupIcon className="mr-2" /> {agendaEvent.numberOfRegistrations}
+            <GroupIcon className="mr-2" />
+            <p>
+              {event.numberOfRegistrations}
+              {event.maxRegistrations && '/' + event.maxRegistrations}
+            </p>
           </div>
-          <RegisterButton agendaEvent={agendaEvent} />
+          <RegisterButton
+            registrationCloseTime={event.registrationCloseTime}
+            registrationOpenTime={event.registrationOpenTime}
+            title={event.title}
+            registrationQuestions={event.registrationQuestions}
+            maxRegistrations={event.maxRegistrations}
+            numberOfRegistrations={event.numberOfRegistrations}
+          />
         </div>
       )}
     </div>

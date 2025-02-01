@@ -1,15 +1,15 @@
 import { ReactNode, useRef, useState } from 'react';
 import { Button, Checkbox, FormControlLabel } from '@mui/material';
-import ValidatedPassword from './ValidatedPassword.tsx';
+import ValidatedPassword from '../ValidatedPassword.tsx';
 import { enqueueSnackbar } from 'notistack';
-import ValidatedTextField from './ValidatedTextField';
-import { emailValidator, nameValidator, passwordValidator } from '../validator.ts';
+import ValidatedTextField from '../ValidatedTextField.tsx';
+import { emailValidator, nameValidator, passwordValidator } from '../../validator.ts';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
-import router from '../router.tsx';
-import { text } from '../util.ts';
-import { apiFetch } from '../api.ts';
+import router from '../../router.tsx';
+import { text } from '../../util.ts';
+import { apiFetch } from '../../api.ts';
 
 const steps = ['Personal', 'Education', 'Financial', 'Emergency contact', 'Overview'];
 

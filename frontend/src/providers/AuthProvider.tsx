@@ -1,7 +1,16 @@
 import { createContext, useContext, ReactNode, useState } from 'react';
-import { AuthContextType, UserType } from '../types.ts';
 import { enqueueSnackbar } from 'notistack';
 import { apiFetch } from '../api.ts';
+import { UserType } from '../types.ts';
+
+interface AuthContextType {
+  user: UserType | undefined;
+  isLoggedIn: boolean;
+  checkAuth: () => void;
+  logout: () => void;
+  authOpen: boolean;
+  toggleAuthOpen: () => void;
+}
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 

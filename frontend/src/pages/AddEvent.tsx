@@ -1,17 +1,17 @@
-import { AgendaEventType } from '../types.ts';
+import { EventType } from '../types.ts';
 import router from '../router.tsx';
 import EditEvent from '../components/edit/EditEvent.tsx';
 
 export default function AddEvent() {
-  const handleUpdate = (updatedAgendaEvent: AgendaEventType) => {
+  const handleUpdate = (updatedEvent: EventType) => {
     //Send to backend
-    router.navigate('/agenda/' + updatedAgendaEvent.id);
+    router.navigate('/agenda/' + updatedEvent.id);
   };
 
   const now = new Date();
 
-  const agendaEvent: AgendaEventType = {
-    id: 5,
+  const event: EventType = {
+    id: '5',
     image:
       'https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/76/52/1b/76521bcd-7c16-6404-b845-be35fc720792/AppIcon-0-0-1x_U007epad-0-85-220.png/1200x600wa.png',
     title: { en: '', nl: '' },
@@ -34,7 +34,7 @@ export default function AddEvent() {
     endDateTime: now.toISOString(),
     registrationOpenTime: now.toISOString(),
     registrationCloseTime: now.toISOString(),
-    registrationFields: []
+    registrationQuestions: []
   };
-  return <EditEvent agendaEvent={agendaEvent} handleUpdate={handleUpdate} />;
+  return <EditEvent event={event} handleUpdate={handleUpdate} />;
 }

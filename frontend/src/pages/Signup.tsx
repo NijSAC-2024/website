@@ -1,10 +1,10 @@
 import GenericPage from './GenericPage.tsx';
 import ContentCard from '../components/ContentCard.tsx';
-import SignupForm from '../components/SignupForm.tsx';
+import SignupForm from '../components/signup/SignupForm.tsx';
 import { text } from '../util.ts';
 import { Button, Chip, Collapse } from '@mui/material';
 import { useState } from 'react';
-import SingupOptions from '../components/SingupOptions.tsx';
+import SingupOptions from '../components/signup/SingupOptions.tsx';
 
 type MembershipTypeEN = 'Member' | 'Extraordinary Member' | 'Donor';
 type MembershipTypeNL = 'Lid' | 'Buitengewoon Lid' | 'Donateur';
