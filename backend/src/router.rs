@@ -22,7 +22,7 @@ use tracing::Level;
 
 pub fn create_router(state: AppState) -> Router {
     let memory_router = MemoryServe::new(load_assets!("../frontend/dist"))
-        .index_file(None)
+        .index_file(Some("/index.html"))
         .into_router();
 
     Router::new()

@@ -1,0 +1,29 @@
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: deploy to Scaleway
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create version tag
+        shell: bash
+        run: echo "tag=$(git show -s --format="%ct-%h" $GITHUB_SHA)" >> $GITHUB_ENV
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Login to Scaleway Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: rg.fr-par.scw.cloud/namespace-nijsac-test
+          username: nologin
+          password: ${{ secrets.SCW_SECRET_KEY }}
+      - name: Pull from GitHub and Push to Scaleway
+        run: |
+          docker pull ghcr.io/nijsac-2024/nijsac-website:${{ env.tag }}
+          docker tag ghcr.io/nijsac-2024/nijsac-website:${{ env.tag }} rg.fr-par.scw.cloud/namespace-nijsac-test/website:${{ env.tag }}
+          docker push rg.fr-par.scw.cloud/namespace-nijsac-test/website:${{ env.tag }}
+            
