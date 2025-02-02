@@ -8,8 +8,8 @@ import { useLanguage } from '../providers/LanguageProvider.tsx';
 import moment from 'moment/moment';
 
 interface RegisterButtonProps {
-  numberOfRegistrations: number;
-  maxRegistrations: number;
+  numberOfRegistrations?: number;
+  maxRegistrations?: number;
   registrationOpenTime: string;
   registrationCloseTime: string;
   registrationQuestions: QuestionType[];

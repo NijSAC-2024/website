@@ -24,7 +24,8 @@ export interface DateType {
 
 export interface EventType {
   id: string;
-  image: string;
+  isPublished: boolean;
+  image?: string;
   title: LanguageType;
   category: CategoryType;
   type: OptionType[];
@@ -33,9 +34,11 @@ export interface EventType {
   gear: LanguageType;
   experience: OptionType[];
   allowsRegistrations: boolean;
-  numberOfRegistrations: number;
-  maxRegistrations: number;
+  numberOfRegistrations?: number;
+  hasMaxRegistration: boolean;
+  maxRegistrations?: number;
   dates: DateType[];
+  requiredMembershipStatus: MembershipStatus[];
   registrationOpenTime?: string;
   registrationCloseTime?: string;
   registrationQuestions: QuestionType[];

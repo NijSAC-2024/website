@@ -26,7 +26,7 @@ export default function Event() {
       nl: 'Elk voor- en najaar kan je leren voorklimmen in de cursus OV-Singlepitch. In deze cursus leert de cursist voorklimmen, en tevens zekeren voorklim situatie. Om dat we een OV (Outdoor Voorklim) cursus geven proberen we iedereen klaar te stomen om dit ook op de rotsen te kunnen beoefenen. Het examen zal buiten op de rots worden afgelegd, de instructeur beoordeelt dan bij elke deelnemer individueel of de bovengenoemde technieken beheerst (hiervoor krijg je dan een pasje KVB-OV-Singlepitch.)\n'
     },
     gear: {
-      en: 'Helmet, Rope, Safe Biner',
+      en: 'HMS biner, Long slinge (120 cm; stitched), Dynamic safety line,  4 (small) screw carabiners (D-biners), Prussik rope 1 meter (5 or 6 mm)',
       nl: 'Helm, Touw, Safe Biner'
     },
     experience: ['mp'],
@@ -38,7 +38,10 @@ export default function Event() {
     registrationCloseTime: '2027-03-07T00:00:00.000Z',
     registrationQuestions: [
       { question: { en: 'How many quickdraws', nl: 'Hoeveel setjes' }, required: true }
-    ]
+    ],
+    isPublished: false,
+    hasMaxRegistration: false,
+    requiredMembershipStatus: []
   });
 
   const [isEditing, setIsEditing] = useState<boolean>(false);

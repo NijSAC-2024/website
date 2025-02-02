@@ -41,7 +41,10 @@ export default function Agenda() {
       registrationCloseTime: '2027-03-07T00:00:00.000Z',
       registrationQuestions: [
         { question: { en: 'How many quickdraws', nl: 'Hoeveel setjes' }, required: true }
-      ]
+      ],
+      isPublished: false,
+      hasMaxRegistration: false,
+      requiredMembershipStatus: []
     },
     {
       id: '4',
@@ -70,7 +73,10 @@ export default function Agenda() {
       registrationCloseTime: '2027-03-07T00:00:00.000Z',
       registrationQuestions: [
         { question: { en: 'How many quickdraws', nl: 'Hoeveel setjes' }, required: true }
-      ]
+      ],
+      isPublished: false,
+      hasMaxRegistration: false,
+      requiredMembershipStatus: []
     }
   ];
 

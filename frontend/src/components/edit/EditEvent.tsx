@@ -111,7 +111,7 @@ export default function EditEvent({ event, handleUpdate }: EditEventProps) {
         </div>
 
         <EditAgendaCard
-          dates={event.dates}
+          dates={updatedEvent.dates}
           image={updatedEvent.image}
           category={updatedEvent.category}
           title={updatedEvent.title}
@@ -133,6 +133,7 @@ export default function EditEvent({ event, handleUpdate }: EditEventProps) {
         <EditRegistrations
           allowsRegistrations={updatedEvent.allowsRegistrations}
           startDateTime={updatedEvent.dates[0].startDateTime}
+          hasMaxRegistrations={updatedEvent.hasMaxRegistration}
           maxRegistrations={updatedEvent.maxRegistrations}
           registrationOpenTime={updatedEvent.registrationOpenTime}
           registrationCloseTime={updatedEvent.registrationCloseTime}

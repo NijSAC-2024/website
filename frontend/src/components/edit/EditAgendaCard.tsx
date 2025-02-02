@@ -14,10 +14,11 @@ import OptionSelector from '../OptionSelector.tsx';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import { ChangeEvent } from 'react';
 import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 interface EditAgendaCardProps {
   category: CategoryType;
-  image: string;
+  image?: string;
   type: OptionType[];
   title: LanguageType;
   dates: DateType[];
@@ -26,7 +27,7 @@ interface EditAgendaCardProps {
     // eslint-disable-next-line no-unused-vars
     name: keyof EventType,
     // eslint-disable-next-line no-unused-vars
-    value: LanguageType | string | OptionType[]
+    value: LanguageType | string | OptionType[] | boolean
   ) => void;
   // eslint-disable-next-line no-unused-vars
   handleDateChange: (index: number, startDate: boolean, value: string) => void;
@@ -37,7 +38,7 @@ interface EditAgendaCardProps {
 
 export default function EditAgendaCard({
   category,
-  image,
+  image = 'https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/76/52/1b/76521bcd-7c16-6404-b845-be35fc720792/AppIcon-0-0-1x_U007epad-0-85-220.png/1200x600wa.png',
   type,
   title,
   dates,
@@ -100,6 +101,7 @@ export default function EditAgendaCard({
               initialOptions={type}
             />
           </div>
+
           <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
             <TextField
               value={title.en}
@@ -112,22 +114,47 @@ export default function EditAgendaCard({
               onChange={(e) => handleFieldChange('title', { ...title, nl: e.target.value })}
             />
           </div>
+
           <TextField
             value={location}
             label={text('Location*', 'Locatie*')}
             onChange={(e) => handleFieldChange('location', e.target.value)}
           />
-          <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
-            <DateTimePicker
-              label={text('Start Date*', 'Startdatum*')}
-              value={moment(dates[0].startDateTime)}
-              onChange={(date) => handleFieldChange('dates', date!.toISOString())}
-            />
-            <DateTimePicker
-              label={text('End Date*', 'Einddatum*')}
-              value={moment(dates[0].endDateTime)}
-              onChange={(date) => handleFieldChange('dates', date!.toISOString())}
-            />
+
+          <div className="grid gap-3">
+            <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
+              <DateTimePicker
+                label={text('Start Date', 'Startdatum')}
+                value={moment(dates[0].startDateTime)}
+                onChange={(date) => handleDateChange(0, true, date!.toISOString())}
+              />
+              <DateTimePicker
+                label={text('End Date', 'Einddatum')}
+                value={moment(dates[0].endDateTime)}
+                onChange={(date) => handleDateChange(0, false, date!.toISOString())}
+              />
+            </div>
+            {dates.slice(1).map((date, index) => (
+              <div key={index} className="flex justify-between gap-4">
+                <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
+                  <DateTimePicker
+                    label={`${text('Start Date', 'Startdatum')} ${index + 2}`}
+                    value={moment(date.startDateTime)}
+                    onChange={(date) => handleDateChange(index + 1, true, date!.toISOString())}
+                  />
+                  <DateTimePicker
+                    label={`${text('End Date', 'Einddatum')} ${index + 2}`}
+                    value={moment(date.endDateTime)}
+                    onChange={(date) => handleDateChange(index + 1, false, date!.toISOString())}
+                  />
+                </div>
+                <div className="flex items-center">
+                  <Fab size="small" color="error" onClick={() => handleRemoveDate(index + 1)}>
+                    <DeleteIcon />
+                  </Fab>
+                </div>
+              </div>
+            ))}
           </div>
           <div className="flex justify-center">
             <Fab size="small" color="primary" onClick={() => handleAddDate()}>
