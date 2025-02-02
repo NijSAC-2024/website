@@ -41,7 +41,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   };
 
   const logout = async () => {
-    const { error } = await apiFetch<void>('/api/logout', { method: 'GET' });
+    const { error } = await apiFetch<void>('/logout', { method: 'GET' });
 
     if (!error) {
       setIsLoggedIn(false);

@@ -76,13 +76,23 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
 
   return (
     <div className="w-full rounded-2xl bg-inherit border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] flex flex-col relative justify-between">
-      <div onClick={() => router.navigate('/agenda/' + event.id)} className="hover:cursor-pointer">
+      <div
+        onClick={() => router.navigate('/agenda/' + event.id)}
+        className={agendaPage ? 'hover:cursor-pointer' : ''}
+      >
         <Chip
           label={formatDate(event.dates[0].startDateTime, event.dates[0].endDateTime)}
           className="absolute uppercase font-semibold top-5 right-5"
           color="primary"
           sx={{ fontSize: 16 }}
         />
+        {agendaPage && !event.isPublished && (
+          <Chip
+            label={text('Draft', 'Concept')}
+            className="absolute uppercase font-semibold top-5 left-5"
+            color="primary"
+          />
+        )}
         <img className="w-full aspect-[4/2] object-cover" src={event.image} alt="not available" />
         <div className="p-5 grid space-y-1">
           <div className="flex justify-between">
@@ -107,17 +117,26 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
             </div>
           </div>
           <h2>{text(event.title.en, event.title.nl)}</h2>
-          {agendaPage && (
+          {agendaPage ? (
             <Markdown>
               {text(
                 truncateMarkdown(event.descriptionMarkdown.en, 120),
                 truncateMarkdown(event.descriptionMarkdown.nl, 120)
               )}
             </Markdown>
+          ) : (
+            event.dates.length > 1 && (
+              <>
+                <b>{text(getLabel(event.category)) + text(' dates:', ' datums:')}</b>
+                {event.dates.map((date, index) => (
+                  <p key={index}>{formatDate(date.startDateTime, date.endDateTime)}</p>
+                ))}
+              </>
+            )
           )}
         </div>
       </div>
-      {event.registrationOpenTime && event.registrationCloseTime && (
+      {event.registrationOpenTime && event.registrationCloseTime && event.allowsRegistrations && (
         <div className="p-5 flex justify-between items-center border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
           <div className="flex items-center">
             <GroupIcon className="mr-2" />

@@ -42,8 +42,8 @@ export default function Agenda() {
       registrationQuestions: [
         { question: { en: 'How many quickdraws', nl: 'Hoeveel setjes' }, required: true }
       ],
-      isPublished: false,
-      hasMaxRegistration: false,
+      isPublished: true,
+      hasMaxRegistration: true,
       requiredMembershipStatus: []
     },
     {
@@ -75,7 +75,7 @@ export default function Agenda() {
         { question: { en: 'How many quickdraws', nl: 'Hoeveel setjes' }, required: true }
       ],
       isPublished: false,
-      hasMaxRegistration: false,
+      hasMaxRegistration: true,
       requiredMembershipStatus: []
     }
   ];
@@ -116,7 +116,8 @@ export default function Agenda() {
                     value={selectedCategory}
                     label={text('Category', 'Categorie')}
                     onChange={(e) => setSelectedCategory(e.target.value as CategoryType | 'all')}
-                    variant="outlined">
+                    variant="outlined"
+                  >
                     <MenuItem value="all">{text('All', 'Alles')}</MenuItem>
                     <MenuItem value="activity">{text('Activities', 'Activiteiten')}</MenuItem>
                     <MenuItem value="course">{text('Courses', 'Cursussen')}</MenuItem>
@@ -131,7 +132,8 @@ export default function Agenda() {
                     value={selectedType}
                     label={text('Type', 'Type')}
                     onChange={(e) => setSelectedType(e.target.value as OptionType | 'all')}
-                    variant="outlined">
+                    variant="outlined"
+                  >
                     <MenuItem value="all">{text('All', 'Alles')}</MenuItem>
                     <MenuItem value="sp">{text('Single Pitch', 'Single Pitch')}</MenuItem>
                     <MenuItem value="mp">{text('Multi Pitch', 'Multi Pitch')}</MenuItem>

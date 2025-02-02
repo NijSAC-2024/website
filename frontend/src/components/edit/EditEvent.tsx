@@ -1,6 +1,5 @@
 import { EventType, OptionType, LanguageType, QuestionType } from '../../types.ts';
-import { Button, Fab } from '@mui/material';
-import SaveIcon from '@mui/icons-material/Save';
+import { Button } from '@mui/material';
 import { text } from '../../util.ts';
 import { useState } from 'react';
 import EditRegistrations from './EditRegistrations.tsx';
@@ -8,7 +7,7 @@ import EditAgendaCard from './EditAgendaCard.tsx';
 import EditDescription from './EditDescription.tsx';
 import router from '../../router.tsx';
 import GenericPage from '../../pages/GenericPage.tsx';
-import moment from 'moment';
+import SaveButton from './SaveButton.tsx';
 
 interface EditEventProps {
   event: EventType;
@@ -81,33 +80,33 @@ export default function EditEvent({ event, handleUpdate }: EditEventProps) {
       registrationQuestions: updatedEvent.registrationQuestions.filter((_, idx) => idx !== index)
     });
 
+  const handleSave = (bool: boolean) => {
+    handleUpdate({ ...updatedEvent, isPublished: bool });
+  };
+
   return (
     <GenericPage image={updatedEvent.image}>
+      <SaveButton
+        startDateTime={updatedEvent.dates[0].startDateTime}
+        endDateTime={updatedEvent.dates[0].endDateTime}
+        title={updatedEvent.title}
+        location={updatedEvent.location}
+        category={updatedEvent.category}
+        handleSave={handleSave}
+      />
+
       <div className="grid xl:grid-cols-3 gap-5 mt-[-9.3rem]">
-        <div className="xl:col-span-3 mb-[-0.5rem]">
+        <div className="xl:col-span-3 mb-[-0.5rem] flex justify-between">
           <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">
             <Button color="inherit" onClick={() => router.navigate('/agenda')}>
               {text('Back to Agenda', 'Terug naar Agenda')}
             </Button>
           </div>
-        </div>
-        <div className="fixed bottom-5 right-5 z-10">
-          <Fab
-            variant="extended"
-            color="primary"
-            onClick={() => handleUpdate(updatedEvent)}
-            disabled={
-              !updatedEvent.title.en ||
-              !updatedEvent.title.nl ||
-              !updatedEvent.location ||
-              !updatedEvent.category ||
-              moment(updatedEvent.dates[0].endDateTime).isBefore(
-                moment(updatedEvent.dates[0].startDateTime)
-              )
-            }>
-            <SaveIcon className="mr-2" />
-            {text('Save Event', 'Evenement opslaan')}
-          </Fab>
+          {!updatedEvent.isPublished && (
+            <Button variant="contained">
+              <b>{text('Draft', 'Concept')}</b>
+            </Button>
+          )}
         </div>
 
         <EditAgendaCard
@@ -132,6 +131,7 @@ export default function EditEvent({ event, handleUpdate }: EditEventProps) {
 
         <EditRegistrations
           allowsRegistrations={updatedEvent.allowsRegistrations}
+          requiredMembershipStatus={updatedEvent.requiredMembershipStatus}
           startDateTime={updatedEvent.dates[0].startDateTime}
           hasMaxRegistrations={updatedEvent.hasMaxRegistration}
           maxRegistrations={updatedEvent.maxRegistrations}

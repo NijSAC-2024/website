@@ -2,14 +2,16 @@ import { text } from '../../util.ts';
 import { Checkbox, Collapse, Fab, Switch, TextField } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import { EventType, LanguageType, QuestionType } from '../../types.ts';
+import { EventType, LanguageType, memberOptions, OptionType, QuestionType } from '../../types.ts';
 import ContentCard from '../ContentCard.tsx';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import moment from 'moment';
 import Tooltip from '@mui/material/Tooltip';
+import OptionSelector from '../OptionSelector.tsx';
 
 interface EditRegistrationProps {
   allowsRegistrations: boolean;
+  requiredMembershipStatus: OptionType[];
   startDateTime: string;
   hasMaxRegistrations: boolean;
   maxRegistrations?: number;
@@ -17,7 +19,7 @@ interface EditRegistrationProps {
   registrationCloseTime?: string;
   registrationQuestions: QuestionType[];
   // eslint-disable-next-line no-unused-vars
-  handleFieldChange: (name: keyof EventType, value: string | boolean) => void;
+  handleFieldChange: (name: keyof EventType, value: string | boolean | OptionType[]) => void;
   handleRegistrationQuestionChange: (
     // eslint-disable-next-line no-unused-vars
     index: number,
@@ -33,6 +35,7 @@ interface EditRegistrationProps {
 
 export default function EditRegistrations({
   allowsRegistrations,
+  requiredMembershipStatus,
   startDateTime,
   hasMaxRegistrations,
   maxRegistrations,
@@ -61,7 +64,7 @@ export default function EditRegistrations({
       </div>
       <Collapse in={allowsRegistrations} timeout="auto" unmountOnExit>
         <div className="grid p-7 gap-3 border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
-          {/* Registration Info*/}
+          {/* Max Registrations and Registration Dates */}
           <div className="flex items-center">
             <p>{text('Maximum registrations', 'Maximum inschrjvingen')}</p>
             <Switch
@@ -90,8 +93,14 @@ export default function EditRegistrations({
               onChange={(date) => handleFieldChange('registrationCloseTime', date!.toISOString())}
             />
           </div>
+          <OptionSelector
+            options={memberOptions}
+            onChange={(selected) => handleFieldChange('requiredMembershipStatus', selected)}
+            label={text('Necessary Membership Status', 'Benodigd Lidmaatschapstatus')}
+            initialOptions={requiredMembershipStatus}
+          />
 
-          {/* Registration Questions*/}
+          {/* Registration Questions */}
           <h3>{text('Registration Questions', 'Inschrijfvragen')}</h3>
           {registrationQuestions.length === 0 ? (
             <p>{text('No questions yet.', 'Nog geen vragen.')}</p>
@@ -138,7 +147,8 @@ export default function EditRegistrations({
                       <Fab
                         size="small"
                         color="error"
-                        onClick={() => handleRemoveRegistrationQuestion(index)}>
+                        onClick={() => handleRemoveRegistrationQuestion(index)}
+                      >
                         <DeleteIcon />
                       </Fab>
                     </Tooltip>

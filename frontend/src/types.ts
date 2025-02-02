@@ -8,7 +8,16 @@ export interface ValidateProps {
   setValue: (value: string) => void;
 }
 
-export type OptionType = 'sp' | 'mp' | 'boulder' | 'trad' | 'education';
+export type OptionType =
+  | 'sp'
+  | 'mp'
+  | 'boulder'
+  | 'trad'
+  | 'education'
+  | 'pending'
+  | 'member'
+  | 'extraordinary'
+  | ' non_member';
 
 export type CategoryType = 'activity' | 'course' | 'training' | 'weekend' | '';
 
@@ -38,10 +47,46 @@ export interface EventType {
   hasMaxRegistration: boolean;
   maxRegistrations?: number;
   dates: DateType[];
-  requiredMembershipStatus: MembershipStatus[];
+  requiredMembershipStatus: OptionType[];
   registrationOpenTime?: string;
   registrationCloseTime?: string;
   registrationQuestions: QuestionType[];
+}
+
+export interface EventTypeApi {
+  id: string;
+  isPublished: boolean;
+  image: string;
+  nameNl: string;
+  nameEn: string;
+  activityType: string;
+  metadata: {
+    experience: string[];
+    type: string[];
+    location: string;
+    gearEn: string;
+    gearNl: string;
+  }[];
+  descriptionNl: string;
+  descriptionEn: string;
+  registrationStart: string | null;
+  registrationEnd: string | null;
+  registrationCount: number;
+  registrationMax: number | null;
+  dates: { start: string; end: string }[];
+  requiredMembershipStatus: string[];
+  questions: { questionNl: string; questionEn: string; required: boolean }[];
+  waitingListCount: number;
+  waitingListMax: number;
+}
+
+export interface LocationTypeAPI {
+  id: string;
+  nameNl: string;
+  nameEn: string;
+  descriptionNl: string;
+  descriptionEn: string;
+  reusable: boolean;
 }
 
 export interface QuestionType {
@@ -120,6 +165,12 @@ export const typesOptions: OptionsType[] = [
 export const experienceOptions: OptionsType[] = [
   { id: 'sp', label: { en: 'Single Pitch', nl: 'Single Pitch' } },
   { id: 'mp', label: { en: 'Multi Pitch', nl: 'Multi Pitch' } }
+];
+
+export const memberOptions: OptionsType[] = [
+  { id: 'member', label: { en: 'Member', nl: 'Lid' } },
+  { id: 'extraordinary', label: { en: 'Extraordinary Member', nl: 'Buitengewoon Lid' } },
+  { id: ' non_member', label: { en: 'Non Member', nl: 'Niet Lid' } }
 ];
 
 export const eventOptions = [

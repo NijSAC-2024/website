@@ -6,17 +6,17 @@ import { TabContext, TabList, TabPanel } from '@mui/lab';
 import MarkdownEditorToolbar from './MarkdownEditorToolbar.tsx';
 import { text } from '../../util.ts';
 import remarkGfm from 'remark-gfm';
-import { EventType, LanguageType } from '../../types.ts';
+import { LanguageType } from '../../types.ts';
 
 interface MarkdownEditorProps {
   initialMarkdown?: LanguageType;
   // eslint-disable-next-line no-unused-vars
-  handleFieldChange: (name: keyof EventType, value: LanguageType) => void;
+  handleMarkdown: (markdown: LanguageType) => void;
 }
 
 export default function MarkdownEditor({
   initialMarkdown = { en: '', nl: '' },
-  handleFieldChange
+  handleMarkdown
 }: MarkdownEditorProps) {
   const [value, setValue] = useState('1');
   const [markdownContent, setMarkdownContent] = useState<LanguageType>(initialMarkdown);
@@ -39,7 +39,7 @@ export default function MarkdownEditor({
       [langCode]: event.target.value
     };
     setMarkdownContent(updatedMarkdown);
-    handleFieldChange('descriptionMarkdown', updatedMarkdown);
+    handleMarkdown(updatedMarkdown);
   };
 
   const insertMarkdown = (syntax: string, langCode: 'en' | 'nl') => {
@@ -95,7 +95,7 @@ export default function MarkdownEditor({
       [langCode]: newContent
     };
     setMarkdownContent(updatedMarkdown);
-    handleFieldChange('descriptionMarkdown', updatedMarkdown);
+    handleMarkdown(updatedMarkdown);
 
     setTimeout(() => {
       textarea.selectionStart = textarea.selectionEnd = newCursorPosition;

@@ -39,17 +39,41 @@ export default function Event() {
     registrationQuestions: [
       { question: { en: 'How many quickdraws', nl: 'Hoeveel setjes' }, required: true }
     ],
-    isPublished: false,
-    hasMaxRegistration: false,
-    requiredMembershipStatus: []
+    isPublished: true,
+    hasMaxRegistration: true,
+    requiredMembershipStatus: ['member']
   });
 
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const toggleIsEditing = () => {
     setIsEditing((prevState) => !prevState);
   };
-  const handleUpdate = (updatedEvent: EventType) => {
-    //Send to backend
+  const handleUpdate = async (updatedEvent: EventType) => {
+    // const { error } = await apiFetch<void>('/activity', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify(eventToApi(updatedEvent))
+    // });
+    //
+    // if (error) {
+    //   switch (error.message) {
+    //     case 'Unauthorized':
+    //       enqueueSnackbar(
+    //         text(
+    //           'You do not have the rights to create or edit events.',
+    //           'Je hebt niet de rechten om evenementen aan te maken of te bewerken.'
+    //         ),
+    //         { variant: 'error' }
+    //       );
+    //       break;
+    //     default:
+    //       enqueueSnackbar(`${error.message}: ${error.reference}`, {
+    //         variant: 'error'
+    //       });
+    //   }
+    // } else {
+    //   enqueueSnackbar(text('Event saved', 'Evenement opgeslagen'), { variant: 'success' });
+    // }
     setEvent(updatedEvent);
     toggleIsEditing();
   };
@@ -70,16 +94,26 @@ export default function Event() {
           </div>
           <GenericPage image={event.image}>
             <div className="grid xl:grid-cols-3 gap-5 mt-[-9.3rem]">
-              <div className="xl:col-span-3 mb-[-0.5rem]">
+              <div className="xl:col-span-3 mb-[-0.5rem] flex justify-between">
                 <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">
                   <Button color="inherit" onClick={() => router.navigate('/agenda')}>
                     {text('Back to Agenda', 'Terug naar Agenda')}
                   </Button>
                 </div>
+                {!event.isPublished && (
+                  <Button variant="contained" onClick={toggleIsEditing}>
+                    <b>{text('Draft', 'Concept')}</b>
+                  </Button>
+                )}
               </div>
+
               <EventCard event={event} agendaPage={false} />
-              <DescriptionCard event={event} />
-              <RegistrationsCard event={event} />
+              <DescriptionCard
+                descriptionMarkdown={event.descriptionMarkdown}
+                experience={event.experience}
+                gear={event.gear}
+              />
+              <RegistrationsCard allowsRegistrations={event.allowsRegistrations} />
             </div>
           </GenericPage>
         </>

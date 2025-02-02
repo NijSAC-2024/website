@@ -15,7 +15,7 @@ interface ApiResponse<T> {
 
 export async function apiFetch<T>(url: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
   try {
-    const response = await fetch(url, {
+    const response = await fetch('/api' + url, {
       credentials: 'include',
       ...options
     });

@@ -11,13 +11,11 @@ export default function AddEvent() {
   const now = new Date();
 
   const event: EventType = {
-    dates: [],
+    dates: [{ startDateTime: now.toISOString(), endDateTime: now.toISOString() }],
     hasMaxRegistration: false,
     isPublished: false,
-    requiredMembershipStatus: [],
+    requiredMembershipStatus: ['member'],
     id: '5',
-    image:
-      'https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/76/52/1b/76521bcd-7c16-6404-b845-be35fc720792/AppIcon-0-0-1x_U007epad-0-85-220.png/1200x600wa.png',
     title: { en: '', nl: '' },
     category: '',
     type: [],

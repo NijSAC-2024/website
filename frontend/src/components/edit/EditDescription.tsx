@@ -22,14 +22,18 @@ export default function EditDescription({
   experience,
   handleFieldChange
 }: EditDescriptionProps) {
+  const handleMarkdown = (markdown: LanguageType) => {
+    handleFieldChange('descriptionMarkdown', markdown);
+  };
+
   return (
     <ContentCard className="xl:col-span-2 flex flex-col justify-between">
+      {/* Description */}
       <div>
-        <MarkdownEditor
-          initialMarkdown={descriptionMarkdown}
-          handleFieldChange={handleFieldChange}
-        />
+        <MarkdownEditor initialMarkdown={descriptionMarkdown} handleMarkdown={handleMarkdown} />
       </div>
+
+      {/* Gear and Experience */}
       <div className="grid xl:grid-cols-2 gap-3 px-7 py-5 border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
         <TextField
           multiline
@@ -50,7 +54,7 @@ export default function EditDescription({
         <div className="xl:col-span-2 grid">
           <OptionSelector
             options={experienceOptions}
-            onChange={(selectedTypes) => handleFieldChange('experience', selectedTypes)}
+            onChange={(selected) => handleFieldChange('experience', selected)}
             label={text('Necessary Experience', 'Benodigde Ervaring')}
             initialOptions={experience}
           />

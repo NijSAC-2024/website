@@ -41,7 +41,7 @@ export default function SignupForm() {
       return;
     }
 
-    const { error } = await apiFetch<void>('/api/register', {
+    const { error } = await apiFetch<void>('/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, firstName, lastName, password })

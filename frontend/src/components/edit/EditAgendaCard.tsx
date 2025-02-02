@@ -1,4 +1,13 @@
-import { FormControl, InputLabel, MenuItem, Select, TextField, Button, Fab } from '@mui/material';
+import {
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Button,
+  Fab,
+  Tooltip
+} from '@mui/material';
 import { text } from '../../util.ts';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import moment from 'moment/moment';
@@ -27,7 +36,7 @@ interface EditAgendaCardProps {
     // eslint-disable-next-line no-unused-vars
     name: keyof EventType,
     // eslint-disable-next-line no-unused-vars
-    value: LanguageType | string | OptionType[] | boolean
+    value: LanguageType | string | OptionType[]
   ) => void;
   // eslint-disable-next-line no-unused-vars
   handleDateChange: (index: number, startDate: boolean, value: string) => void;
@@ -68,17 +77,20 @@ export default function EditAgendaCard({
       </div>
       <div className="p-5">
         <div className="grid gap-5">
+          {/* Image */}
           <Button
             component="label"
             variant="contained"
             color="primary"
             aria-label={text('Change Image', 'Afbeelding Wijzigen')}
-            className="mx-auto">
+            className="mx-auto"
+          >
             <PhotoCameraIcon className="mr-2" />
             {text('Upload Image', 'Afbeelding Uploaden')}
             <input type="file" accept="image/*" hidden onChange={handleImageChange} />
           </Button>
 
+          {/* Category and Type */}
           <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
             <FormControl fullWidth>
               <InputLabel id="select-label">{text('Category*', 'Categorie*')}</InputLabel>
@@ -87,7 +99,8 @@ export default function EditAgendaCard({
                 value={category}
                 label={text('Category*', 'Categorie*')}
                 variant="outlined"
-                onChange={(e) => handleFieldChange('category', e.target.value)}>
+                onChange={(e) => handleFieldChange('category', e.target.value)}
+              >
                 <MenuItem value="activity">{text('Activity', 'Activiteit')}</MenuItem>
                 <MenuItem value="course">{text('Course', 'Cursus')}</MenuItem>
                 <MenuItem value="training">{text('Training', 'Training')}</MenuItem>
@@ -102,6 +115,7 @@ export default function EditAgendaCard({
             />
           </div>
 
+          {/* Title */}
           <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
             <TextField
               value={title.en}
@@ -115,12 +129,14 @@ export default function EditAgendaCard({
             />
           </div>
 
+          {/* Location */}
           <TextField
             value={location}
             label={text('Location*', 'Locatie*')}
             onChange={(e) => handleFieldChange('location', e.target.value)}
           />
 
+          {/* Dates */}
           <div className="grid gap-3">
             <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
               <DateTimePicker
@@ -135,7 +151,7 @@ export default function EditAgendaCard({
               />
             </div>
             {dates.slice(1).map((date, index) => (
-              <div key={index} className="flex justify-between gap-4">
+              <div key={index} className="flex justify-between gap-3">
                 <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
                   <DateTimePicker
                     label={`${text('Start Date', 'Startdatum')} ${index + 2}`}
@@ -149,17 +165,21 @@ export default function EditAgendaCard({
                   />
                 </div>
                 <div className="flex items-center">
-                  <Fab size="small" color="error" onClick={() => handleRemoveDate(index + 1)}>
-                    <DeleteIcon />
-                  </Fab>
+                  <Tooltip title={text('Delete Date', 'Verwijder Datum')}>
+                    <Fab size="small" color="error" onClick={() => handleRemoveDate(index + 1)}>
+                      <DeleteIcon />
+                    </Fab>
+                  </Tooltip>
                 </div>
               </div>
             ))}
-          </div>
-          <div className="flex justify-center">
-            <Fab size="small" color="primary" onClick={() => handleAddDate()}>
-              <AddIcon />
-            </Fab>
+            <div className="flex justify-center">
+              <Tooltip title={text('Add Date', 'Voeg Datum Toe')}>
+                <Fab size="small" color="primary" onClick={() => handleAddDate()}>
+                  <AddIcon />
+                </Fab>
+              </Tooltip>
+            </div>
           </div>
         </div>
       </div>

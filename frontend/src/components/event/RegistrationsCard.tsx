@@ -2,12 +2,12 @@ import ContentCard from '../ContentCard.tsx';
 import { text } from '../../util.ts';
 import { Table, TableBody, TableCell, TableRow } from '@mui/material';
 import { useAuth } from '../../providers/AuthProvider.tsx';
-import { EventType, registrationsType } from '../../types.ts';
+import { registrationsType } from '../../types.ts';
 
 interface RegistrationsCardProps {
-  event: EventType;
+  allowsRegistrations: boolean;
 }
-export default function RegistrationsCard({ event }: RegistrationsCardProps) {
+export default function RegistrationsCard({ allowsRegistrations }: RegistrationsCardProps) {
   const { isLoggedIn } = useAuth();
 
   const registrations: registrationsType = {
@@ -29,7 +29,7 @@ export default function RegistrationsCard({ event }: RegistrationsCardProps) {
 
   return (
     <>
-      {event.allowsRegistrations && isLoggedIn && (
+      {allowsRegistrations && isLoggedIn && (
         <ContentCard className="xl:col-span-3 p-7">
           <h1>{text('Participants', 'Deelnemers')}</h1>
           <Table>
