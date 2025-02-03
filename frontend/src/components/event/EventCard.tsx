@@ -142,7 +142,7 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
             <GroupIcon className="mr-2" />
             <p>
               {event.numberOfRegistrations}
-              {event.maxRegistrations && '/' + event.maxRegistrations}
+              {event.hasMaxRegistration && '/' + event.maxRegistrations}
             </p>
           </div>
           <RegisterButton

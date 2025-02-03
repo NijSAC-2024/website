@@ -5,7 +5,7 @@ import { useLanguage } from '../providers/LanguageProvider.tsx';
 import { text } from '../util.ts';
 import moment from 'moment';
 import { EventType } from '../types.ts';
-import { Button, Fab } from '@mui/material';
+import { Button, Chip, Fab } from '@mui/material';
 import router from '../router.tsx';
 import { useState } from 'react';
 import EditEvent from '../components/edit/EditEvent.tsx';
@@ -94,16 +94,18 @@ export default function Event() {
           </div>
           <GenericPage image={event.image}>
             <div className="grid xl:grid-cols-3 gap-5 mt-[-9.3rem]">
-              <div className="xl:col-span-3 mb-[-0.5rem] flex justify-between">
+              <div className="xl:col-span-3 mb-[-0.5rem] flex justify-between items-center">
                 <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">
                   <Button color="inherit" onClick={() => router.navigate('/agenda')}>
                     {text('Back to Agenda', 'Terug naar Agenda')}
                   </Button>
                 </div>
                 {!event.isPublished && (
-                  <Button variant="contained" onClick={toggleIsEditing}>
-                    <b>{text('Draft', 'Concept')}</b>
-                  </Button>
+                  <Chip
+                    label={text('Draft', 'Concept')}
+                    className="uppercase font-semibold"
+                    color="primary"
+                  />
                 )}
               </div>
 

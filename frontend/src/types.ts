@@ -17,7 +17,7 @@ export type OptionType =
   | 'pending'
   | 'member'
   | 'extraordinary'
-  | ' non_member';
+  | 'non_member';
 
 export type CategoryType = 'activity' | 'course' | 'training' | 'weekend' | '';
 
@@ -29,6 +29,13 @@ export interface LanguageType {
 export interface DateType {
   startDateTime: string;
   endDateTime: string;
+}
+
+export interface QuestionType {
+  id?: string;
+  question: LanguageType;
+  questionType?: string;
+  required: boolean;
 }
 
 export interface EventType {
@@ -87,13 +94,6 @@ export interface LocationTypeAPI {
   descriptionNl: string;
   descriptionEn: string;
   reusable: boolean;
-}
-
-export interface QuestionType {
-  id?: string;
-  question: LanguageType;
-  questionType?: string;
-  required: boolean;
 }
 
 interface registrationType {
@@ -170,7 +170,7 @@ export const experienceOptions: OptionsType[] = [
 export const memberOptions: OptionsType[] = [
   { id: 'member', label: { en: 'Member', nl: 'Lid' } },
   { id: 'extraordinary', label: { en: 'Extraordinary Member', nl: 'Buitengewoon Lid' } },
-  { id: ' non_member', label: { en: 'Non Member', nl: 'Niet Lid' } }
+  { id: 'non_member', label: { en: 'Non Member', nl: 'Niet Lid' } }
 ];
 
 export const eventOptions = [
