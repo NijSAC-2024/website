@@ -11,7 +11,7 @@ axum-extra = { version = "0.10.0", features = ["cookie"] }
 tower-http = { version = "0.6.2", features = ["trace"] }
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
-sqlx = { version = "0.8.3", features = ["postgres", "runtime-tokio", "migrate", "macros", "time", "uuid"] }
+sqlx = { version = "0.8.3", features = ["postgres", "runtime-tokio", "migrate", "macros", "time", "uuid", "tls-rustls"] }
 thiserror = "2.0.11"
 validator = { version = "0.20.0", features = ["derive"] }
 uuid = { version = "1.12.1", features = ["v7", "serde"] }

@@ -12,5 +12,6 @@ allow = [
     "Zlib",
     "BSD-2-Clause",
     "Apache-2.0 WITH LLVM-exception",
-    "NCSA"
+    "NCSA",
+    "MPL-2.0"
 ]

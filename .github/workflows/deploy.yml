@@ -1,0 +1,25 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: deploy to Scaleway
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Create version tag
+        shell: bash
+        run: echo "tag=$(git show -s --format="%ct-%h" $GITHUB_SHA)" >> $GITHUB_ENV
+      - name: Update container with new image version
+        shell: bash
+        run: >
+          curl -X PATCH \
+             -H "X-Auth-Token: ${{ secrets.SCW_SECRET_KEY}}" \
+             -H "Content-Type: application/json" \
+             -d '{"registry_image": "ghcr.io/nijsac-2024/nijsac-website:${{ env.tag }}"}' \
+             "https://api.scaleway.com/containers/v1beta1/regions/fr-par/containers/7b11b0ec-ac6f-45f3-a891-8b92be62c89a"
