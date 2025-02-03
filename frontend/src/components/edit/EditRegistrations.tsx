@@ -1,110 +1,110 @@
 import { text } from '../../util.ts';
-import { Collapse, Fab, Switch, TextField } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';
-import { AgendaEventType } from '../../types.ts';
+import { Collapse, Switch, TextField } from '@mui/material';
+import { EventType, LanguageType, memberOptions, OptionType, QuestionType } from '../../types.ts';
 import ContentCard from '../ContentCard.tsx';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import moment from 'moment';
+import OptionSelector from '../OptionSelector.tsx';
+import EditRegistrationQuestions from './EditRegistrationQuestions.tsx';
 
-interface EditRegistrationFieldsProps {
-  updatedAgendaEvent: AgendaEventType;
+interface EditRegistrationProps {
+  allowsRegistrations: boolean;
+  requiredMembershipStatus: OptionType[];
+  startDateTime: string;
+  hasMaxRegistrations: boolean;
+  maxRegistrations?: number;
+  registrationOpenTime?: string;
+  registrationCloseTime?: string;
+  registrationQuestions: QuestionType[];
   // eslint-disable-next-line no-unused-vars
-  handleFieldChange: (name: keyof AgendaEventType, value: string | boolean) => void;
+  handleFieldChange: (name: keyof EventType, value: string | boolean | OptionType[]) => void;
+  handleRegistrationQuestionChange: (
+    // eslint-disable-next-line no-unused-vars
+    index: number,
+    // eslint-disable-next-line no-unused-vars
+    name: keyof QuestionType,
+    // eslint-disable-next-line no-unused-vars
+    value: LanguageType | boolean
+  ) => void;
+  handleAddRegistrationQuestion: () => void;
   // eslint-disable-next-line no-unused-vars
-  handleRegistrationFieldsChange: (langCode: 'en' | 'nl', index: number, value: string) => void;
-  handleAddRegistrationField: () => void;
-  // eslint-disable-next-line no-unused-vars
-  handleRemoveRegistrationField: (index: number) => void;
+  handleRemoveRegistrationQuestion: (index: number) => void;
 }
 
 export default function EditRegistrations({
-  updatedAgendaEvent,
+  allowsRegistrations,
+  requiredMembershipStatus,
+  startDateTime,
+  hasMaxRegistrations,
+  maxRegistrations,
+  registrationOpenTime,
+  registrationCloseTime,
+  registrationQuestions,
   handleFieldChange,
-  handleRegistrationFieldsChange,
-  handleAddRegistrationField,
-  handleRemoveRegistrationField
-}: EditRegistrationFieldsProps) {
+  handleRegistrationQuestionChange,
+  handleAddRegistrationQuestion,
+  handleRemoveRegistrationQuestion
+}: EditRegistrationProps) {
   const handleToggleRegistrations = () => {
-    handleFieldChange('allowsRegistrations', !updatedAgendaEvent.allowsRegistrations);
-    handleFieldChange('registrationOpenTime', updatedAgendaEvent.startDateTime);
-    handleFieldChange('registrationCloseTime', updatedAgendaEvent.endDateTime);
+    const now = new Date();
+    handleFieldChange('allowsRegistrations', !allowsRegistrations);
+    handleFieldChange('registrationOpenTime', now.toISOString());
+    handleFieldChange('registrationCloseTime', startDateTime);
   };
   return (
     <ContentCard className="xl:col-span-3">
       <div className="flex justify-between p-7">
         <h1>{text('Registrations', 'Inschrijvingen')}</h1>
-        <div>
-          {text('Allow registrations', 'Open voor inschrijvingen')}
-          <Switch
-            checked={updatedAgendaEvent.allowsRegistrations}
-            onChange={handleToggleRegistrations}
-          />
+        <div className="flex items-center">
+          <p>{text('Allow registrations', 'Open voor inschrijvingen')}</p>
+          <Switch checked={allowsRegistrations} onChange={handleToggleRegistrations} />
         </div>
       </div>
-      <Collapse in={updatedAgendaEvent.allowsRegistrations} timeout="auto" unmountOnExit>
-        <div className="grid p-7 space-y-3 border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
-          <TextField
-            type="number"
-            label={text('Maximum Registrations', 'Maximaal Aantal Inschrijvingen')}
-            value={updatedAgendaEvent.maxRegistrations || ''}
-            onChange={(e) => handleFieldChange('maxRegistrations', e.target.value)}
-          />
+      <Collapse in={allowsRegistrations} timeout="auto" unmountOnExit>
+        <div className="grid p-7 gap-3 border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
+          {/* Max Registrations and Registration Dates */}
+          <div className="flex items-center">
+            <p>{text('Maximum registrations', 'Maximum inschrjvingen')}</p>
+            <Switch
+              checked={hasMaxRegistrations}
+              onChange={() => handleFieldChange('hasMaxRegistration', !hasMaxRegistrations)}
+            />
+          </div>
+          <Collapse in={hasMaxRegistrations} timeout="auto" unmountOnExit>
+            <TextField
+              fullWidth
+              type="number"
+              label={text('Maximum Registrations', 'Maximaal Aantal Inschrijvingen')}
+              value={maxRegistrations || ''}
+              onChange={(e) => handleFieldChange('maxRegistrations', e.target.value)}
+            />
+          </Collapse>
           <div className="grid grid-cols-2 gap-3">
             <DateTimePicker
               label={text('Start Date Registrations', 'Startdatum Inschrijvingen')}
-              value={moment(updatedAgendaEvent.registrationOpenTime)}
+              value={moment(registrationOpenTime)}
               onChange={(date) => handleFieldChange('registrationOpenTime', date!.toISOString())}
             />
             <DateTimePicker
               label={text('End Date Registrations', 'Einddatum Inschrijvingen')}
-              value={moment(updatedAgendaEvent.registrationCloseTime)}
+              value={moment(registrationCloseTime)}
               onChange={(date) => handleFieldChange('registrationCloseTime', date!.toISOString())}
             />
           </div>
-          <div>
-            <h3>{text('Registration Fields', 'Inschrijfvelden')}</h3>
-            {updatedAgendaEvent.registrationFields.length === 0 ? (
-              <p>{text('No fields yet.', 'Nog geen velden.')}</p>
-            ) : (
-              <div className="mt-3 grid gap-2">
-                {updatedAgendaEvent.registrationFields.map((field, index) => (
-                  <div key={index} className="flex items-center space-x-2 z-0">
-                    <div className="flex w-full space-x-2">
-                      <TextField
-                        value={field.en}
-                        label={`${text('Field', 'Veld')} ${index + 1} ${text('English', 'Engels')}`}
-                        onChange={(e) =>
-                          handleRegistrationFieldsChange('en', index, e.target.value)
-                        }
-                        fullWidth
-                      />
-                      <TextField
-                        value={field.nl}
-                        label={`${text('Field', 'Veld')} ${index + 1} ${text('Dutch', 'Nederlands')}`}
-                        onChange={(e) =>
-                          handleRegistrationFieldsChange('nl', index, e.target.value)
-                        }
-                        fullWidth
-                      />
-                    </div>
-                    <Fab
-                      size="small"
-                      color="error"
-                      onClick={() => handleRemoveRegistrationField(index)}
-                    >
-                      <DeleteIcon />
-                    </Fab>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-          <div className="flex justify-center">
-            <Fab size="small" color="primary" onClick={() => handleAddRegistrationField()}>
-              <AddIcon />
-            </Fab>
-          </div>
+          <OptionSelector
+            options={memberOptions}
+            onChange={(selected) => handleFieldChange('requiredMembershipStatus', selected)}
+            label={text('Necessary Membership Status', 'Benodigd Lidmaatschapstatus')}
+            initialOptions={requiredMembershipStatus}
+          />
+
+          {/* Registration Questions */}
+          <EditRegistrationQuestions
+            registrationQuestions={registrationQuestions}
+            handleRegistrationQuestionChange={handleRegistrationQuestionChange}
+            handleAddRegistrationQuestion={handleAddRegistrationQuestion}
+            handleRemoveRegistrationQuestion={handleRemoveRegistrationQuestion}
+          />
         </div>
       </Collapse>
     </ContentCard>

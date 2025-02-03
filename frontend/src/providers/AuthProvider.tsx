@@ -1,7 +1,16 @@
 import { createContext, useContext, ReactNode, useState } from 'react';
-import { AuthContextType, UserType } from '../types.ts';
 import { enqueueSnackbar } from 'notistack';
 import { apiFetch } from '../api.ts';
+import { UserType } from '../types.ts';
+
+interface AuthContextType {
+  user: UserType | undefined;
+  isLoggedIn: boolean;
+  checkAuth: () => void;
+  logout: () => void;
+  authOpen: boolean;
+  toggleAuthOpen: () => void;
+}
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -21,7 +30,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   };
 
   const checkAuth = async () => {
-    const { error, data } = await apiFetch<UserType>('/api/whoami');
+    const { error, data } = await apiFetch<UserType>('/whoami');
 
     if (!error) {
       setUser(data);
@@ -32,7 +41,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   };
 
   const logout = async () => {
-    const { error } = await apiFetch<void>('/api/logout', { method: 'GET' });
+    const { error } = await apiFetch<void>('/logout', { method: 'GET' });
 
     if (!error) {
       setIsLoggedIn(false);

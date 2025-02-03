@@ -13,7 +13,7 @@ import {
   StrikethroughS as StrikethroughIcon,
   Title as TitleIcon
 } from '@mui/icons-material';
-import { text } from '../util.ts';
+import { text } from '../../util.ts';
 
 interface MarkdownEditorToolbarProps {
   // eslint-disable-next-line no-unused-vars

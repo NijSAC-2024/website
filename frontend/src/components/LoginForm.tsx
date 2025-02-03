@@ -24,7 +24,7 @@ export default function LoginForm({ onClose }: LoginFormProps) {
       });
       return;
     }
-    const { error } = await apiFetch<void>('/api/login', {
+    const { error } = await apiFetch<void>('/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })

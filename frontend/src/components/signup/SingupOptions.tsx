@@ -1,5 +1,5 @@
-import { text } from '../util.ts';
-import TextCard from './TextCard.tsx';
+import { text } from '../../util.ts';
+import TextCard from '../TextCard.tsx';
 import { Button, Divider } from '@mui/material';
 
 interface SingupOptionsProps {

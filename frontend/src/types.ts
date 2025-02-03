@@ -1,12 +1,3 @@
-export interface AuthContextType {
-  user: UserType | undefined;
-  isLoggedIn: boolean;
-  checkAuth: () => void;
-  logout: () => void;
-  authOpen: boolean;
-  toggleAuthOpen: () => void;
-}
-
 export interface ValidateProps {
   label: string;
   // eslint-disable-next-line no-unused-vars
@@ -17,23 +8,40 @@ export interface ValidateProps {
   setValue: (value: string) => void;
 }
 
+export type OptionType =
+  | 'sp'
+  | 'mp'
+  | 'boulder'
+  | 'trad'
+  | 'education'
+  | 'pending'
+  | 'member'
+  | 'extraordinary'
+  | 'non_member';
+
+export type CategoryType = 'activity' | 'course' | 'training' | 'weekend' | '';
+
 export interface LanguageType {
   en: string;
   nl: string;
 }
 
-export type OptionType = 'sp' | 'mp' | 'boulder' | 'trad' | 'education';
-
-export interface LanguageType {
-  en: string;
-  nl: string;
+export interface DateType {
+  startDateTime: string;
+  endDateTime: string;
 }
 
-export type CategoryType = 'activity' | 'course' | 'training' | 'weekend' | '' | 'all';
+export interface QuestionType {
+  id?: string;
+  question: LanguageType;
+  questionType?: string;
+  required: boolean;
+}
 
-export interface AgendaEventType {
-  id: number;
-  image: string;
+export interface EventType {
+  id: string;
+  isPublished: boolean;
+  image?: string;
   title: LanguageType;
   category: CategoryType;
   type: OptionType[];
@@ -42,13 +50,50 @@ export interface AgendaEventType {
   gear: LanguageType;
   experience: OptionType[];
   allowsRegistrations: boolean;
-  numberOfRegistrations: number;
-  maxRegistrations: number;
-  startDateTime: string;
-  endDateTime: string;
-  registrationOpenTime: string;
-  registrationCloseTime: string;
-  registrationFields: LanguageType[];
+  numberOfRegistrations?: number;
+  hasMaxRegistration: boolean;
+  maxRegistrations?: number;
+  dates: DateType[];
+  requiredMembershipStatus: OptionType[];
+  registrationOpenTime?: string;
+  registrationCloseTime?: string;
+  registrationQuestions: QuestionType[];
+}
+
+export interface EventTypeApi {
+  id: string;
+  isPublished: boolean;
+  image: string;
+  nameNl: string;
+  nameEn: string;
+  activityType: string;
+  metadata: {
+    experience: string[];
+    type: string[];
+    location: string;
+    gearEn: string;
+    gearNl: string;
+  }[];
+  descriptionNl: string;
+  descriptionEn: string;
+  registrationStart: string | null;
+  registrationEnd: string | null;
+  registrationCount: number;
+  registrationMax: number | null;
+  dates: { start: string; end: string }[];
+  requiredMembershipStatus: string[];
+  questions: { questionNl: string; questionEn: string; required: boolean }[];
+  waitingListCount: number;
+  waitingListMax: number;
+}
+
+export interface LocationTypeAPI {
+  id: string;
+  nameNl: string;
+  nameEn: string;
+  descriptionNl: string;
+  descriptionEn: string;
+  reusable: boolean;
 }
 
 interface registrationType {
@@ -60,14 +105,25 @@ export interface registrationsType {
   registrations: registrationType[];
 }
 
+export type MembershipStatus = 'pending' | 'member' | 'extraordinary' | 'non_member';
+
 export interface UserType {
   id: string;
   created: string;
   updated: string;
   firstName: string;
+  infix: string;
   lastName: string;
-  roles: string[];
-  status: string;
+  phone: string;
+  studentNumber: string;
+  nkbvNumber: number;
+  sportcardNumber: number;
+  iceContactName: string;
+  iceContactEmail: null;
+  iceContactPhone: null;
+  importantInfo: null;
+  roles: [];
+  status: MembershipStatus;
   email: string;
 }
 
@@ -109,6 +165,12 @@ export const typesOptions: OptionsType[] = [
 export const experienceOptions: OptionsType[] = [
   { id: 'sp', label: { en: 'Single Pitch', nl: 'Single Pitch' } },
   { id: 'mp', label: { en: 'Multi Pitch', nl: 'Multi Pitch' } }
+];
+
+export const memberOptions: OptionsType[] = [
+  { id: 'member', label: { en: 'Member', nl: 'Lid' } },
+  { id: 'extraordinary', label: { en: 'Extraordinary Member', nl: 'Buitengewoon Lid' } },
+  { id: 'non_member', label: { en: 'Non Member', nl: 'Niet Lid' } }
 ];
 
 export const eventOptions = [

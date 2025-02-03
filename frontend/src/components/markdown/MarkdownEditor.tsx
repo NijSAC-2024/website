@@ -1,22 +1,22 @@
 import { ChangeEvent, SyntheticEvent, useRef, useState } from 'react';
 import Markdown from 'react-markdown';
 import { Tab, TextField } from '@mui/material';
-import TextCard from './TextCard.tsx';
+import TextCard from '../TextCard.tsx';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import MarkdownEditorToolbar from './MarkdownEditorToolbar.tsx';
-import { text } from '../util.ts';
+import { text } from '../../util.ts';
 import remarkGfm from 'remark-gfm';
-import { AgendaEventType, LanguageType } from '../types.ts';
+import { LanguageType } from '../../types.ts';
 
 interface MarkdownEditorProps {
   initialMarkdown?: LanguageType;
   // eslint-disable-next-line no-unused-vars
-  handleFieldChange: (name: keyof AgendaEventType, value: LanguageType) => void;
+  handleMarkdown: (markdown: LanguageType) => void;
 }
 
 export default function MarkdownEditor({
   initialMarkdown = { en: '', nl: '' },
-  handleFieldChange
+  handleMarkdown
 }: MarkdownEditorProps) {
   const [value, setValue] = useState('1');
   const [markdownContent, setMarkdownContent] = useState<LanguageType>(initialMarkdown);
@@ -39,7 +39,7 @@ export default function MarkdownEditor({
       [langCode]: event.target.value
     };
     setMarkdownContent(updatedMarkdown);
-    handleFieldChange('descriptionMarkdown', updatedMarkdown);
+    handleMarkdown(updatedMarkdown);
   };
 
   const insertMarkdown = (syntax: string, langCode: 'en' | 'nl') => {
@@ -95,7 +95,7 @@ export default function MarkdownEditor({
       [langCode]: newContent
     };
     setMarkdownContent(updatedMarkdown);
-    handleFieldChange('descriptionMarkdown', updatedMarkdown);
+    handleMarkdown(updatedMarkdown);
 
     setTimeout(() => {
       textarea.selectionStart = textarea.selectionEnd = newCursorPosition;
@@ -138,7 +138,7 @@ export default function MarkdownEditor({
           </div>
         </TabPanel>
         <TabPanel value="2">
-          <div className="grid space-y-5">
+          <div className="grid gap-5">
             <Markdown remarkPlugins={[remarkGfm]}>{markdownContent.en}</Markdown>
             <Markdown remarkPlugins={[remarkGfm]}>{markdownContent.nl}</Markdown>
           </div>

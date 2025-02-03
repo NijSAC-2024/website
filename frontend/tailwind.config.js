@@ -1,7 +1,6 @@
 // eslint-disable-next-line no-undef
 module.exports = {
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
-  presets: [],
   darkMode: 'selector', // or 'class'
   theme: {
     accentColor: ({ theme }) => ({
@@ -652,7 +651,7 @@ module.exports = {
       max: 'max-content',
       fit: 'fit-content'
     }),
-    maxWidth: ({ theme, breakpoints }) => ({
+    maxWidth: ({ theme }) => ({
       ...theme('spacing'),
       none: 'none',
       xs: '20rem',
@@ -670,8 +669,7 @@ module.exports = {
       min: 'min-content',
       max: 'max-content',
       fit: 'fit-content',
-      prose: '65ch',
-      ...breakpoints(theme('screens'))
+      prose: '65ch'
     }),
     minHeight: ({ theme }) => ({
       ...theme('spacing'),

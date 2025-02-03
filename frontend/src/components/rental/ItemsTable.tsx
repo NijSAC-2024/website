@@ -55,7 +55,7 @@ export default function ItemsTable({ reservation, onAmountChange }: ItemsTablePr
   };
 
   return (
-    <div className="grid space-y-4">
+    <div className="grid gap-4">
       <Table>
         {reservation.items.length > 0 && (
           <TableHead>

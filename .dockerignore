@@ -1,0 +1,6 @@
+frontend/dist/
+frontend/node_modules/
+
+backend/.cargo
+backend/.env
+backend/target/
