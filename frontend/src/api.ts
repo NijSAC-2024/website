@@ -13,10 +13,11 @@ interface ApiResponse<T> {
   error?: errorType;
 }
 
-export async function apiFetch<T>(url: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
+async function apiFetchResponse(url: string, options: RequestInit = {}): Promise<ApiResponse<Response>> {
   try {
     const response = await fetch('/api' + url, {
       credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
       ...options
     });
 
@@ -37,8 +38,7 @@ export async function apiFetch<T>(url: string, options: RequestInit = {}): Promi
       return { error };
     }
 
-    const data: T = await response.json();
-    return { data };
+    return { data: response };
   } catch (error) {
     const networkError: errorType = {
       message: String(error),
@@ -48,4 +48,21 @@ export async function apiFetch<T>(url: string, options: RequestInit = {}): Promi
     enqueueSnackbar(networkError.message, { variant: 'error' });
     return { error: networkError };
   }
+}
+
+export async function apiFetch<T>(url: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
+  const { data, error } = await apiFetchResponse(url, options);
+  if (error || !data) {
+    return { error };
+  }
+  const content: T = await data.json();
+  return { data: content };
+}
+
+export async function apiFetchVoid(url: string, options: RequestInit = {}): Promise<ApiResponse<void>> {
+  const { data, error } = await apiFetchResponse(url, options);
+  if (error || !data) {
+    return { error };
+  }
+  return {};
 }

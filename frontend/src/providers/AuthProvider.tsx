@@ -30,7 +30,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   };
 
   const checkAuth = async () => {
-    const { error, data } = await apiFetch<UserType>('/api/whoami');
+    const { error, data } = await apiFetch<UserType>('/whoami');
 
     if (!error) {
       setUser(data);

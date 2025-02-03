@@ -20,6 +20,9 @@ RUN cargo build --release
 FROM debian:bookworm-slim AS final
 RUN apt-get update && apt-get install curl -y
 
+ARG version=development
+ENV VERSION=$version
+
 ARG user=nonroot
 ARG group=nonroot
 ARG uid=2000

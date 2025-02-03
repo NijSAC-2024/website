@@ -114,6 +114,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
+          build-args: "version=${{ env.tag }}"
           push: true
           tags: "ghcr.io/nijsac-2024/nijsac-website:${{ env.tag }}"
           cache-from: type=gha

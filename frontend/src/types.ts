@@ -105,7 +105,7 @@ export interface registrationsType {
   registrations: registrationType[];
 }
 
-export type MembershipStatus = 'pending' | 'member' | 'extraordinary' | ' non_member';
+export type MembershipStatus = 'pending' | 'member' | 'extraordinary' | 'non_member';
 
 export interface UserType {
   id: string;
