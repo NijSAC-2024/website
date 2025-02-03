@@ -6,6 +6,7 @@ export interface ValidateProps {
   onChange: (isValid: boolean) => void;
   // eslint-disable-next-line no-unused-vars
   setValue: (value: string) => void;
+  type?: string;
 }
 
 export type OptionType =

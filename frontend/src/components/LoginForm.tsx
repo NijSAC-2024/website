@@ -1,33 +1,56 @@
-import { useState, useRef } from 'react';
-import { Button } from '@mui/material';
-import ValidatedPassword from './ValidatedPassword.tsx';
+import React from 'react';
+import { Box, Button, FormControl, FormLabel, TextField } from '@mui/material';
 import { enqueueSnackbar } from 'notistack';
-import ValidatedTextField from './ValidatedTextField';
-import { emailValidator, noneValidator } from '../validator.ts';
 import { text } from '../util.ts';
-import { apiFetch } from '../api.ts';
+import { apiFetchVoid } from '../api.ts';
 
 interface LoginFormProps {
   onClose: () => void;
 }
 
 export default function LoginForm({ onClose }: LoginFormProps) {
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  const [emailError, setEmailError] = React.useState(false);
+  const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
+  const [passwordError, setPasswordError] = React.useState(false);
+  const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
 
-  const formValid = useRef({ email: false, password: false });
+  const validateInputs = () => {
+    const email = document.getElementById('email') as HTMLInputElement;
+    const password = document.getElementById('password') as HTMLInputElement;
 
-  const handleSubmit = async () => {
-    if (Object.values(formValid.current).some((isValid) => !isValid)) {
-      enqueueSnackbar('Please enter valid email and password.', {
-        variant: 'error'
-      });
+    let isValid = true;
+
+    if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
+      setEmailError(true);
+      setEmailErrorMessage('Please enter a valid email address.');
+      isValid = false;
+    } else {
+      setEmailError(false);
+      setEmailErrorMessage('');
+    }
+
+    if (!password.value || password.value.length < 5) {
+      setPasswordError(true);
+      setPasswordErrorMessage('Password must be at least 5 characters long.');
+      isValid = false;
+    } else {
+      setPasswordError(false);
+      setPasswordErrorMessage('');
+    }
+
+    return isValid;
+  };
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (emailError || passwordError) {
+      event.preventDefault();
       return;
     }
-    const { error } = await apiFetch<void>('/login', {
+    const data = new FormData(event.currentTarget);
+
+    const { error } = await apiFetchVoid('/login', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ email: data.get('email'), password: data.get('password') })
     });
 
     if (error) {
@@ -50,23 +73,42 @@ export default function LoginForm({ onClose }: LoginFormProps) {
     <>
       <div className="grid gap-4">
         <h1>{text('Login', 'Inloggen')}</h1>
-        <div className="grid gap-2.5">
-          <ValidatedTextField
-            label={'Email'}
-            validator={emailValidator}
-            onChange={(isValid) => (formValid.current.email = isValid)}
-            setValue={setEmail}
-          />
-          <ValidatedPassword
-            label={text('Password', 'Wachtwoord')}
-            validator={noneValidator}
-            onChange={(isValid) => (formValid.current.password = isValid)}
-            setValue={setPassword}
-          />
-        </div>
-        <Button variant="contained" onClick={handleSubmit}>
-          {text('Login', 'Inloggen')}
-        </Button>
+        <Box className="grid gap-2.5" component="form" onSubmit={handleSubmit}>
+          <FormControl>
+            <FormLabel htmlFor="email">Email</FormLabel>
+            <TextField
+              required
+              fullWidth
+              id="email"
+              placeholder="your@email.com"
+              name="email"
+              autoComplete="email"
+              variant="outlined"
+              error={emailError}
+              helperText={emailErrorMessage}
+              color={passwordError ? 'error' : 'primary'}
+            />
+          </FormControl>
+          <FormControl>
+            <FormLabel htmlFor="password">{text('Password', 'Wachtwoord')}</FormLabel>
+            <TextField
+              required
+              fullWidth
+              name="password"
+              placeholder="••••••"
+              type="password"
+              id="password"
+              autoComplete="new-password"
+              variant="outlined"
+              error={passwordError}
+              helperText={passwordErrorMessage}
+              color={passwordError ? 'error' : 'primary'}
+            />
+          </FormControl>
+          <Button variant="contained" type="submit" onClick={validateInputs}>
+            {text('Login', 'Inloggen')}
+          </Button>
+        </Box>
       </div>
     </>
   );

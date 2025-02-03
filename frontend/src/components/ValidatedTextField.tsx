@@ -6,7 +6,8 @@ export default function ValidatedTextField({
   label,
   validator,
   onChange,
-  setValue
+  setValue,
+  type
 }: ValidateProps) {
   const [error, setError] = useState<string | false>(false);
 
@@ -25,6 +26,7 @@ export default function ValidatedTextField({
       helperText={error || ''}
       fullWidth
       label={label}
+      type={type}
     />
   );
 }

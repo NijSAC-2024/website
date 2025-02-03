@@ -3,13 +3,13 @@ import { Button, Checkbox, FormControlLabel } from '@mui/material';
 import ValidatedPassword from '../ValidatedPassword.tsx';
 import { enqueueSnackbar } from 'notistack';
 import ValidatedTextField from '../ValidatedTextField.tsx';
-import { emailValidator, nameValidator, passwordValidator } from '../../validator.ts';
+import { nameValidator, noneValidator, passwordValidator } from '../../validator.ts';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import router from '../../router.tsx';
 import { text } from '../../util.ts';
-import { apiFetch } from '../../api.ts';
+import { apiFetchVoid } from '../../api.ts';
 
 const steps = ['Personal', 'Education', 'Financial', 'Emergency contact', 'Overview'];
 
@@ -41,9 +41,8 @@ export default function SignupForm() {
       return;
     }
 
-    const { error } = await apiFetch<void>('/register', {
+    const { error } = await apiFetchVoid('/register', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, firstName, lastName, password })
     });
 
@@ -92,9 +91,10 @@ export default function SignupForm() {
         />
         <ValidatedTextField
           label={text('Email', 'E-mail')}
-          validator={emailValidator}
+          validator={noneValidator}
           onChange={(isValid) => (formValid.current.email = isValid)}
           setValue={setEmail}
+          type="email"
         />
         <ValidatedPassword
           label={text('Password', 'Wachtwoord')}
