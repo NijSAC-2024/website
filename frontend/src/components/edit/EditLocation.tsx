@@ -2,21 +2,21 @@ import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import CircularProgress from '@mui/material/CircularProgress';
 import { Fragment, useState } from 'react';
-import { LocationTypeAPI } from '../../types.ts';
+import { Location } from '../../types.ts';
 import { text } from '../../util.ts';
 import { apiFetch } from '../../api.ts';
 import { enqueueSnackbar } from 'notistack';
 
 export default function EditLocation() {
   const [open, setOpen] = useState(false);
-  const [options, setOptions] = useState<LocationTypeAPI[]>([]);
+  const [options, setOptions] = useState<Location[]>([]);
   const [loading, setLoading] = useState(false);
 
   const handleOpen = async () => {
     setOpen(true);
 
     setLoading(true);
-    const { error, data } = await apiFetch<LocationTypeAPI[]>(
+    const { error, data } = await apiFetch<Location[]>(
       '/location?reusable=true&limit=2&offset=0',
       {
         method: 'GET',

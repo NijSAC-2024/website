@@ -2,7 +2,7 @@ use crate::{
     data_source::Count,
     error::{AppResult, Error},
     location::{Location, LocationContent, LocationId, UsedBy},
-    AppState, LocationFilter,
+    AppState, Language, LocationFilter,
 };
 use axum::{extract::FromRequestParts, http::request::Parts};
 use sqlx::PgPool;
@@ -44,11 +44,17 @@ impl From<PgLocation> for Location {
             created: pg.created,
             updated: pg.updated,
             content: LocationContent {
-                name_nl: pg.name_nl,
-                name_en: pg.name_en,
+                name: Language {
+                    en: pg.name_en,
+                    nl: pg.name_nl,
+                },
                 reusable: pg.reusable,
-                description_nl: pg.description_nl,
-                description_en: pg.description_en,
+                description: pg.description_en.map(|en| Language {
+                    en,
+                    nl: pg.description_nl.expect(
+                        "If a english description exists in the DB, there must also exist a dutch",
+                    ),
+                }),
             },
         }
     }
@@ -78,10 +84,10 @@ impl LocationStore {
             RETURNING *
             "#,
             id,
-            new.name_nl,
-            new.name_en,
-            new.description_nl,
-            new.description_en,
+            new.name.nl,
+            new.name.en,
+            new.description.as_ref().map(|d| d.nl.clone()),
+            new.description.map(|d| d.en),
             new.reusable
         )
             .fetch_one(&self.db)
@@ -104,10 +110,10 @@ impl LocationStore {
             RETURNING *
             "#,
             **id,
-            updated.name_nl,
-            updated.name_en,
-            updated.description_nl,
-            updated.description_en,
+            updated.name.nl,
+            updated.name.en,
+            updated.description.as_ref().map(|d| d.nl.clone()),
+            updated.description.map(|d| d.en),
             updated.reusable
         )
         .fetch_one(&self.db)

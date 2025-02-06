@@ -1,7 +1,7 @@
 import { Button, Dialog, DialogActions, DialogContent } from '@mui/material';
 import { text } from '../util.ts';
 import { useAuth } from '../providers/AuthProvider.tsx';
-import { LanguageType, QuestionType } from '../types.ts';
+import { Language, Question } from '../types.ts';
 import { useState } from 'react';
 import RegisterForm from './RegisterForm.tsx';
 import { useLanguage } from '../providers/LanguageProvider.tsx';
@@ -12,8 +12,8 @@ interface RegisterButtonProps {
   maxRegistrations?: number;
   registrationOpenTime: string;
   registrationCloseTime: string;
-  registrationQuestions: QuestionType[];
-  title: LanguageType;
+  registrationQuestions: Question[];
+  title: Language;
 }
 
 export default function RegisterButton({

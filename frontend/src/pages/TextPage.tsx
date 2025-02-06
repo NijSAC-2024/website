@@ -1,10 +1,10 @@
 import GenericPage from './GenericPage.tsx';
 import ContentCard from '../components/ContentCard.tsx';
 import MarkdownEditor from '../components/markdown/MarkdownEditor.tsx';
-import { LanguageType } from '../types.ts';
+import { Language } from '../types.ts';
 
 export default function TextPage() {
-  const handleMarkdown = (markdown: LanguageType) => {
+  const handleMarkdown = (markdown: Language) => {
     console.log(markdown);
   };
   return (

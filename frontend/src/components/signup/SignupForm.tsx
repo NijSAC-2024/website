@@ -59,7 +59,7 @@ export default function SignupForm() {
     }
 
     enqueueSnackbar(`Created account: ${firstName} ${lastName}`, { variant: 'success' });
-    await router.navigate('/');
+    await router.navigate();
   };
 
   return (

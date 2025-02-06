@@ -10,16 +10,16 @@ import {
   ListItemText,
   Toolbar
 } from '@mui/material';
-import router from '../../router.tsx';
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import { text } from '../../util.ts';
 import { MenuType } from '../../types.ts';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import { useAuth } from '../../providers/AuthProvider.tsx';
 import UserMenu from './UserMenu.tsx';
+import { StateContext } from '../../hooks/useState.ts';
 
 interface MobileMenuProps {
   handleLoginOpen: () => void;
@@ -32,6 +32,7 @@ export default function MobileMenu({
   dropdownOpen,
   toggleDropdown
 }: MobileMenuProps) {
+  const { navigate } = useContext(StateContext);
   const { isLoggedIn } = useAuth();
   const { setEnglish, setDutch } = useLanguage();
   const [openMenu, setOpenMenu] = useState<MenuType>(undefined);
@@ -44,11 +45,10 @@ export default function MobileMenu({
     }
   };
 
-  const navigateSubmenu = (address: string) => {
-    router
-      .navigate(address)
-      .then(toggleDropdown)
-      .then(() => setOpenMenu(undefined));
+  const navigateSubmenu = (page: string) => {
+    toggleDropdown();
+    setOpenMenu(undefined);
+    navigate(page);
   };
 
   return (
@@ -58,7 +58,12 @@ export default function MobileMenu({
           src={'/images/logo.svg'}
           alt="Logo"
           className="hover:opacity-50 hover:cursor-pointer h-24"
-          onClick={() => router.navigate('/').then(dropdownOpen ? toggleDropdown : null)}
+          onClick={() => {
+            if (dropdownOpen) {
+              toggleDropdown();
+            }
+            navigate('home');
+          }}
         />
         <IconButton size="large" color="inherit" onClick={toggleDropdown}>
           {dropdownOpen ? <CloseIcon fontSize="large" /> : <MenuIcon fontSize="large" />}
@@ -75,7 +80,7 @@ export default function MobileMenu({
             src={'/images/logo.svg'}
             alt="Logo"
             className="hover:opacity-50 hover:cursor-pointer h-24"
-            onClick={() => router.navigate('/').then(toggleDropdown)}
+            onClick={() => router.navigate().then(toggleDropdown)}
           />
           <IconButton size="large" color="inherit" onClick={toggleDropdown}>
             {dropdownOpen ? <CloseIcon fontSize="large" /> : <MenuIcon fontSize="large" />}
@@ -84,7 +89,7 @@ export default function MobileMenu({
         <List disablePadding>
           {/* Agenda */}
           <ListItem disablePadding>
-            <ListItemButton onClick={() => router.navigate('/agenda').then(toggleDropdown)}>
+            <ListItemButton onClick={() => router.navigate().then(toggleDropdown)}>
               <ListItemText primary={text('Agenda', 'Agenda')} className="uppercase px-10" />
             </ListItemButton>
           </ListItem>
@@ -355,7 +360,7 @@ export default function MobileMenu({
               <ListItem className="px-10 pb-3 pt-2" disablePadding>
                 <Button
                   variant="contained"
-                  onClick={() => router.navigate('/register').then(toggleDropdown)}
+                  onClick={() => router.navigate().then(toggleDropdown)}
                 >
                   {text('Become a member', 'Lid worden')}
                 </Button>

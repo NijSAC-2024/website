@@ -2,10 +2,10 @@ import { FormControl, InputLabel, MenuItem, Select, TextField, Button } from '@m
 import { text } from '../../util.ts';
 import {
   EventType,
-  OptionType,
-  LanguageType,
+  WeekendType,
+  Language,
   typesOptions,
-  CategoryType,
+  ActivityType,
   DateType
 } from '../../types.ts';
 import OptionSelector from '../OptionSelector.tsx';
@@ -14,17 +14,17 @@ import { ChangeEvent } from 'react';
 import EditDates from './EditDates.tsx';
 
 interface EditAgendaCardProps {
-  category: CategoryType;
+  category: ActivityType;
   image?: string;
-  type: OptionType[];
-  title: LanguageType;
+  type: WeekendType[];
+  title: Language;
   dates: DateType[];
   location: string;
   handleFieldChange: (
     // eslint-disable-next-line no-unused-vars
     name: keyof EventType,
     // eslint-disable-next-line no-unused-vars
-    value: LanguageType | string | OptionType[]
+    value: Language | string | WeekendType[]
   ) => void;
   // eslint-disable-next-line no-unused-vars
   handleDateChange: (index: number, startDate: boolean, value: string) => void;
@@ -87,7 +87,7 @@ export default function EditAgendaCard({
                 value={category}
                 label={text('Category*', 'Categorie*')}
                 variant="outlined"
-                onChange={(e) => handleFieldChange('category', e.target.value)}
+                onChange={(e) => handleFieldChange('activityType', e.target.value)}
               >
                 <MenuItem value="activity">{text('Activity', 'Activiteit')}</MenuItem>
                 <MenuItem value="course">{text('Course', 'Cursus')}</MenuItem>

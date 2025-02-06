@@ -6,12 +6,12 @@ import { TabContext, TabList, TabPanel } from '@mui/lab';
 import MarkdownEditorToolbar from './MarkdownEditorToolbar.tsx';
 import { text } from '../../util.ts';
 import remarkGfm from 'remark-gfm';
-import { LanguageType } from '../../types.ts';
+import { Language } from '../../types.ts';
 
 interface MarkdownEditorProps {
-  initialMarkdown?: LanguageType;
+  initialMarkdown?: Language;
   // eslint-disable-next-line no-unused-vars
-  handleMarkdown: (markdown: LanguageType) => void;
+  handleMarkdown: (markdown: Language) => void;
 }
 
 export default function MarkdownEditor({
@@ -19,7 +19,7 @@ export default function MarkdownEditor({
   handleMarkdown
 }: MarkdownEditorProps) {
   const [value, setValue] = useState('1');
-  const [markdownContent, setMarkdownContent] = useState<LanguageType>(initialMarkdown);
+  const [markdownContent, setMarkdownContent] = useState<Language>(initialMarkdown);
 
   const textareaRef = useRef<{ en: HTMLTextAreaElement | null; nl: HTMLTextAreaElement | null }>({
     en: null,

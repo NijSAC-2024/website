@@ -3,7 +3,7 @@ import moment from 'moment/moment';
 import SaveIcon from '@mui/icons-material/Save';
 import { text } from '../../util.ts';
 import SaveAsIcon from '@mui/icons-material/SaveAs';
-import { CategoryType, LanguageType } from '../../types.ts';
+import { ActivityType, Language } from '../../types.ts';
 import { useState } from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
@@ -11,12 +11,11 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AreYouSure from '../AreYouSure.tsx';
 
 interface SaveButtonProps {
-  title: LanguageType;
+  title: Language;
   location: string;
-  category: CategoryType;
+  category: ActivityType;
   startDateTime: string;
   endDateTime: string;
-  // eslint-disable-next-line no-unused-vars
   handleSave: (isPublished: boolean) => void;
 }
 

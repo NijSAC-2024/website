@@ -60,21 +60,21 @@ create table location
 create table activity --Activity base
 (
     id                         uuid primary key,
-    location_id                uuid        not null references location (id),
-    name_nl                    text        not null,
-    name_en                    text        not null,
+    location_id                uuid                not null references location (id),
+    name_nl                    text                not null,
+    name_en                    text                not null,
     image                      uuid references file (id),
     description_nl             text,
-    description_en             text,                 -- location also has its own description
-    registration_start         timestamptz not null,
-    registration_end           timestamptz not null,
-    registration_max           integer     not null,
-    waiting_list_max           integer     not null,
-    is_published               boolean     not null default true,
+    description_en             text,                         -- location also has its own description
+    registration_start         timestamptz         not null,
+    registration_end           timestamptz         not null,
+    registration_max           integer             not null,
+    waiting_list_max           integer             not null,
+    is_published               boolean             not null default true,
     -- Courses only members, climbing activities only extraordinary, activities only donors, some for all
     -- Null means that everyone, also externals can participate
-    required_membership_status membership_status[]  default '{"member"}',
-    activity_type              text        not null,
+    required_membership_status membership_status[] not null default '{"member"}',
+    activity_type              text                not null,
     -- example scheme:
     -- [
     --   {
@@ -85,13 +85,13 @@ create table activity --Activity base
     --     "required": false
     --   }
     -- ]
-    questions                  jsonb       not null, -- if no questions are asked, use an empty array
+    questions                  jsonb               not null, -- if no questions are asked, use an empty array
     -- example scheme:
     -- { "weekendType": "singlePitch" }
-    metadata                   jsonb       not null, -- if no metadata is given, use an empty object
-    created_by                 uuid        not null references "user" (id),
-    created                    timestamptz not null,
-    updated                    timestamptz not null
+    metadata                   jsonb               not null, -- if no metadata is given, use an empty object
+    created_by                 uuid                not null references "user" (id),
+    created                    timestamptz         not null,
+    updated                    timestamptz         not null
 );
 
 create table date

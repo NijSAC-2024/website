@@ -1,3 +1,4 @@
+import React from 'react';
 import ContentCard from '../ContentCard.tsx';
 import { text } from '../../util.ts';
 import { Table, TableBody, TableCell, TableRow } from '@mui/material';
@@ -7,6 +8,7 @@ import { registrationsType } from '../../types.ts';
 interface RegistrationsCardProps {
   allowsRegistrations: boolean;
 }
+
 export default function RegistrationsCard({ allowsRegistrations }: RegistrationsCardProps) {
   const { isLoggedIn } = useAuth();
 

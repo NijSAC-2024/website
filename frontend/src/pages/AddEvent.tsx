@@ -5,7 +5,7 @@ import EditEvent from '../components/edit/EditEvent.tsx';
 export default function AddEvent() {
   const handleUpdate = (updatedEvent: EventType) => {
     //Send to backend
-    router.navigate('/agenda/' + updatedEvent.id);
+    router.navigate();
   };
 
   const now = new Date();
@@ -17,7 +17,7 @@ export default function AddEvent() {
     requiredMembershipStatus: ['member'],
     id: '5',
     title: { en: '', nl: '' },
-    category: '',
+    activityType: '',
     type: [],
     location: '',
     descriptionMarkdown: {
@@ -36,5 +36,5 @@ export default function AddEvent() {
     registrationCloseTime: now.toISOString(),
     registrationQuestions: []
   };
-  return <EditEvent event={event} handleUpdate={handleUpdate} />;
+  return <EditEvent activityContent={event} handleUpdate={handleUpdate} />;
 }

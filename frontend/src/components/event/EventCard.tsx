@@ -77,7 +77,7 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
   return (
     <div className="w-full rounded-2xl bg-inherit border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] flex flex-col relative justify-between">
       <div
-        onClick={() => router.navigate('/agenda/' + event.id)}
+        onClick={() => router.navigate()}
         className={agendaPage ? 'hover:cursor-pointer' : ''}
       >
         <Chip
@@ -98,7 +98,7 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
           <div className="flex justify-between">
             <div className="flex flex-wrap gap-1">
               <Chip
-                label={text(getLabel(event.category))}
+                label={text(getLabel(event.activityType))}
                 className="uppercase font-semibold"
                 size="small"
               />
@@ -127,7 +127,7 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
           ) : (
             event.dates.length > 1 && (
               <>
-                <b>{text(getLabel(event.category)) + text(' dates:', ' datums:')}</b>
+                <b>{text(getLabel(event.activityType)) + text(' dates:', ' datums:')}</b>
                 {event.dates.map((date, index) => (
                   <p key={index}>{formatDate(date.startDateTime, date.endDateTime)}</p>
                 ))}

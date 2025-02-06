@@ -1,7 +1,7 @@
+import React, { useEffect } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { useThemeMode } from './providers/ThemeProvider.tsx';
-import { RouterProvider } from 'react-router-dom';
 import { SnackbarProvider } from 'notistack';
 import Success from './components/alerts/Success.tsx';
 import Error from './components/alerts/Error.tsx';
@@ -9,11 +9,12 @@ import Warning from './components/alerts/Warning.tsx';
 import Info from './components/alerts/Info.tsx';
 import MainMenu from './components/menu/MainMenu.tsx';
 
-import router from './router.tsx';
-import { useEffect } from 'react';
 import { useLanguage } from './providers/LanguageProvider.tsx';
+import useInternalState, { StateContext } from './hooks/useState.ts';
+import { parseLocation } from './hooks/useRouter.ts';
 
-export default function App() {
+export default function App(): React.ReactElement {
+  const { state, navigate } = useInternalState();
   const { isDarkMode, toggleTheme } = useThemeMode();
   const language = useLanguage();
 
@@ -92,22 +93,50 @@ export default function App() {
     });
   }
 
+  useEffect(() => {
+
+    // Listen to browser back and forward buttons
+    window.addEventListener('popstate', (event) => {
+      if (event.state && event.state.route !== window.location.pathname) {
+        navigate(event.state.route.name, event.state.route.params);
+      }
+    });
+
+  }, []);
+
+  useEffect(() => {
+
+    // Update route on page load
+    try {
+      const newRoute = parseLocation(window.location);
+      if (state.route.name !== newRoute.name || state.route.params !== newRoute.params) {
+        if (newRoute) {
+          navigate(newRoute.name, newRoute.params);
+        }
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      navigate('home_not_found');
+    }
+  }, []);
+
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <MainMenu />
-      <RouterProvider router={router} />
-      <SnackbarProvider
-        maxSnack={3}
-        autoHideDuration={5000}
-        preventDuplicate
-        Components={{
-          success: Success,
-          error: Error,
-          warning: Warning,
-          info: Info
-        }}
-      />
+      <StateContext.Provider value={{ state, navigate }}>
+        <SnackbarProvider
+          maxSnack={3}
+          autoHideDuration={5000}
+          preventDuplicate
+          Components={{
+            success: Success,
+            error: Error,
+            warning: Warning,
+            info: Info
+          }}
+        />
+      </StateContext.Provider>
     </ThemeProvider>
   );
 }

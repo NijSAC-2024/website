@@ -1,19 +1,30 @@
-import globals from 'globals';
-import pluginJs from '@eslint/js';
+import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
-import pluginReact from 'eslint-plugin-react';
 
-export default [
-  { files: ['**/*.{ts,tsx}'] },
-  { languageOptions: { globals: globals.browser } },
-  pluginJs.configs.recommended,
+export default tseslint.config(
+  eslint.configs.recommended,
   ...tseslint.configs.recommended,
-  pluginReact.configs.flat.recommended,
   {
+    plugins: {
+      'typescript-eslint': tseslint.plugin,
+    },
+    languageOptions: {
+      parserOptions: {
+        parser: tseslint.parser,
+        project: './tsconfig.json',
+        extraFileExtensions: ['.vue'],
+        sourceType: 'module',
+      },
+    },
     rules: {
-      'no-unused-vars': 'warn',
-      'no-undef': 'warn',
-      'react/react-in-jsx-scope': 'off'
+      indent: [
+        "error",
+        2
+      ],
+      quotes: [
+        "error",
+        "single"
+      ]
     }
-  }
-];
+  },
+);

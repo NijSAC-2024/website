@@ -1,5 +1,5 @@
 import { IconButton, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import { LanguageType, rentOptions, ReservationItemType, ReservationType } from '../../types';
+import { Language, rentOptions, ReservationItemType, ReservationType } from '../../types';
 import { text } from '../../util';
 import RemoveIcon from '@mui/icons-material/Remove';
 import AddIcon from '@mui/icons-material/Add';
@@ -12,12 +12,12 @@ interface ItemsTableProps {
 }
 
 export default function ItemsTable({ reservation, onAmountChange }: ItemsTableProps) {
-  const findRemark = (itemName: LanguageType): LanguageType => {
+  const findRemark = (itemName: Language): Language => {
     const rentOption = rentOptions.find((option) => option.name.en === itemName.en);
     return rentOption?.remark || { en: '', nl: '' };
   };
 
-  const findInterval = (remark?: { en: string; nl: string }): LanguageType => {
+  const findInterval = (remark?: { en: string; nl: string }): Language => {
     if (remark?.en.includes('per month after 1 month')) {
       return { en: 'month', nl: 'maand' };
     } else if (remark?.en.includes('per month')) {

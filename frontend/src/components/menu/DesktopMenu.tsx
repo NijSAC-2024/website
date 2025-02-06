@@ -1,4 +1,4 @@
-import router from '../../router.tsx';
+import React, { useContext } from 'react';
 import { Button, Menu, MenuItem, Toolbar } from '@mui/material';
 import { text } from '../../util.ts';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -7,12 +7,15 @@ import { useAuth } from '../../providers/AuthProvider.tsx';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import { MouseEvent, useState } from 'react';
 import { MenuType } from '../../types.ts';
+import { StateContext } from '../../hooks/useState.ts';
+import Link from '../Link.tsx';
 
 interface DesktopMenuProps {
   handleLoginOpen: () => void;
 }
 
 export default function DesktopMenu({ handleLoginOpen }: DesktopMenuProps) {
+  const { navigate } = useContext(StateContext);
   const { isLoggedIn } = useAuth();
   const { setEnglish, setDutch } = useLanguage();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | undefined>(undefined);
@@ -28,20 +31,21 @@ export default function DesktopMenu({ handleLoginOpen }: DesktopMenuProps) {
     setOpenMenu(undefined);
   };
 
-  const navigateSubmenu = (address: string) => {
-    router.navigate(address).then(handleMenuClose);
+  const navigateSubmenu = (page: string) => {
+    navigate(page)
+    handleMenuClose();
   };
 
   return (
     <Toolbar className="flex justify-between w-[80%] max-w-[1000px] mx-auto">
       <div className="flex items-center">
-        <img
+        <Link routeName={'home'}><img
           src={'/images/logo.svg'}
           alt="Logo"
           className="hover:opacity-50 hover:cursor-pointer h-24 mr-4"
-          onClick={() => router.navigate('/')}
         />
-        <Button color="inherit" onClick={() => router.navigate('/agenda')}>
+        </Link>
+        <Button color="inherit" onClick={() => router.navigate()}>
           {text('Agenda', 'Agenda')}
         </Button>
 
@@ -140,7 +144,7 @@ export default function DesktopMenu({ handleLoginOpen }: DesktopMenuProps) {
             <Button color="inherit" onClick={handleLoginOpen}>
               {text('Login', 'Inloggen')}
             </Button>
-            <Button variant="contained" onClick={() => router.navigate('/register')}>
+            <Button variant="contained" onClick={() => router.navigate()}>
               {text('Become a member', 'Lid worden')}
             </Button>
           </>

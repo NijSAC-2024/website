@@ -1,4 +1,4 @@
-import { LanguageType, QuestionType } from '../types.ts';
+import { Language, Question } from '../types.ts';
 import { text } from '../util.ts';
 import { Button, TextField } from '@mui/material';
 import AccessAlarmIcon from '@mui/icons-material/AccessAlarm';
@@ -6,8 +6,8 @@ import { useLanguage } from '../providers/LanguageProvider.tsx';
 import moment from 'moment';
 
 interface RegisterFormProps {
-  registrationQuestions: QuestionType[];
-  title: LanguageType;
+  registrationQuestions: Question[];
+  title: Language;
   registrationCloseTime: string;
 }
 

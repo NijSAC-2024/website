@@ -1,12 +1,10 @@
 use crate::{
-    activity::{
-        Activity, ActivityContent, Answer, Hydrated, IdOnly, NewRegistration, Question,
-        Registration,
-    },
+    activity::{Activity, ActivityContent, Answer, Date, NewRegistration, Question, Registration},
     api::{ApiResult, ValidatedJson},
     auth::{role::Role, session::Session},
     data_source::activity::ActivityStore,
     error::{AppResult, Error},
+    location::{Location, LocationId},
     user::UserId,
     wire::activity::ActivityId,
 };
@@ -72,7 +70,7 @@ pub async fn get_activity(
     store: ActivityStore,
     Path(id): Path<ActivityId>,
     session: Option<Session>,
-) -> ApiResult<Activity<Hydrated>> {
+) -> ApiResult<Activity<Location>> {
     if let Some(session) = session {
         if update_all_full_activity_access(&session).is_ok() {
             return Ok(Json(store.get_activity_hydrated(&id, true).await?));
@@ -86,7 +84,7 @@ pub async fn get_activity(
 pub async fn get_activities(
     store: ActivityStore,
     session: Option<Session>,
-) -> ApiResult<Vec<Activity<Hydrated>>> {
+) -> ApiResult<Vec<Activity<Location>>> {
     if let Some(session) = session {
         if update_all_full_activity_access(&session).is_ok() {
             return Ok(Json(store.get_activities(true).await?));
@@ -98,8 +96,8 @@ pub async fn get_activities(
 pub async fn create_activity(
     store: ActivityStore,
     session: Session,
-    ValidatedJson(new): ValidatedJson<ActivityContent<IdOnly>>,
-) -> ApiResult<Activity<Hydrated>> {
+    ValidatedJson(new): ValidatedJson<ActivityContent<LocationId>>,
+) -> ApiResult<Activity<Location>> {
     update_all_full_activity_access(&session)?;
     Ok(Json(store.new_activity(new, session.user_id()).await?))
 }
@@ -108,8 +106,8 @@ pub async fn update_activity(
     store: ActivityStore,
     session: Session,
     Path(id): Path<ActivityId>,
-    ValidatedJson(updated): ValidatedJson<ActivityContent<IdOnly>>,
-) -> ApiResult<Activity<Hydrated>> {
+    ValidatedJson(updated): ValidatedJson<ActivityContent<LocationId>>,
+) -> ApiResult<Activity<Location>> {
     update_all_full_activity_access(&session)?;
     Ok(Json(store.update_activity(&id, updated).await?))
 }
@@ -142,11 +140,19 @@ pub async fn create_registration(
 
     let activity = store.get_activity_hydrated(&activity_id, true).await?;
     if update_all_full_activity_access(&session).is_err()
-        && activity.content.registration_end < OffsetDateTime::now_utc()
+        && activity.content.registration_period.is_none()
     {
-        Err(Error::BadRequest(
-            "Registration deadline has already passed",
-        ))?
+        Err(Error::BadRequest("Registrations are not open"))?
+    }
+
+    if update_all_full_activity_access(&session).is_err() {
+        if let Some(Date { end, .. }) = activity.content.registration_period {
+            if end < OffsetDateTime::now_utc() {
+                Err(Error::BadRequest(
+                    "Registration deadline has already passed",
+                ))?
+            }
+        }
     }
 
     ensure_correct_waiting_list_position(&activity, &mut new, &session, None)?;
@@ -207,7 +213,7 @@ fn check_required_questions_answered(questions: &[Question], answers: &[Answer])
 /// Depending on access rights, it allows overwriting the waiting list position
 /// Additionally, it ensures that only valid positions are accepted.
 fn ensure_correct_waiting_list_position(
-    activity: &Activity<Hydrated>,
+    activity: &Activity<Location>,
     new_registration: &mut NewRegistration,
     session: &Session,
     current_registration: Option<&Registration>,

@@ -4,12 +4,12 @@ import { getLabel, text } from '../../util.ts';
 import { Chip } from '@mui/material';
 import ContentCard from '../ContentCard.tsx';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
-import { LanguageType, OptionType } from '../../types.ts';
+import { Language, WeekendType } from '../../types.ts';
 
 interface DescriptionCardProps {
-  descriptionMarkdown: LanguageType;
-  gear: LanguageType;
-  experience: OptionType[];
+  descriptionMarkdown: Language;
+  gear: Language;
+  experience: WeekendType[];
 }
 export default function DescriptionCard({
   descriptionMarkdown,

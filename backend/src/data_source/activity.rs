@@ -1,16 +1,15 @@
 use crate::{
     error::Error,
     wire::activity::{Activity, ActivityContent, ActivityId},
-    AppState,
+    AppState, Language,
 };
 
 use crate::{
-    activity::{Date, Hydrated, NewRegistration, Registration},
+    activity::{Date, NewRegistration, Registration},
     auth::role::MembershipStatus,
     error::AppResult,
-    location::{Location, LocationContent},
+    location::{Location, LocationContent, LocationId},
     user::{BasicUser, UserId},
-    wire::activity::IdOnly,
 };
 use axum::{extract::FromRequestParts, http::request::Parts};
 use sqlx::{Executor, PgConnection, PgPool, Postgres};
@@ -53,12 +52,12 @@ struct PgActivity {
     description_en: Option<String>,
     start: Option<Vec<OffsetDateTime>>,
     end: Option<Vec<OffsetDateTime>>,
-    registration_start: OffsetDateTime,
-    registration_end: OffsetDateTime,
+    registration_start: Option<OffsetDateTime>,
+    registration_end: Option<OffsetDateTime>,
     registration_max: Option<i32>,
     waiting_list_max: Option<i32>,
     is_published: bool,
-    required_membership_status: Option<Vec<MembershipStatus>>,
+    required_membership_status: Vec<MembershipStatus>,
     activity_type: String,
     questions: serde_json::Value,
     metadata: serde_json::Value,
@@ -68,34 +67,36 @@ struct PgActivity {
     updated: OffsetDateTime,
 }
 
-impl TryFrom<PgActivity> for Hydrated {
+impl TryFrom<PgActivity> for Location {
     type Error = Error;
 
     fn try_from(pg: PgActivity) -> Result<Self, Self::Error> {
-        Ok(Self {
-            location: Location {
-                id: pg.location_id.into(),
-                created: pg.location_created,
-                updated: pg.location_updated,
-                content: LocationContent {
-                    name_nl: pg.location_name_nl,
-                    name_en: pg.location_name_en,
-                    reusable: pg.location_reusable,
-                    description_nl: pg.location_description_nl,
-                    description_en: pg.location_description_en,
+        Ok(Location {
+            id: pg.location_id.into(),
+            created: pg.location_created,
+            updated: pg.location_updated,
+            content: LocationContent {
+                name: Language {
+                    en: pg.location_name_en,
+                    nl: pg.location_name_nl,
                 },
+                reusable: pg.location_reusable,
+                description: pg.location_description_en.map(|en| Language {
+                    en,
+                    nl: pg.location_description_nl.expect(
+                        "If a english description exists in the DB, there must also exist a dutch",
+                    ),
+                }),
             },
         })
     }
 }
 
-impl TryFrom<PgActivity> for IdOnly {
+impl TryFrom<PgActivity> for LocationId {
     type Error = Error;
 
     fn try_from(pg: PgActivity) -> Result<Self, Self::Error> {
-        Ok(Self {
-            location_id: pg.location_id.into(),
-        })
+        Ok(pg.location_id.into())
     }
 }
 
@@ -107,7 +108,7 @@ where
     type Error = Error;
 
     fn try_from(pg: PgActivity) -> Result<Self, Self::Error> {
-        let details = TryFrom::try_from(pg.clone())?;
+        let location = TryFrom::try_from(pg.clone())?;
 
         let dates = if let Some(start) = pg.start {
             start
@@ -128,13 +129,18 @@ where
             registration_count: pg.registration_count,
             waiting_list_count: pg.waiting_list_count,
             content: ActivityContent {
-                name_nl: pg.name_nl,
-                name_en: pg.name_en,
+                name: Language {
+                    en: pg.name_en,
+                    nl: pg.name_nl,
+                },
                 image: pg.image.map(Into::into),
-                description_nl: pg.description_nl,
-                description_en: pg.description_en,
-                registration_start: pg.registration_start,
-                registration_end: pg.registration_end,
+                description: pg.description_en.map(|en| Language {
+                    en,
+                    nl: pg.description_nl.expect(
+                        "If a english description exists in the DB, there must also exist a dutch",
+                    ),
+                }),
+                registration_period: pg.registration_start.map(|start| Date { start, end: pg.registration_end.expect("If a registration start exists in the DB, there must also be an registration end") }),
                 registration_max: pg.registration_max,
                 waiting_list_max: pg.waiting_list_max,
                 is_published: pg.is_published,
@@ -143,7 +149,7 @@ where
                 dates,
                 questions: serde_json::from_value(pg.questions)?,
                 metadata: pg.metadata,
-                details,
+                location
             },
         })
     }
@@ -184,9 +190,9 @@ impl TryFrom<PgRegistration> for Registration {
 impl ActivityStore {
     pub async fn new_activity(
         &self,
-        activity: ActivityContent<IdOnly>,
+        activity: ActivityContent<LocationId>,
         created_by: &UserId,
-    ) -> AppResult<Activity<Hydrated>> {
+    ) -> AppResult<Activity<Location>> {
         let activity_id = Uuid::now_v7();
 
         let mut tx = self.db.begin().await?;
@@ -216,18 +222,18 @@ impl ActivityStore {
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13::membership_status[], $14, $15, $16, $17, now(), now())
             "#,
             activity_id,
-            *activity.details.location_id,
-            activity.name_nl,
-            activity.name_en,
+            *activity.location,
+            activity.name.nl,
+            activity.name.en,
             activity.image.map(|id|*id),
-            activity.description_nl,
-            activity.description_en,
-            activity.registration_start,
-            activity.registration_end,
+            activity.description.as_ref().map(|l| l.nl.clone()),
+            activity.description.map(|l| l.en),
+            activity.registration_period.as_ref().map(|r| r.start),
+            activity.registration_period.as_ref().map(|r| r.end),
             activity.registration_max,
             activity.waiting_list_max,
             activity.is_published,
-            activity.required_membership_status as Option<Vec<MembershipStatus>>,
+            activity.required_membership_status as Vec<MembershipStatus>,
             Into::<&str>::into(activity.activity_type),
             serde_json::to_value(activity.questions)?,
             activity.metadata,
@@ -249,7 +255,7 @@ impl ActivityStore {
         &self,
         id: &ActivityId,
         display_hidden: bool,
-    ) -> AppResult<Activity<Hydrated>> {
+    ) -> AppResult<Activity<Location>> {
         Self::get_activity(&self.db, id, display_hidden).await
     }
 
@@ -257,7 +263,7 @@ impl ActivityStore {
         db: E,
         id: &ActivityId,
         display_hidden: bool,
-    ) -> AppResult<Activity<Hydrated>>
+    ) -> AppResult<Activity<Location>>
     where
         E: Executor<'c, Database = Postgres>,
     {
@@ -309,7 +315,7 @@ impl ActivityStore {
             .try_into()
     }
 
-    pub async fn get_activities(&self, display_hidden: bool) -> AppResult<Vec<Activity<Hydrated>>> {
+    pub async fn get_activities(&self, display_hidden: bool) -> AppResult<Vec<Activity<Location>>> {
         sqlx::query_as!(
             PgActivity,
             r#"
@@ -361,8 +367,8 @@ impl ActivityStore {
     pub async fn update_activity(
         &self,
         id: &ActivityId,
-        updated: ActivityContent<IdOnly>,
-    ) -> AppResult<Activity<Hydrated>> {
+        updated: ActivityContent<LocationId>,
+    ) -> AppResult<Activity<Location>> {
         let mut tx = self.db.begin().await?;
 
         sqlx::query!(
@@ -387,18 +393,18 @@ impl ActivityStore {
             WHERE id = $1
             "#,
             **id,
-            *updated.details.location_id,
-            updated.name_nl,
-            updated.name_en,
+            *updated.location,
+            updated.name.nl,
+            updated.name.en,
             updated.image.map(|id| *id),
-            updated.description_nl,
-            updated.description_en,
-            updated.registration_start,
-            updated.registration_end,
+            updated.description.as_ref().map(|l| l.nl.clone()),
+            updated.description.map(|l| l.en),
+            updated.registration_period.as_ref().map(|r| r.start),
+            updated.registration_period.as_ref().map(|r| r.end),
             updated.registration_max,
             updated.waiting_list_max,
             updated.is_published,
-            updated.required_membership_status as Option<Vec<MembershipStatus>>,
+            updated.required_membership_status as Vec<MembershipStatus>,
             Into::<&str>::into(updated.activity_type),
             serde_json::to_value(updated.questions)?,
             updated.metadata,
@@ -509,7 +515,7 @@ impl ActivityStore {
                 pos
             ).execute(&mut *tx).await?;
             Ok(Some(pos))
-        }else {
+        } else {
             Ok(None)
         }
     }

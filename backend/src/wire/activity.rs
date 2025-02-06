@@ -1,7 +1,4 @@
-use crate::{
-    auth::role::MembershipStatus, error::Error, file::FileId, location::LocationId,
-    user::BasicUser, wire::location::Location,
-};
+use crate::{auth::role::MembershipStatus, error::Error, file::FileId, user::BasicUser, Language};
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 use std::{borrow::Cow, ops::Deref, str::FromStr};
@@ -53,11 +50,9 @@ impl FromStr for ActivityType {
             "course" => ActivityType::Course,
             "weekend" => ActivityType::Weekend,
             "training" => ActivityType::Training,
-            _ => {
-                return Err(Error::Other(format!(
-                    "Invalid activity type {s}: Must be one of activity, course, or weekend"
-                )))
-            }
+            _ => return Err(Error::Other(format!(
+                "Invalid activity type {s}: Must be one of activity, course, weekend, or training"
+            ))),
         })
     }
 }
@@ -84,49 +79,26 @@ where
 #[skip_serializing_none]
 #[derive(Serialize, Deserialize, Debug, Validate)]
 #[serde(rename_all = "camelCase")]
-#[validate(schema(function = "validate_activity"))]
-pub struct ActivityContent<T>
-where
-    T: Validate,
-{
-    #[validate(length(min = 1, max = 100))]
-    pub name_nl: String,
-    #[validate(length(min = 1, max = 100))]
-    pub name_en: String,
+pub struct ActivityContent<T> {
+    #[validate(nested)]
+    pub name: Language,
     pub image: Option<FileId>,
-    #[validate(length(min = 1, max = 50000))]
-    pub description_nl: Option<String>,
-    #[validate(length(min = 1, max = 50000))]
-    pub description_en: Option<String>,
+    #[validate(nested)]
+    pub description: Option<Language>,
     #[validate(nested)]
     pub dates: Vec<Date>,
-    #[serde(with = "time::serde::rfc3339")]
-    pub registration_start: OffsetDateTime,
-    #[serde(with = "time::serde::rfc3339")]
-    pub registration_end: OffsetDateTime,
+    pub registration_period: Option<Date>,
     #[validate(range(min = 0, max = 999, message = "Maximum registrations is 999"))]
     pub registration_max: Option<i32>,
     #[validate(range(min = 0, max = 999, message = "Maximum waiting list is 999"))]
     pub waiting_list_max: Option<i32>,
     pub is_published: bool,
-    pub required_membership_status: Option<Vec<MembershipStatus>>,
+    pub required_membership_status: Vec<MembershipStatus>,
     pub activity_type: ActivityType,
+    #[validate[nested]]
     pub questions: Vec<Question>,
     pub metadata: serde_json::Value,
-    #[serde(flatten)]
-    #[validate(nested)]
-    pub(crate) details: T,
-}
-#[derive(Serialize, Debug, Validate)]
-#[serde(rename_all = "camelCase")]
-pub struct Hydrated {
-    pub location: Location,
-}
-
-#[derive(Serialize, Deserialize, Debug, Validate)]
-#[serde(rename_all = "camelCase")]
-pub struct IdOnly {
-    pub location_id: LocationId,
+    pub location: T,
 }
 
 #[derive(Serialize, Deserialize, Debug, Validate)]
@@ -142,16 +114,6 @@ pub struct Date {
 fn validate_date(activity: &Date) -> Result<(), ValidationError> {
     if activity.start > activity.end {
         Err(ValidationError::new("date").with_message(Cow::Borrowed("Start cannot be after end")))
-    } else {
-        Ok(())
-    }
-}
-
-fn validate_activity<T: Validate>(activity: &ActivityContent<T>) -> Result<(), ValidationError> {
-    if activity.registration_start > activity.registration_end {
-        Err(ValidationError::new("date").with_message(Cow::Borrowed(
-            "registration start cannot be later than registration end",
-        )))
     } else {
         Ok(())
     }
@@ -187,12 +149,12 @@ pub struct Answer {
     pub answer: String,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct Question {
     pub id: Uuid,
-    pub question_nl: String,
-    pub question_en: String,
+    #[validate(nested)]
+    pub question: Language,
     pub question_type: QuestionType,
     pub required: bool,
 }

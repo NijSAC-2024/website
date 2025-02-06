@@ -2,18 +2,16 @@ import MarkdownEditor from '../markdown/MarkdownEditor.tsx';
 import { TextField } from '@mui/material';
 import { text } from '../../util.ts';
 import OptionSelector from '../OptionSelector.tsx';
-import { EventType, experienceOptions, LanguageType, OptionType } from '../../types.ts';
+import { Activity, experienceOptions, Language, WeekendType } from '../../types.ts';
 import ContentCard from '../ContentCard.tsx';
 
 interface EditDescriptionProps {
-  descriptionMarkdown: LanguageType;
-  gear: LanguageType;
-  experience: OptionType[];
+  descriptionMarkdown: Language;
+  gear: Language;
+  experience: WeekendType[];
   handleFieldChange: (
-    // eslint-disable-next-line no-unused-vars
-    name: keyof EventType,
-    // eslint-disable-next-line no-unused-vars
-    value: LanguageType | string | OptionType[]
+    name: keyof Activity,
+    value: Language | string | WeekendType[]
   ) => void;
 }
 export default function EditDescription({
@@ -22,8 +20,8 @@ export default function EditDescription({
   experience,
   handleFieldChange
 }: EditDescriptionProps) {
-  const handleMarkdown = (markdown: LanguageType) => {
-    handleFieldChange('descriptionMarkdown', markdown);
+  const handleMarkdown = (markdown: Language) => {
+    handleFieldChange('description', markdown);
   };
 
   return (
@@ -40,7 +38,7 @@ export default function EditDescription({
           fullWidth
           value={gear.en}
           label={text('Necessary Gear English ', 'Benodigde Uitrusting Engels')}
-          placeholder={text('Separated by commas', "Gescheiden door komma's")}
+          placeholder={text('Separated by commas', 'Gescheiden door komma\'s')}
           onChange={(e) => handleFieldChange('gear', { ...gear, en: e.target.value })}
         />
         <TextField
@@ -48,7 +46,7 @@ export default function EditDescription({
           fullWidth
           value={gear.nl}
           label={text('Necessary Gear Dutch', 'Benodigde Uitrusting Nederlands')}
-          placeholder={text('Separated by commas', "Gescheiden door komma's")}
+          placeholder={text('Separated by commas', 'Gescheiden door komma\'s')}
           onChange={(e) => handleFieldChange('gear', { ...gear, nl: e.target.value })}
         />
         <div className="xl:col-span-2 grid">

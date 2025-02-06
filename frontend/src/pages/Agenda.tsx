@@ -1,25 +1,26 @@
+import React, { useState } from 'react';
 import GenericPage from './GenericPage.tsx';
 import ContentCard from '../components/ContentCard.tsx';
 import EventCard from '../components/event/EventCard.tsx';
 import { text } from '../util.ts';
-import { useState } from 'react';
-import { EventType, CategoryType, OptionType } from '../types.ts';
+import { Activity, ActivityType, WeekendType } from '../types.ts';
 import { Fab, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import router from '../router.tsx';
 import moment from 'moment/moment';
+import useInternalState from '../hooks/useState.ts';
 
 export default function Agenda() {
-  const [selectedCategory, setSelectedCategory] = useState<CategoryType | 'all'>('all');
-  const [selectedType, setSelectedType] = useState<OptionType | 'all'>('all');
+  const { state, navigate } = useInternalState();
+  const [selectedCategory, setSelectedCategory] = useState<ActivityType | 'all'>('all');
+  const [selectedType, setSelectedType] = useState<WeekendType | 'all'>('all');
 
-  const exampleAPIResponse: EventType[] = [
+  const exampleAPIResponse: Activity[] = [
     {
       id: '5',
       image:
         'https://images.squarespace-cdn.com/content/v1/531722ebe4b01396b755c991/1489157370692-DZW7VKX7TY1KBJBQFYTW/SPA+16.03+Single+Pitch+Award+assessment+02+resized.jpg?format=1500w',
       title: { en: 'Singlepitch Course', nl: 'Singlepitch Cursus' },
-      category: 'course',
+      activityType: 'course',
       type: ['sp'],
       location: 'RSC',
       descriptionMarkdown: {
@@ -51,11 +52,11 @@ export default function Agenda() {
       image:
         'https://www.climbfit.com.au/wp-content/uploads/2020/10/LRM_EXPORT_6923110695509_20190202_212254494.jpg',
       title: { en: 'Boulder Training', nl: 'Boulder Training' },
-      category: 'training',
+      activityType: 'training',
       type: ['boulder'],
       location: 'Fontainebleau',
       descriptionMarkdown: {
-        en: "Let's go boulder",
+        en: 'Let\'s go boulder',
         nl: 'Laten we gaan boulderen.'
       },
       gear: {
@@ -83,7 +84,7 @@ export default function Agenda() {
   return (
     <>
       <div className="fixed bottom-5 right-5 z-10">
-        <Fab variant="extended" color="primary" onClick={() => router.navigate('/add-event')}>
+        <Fab variant="extended" color="primary" onClick={() => router.navigate()}>
           <AddIcon className="mr-2" />
           <p>{text('Add event', 'Voeg evenement toe')}</p>
         </Fab>
@@ -115,7 +116,7 @@ export default function Agenda() {
                     labelId="select-label"
                     value={selectedCategory}
                     label={text('Category', 'Categorie')}
-                    onChange={(e) => setSelectedCategory(e.target.value as CategoryType | 'all')}
+                    onChange={(e) => setSelectedCategory(e.target.value as ActivityType | 'all')}
                     variant="outlined"
                   >
                     <MenuItem value="all">{text('All', 'Alles')}</MenuItem>
@@ -131,7 +132,7 @@ export default function Agenda() {
                     labelId="select-label"
                     value={selectedType}
                     label={text('Type', 'Type')}
-                    onChange={(e) => setSelectedType(e.target.value as OptionType | 'all')}
+                    onChange={(e) => setSelectedType(e.target.value as WeekendType | 'all')}
                     variant="outlined"
                   >
                     <MenuItem value="all">{text('All', 'Alles')}</MenuItem>
@@ -147,7 +148,7 @@ export default function Agenda() {
             {exampleAPIResponse
               .filter(
                 (event: EventType) =>
-                  (selectedCategory === 'all' || event.category === selectedCategory) &&
+                  (selectedCategory === 'all' || event.activityType === selectedCategory) &&
                   (selectedType === 'all' || event.type.includes(selectedType))
               )
               .sort(

@@ -9,28 +9,25 @@ import {
   Checkbox
 } from '@mui/material';
 import { text } from '../util.ts';
-import { OptionsType, OptionType } from '../types.ts';
+import { OptionsType } from '../types.ts';
 
 interface OptionSelectorProps {
   options: OptionsType[];
-  // eslint-disable-next-line no-unused-vars
-  onChange: (selectedOptions: OptionType[]) => void;
+  onChange: (selectedOptions: OptionsType[]) => void;
   label: string;
-  initialOptions: OptionType[];
 }
 
 export default function OptionSelector({
   options,
   onChange,
   label,
-  initialOptions
 }: OptionSelectorProps) {
-  const [selectedOptions, setSelectedOptions] = useState<OptionType[]>(initialOptions);
+  const [selectedOptions, setSelectedOptions] = useState<OptionsType[]>(options);
 
-  const handleChange = (value: string | OptionType[]) => {
+  const handleChange = (value: string | OptionsType[]) => {
     const selectedValues = typeof value === 'string' ? value.split(',') : value;
-    setSelectedOptions(selectedValues as OptionType[]);
-    onChange(selectedValues as OptionType[]);
+    setSelectedOptions(selectedValues as OptionsType[]);
+    onChange(selectedValues as OptionsType[]);
   };
 
   return (

@@ -1,10 +1,10 @@
 import { createContext, useContext, ReactNode, useState } from 'react';
 import { enqueueSnackbar } from 'notistack';
 import { apiFetch } from '../api.ts';
-import { UserType } from '../types.ts';
+import { User } from '../types.ts';
 
 interface AuthContextType {
-  user: UserType | undefined;
+  user: User | undefined;
   isLoggedIn: boolean;
   checkAuth: () => void;
   logout: () => void;
@@ -21,7 +21,7 @@ interface AuthProviderProps {
 export default function AuthProvider({ children }: AuthProviderProps) {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(true);
 
-  const [user, setUser] = useState<UserType | undefined>(undefined);
+  const [user, setUser] = useState<User | undefined>(undefined);
 
   const [authOpen, setAuthOpen] = useState<boolean>(false);
 
@@ -30,7 +30,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   };
 
   const checkAuth = async () => {
-    const { error, data } = await apiFetch<UserType>('/whoami');
+    const { error, data } = await apiFetch<User>('/whoami');
 
     if (!error) {
       setUser(data);

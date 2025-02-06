@@ -45,14 +45,14 @@ impl Display for UserId {
 #[derive(Serialize, Deserialize, Debug, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct User {
-    pub(crate) id: UserId,
+    pub id: UserId,
     #[serde(with = "time::serde::rfc3339")]
-    pub(crate) created: OffsetDateTime,
+    pub created: OffsetDateTime,
     #[serde(with = "time::serde::rfc3339")]
-    pub(crate) updated: OffsetDateTime,
+    pub updated: OffsetDateTime,
     #[serde(flatten)]
     #[validate(nested)]
-    pub(crate) content: UserContent,
+    pub content: UserContent,
 }
 
 #[skip_serializing_none]

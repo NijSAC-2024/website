@@ -1,99 +1,79 @@
 export interface ValidateProps {
   label: string;
-  // eslint-disable-next-line no-unused-vars
   validator: (value: string) => string | false;
-  // eslint-disable-next-line no-unused-vars
   onChange: (isValid: boolean) => void;
-  // eslint-disable-next-line no-unused-vars
   setValue: (value: string) => void;
 }
 
-export type OptionType =
-  | 'sp'
-  | 'mp'
-  | 'boulder'
-  | 'trad'
-  | 'education'
-  | 'pending'
-  | 'member'
-  | 'extraordinary'
-  | 'non_member';
+export type WeekendType = 'sp' | 'mp' | 'boulder' | 'trad' | 'education';
 
-export type CategoryType = 'activity' | 'course' | 'training' | 'weekend' | '';
+export type ActivityType = 'activity' | 'course' | 'training' | 'weekend';
 
-export interface LanguageType {
+export type MembershipStatus = 'pending' | 'member' | 'extraordinary' | 'nonMember';
+
+export type QuestionType = 'shortText' | 'longText' | 'number' | 'time' | { 'multipleChoice': Array<string> }
+
+export interface OptionsType {
+  id: WeekendType | ActivityType | MembershipStatus | QuestionType;
+  label: Language;
+}
+
+export interface Language {
   en: string;
   nl: string;
 }
 
 export interface DateType {
-  startDateTime: string;
-  endDateTime: string;
+  start: Date;
+  end: Date;
 }
 
-export interface QuestionType {
-  id?: string;
-  question: LanguageType;
-  questionType?: string;
+export interface Question {
+  id: string;
+  question: Language;
+  questionType: QuestionType;
   required: boolean;
 }
 
-export interface EventType {
+export interface Activity extends Omit<ActivityContent, 'location'> {
   id: string;
-  isPublished: boolean;
-  image?: string;
-  title: LanguageType;
-  category: CategoryType;
-  type: OptionType[];
-  location: string;
-  descriptionMarkdown: LanguageType;
-  gear: LanguageType;
-  experience: OptionType[];
-  allowsRegistrations: boolean;
-  numberOfRegistrations?: number;
-  hasMaxRegistration: boolean;
-  maxRegistrations?: number;
-  dates: DateType[];
-  requiredMembershipStatus: OptionType[];
-  registrationOpenTime?: string;
-  registrationCloseTime?: string;
-  registrationQuestions: QuestionType[];
-}
-
-export interface EventTypeApi {
-  id: string;
-  isPublished: boolean;
-  image: string;
-  nameNl: string;
-  nameEn: string;
-  activityType: string;
-  metadata: {
-    experience: string[];
-    type: string[];
-    location: string;
-    gearEn: string;
-    gearNl: string;
-  }[];
-  descriptionNl: string;
-  descriptionEn: string;
-  registrationStart: string | null;
-  registrationEnd: string | null;
+  created: string;
+  updated: string;
   registrationCount: number;
-  registrationMax: number | null;
-  dates: { start: string; end: string }[];
-  requiredMembershipStatus: string[];
-  questions: { questionNl: string; questionEn: string; required: boolean }[];
   waitingListCount: number;
-  waitingListMax: number;
+  location: Location;
 }
 
-export interface LocationTypeAPI {
+export interface ActivityContent {
+  name: Language;
+  image?: string;
+  description?: Language;
+  dates: DateType[];
+  registrationPeriod?: DateType;
+  registrationMax?: number;
+  waitingListMax?: number;
+  isPublished: boolean;
+  requiredMembershipStatus: MembershipStatus[];
+  activityType: ActivityType;
+  questions: Question[];
+  metadata?: {
+    experience?: string[];
+    type?: string[];
+    gear?: Language;
+  };
+  location: string,
+}
+
+export interface Location extends LocationContent {
   id: string;
-  nameNl: string;
-  nameEn: string;
-  descriptionNl: string;
-  descriptionEn: string;
+  created: Date;
+  updated: Date;
+}
+
+export interface LocationContent {
+  name: Language;
   reusable: boolean;
+  description?: Language;
 }
 
 interface registrationType {
@@ -105,9 +85,7 @@ export interface registrationsType {
   registrations: registrationType[];
 }
 
-export type MembershipStatus = 'pending' | 'member' | 'extraordinary' | 'non_member';
-
-export interface UserType {
+export interface User {
   id: string;
   created: string;
   updated: string;
@@ -128,9 +106,9 @@ export interface UserType {
 }
 
 export interface rentOption {
-  name: LanguageType;
+  name: Language;
   price: number;
-  remark?: LanguageType;
+  remark?: Language;
 }
 
 export interface ReservationType {
@@ -142,17 +120,30 @@ export interface ReservationType {
 }
 
 export interface ReservationItemType {
-  name: LanguageType;
+  name: Language;
   price: number;
   amount: number;
 }
 
-export type MenuType = 'association' | 'climbing' | 'alps' | 'language' | undefined;
 
-export interface OptionsType {
-  id: OptionType;
-  label: LanguageType;
+export interface Route {
+  name: string;
+  path: string;
+  params?: RouteParams;
 }
+
+export type RouteParams = Record<string, string>;
+export type Navigate = (name: string, params: RouteParams) => void;
+
+export interface State {
+  version: string,
+  route: Route,
+  user?: User,
+  activities?: Activity[],
+  activity?: Activity,
+}
+
+export type MenuType = 'association' | 'climbing' | 'alps' | 'language' | undefined;
 
 export const typesOptions: OptionsType[] = [
   { id: 'sp', label: { en: 'Single Pitch', nl: 'Single Pitch' } },
@@ -170,7 +161,8 @@ export const experienceOptions: OptionsType[] = [
 export const memberOptions: OptionsType[] = [
   { id: 'member', label: { en: 'Member', nl: 'Lid' } },
   { id: 'extraordinary', label: { en: 'Extraordinary Member', nl: 'Buitengewoon Lid' } },
-  { id: 'non_member', label: { en: 'Non Member', nl: 'Niet Lid' } }
+  { id: 'nonMember', label: { en: 'Non Member', nl: 'Niet Lid' } },
+  { id: 'pending', label: { en: 'Pending', nl: 'In afwachting' } }
 ];
 
 export const eventOptions = [
