@@ -210,6 +210,10 @@ impl OptionalFromRequestParts<AppState> for Session {
             Some(c) => c.value(),
         };
 
-        Ok(Some(Session::get(session_cookie, state.pool()).await?))
+        match Session::get(session_cookie, state.pool()).await {
+            Ok(session) => Ok(Some(session)),
+            Err(Error::Unauthorized) => Ok(None),
+            Err(err) => Err(err),
+        }
     }
 }

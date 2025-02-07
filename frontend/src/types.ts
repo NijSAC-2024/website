@@ -11,7 +11,7 @@ export type ActivityType = 'activity' | 'course' | 'training' | 'weekend';
 
 export type MembershipStatus = 'pending' | 'member' | 'extraordinary' | 'nonMember';
 
-export type QuestionType = 'shortText' | 'longText' | 'number' | 'time' | { 'multipleChoice': Array<string> }
+export type QuestionType = 'shortText' | 'longText' | 'number' | 'time';
 
 export interface OptionsType {
   id: WeekendType | ActivityType | MembershipStatus | QuestionType;

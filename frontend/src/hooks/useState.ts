@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState } from 'react';
-import { matchName, paramsToPath, parseLocation } from './useRouter';
+import { matchName, paramsToPath, parseLocation } from '../router.ts';
 import { Activity, ActivityContent, Route, State } from '../types.ts';
 import { apiFetch } from '../api.ts';
 import { enqueueSnackbar } from 'notistack';
@@ -54,7 +54,7 @@ export default function useInternalState(): InternalState {
 
   const updateActivity = (content: ActivityContent, id: string) =>
   {
-    apiFetch<Activity>(`/api/activity/${id}`, {
+    apiFetch<Activity>(`/activity/${id}`, {
       method: 'PUT',
       body: JSON.stringify(content)
     }).then(({error, data: activity}) => {
@@ -70,7 +70,7 @@ export default function useInternalState(): InternalState {
 
   const createActivity = (content: ActivityContent) =>
   {
-    apiFetch<Activity>('/api/activity', {
+    apiFetch<Activity>('/activity', {
       method: 'POST',
       body: JSON.stringify(content)
     }).then(({error, data: activity}) => {
@@ -86,18 +86,22 @@ export default function useInternalState(): InternalState {
 
   useEffect(() => {
     // Load activities only once from the backend
-    if (state.route.name === 'agenda' && !state.activities) {
-      apiFetch<Array<Activity>>('/api/activity').then(({ error, data: activities }) => {
-        if (error) {
-          enqueueSnackbar(`${error.message}: ${error.reference}`, {
-            variant: 'error'
-          });
-        }
+    // if (state.route.name === 'agenda' && !state.activities) {
 
-        setState({ ...state, activities });
-      });
-    }
+    // }
   }, []);
+
+  apiFetch<Array<Activity>>('/activity')
+    .then(({ error, data: activities }) => {
+      if (error) {
+        enqueueSnackbar(`${error.message}: ${error.reference}`, {
+          variant: 'error'
+        });
+      }
+
+      setState({ ...state, activities });
+    });
+
 
   return {
     state,

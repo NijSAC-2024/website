@@ -1,93 +1,28 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import GenericPage from './GenericPage.tsx';
 import ContentCard from '../components/ContentCard.tsx';
-import EventCard from '../components/event/EventCard.tsx';
 import { text } from '../util.ts';
 import { Activity, ActivityType, WeekendType } from '../types.ts';
 import { Fab, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import moment from 'moment/moment';
-import useInternalState from '../hooks/useState.ts';
+import { StateContext } from '../hooks/useState.ts';
+import Link from '../components/Link.tsx';
+import ActivityCard from '../components/event/ActivityCard.tsx';
 
 export default function Agenda() {
-  const { state, navigate } = useInternalState();
+  const { state } = useContext(StateContext);
   const [selectedCategory, setSelectedCategory] = useState<ActivityType | 'all'>('all');
   const [selectedType, setSelectedType] = useState<WeekendType | 'all'>('all');
-
-  const exampleAPIResponse: Activity[] = [
-    {
-      id: '5',
-      image:
-        'https://images.squarespace-cdn.com/content/v1/531722ebe4b01396b755c991/1489157370692-DZW7VKX7TY1KBJBQFYTW/SPA+16.03+Single+Pitch+Award+assessment+02+resized.jpg?format=1500w',
-      title: { en: 'Singlepitch Course', nl: 'Singlepitch Cursus' },
-      activityType: 'course',
-      type: ['sp'],
-      location: 'RSC',
-      descriptionMarkdown: {
-        en: 'Every spring and autumn you can learn leadclimbing in the OV-Singlepitch course. In this course the student learns how to lead climb, and also to belay a lead climber. Because we give an OV (Outdoor leadclimbing) course, we try to prepare everyone to be able to practice this on the rocks. The exam is taken on a weekend outdoors in which the instructor assesses whether each participant individually masters the above techniques (you will then receive a KVB OV-Singlepitch certificate.)',
-        nl: 'Elk voor- en najaar kan je leren voorklimmen in de cursus OV-Singlepitch. In deze cursus leert de cursist voorklimmen, en tevens zekeren voorklim situatie. Om dat we een OV (Outdoor Voorklim) cursus geven proberen we iedereen klaar te stomen om dit ook op de rotsen te kunnen beoefenen. Het examen zal buiten op de rots worden afgelegd, de instructeur beoordeelt dan bij elke deelnemer individueel of de bovengenoemde technieken beheerst (hiervoor krijg je dan een pasje KVB-OV-Singlepitch.)\n'
-      },
-      gear: {
-        en: 'HMS biner, Long slinge (120 cm; stitched), Dynamic safety line,  4 (small) screw carabiners (D-biners), Prussik rope 1 meter (5 or 6 mm)',
-        nl: 'Helm, Touw, Safe Biner'
-      },
-      experience: ['mp'],
-      allowsRegistrations: true,
-      numberOfRegistrations: 12,
-      maxRegistrations: 20,
-      dates: [
-        { startDateTime: '2025-03-06T08:30:00.000Z', endDateTime: '2025-04-06T09:30:00.000Z' }
-      ],
-      registrationOpenTime: '2024-12-23T00:00:00.000Z',
-      registrationCloseTime: '2027-03-07T00:00:00.000Z',
-      registrationQuestions: [
-        { question: { en: 'How many quickdraws', nl: 'Hoeveel setjes' }, required: true }
-      ],
-      isPublished: true,
-      hasMaxRegistration: true,
-      requiredMembershipStatus: []
-    },
-    {
-      id: '4',
-      image:
-        'https://www.climbfit.com.au/wp-content/uploads/2020/10/LRM_EXPORT_6923110695509_20190202_212254494.jpg',
-      title: { en: 'Boulder Training', nl: 'Boulder Training' },
-      activityType: 'training',
-      type: ['boulder'],
-      location: 'Fontainebleau',
-      descriptionMarkdown: {
-        en: 'Let\'s go boulder',
-        nl: 'Laten we gaan boulderen.'
-      },
-      gear: {
-        en: '',
-        nl: ''
-      },
-      experience: [],
-      allowsRegistrations: true,
-      numberOfRegistrations: 10,
-      maxRegistrations: 10,
-      dates: [
-        { startDateTime: '2025-03-06T22:30:00.000Z', endDateTime: '2025-03-08T22:30:00.000Z' }
-      ],
-      registrationOpenTime: '2024-12-23T00:00:00.000Z',
-      registrationCloseTime: '2027-03-07T00:00:00.000Z',
-      registrationQuestions: [
-        { question: { en: 'How many quickdraws', nl: 'Hoeveel setjes' }, required: true }
-      ],
-      isPublished: false,
-      hasMaxRegistration: true,
-      requiredMembershipStatus: []
-    }
-  ];
 
   return (
     <>
       <div className="fixed bottom-5 right-5 z-10">
-        <Fab variant="extended" color="primary" onClick={() => router.navigate()}>
-          <AddIcon className="mr-2" />
-          <p>{text('Add event', 'Voeg evenement toe')}</p>
-        </Fab>
+        <Link routeName={'new_activity'}>
+          <Fab variant="extended" color="primary">
+            <AddIcon className="mr-2" />
+            <p>{text('Add event', 'Voeg evenement toe')}</p>
+          </Fab>
+        </Link>
       </div>
       <GenericPage>
         <div className="Agenda">
@@ -145,23 +80,24 @@ export default function Agenda() {
                 </FormControl>
               </div>
             </ContentCard>
-            {exampleAPIResponse
+            {state.activities && state.activities
               .filter(
-                (event: EventType) =>
-                  (selectedCategory === 'all' || event.activityType === selectedCategory) &&
-                  (selectedType === 'all' || event.type.includes(selectedType))
+                (activity: Activity) =>
+                  (selectedCategory === 'all' || activity.activityType === selectedCategory) &&
+                  (selectedType === 'all' || activity.metadata?.type?.includes(selectedType))
               )
               .sort(
-                (a: EventType, b: EventType) =>
-                  moment(a.dates[0].startDateTime).valueOf() -
-                  moment(b.dates[0].startDateTime).valueOf()
+                (a: Activity, b: Activity) =>
+                  a.dates[0].start.valueOf() -
+                  b.dates[0].start.valueOf()
               )
-              .map((event: EventType) => (
-                <EventCard event={event} agendaPage={true} key={event.id} />
+              .map((activity: Activity) => (
+                <ActivityCard activity={activity} agendaPage={true} key={activity.id} />
               ))}
           </div>
         </div>
       </GenericPage>
+      ;
     </>
-  );
+  )
 }

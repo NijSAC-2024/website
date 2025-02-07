@@ -53,6 +53,9 @@ async function apiFetchResponse(url: string, options: RequestInit = {}): Promise
 export async function apiFetch<T>(url: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
   const { data, error } = await apiFetchResponse(url, options);
   if (error || !data) {
+    if (error?.status === 401 || error?.status === 403) {
+      await apiFetchVoid('/logout');
+    }
     return { error };
   }
   const content: T = await data.json();

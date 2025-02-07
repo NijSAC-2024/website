@@ -7,7 +7,6 @@ import { emailValidator, nameValidator, passwordValidator } from '../../validato
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
-import router from '../../router.tsx';
 import { text } from '../../util.ts';
 import { apiFetch } from '../../api.ts';
 

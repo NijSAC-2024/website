@@ -17,7 +17,7 @@ interface EditAgendaCardProps {
   category: ActivityType;
   image?: string;
   type: WeekendType[];
-  title: Language;
+  name: Language;
   dates: DateType[];
   location: string;
   handleFieldChange: (
@@ -37,7 +37,7 @@ export default function EditAgendaCard({
   category,
   image = 'https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/76/52/1b/76521bcd-7c16-6404-b845-be35fc720792/AppIcon-0-0-1x_U007epad-0-85-220.png/1200x600wa.png',
   type,
-  title,
+  name,
   dates,
   location,
   handleFieldChange,
@@ -106,14 +106,14 @@ export default function EditAgendaCard({
           {/* Title */}
           <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
             <TextField
-              value={title.en}
+              value={name.en}
               label={text('Title English*', 'Titel Engels*')}
-              onChange={(e) => handleFieldChange('title', { ...title, en: e.target.value })}
+              onChange={(e) => handleFieldChange('title', { ...name, en: e.target.value })}
             />
             <TextField
-              value={title.nl}
+              value={name.nl}
               label={text('Title Dutch*', 'Titel Nederlands*')}
-              onChange={(e) => handleFieldChange('title', { ...title, nl: e.target.value })}
+              onChange={(e) => handleFieldChange('title', { ...name, nl: e.target.value })}
             />
           </div>
 

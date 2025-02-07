@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { StateContext } from '../hooks/useState';
-import { matchName } from '../hooks/useRouter';
+import { matchName } from '../router';
 
 interface LinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
   routeName?: string;

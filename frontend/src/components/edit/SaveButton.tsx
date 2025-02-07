@@ -1,5 +1,4 @@
 import { Button, Collapse, Fab, IconButton, Tooltip } from '@mui/material';
-import moment from 'moment/moment';
 import SaveIcon from '@mui/icons-material/Save';
 import { text } from '../../util.ts';
 import SaveAsIcon from '@mui/icons-material/SaveAs';
@@ -11,20 +10,16 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AreYouSure from '../AreYouSure.tsx';
 
 interface SaveButtonProps {
-  title: Language;
+  name: Language;
   location: string;
   category: ActivityType;
-  startDateTime: string;
-  endDateTime: string;
   handleSave: (isPublished: boolean) => void;
 }
 
 export default function SaveButton({
-  title,
+  name,
   location,
   category,
-  startDateTime,
-  endDateTime,
   handleSave
 }: SaveButtonProps) {
   const [isDraft, setIsDraft] = useState<boolean>(false);
@@ -42,21 +37,15 @@ export default function SaveButton({
   return (
     <>
       <div className="fixed bottom-5 right-5 z-10">
-        <Fab variant="extended" color="primary">
-          <Button
-            color="inherit"
-            onClick={() => handleSave(true)}
-            disabled={
-              !title.en ||
-              !title.nl ||
-              !location ||
-              !category ||
-              moment(endDateTime).isBefore(moment(startDateTime))
-            }
-          >
-            <SaveIcon className="mr-2" />
-            {text('Save Event', 'Evenement opslaan')}
-          </Button>
+        <Fab variant="extended" color="primary" onClick={() => handleSave(true)}
+          disabled={
+            !name.en ||
+               !name.nl ||
+               !location ||
+               !category}
+        >
+          <SaveIcon className="mr-2" />
+          {text('Save Event', 'Evenement opslaan')}
           <Tooltip title={isDraft ? null : text('More Options', 'Meer opties')}>
             <IconButton color="inherit" onClick={toggleIsDraft}>
               {isDraft ? <ExpandLessIcon /> : <ExpandMoreIcon />}
@@ -82,7 +71,8 @@ export default function SaveButton({
           'You are about to delete this event.',
           'Je staat op het punt dit evenement te verwijderen.'
         )}
-      />
+      />;
     </>
-  );
+  )
+  ;
 }

@@ -8,20 +8,20 @@ import { useLanguage } from '../providers/LanguageProvider.tsx';
 import moment from 'moment/moment';
 
 interface RegisterButtonProps {
-  numberOfRegistrations?: number;
-  maxRegistrations?: number;
+  registrationCount?: number;
+  registrationMax?: number;
   registrationOpenTime: string;
   registrationCloseTime: string;
-  registrationQuestions: Question[];
+  questions: Question[];
   title: Language;
 }
 
 export default function RegisterButton({
-  numberOfRegistrations,
-  maxRegistrations,
+  registrationCount,
+  registrationMax,
   registrationOpenTime,
   registrationCloseTime,
-  registrationQuestions,
+  questions,
   title
 }: RegisterButtonProps) {
   const { isLoggedIn, toggleAuthOpen } = useAuth();
@@ -40,7 +40,7 @@ export default function RegisterButton({
 
   return (
     <>
-      {numberOfRegistrations === maxRegistrations ? (
+      {registrationCount === registrationMax ? (
         <Button variant="contained" disabled>
           {text('Full', 'Vol')}
         </Button>
@@ -64,7 +64,7 @@ export default function RegisterButton({
       <Dialog open={registerDialogOpen} onClose={toggleDialog} fullWidth>
         <DialogContent>
           <RegisterForm
-            registrationQuestions={registrationQuestions}
+            registrationQuestions={questions}
             title={title}
             registrationCloseTime={registrationCloseTime}
           />

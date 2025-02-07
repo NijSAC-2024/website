@@ -1,40 +1,19 @@
-import { EventType } from '../types.ts';
-import router from '../router.tsx';
+import React from 'react';
 import EditEvent from '../components/edit/EditEvent.tsx';
+import { ActivityContent } from '../types.ts';
 
 export default function AddEvent() {
-  const handleUpdate = (updatedEvent: EventType) => {
-    //Send to backend
-    router.navigate();
-  };
-
-  const now = new Date();
-
-  const event: EventType = {
-    dates: [{ startDateTime: now.toISOString(), endDateTime: now.toISOString() }],
-    hasMaxRegistration: false,
+  const activity: ActivityContent = {
+    name: {
+      en: 'New activity',
+      nl: 'Nieuwe activiteit'
+    },
+    dates: [],
     isPublished: false,
     requiredMembershipStatus: ['member'],
-    id: '5',
-    title: { en: '', nl: '' },
-    activityType: '',
-    type: [],
-    location: '',
-    descriptionMarkdown: {
-      en: '',
-      nl: ''
-    },
-    gear: {
-      en: '',
-      nl: ''
-    },
-    experience: [],
-    allowsRegistrations: false,
-    numberOfRegistrations: 0,
-    maxRegistrations: 0,
-    registrationOpenTime: now.toISOString(),
-    registrationCloseTime: now.toISOString(),
-    registrationQuestions: []
+    activityType: 'activity',
+    questions: [],
+    location: ''
   };
-  return <EditEvent activityContent={event} handleUpdate={handleUpdate} />;
+  return <EditEvent activityContent={activity} />;
 }

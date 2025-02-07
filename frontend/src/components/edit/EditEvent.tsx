@@ -12,12 +12,10 @@ import { StateContext } from '../../hooks/useState.ts';
 interface EditEventProps {
   id?: string,
   activityContent: ActivityContent;
-  create: (activity: ActivityContent) => void;
-  update: (activity: ActivityContent, id: string) => void;
 }
 
-export default function EditEvent({ id, activityContent, create, update }: EditEventProps) {
-  const {navigate} = useContext(StateContext);
+export default function EditEvent({ id, activityContent }: EditEventProps) {
+  const { navigate, updateActivity, createActivity } = useContext(StateContext);
   const [activity, setActivity] = useState<ActivityContent>(activityContent);
 
   const updateEvent = (changes: Partial<Activity>) => {
@@ -85,9 +83,7 @@ export default function EditEvent({ id, activityContent, create, update }: EditE
   return (
     <GenericPage image={activity.image}>
       <SaveButton
-        startDateTime={activity.dates[0].startDateTime}
-        endDateTime={activity.dates[0].endDateTime}
-        title={activity.title}
+        name={activity.name}
         location={activity.location}
         category={activity.activityType}
         handleSave={handleSave}
@@ -111,8 +107,8 @@ export default function EditEvent({ id, activityContent, create, update }: EditE
           dates={activity.dates}
           image={activity.image}
           category={activity.activityType}
-          title={activity.title}
-          type={activity.type}
+          name={activity.name}
+          type={activity.metadata?.type}
           location={activity.location}
           handleFieldChange={handleFieldChange}
           handleDateChange={handleDateChange}
@@ -121,15 +117,14 @@ export default function EditEvent({ id, activityContent, create, update }: EditE
         />
 
         <EditDescription
-          descriptionMarkdown={activity.descriptionMarkdown}
-          gear={activity.gear}
-          experience={activity.experience}
+          description={activity.description}
+          gear={activity.metadata?.gear}
+          experience={activity.metadata?.experience}
           handleFieldChange={handleFieldChange}
         />
 
         <EditRegistrations
           requiredMembershipStatus={activity.requiredMembershipStatus}
-          startDateTime={activity.dates[0].startDateTime}
           registrationMax={activity.registrationMax}
           registrationPeriod={activity.registrationPeriod}
           questions={activity.questions}
@@ -137,7 +132,7 @@ export default function EditEvent({ id, activityContent, create, update }: EditE
           handleRegistrationQuestionChange={handleRegistrationQuestionChange}
           handleAddRegistrationQuestion={handleAddRegistrationQuestion}
           handleRemoveRegistrationQuestion={handleRemoveRegistrationQuestion}
-        />
+          dates={activity.dates} />
       </div>
     </GenericPage>
   );

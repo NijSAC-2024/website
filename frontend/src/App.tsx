@@ -11,10 +11,18 @@ import MainMenu from './components/menu/MainMenu.tsx';
 
 import { useLanguage } from './providers/LanguageProvider.tsx';
 import useInternalState, { StateContext } from './hooks/useState.ts';
-import { parseLocation } from './hooks/useRouter.ts';
+import { parseLocation } from './router.ts';
+import Home from './pages/Home.tsx';
+import Signup from './pages/Signup.tsx';
+import Agenda from './pages/Agenda.tsx';
+import ErrorPage from './pages/ErrorPage.tsx';
+import Event from './pages/Event.tsx';
+import EditEvent from './components/edit/EditEvent.tsx';
+import AddEvent from './pages/AddEvent.tsx';
 
 export default function App(): React.ReactElement {
-  const { state, navigate } = useInternalState();
+  const internalState = useInternalState();
+  const { navigate, state } = internalState;
   const { isDarkMode, toggleTheme } = useThemeMode();
   const language = useLanguage();
 
@@ -73,25 +81,25 @@ export default function App(): React.ReactElement {
   });
 
   // DEBUG: on "ctrl-,", flip the theme, on "ctrl-.", flip the language
-  const eventListener = (e: KeyboardEvent) => {
-    if (e.ctrlKey && e.key === ',') {
-      toggleTheme();
-    }
-
-    if (e.ctrlKey && e.key === '.') {
-      language.toggleLanguage();
-    }
-  };
-
-  if (import.meta.env.MODE === 'development') {
-    useEffect(() => {
-      addEventListener('keydown', eventListener);
-
-      return () => {
-        removeEventListener('keydown', eventListener);
-      };
-    });
-  }
+  // const eventListener = (e: KeyboardEvent) => {
+  //   if (e.ctrlKey && e.key === ',') {
+  //     toggleTheme();
+  //   }
+  //
+  //   if (e.ctrlKey && e.key === '.') {
+  //     language.toggleLanguage();
+  //   }
+  // };
+  //
+  // if (import.meta.env.MODE === 'development') {
+  //   useEffect(() => {
+  //     addEventListener('keydown', eventListener);
+  //
+  //     return () => {
+  //       removeEventListener('keydown', eventListener);
+  //     };
+  //   });
+  // }
 
   useEffect(() => {
 
@@ -120,11 +128,25 @@ export default function App(): React.ReactElement {
     }
   }, []);
 
+  let component: React.ReactElement;
+  if (state.route.name == 'index') {
+    component = <Home />;
+  } else if (state.route.name.startsWith('register')) {
+    component = <Signup />;
+  } else if (state.route.name == 'agenda') {
+    component = <Agenda />;
+  } else if (state.route.name == 'new_activity') {
+    component = <AddEvent />;
+  } else {
+    console.log('not found');
+    component = <ErrorPage error={'Page not found'} />;
+  }
+
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <MainMenu />
-      <StateContext.Provider value={{ state, navigate }}>
+      <StateContext.Provider value={internalState}>
         <SnackbarProvider
           maxSnack={3}
           autoHideDuration={5000}
@@ -136,6 +158,7 @@ export default function App(): React.ReactElement {
             info: Info
           }}
         />
+        {component}
       </StateContext.Provider>
     </ThemeProvider>
   );

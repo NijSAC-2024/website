@@ -18,8 +18,10 @@ VALUES ('24e2256c-4612-4774-a8ce-168c7817fbd4',
         '[
           {
             "id": "24e2256c-4612-4774-a8ce-168c7817fbd4",
-            "questionEn": "What is your favorite color?",
-            "questionNl": "Wat is je favoriete kleur?",
+            "question": {
+              "en": "What is your favorite color?",
+              "nl": "Wat is je favoriete kleur?"
+            },
             "questionType": "shortText",
             "required": true
           }

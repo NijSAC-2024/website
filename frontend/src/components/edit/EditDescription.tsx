@@ -6,7 +6,7 @@ import { Activity, experienceOptions, Language, WeekendType } from '../../types.
 import ContentCard from '../ContentCard.tsx';
 
 interface EditDescriptionProps {
-  descriptionMarkdown: Language;
+  description: Language;
   gear: Language;
   experience: WeekendType[];
   handleFieldChange: (
@@ -15,7 +15,7 @@ interface EditDescriptionProps {
   ) => void;
 }
 export default function EditDescription({
-  descriptionMarkdown,
+  description,
   gear,
   experience,
   handleFieldChange
@@ -28,7 +28,7 @@ export default function EditDescription({
     <ContentCard className="xl:col-span-2 flex flex-col justify-between">
       {/* Description */}
       <div>
-        <MarkdownEditor initialMarkdown={descriptionMarkdown} handleMarkdown={handleMarkdown} />
+        <MarkdownEditor initialMarkdown={description} handleMarkdown={handleMarkdown} />
       </div>
 
       {/* Gear and Experience */}

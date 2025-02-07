@@ -6,12 +6,12 @@ use axum_extra::extract::{cookie::Cookie, CookieJar};
 use sqlx::PgPool;
 use tracing::trace;
 
-pub(crate) mod role;
-pub(crate) mod session;
+pub mod role;
+pub mod session;
 
 const COOKIE_NAME: &str = "SESSION";
 
-pub(crate) async fn login(
+pub async fn login(
     db: PgPool,
     jar: CookieJar,
     ValidatedJson(credentials): ValidatedJson<UserCredentials>,
@@ -21,12 +21,14 @@ pub(crate) async fn login(
     Ok(jar.add(session.into_cookie()))
 }
 
-pub(crate) async fn logout(
+pub async fn logout(
     db: PgPool,
-    session: Session,
+    session: Option<Session>,
     mut jar: CookieJar,
 ) -> Result<impl IntoResponse, Error> {
     jar = jar.remove(Cookie::from(COOKIE_NAME));
-    session.delete(&db).await?;
+    if let Some(session) = session {
+        session.delete(&db).await?;
+    } 
     Ok(jar)
 }
