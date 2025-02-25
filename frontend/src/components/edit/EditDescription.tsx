@@ -4,11 +4,12 @@ import { text } from '../../util.ts';
 import OptionSelector from '../OptionSelector.tsx';
 import { Activity, experienceOptions, Language, WeekendType } from '../../types.ts';
 import ContentCard from '../ContentCard.tsx';
+import { useLanguage } from '../../providers/LanguageProvider.tsx';
 
 interface EditDescriptionProps {
-  description: Language;
-  gear: Language;
-  experience: WeekendType[];
+  description?: Language;
+  gear?: Language;
+  experience?: WeekendType[];
   handleFieldChange: (
     name: keyof Activity,
     value: Language | string | WeekendType[]
@@ -20,6 +21,8 @@ export default function EditDescription({
   experience,
   handleFieldChange
 }: EditDescriptionProps) {
+  const { language: lang } = useLanguage();
+
   const handleMarkdown = (markdown: Language) => {
     handleFieldChange('description', markdown);
   };
@@ -36,25 +39,25 @@ export default function EditDescription({
         <TextField
           multiline
           fullWidth
-          value={gear.en}
-          label={text('Necessary Gear English ', 'Benodigde Uitrusting Engels')}
-          placeholder={text('Separated by commas', 'Gescheiden door komma\'s')}
+          value={gear?.en}
+          label={text(lang, 'Necessary Gear English ', 'Benodigde Uitrusting Engels')}
+          placeholder={text(lang, 'Separated by commas', 'Gescheiden door komma\'s')}
           onChange={(e) => handleFieldChange('gear', { ...gear, en: e.target.value })}
         />
         <TextField
           multiline
           fullWidth
-          value={gear.nl}
-          label={text('Necessary Gear Dutch', 'Benodigde Uitrusting Nederlands')}
-          placeholder={text('Separated by commas', 'Gescheiden door komma\'s')}
+          value={gear?.nl}
+          label={text(lang, 'Necessary Gear Dutch', 'Benodigde Uitrusting Nederlands')}
+          placeholder={text(lang, 'Separated by commas', 'Gescheiden door komma\'s')}
           onChange={(e) => handleFieldChange('gear', { ...gear, nl: e.target.value })}
         />
         <div className="xl:col-span-2 grid">
           <OptionSelector
             options={experienceOptions}
+            selected={experience}
             onChange={(selected) => handleFieldChange('experience', selected)}
-            label={text('Necessary Experience', 'Benodigde Ervaring')}
-            initialOptions={experience}
+            label={text(lang, 'Necessary Experience', 'Benodigde Ervaring')}
           />
         </div>
       </div>

@@ -1,17 +1,11 @@
-import { FormControl, InputLabel, MenuItem, Select, TextField, Button } from '@mui/material';
+import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import { text } from '../../util.ts';
-import {
-  EventType,
-  WeekendType,
-  Language,
-  typesOptions,
-  ActivityType,
-  DateType
-} from '../../types.ts';
+import { Activity, ActivityType, DateType, Language, typesOptions, WeekendType } from '../../types.ts';
 import OptionSelector from '../OptionSelector.tsx';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import { ChangeEvent } from 'react';
 import EditDates from './EditDates.tsx';
+import { useLanguage } from '../../providers/LanguageProvider.tsx';
 
 interface EditAgendaCardProps {
   category: ActivityType;
@@ -21,15 +15,11 @@ interface EditAgendaCardProps {
   dates: DateType[];
   location: string;
   handleFieldChange: (
-    // eslint-disable-next-line no-unused-vars
-    name: keyof EventType,
-    // eslint-disable-next-line no-unused-vars
+    name: keyof Activity,
     value: Language | string | WeekendType[]
   ) => void;
-  // eslint-disable-next-line no-unused-vars
   handleDateChange: (index: number, startDate: boolean, value: string) => void;
   handleAddDate: () => void;
-  // eslint-disable-next-line no-unused-vars
   handleRemoveDate: (index: number) => void;
 }
 
@@ -45,6 +35,7 @@ export default function EditAgendaCard({
   handleAddDate,
   handleRemoveDate
 }: EditAgendaCardProps) {
+  const { language: lang } = useLanguage();
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -59,7 +50,8 @@ export default function EditAgendaCard({
   };
 
   return (
-    <div className="w-full rounded-2xl bg-inherit border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] flex flex-col">
+    <div
+      className="w-full rounded-2xl bg-inherit border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] flex flex-col">
       <div>
         <img className="w-full aspect-4/2 object-cover" src={image} alt="Event" />
       </div>
@@ -70,67 +62,67 @@ export default function EditAgendaCard({
             component="label"
             variant="contained"
             color="primary"
-            aria-label={text('Change Image', 'Afbeelding Wijzigen')}
+            aria-label={text(lang, 'Change Image', 'Afbeelding Wijzigen')}
             className="mx-auto"
           >
             <PhotoCameraIcon className="mr-2" />
-            {text('Upload Image', 'Afbeelding Uploaden')}
+            {text(lang, 'Upload Image', 'Afbeelding Uploaden')}
             <input type="file" accept="image/*" hidden onChange={handleImageChange} />
           </Button>
 
           {/* Category and Type */}
           <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
             <FormControl fullWidth>
-              <InputLabel id="select-label">{text('Category*', 'Categorie*')}</InputLabel>
+              <InputLabel id="select-label">{text(lang, 'Category*', 'Categorie*')}</InputLabel>
               <Select
                 labelId="select-label"
                 value={category}
-                label={text('Category*', 'Categorie*')}
+                label={text(lang, 'Category*', 'Categorie*')}
                 variant="outlined"
                 onChange={(e) => handleFieldChange('activityType', e.target.value)}
               >
-                <MenuItem value="activity">{text('Activity', 'Activiteit')}</MenuItem>
-                <MenuItem value="course">{text('Course', 'Cursus')}</MenuItem>
-                <MenuItem value="training">{text('Training', 'Training')}</MenuItem>
-                <MenuItem value="weekend">{text('Weekend', 'Weekend')}</MenuItem>
+                <MenuItem value="activity">{text(lang, 'Activity', 'Activiteit')}</MenuItem>
+                <MenuItem value="course">{text(lang, 'Course', 'Cursus')}</MenuItem>
+                <MenuItem value="training">{text(lang, 'Training', 'Training')}</MenuItem>
+                <MenuItem value="weekend">{text(lang, 'Weekend', 'Weekend')}</MenuItem>
               </Select>
             </FormControl>
             <OptionSelector
               options={typesOptions}
+              selected={type}
               onChange={(selectedTypes) => handleFieldChange('type', selectedTypes)}
               label={'Type'}
-              initialOptions={type}
             />
           </div>
 
           {/* Title */}
           <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
-            <TextField
-              value={name.en}
-              label={text('Title English*', 'Titel Engels*')}
-              onChange={(e) => handleFieldChange('title', { ...name, en: e.target.value })}
-            />
-            <TextField
-              value={name.nl}
-              label={text('Title Dutch*', 'Titel Nederlands*')}
-              onChange={(e) => handleFieldChange('title', { ...name, nl: e.target.value })}
-            />
+            {/*<TextField*/}
+            {/*  value={name.en}*/}
+            {/*  label={text('Title English*', 'Titel Engels*')}*/}
+            {/*  onChange={(e) => handleFieldChange('name', { ...name, en: e.target.value })}*/}
+            {/*/>*/}
+            {/*<TextField*/}
+            {/*  value={name.nl}*/}
+            {/*  label={text('Title Dutch*', 'Titel Nederlands*')}*/}
+            {/*  onChange={(e) => handleFieldChange('name', { ...name, nl: e.target.value })}*/}
+            {/*/>*/}
           </div>
 
           {/* Location */}
-          <TextField
-            value={location}
-            label={text('Location*', 'Locatie*')}
-            onChange={(e) => handleFieldChange('location', e.target.value)}
-          />
+          {/*<TextField*/}
+          {/*  value={location}*/}
+          {/*  label={text('Location*', 'Locatie*')}*/}
+          {/*  onChange={(e) => handleFieldChange('location', e.target.value)}*/}
+          {/*/>*/}
 
           {/* Dates */}
-          <EditDates
-            dates={dates}
-            handleAddDate={handleAddDate}
-            handleDateChange={handleDateChange}
-            handleRemoveDate={handleRemoveDate}
-          />
+          {/*<EditDates*/}
+          {/*  dates={dates}*/}
+          {/*  handleAddDate={handleAddDate}*/}
+          {/*  handleDateChange={handleDateChange}*/}
+          {/*  handleRemoveDate={handleRemoveDate}*/}
+          {/*/>*/}
         </div>
       </div>
     </div>

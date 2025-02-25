@@ -1,22 +1,28 @@
 import { Activity, ActivityContent, DateType, Language, Question, WeekendType } from '../../types.ts';
 import { Button } from '@mui/material';
 import { text } from '../../util.ts';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import EditRegistrations from './EditRegistrations.tsx';
 import EditAgendaCard from './EditAgendaCard.tsx';
 import EditDescription from './EditDescription.tsx';
 import GenericPage from '../../pages/GenericPage.tsx';
 import SaveButton from './SaveButton.tsx';
-import { StateContext } from '../../hooks/useState.ts';
+import { useAppState } from '../../providers/AppStateProvider.tsx';
+import { useApiState } from '../../providers/ApiProvider.tsx';
+import { useLanguage } from '../../providers/LanguageProvider.tsx';
 
 interface EditEventProps {
-  id?: string,
   activityContent: ActivityContent;
 }
 
-export default function EditEvent({ id, activityContent }: EditEventProps) {
-  const { navigate, updateActivity, createActivity } = useContext(StateContext);
-  const [activity, setActivity] = useState<ActivityContent>(activityContent);
+export default function EditEvent({ activityContent: init }: EditEventProps) {
+  const { language: lang } = useLanguage();
+  const { createActivity, updateActivity } = useApiState();
+  const { route } = useAppState();
+  const { navigate } = useAppState();
+  const [activity, setActivity] = useState<ActivityContent>(init);
+
+  const id = route.params?.id;
 
   const updateEvent = (changes: Partial<Activity>) => {
     setActivity((prev) => ({ ...prev, ...changes }));
@@ -76,8 +82,12 @@ export default function EditEvent({ id, activityContent }: EditEventProps) {
       questions: activity.questions.filter((q) => q.id !== id)
     });
 
-  const handleSave = (bool: boolean) => {
-    update({ ...activity, isPublished: bool });
+  const handleSave = async (bool: boolean) => {
+    if (id) {
+      await updateActivity(id, { ...activity, isPublished: bool });
+    } else {
+      await createActivity({ ...activity, isPublished: bool });
+    }
   };
 
   return (
@@ -93,12 +103,12 @@ export default function EditEvent({ id, activityContent }: EditEventProps) {
         <div className="xl:col-span-3 mb-[-0.5rem] flex justify-between">
           <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">
             <Button color="inherit" onClick={() => navigate('agenda')}>
-              {text('Back to Agenda', 'Terug naar Agenda')}
+              {text(lang, 'Back to Agenda', 'Terug naar Agenda')}
             </Button>
           </div>
           {!activity.isPublished && (
             <Button variant="contained">
-              <b>{text('Draft', 'Concept')}</b>
+              <b>{text(lang, 'Draft', 'Concept')}</b>
             </Button>
           )}
         </div>
@@ -108,7 +118,7 @@ export default function EditEvent({ id, activityContent }: EditEventProps) {
           image={activity.image}
           category={activity.activityType}
           name={activity.name}
-          type={activity.metadata?.type}
+          type={activity.metadata?.type || []}
           location={activity.location}
           handleFieldChange={handleFieldChange}
           handleDateChange={handleDateChange}

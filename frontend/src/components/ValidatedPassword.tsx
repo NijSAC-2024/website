@@ -10,8 +10,10 @@ import {
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { ValidateProps } from '../types.ts';
 import { text } from '../util.ts';
+import { useLanguage } from '../providers/LanguageProvider.tsx';
 
 export default function ValidatedPassword({ label, validator, onChange, setValue }: ValidateProps) {
+  const { language: lang } = useLanguage();
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [error, setError] = useState<string | false>(false);
 
@@ -30,7 +32,7 @@ export default function ValidatedPassword({ label, validator, onChange, setValue
 
   return (
     <FormControl variant="outlined" className="w-full" error={!!error}>
-      <InputLabel>{text('Password', 'Wachtwoord')}</InputLabel>
+      <InputLabel>{text(lang, 'Password', 'Wachtwoord')}</InputLabel>
       <OutlinedInput
         id="outlined-adornment-password"
         type={showPassword ? 'text' : 'password'}

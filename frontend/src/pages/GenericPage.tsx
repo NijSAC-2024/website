@@ -15,12 +15,12 @@ export default function GenericPage({
     <div className="w-full">
       {!isMobile ? (
         <div
-          className={`relative w-full min-h-80 bg-cover bg-center brightness-70`}
+          className={'relative w-full min-h-80 bg-cover bg-center brightness-70'}
           style={{ backgroundImage: `url('${image}')` }}
         ></div>
       ) : (
         <div
-          className={`relative w-full min-h-80 bg-cover bg-center brightness-70`}
+          className={'relative w-full min-h-80 bg-cover bg-center brightness-70'}
           style={{ backgroundImage: `url('${image}')` }}
         ></div>
       )}

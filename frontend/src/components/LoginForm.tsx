@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Button, FormControl, FormLabel, TextField } from '@mui/material';
 import { text } from '../util.ts';
 import { useAuth } from '../providers/AuthProvider.tsx';
+import { useLanguage } from '../providers/LanguageProvider.tsx';
 
 interface LoginFormProps {
   onClose: () => void;
@@ -9,6 +10,7 @@ interface LoginFormProps {
 
 export default function LoginForm({ onClose }: LoginFormProps) {
   const { login } = useAuth();
+  const { language: lang } = useLanguage();
 
   const [emailError, setEmailError] = React.useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
@@ -54,7 +56,7 @@ export default function LoginForm({ onClose }: LoginFormProps) {
   return (
     <>
       <Box className="grid gap-2.5" component="form" onSubmit={handleSubmit}>
-        <h1>{text('Login', 'Inloggen')}</h1>
+        <h1>{text(lang, 'Login', 'Inloggen')}</h1>
         <FormControl>
           <FormLabel htmlFor="email">Email</FormLabel>
           <TextField
@@ -71,7 +73,7 @@ export default function LoginForm({ onClose }: LoginFormProps) {
           />
         </FormControl>
         <FormControl>
-          <FormLabel htmlFor="password">{text('Password', 'Wachtwoord')}</FormLabel>
+          <FormLabel htmlFor="password">{text(lang, 'Password', 'Wachtwoord')}</FormLabel>
           <TextField
             required
             fullWidth
@@ -87,7 +89,7 @@ export default function LoginForm({ onClose }: LoginFormProps) {
           />
         </FormControl>
         <Button variant="contained" type="submit" onClick={validateInputs}>
-          {text('Login', 'Inloggen')}
+          {text(lang, 'Login', 'Inloggen')}
         </Button>
       </Box>
     </>

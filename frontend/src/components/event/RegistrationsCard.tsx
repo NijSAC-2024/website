@@ -4,12 +4,14 @@ import { text } from '../../util.ts';
 import { Table, TableBody, TableCell, TableRow } from '@mui/material';
 import { useAuth } from '../../providers/AuthProvider.tsx';
 import { registrationsType } from '../../types.ts';
+import { useLanguage } from '../../providers/LanguageProvider.tsx';
 
 interface RegistrationsCardProps {
   allowsRegistrations: boolean;
 }
 
 export default function RegistrationsCard({ allowsRegistrations }: RegistrationsCardProps) {
+  const { language: lang } = useLanguage();
   const { isLoggedIn } = useAuth();
 
   const registrations: registrationsType = {
@@ -33,7 +35,7 @@ export default function RegistrationsCard({ allowsRegistrations }: Registrations
     <>
       {allowsRegistrations && isLoggedIn && (
         <ContentCard className="xl:col-span-3 p-7">
-          <h1>{text('Participants', 'Deelnemers')}</h1>
+          <h1>{text(lang, 'Participants', 'Deelnemers')}</h1>
           <Table>
             <TableBody>
               {registrations.registrations.map((registraton) => (

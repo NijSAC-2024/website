@@ -1,5 +1,6 @@
 import { Dialog, DialogTitle, DialogContent, Button } from '@mui/material';
 import { text } from '../util.ts';
+import { useLanguage } from '../providers/LanguageProvider.tsx';
 
 interface AreYouSureProps {
   open: boolean;
@@ -11,11 +12,20 @@ interface AreYouSureProps {
 
 export default function AreYouSure({
   open,
-  title = text('Are you sure?', 'Weet je het zeker?'),
-  message = text('Do you really want to proceed?', 'Wil je echt doorgaan?'),
+  title ,
+  message,
   onConfirm,
   onCancel
 }: AreYouSureProps) {
+  const { language: lang } = useLanguage();
+
+  if (!title) {
+    title = text(lang, 'Are you sure?', 'Weet je het zeker?')
+  }
+  if (!message) {
+    message = text(lang, 'Do you really want to proceed?', 'Wil je echt doorgaan?')
+  }
+
   return (
     <Dialog open={open} onClose={onCancel}>
       <DialogTitle>{title}</DialogTitle>

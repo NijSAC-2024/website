@@ -13,6 +13,8 @@ export type MembershipStatus = 'pending' | 'member' | 'extraordinary' | 'nonMemb
 
 export type QuestionType = 'shortText' | 'longText' | 'number' | 'time';
 
+export type LanguageEnum = 'nl' | 'en';
+
 export interface OptionsType {
   id: WeekendType | ActivityType | MembershipStatus | QuestionType;
   label: Language;

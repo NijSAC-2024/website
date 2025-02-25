@@ -6,7 +6,6 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        // eslint-disable-next-line no-undef
         target: process?.env?.REMOTE_API ?? 'http://localhost:3000',
         changeOrigin: true
       }

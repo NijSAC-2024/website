@@ -4,14 +4,15 @@ import { text } from '../../util';
 import RemoveIcon from '@mui/icons-material/Remove';
 import AddIcon from '@mui/icons-material/Add';
 import moment from 'moment/moment';
+import { useLanguage } from '../../providers/LanguageProvider.tsx';
 
 interface ItemsTableProps {
   reservation: ReservationType;
-  // eslint-disable-next-line no-unused-vars
   onAmountChange: (name: string, increment: boolean) => void;
 }
 
 export default function ItemsTable({ reservation, onAmountChange }: ItemsTableProps) {
+  const { language: lang } = useLanguage();
   const findRemark = (itemName: Language): Language => {
     const rentOption = rentOptions.find((option) => option.name.en === itemName.en);
     return rentOption?.remark || { en: '', nl: '' };
@@ -60,10 +61,10 @@ export default function ItemsTable({ reservation, onAmountChange }: ItemsTablePr
         {reservation.items.length > 0 && (
           <TableHead>
             <TableRow>
-              <TableCell>{text('Material', 'Materiaal')}</TableCell>
-              <TableCell>{text('Price', 'Prijs')}</TableCell>
-              <TableCell>{text('Amount', 'Aantal')}</TableCell>
-              <TableCell>{text('Total', 'Totaal')}</TableCell>
+              <TableCell>{text(lang, 'Material', 'Materiaal')}</TableCell>
+              <TableCell>{text(lang, 'Price', 'Prijs')}</TableCell>
+              <TableCell>{text(lang, 'Amount', 'Aantal')}</TableCell>
+              <TableCell>{text(lang, 'Total', 'Totaal')}</TableCell>
             </TableRow>
           </TableHead>
         )}

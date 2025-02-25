@@ -1,5 +1,5 @@
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import { Activity } from '../types.ts';
+import { Activity, ActivityContent } from '../types.ts';
 import { useAppState } from './AppStateProvider.tsx';
 import { apiFetch } from '../api.ts';
 import { enqueueSnackbar } from 'notistack';
@@ -7,6 +7,8 @@ import { enqueueSnackbar } from 'notistack';
 interface ApiContextType {
   activities?: Activity[],
   activity?: Activity,
+  updateActivity: (id: string, activity: ActivityContent) => Promise<void>,
+  createActivity: (activity: ActivityContent) => Promise<void>,
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -17,9 +19,45 @@ interface ApiProviderProps {
 
 export default function ApiProvider({ children }: ApiProviderProps) {
   const { route } = useAppState();
+  // we use this boolean to invalidate cached API calls whenever an item gets updated.
+  // The `useEffects` depend on the boolean to trigger a reload on any change
+  const [cache, setCache] = useState<boolean>(false);
   const [activities, setActivities] = useState<Array<Activity>>([]);
-  const [activity, setActivity] = useState<Activity|undefined>(undefined);
-  console.log('create API provider, route name: ', route.name);
+  const [activity, setActivity] = useState<Activity | undefined>(undefined);
+
+  const updateActivity = async (id: string, activity: ActivityContent) => {
+    const { error, data: updatedActivity } = await apiFetch<Activity>(`/activity/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(activity)
+    });
+    if (error) {
+      enqueueSnackbar(`${error.message}: ${error.reference}`, {
+        variant: 'error'
+      });
+      return
+    }
+    setActivity(updatedActivity);
+    enqueueSnackbar('saved', {
+      variant: 'success'
+    });
+  };
+
+  const createActivity = async (activity: ActivityContent) => {
+    const { error, data: updatedActivity } = await apiFetch<Activity>('/activity', {
+      method: 'POST',
+      body: JSON.stringify(activity)
+    });
+    if (error) {
+      enqueueSnackbar(`${error.message}: ${error.reference}`, {
+        variant: 'error'
+      });
+      return
+    }
+    setActivity(updatedActivity);
+    enqueueSnackbar('saved', {
+      variant: 'success'
+    });
+  };
 
   useEffect(() => {
     if (route.name === 'agenda') {
@@ -36,7 +74,7 @@ export default function ApiProvider({ children }: ApiProviderProps) {
         }
       );
     }
-  }, [route.name]);
+  }, [cache, route.name]);
 
   useEffect(() => {
     if (route.name === 'activity') {
@@ -47,16 +85,16 @@ export default function ApiProvider({ children }: ApiProviderProps) {
               variant: 'error'
             });
           }
-          if (activities) {
+          if (activity) {
             setActivity(activity);
           }
         }
       );
     }
-  }, [route.name]);
+  }, [cache, route.name, route.params]);
 
   return (
-    <ApiContext.Provider value={{ activities, activity }}>
+    <ApiContext.Provider value={{ activities, activity, updateActivity, createActivity }}>
       {children}
     </ApiContext.Provider>
   );

@@ -10,24 +10,28 @@ import {
 } from '@mui/material';
 import { text } from '../util.ts';
 import { OptionsType } from '../types.ts';
+import { useLanguage } from '../providers/LanguageProvider.tsx';
 
 interface OptionSelectorProps {
   options: OptionsType[];
-  onChange: (selectedOptions: OptionsType[]) => void;
+  selected?: string[];
+  onChange: (selectedOptions: string[]) => void;
   label: string;
 }
 
 export default function OptionSelector({
   options,
+  selected,
   onChange,
   label,
 }: OptionSelectorProps) {
-  const [selectedOptions, setSelectedOptions] = useState<OptionsType[]>(options);
+  const { language: lang } = useLanguage();
+  const [selectedOptions, setSelectedOptions] = useState<string[]>(selected || []);
 
-  const handleChange = (value: string | OptionsType[]) => {
-    const selectedValues = typeof value === 'string' ? value.split(',') : value;
-    setSelectedOptions(selectedValues as OptionsType[]);
-    onChange(selectedValues as OptionsType[]);
+  const handleChange = (value: string[]) => {
+    // const selectedValues = value.split(',');
+    setSelectedOptions(value);
+    onChange(value);
   };
 
   return (
@@ -41,12 +45,13 @@ export default function OptionSelector({
         input={<OutlinedInput id="select-multiple-chip" label={label} />}
         renderValue={(selected) => (
           <div className="flex flex-wrap gap-1">
-            {selected.map((id) => {
-              const option = options.find((opt) => opt.id === id);
+            {selected.map((selected_id) => {
+              console.log('selected: ', selected);
+              const option = options.find((opt) => opt.id === selected_id);
               return (
                 <Chip
-                  key={id}
-                  label={option ? text(option.label.en, option.label.nl) : id}
+                  key={selected_id}
+                  label={option ? text(lang, option.label.en, option.label.nl) : selected_id}
                   className="uppercase font-semibold"
                   size="small"
                 />
@@ -58,7 +63,7 @@ export default function OptionSelector({
         {options.map((option) => (
           <MenuItem key={option.id} value={option.id}>
             <Checkbox checked={selectedOptions.includes(option.id)} />
-            {text(option.label.en, option.label.nl)}
+            {text(lang, option.label.en, option.label.nl)}
           </MenuItem>
         ))}
       </Select>

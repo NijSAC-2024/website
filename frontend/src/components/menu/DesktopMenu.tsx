@@ -15,6 +15,7 @@ interface DesktopMenuProps {
 }
 
 export default function DesktopMenu({ handleLoginOpen }: DesktopMenuProps) {
+  const { language: lang } = useLanguage();
   const { navigate } = useAppState();
   const { isLoggedIn } = useAuth();
   const { setEnglish, setDutch } = useLanguage();
@@ -46,7 +47,7 @@ export default function DesktopMenu({ handleLoginOpen }: DesktopMenuProps) {
         />
         </Link>
         <Button color="inherit" onClick={() => navigate('agenda')}>
-          {text('Agenda', 'Agenda')}
+          {text(lang, 'Agenda', 'Agenda')}
         </Button>
 
         {/* Association Dropdown */}
@@ -55,15 +56,15 @@ export default function DesktopMenu({ handleLoginOpen }: DesktopMenuProps) {
           className="flex items-center"
           onClick={(e) => handleMenuOpen(e, 'association')}
         >
-          {text('Association', 'Vereniging')} <ExpandMoreIcon />
+          {text(lang, 'Association', 'Vereniging')} <ExpandMoreIcon />
         </Button>
         <Menu anchorEl={anchorEl} open={openMenu === 'association'} onClose={handleMenuClose}>
           <MenuItem onClick={handleMenuClose}>
-            {text('About the NijSAC', 'Over de NijSAC')}
+            {text(lang, 'About the NijSAC', 'Over de NijSAC')}
           </MenuItem>
-          <MenuItem onClick={handleMenuClose}>{text('Board', 'Bestuur')}</MenuItem>
-          <MenuItem onClick={handleMenuClose}>{text('Committees', 'Commissies')}</MenuItem>
-          <MenuItem onClick={handleMenuClose}>{text('Introduction', 'Introductie')}</MenuItem>
+          <MenuItem onClick={handleMenuClose}>{text(lang, 'Board', 'Bestuur')}</MenuItem>
+          <MenuItem onClick={handleMenuClose}>{text(lang, 'Committees', 'Commissies')}</MenuItem>
+          <MenuItem onClick={handleMenuClose}>{text(lang, 'Introduction', 'Introductie')}</MenuItem>
         </Menu>
 
         {/* Climbing Dropdown */}
@@ -72,16 +73,16 @@ export default function DesktopMenu({ handleLoginOpen }: DesktopMenuProps) {
           className="flex items-center"
           onClick={(e) => handleMenuOpen(e, 'climbing')}
         >
-          {text('Climbing', 'Klimmen')} <ExpandMoreIcon />
+          {text(lang, 'Climbing', 'Klimmen')} <ExpandMoreIcon />
         </Button>
         <Menu anchorEl={anchorEl} open={openMenu === 'climbing'} onClose={handleMenuClose}>
-          <MenuItem onClick={handleMenuClose}>{text('Indoor Climbing', 'Indoor Klimmen')}</MenuItem>
+          <MenuItem onClick={handleMenuClose}>{text(lang, 'Indoor Climbing', 'Indoor Klimmen')}</MenuItem>
           <MenuItem onClick={handleMenuClose}>
-            {text('Outdoor Climbing', 'Buiten Klimmen')}
+            {text(lang, 'Outdoor Climbing', 'Buiten Klimmen')}
           </MenuItem>
-          <MenuItem onClick={handleMenuClose}>{text('Climbing Areas', 'Klimgebieden')}</MenuItem>
+          <MenuItem onClick={handleMenuClose}>{text(lang, 'Climbing Areas', 'Klimgebieden')}</MenuItem>
           <MenuItem onClick={() => navigateSubmenu('/material-rental')}>
-            {text('Material Rental', 'Materiaalverhuur')}
+            {text(lang, 'Material Rental', 'Materiaalverhuur')}
           </MenuItem>
         </Menu>
 
@@ -91,22 +92,22 @@ export default function DesktopMenu({ handleLoginOpen }: DesktopMenuProps) {
           className="flex items-center"
           onClick={(e) => handleMenuOpen(e, 'alps')}
         >
-          {text('Alps', 'Alpen')} <ExpandMoreIcon />
+          {text(lang, 'Alps', 'Alpen')} <ExpandMoreIcon />
         </Button>
         <Menu anchorEl={anchorEl} open={openMenu === 'alps'} onClose={handleMenuClose}>
           {/* Summer */}
-          <p className="px-3 py-1 text-gray-500">{text('Summer', 'Zomer')}</p>
-          <MenuItem onClick={handleMenuClose}>{text('Mountaineering', 'Bergbeklimmen')}</MenuItem>
-          <MenuItem onClick={handleMenuClose}>{text('Canyoning', 'Canyoning')}</MenuItem>
-          <MenuItem onClick={handleMenuClose}>{text('Via Ferrata', 'Via Ferrata')}</MenuItem>
-          <MenuItem onClick={handleMenuClose}>{text('Hiking', 'Wandelen')}</MenuItem>
+          <p className="px-3 py-1 text-gray-500">{text(lang, 'Summer', 'Zomer')}</p>
+          <MenuItem onClick={handleMenuClose}>{text(lang, 'Mountaineering', 'Bergbeklimmen')}</MenuItem>
+          <MenuItem onClick={handleMenuClose}>{text(lang, 'Canyoning', 'Canyoning')}</MenuItem>
+          <MenuItem onClick={handleMenuClose}>{text(lang, 'Via Ferrata', 'Via Ferrata')}</MenuItem>
+          <MenuItem onClick={handleMenuClose}>{text(lang, 'Hiking', 'Wandelen')}</MenuItem>
           {/* Winter */}
-          <p className="px-3 py-1 mt-2 text-gray-500">{text('Winter', 'Winter')}</p>
-          <MenuItem onClick={handleMenuClose}>{text('Ice Climbing', 'Ijsklimmen')}</MenuItem>
+          <p className="px-3 py-1 mt-2 text-gray-500">{text(lang, 'Winter', 'Winter')}</p>
+          <MenuItem onClick={handleMenuClose}>{text(lang, 'Ice Climbing', 'Ijsklimmen')}</MenuItem>
           <MenuItem onClick={handleMenuClose}>
-            {text('Off Piste Skiing', 'Off Piste Skiën')}
+            {text(lang, 'Off Piste Skiing', 'Off Piste Skiën')}
           </MenuItem>
-          <MenuItem onClick={handleMenuClose}>{text('Tour Skiing', 'Toerskiën')}</MenuItem>
+          <MenuItem onClick={handleMenuClose}>{text(lang, 'Tour Skiing', 'Toerskiën')}</MenuItem>
         </Menu>
       </div>
       <div className="flex items-center">
@@ -116,7 +117,7 @@ export default function DesktopMenu({ handleLoginOpen }: DesktopMenuProps) {
           className="flex items-center"
           onClick={(e) => handleMenuOpen(e, 'language')}
         >
-          {text('EN', 'NL')}
+          {text(lang, 'EN', 'NL')}
           <ExpandMoreIcon />
         </Button>
         <Menu anchorEl={anchorEl} open={openMenu === 'language'} onClose={handleMenuClose}>
@@ -142,10 +143,10 @@ export default function DesktopMenu({ handleLoginOpen }: DesktopMenuProps) {
         {!isLoggedIn ? (
           <>
             <Button color="inherit" onClick={handleLoginOpen}>
-              {text('Login', 'Inloggen')}
+              {text(lang, 'Login', 'Inloggen')}
             </Button>
             <Button variant="contained" onClick={() => navigate('register')}>
-              {text('Become a member', 'Lid worden')}
+              {text(lang, 'Become a member', 'Lid worden')}
             </Button>
           </>
         ) : (

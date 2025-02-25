@@ -1,11 +1,10 @@
-import { createContext, useContext, useMemo, ReactNode, useState } from 'react';
+import { createContext, ReactNode, useContext, useMemo, useState } from 'react';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers';
-// import { enqueueSnackbar } from 'notistack';
+import { LanguageEnum } from '../types.ts';
 
 interface LanguageContextType {
-  language: boolean;
-  getLangCode: () => string;
+  language: LanguageEnum;
   setDutch: () => void;
   setEnglish: () => void;
   toggleLanguage: () => void;
@@ -18,40 +17,34 @@ interface LanguageProviderProps {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export default function LanguageProvider({ children }: LanguageProviderProps) {
-  const [language, setLanguage] = useState<boolean>(navigator.language.slice(0, 2) !== 'nl');
+  const [language, setLanguage] = useState<LanguageEnum>(navigator.language.slice(0, 2) === 'nl' ? 'nl' : 'en');
 
   const setEnglish = () => {
-    setLanguage(true);
-    // enqueueSnackbar('Changed language to English.', {
-    //   variant: 'info'
-    // });
+    setLanguage('en');
   };
 
   const setDutch = () => {
-    // enqueueSnackbar('Taal veranderd naar Nederlands.', {
-    //   variant: 'info'
-    // });
-    setLanguage(false);
+    setLanguage('nl');
   };
 
-  const getLangCode = () => (language ? 'en' : 'nl');
+  const toggleLanguage = () => (language === 'nl' ? setEnglish() : setDutch());
 
-  const toggleLanguage = () => (language ? setDutch() : setEnglish());
-
-  const value = useMemo(
-    () => ({
-      language,
-      getLangCode,
-      setDutch,
-      setEnglish,
-      toggleLanguage
-    }),
-    [language]
-  );
+  // const value = useMemo(
+  //   () => {
+  //     const toggleLanguage = () => (language === 'nl' ? setEnglish() : setDutch());
+  //     return {
+  //       language,
+  //       setDutch,
+  //       setEnglish,
+  //       toggleLanguage
+  //     };
+  //   },
+  //   [language]
+  // );
 
   return (
-    <LanguageContext.Provider value={value}>
-      <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={getLangCode()}>
+    <LanguageContext.Provider value={{language, setDutch, setEnglish, toggleLanguage}}>
+      <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={language}>
         {children}
       </LocalizationProvider>
     </LanguageContext.Provider>

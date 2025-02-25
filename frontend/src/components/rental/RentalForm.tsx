@@ -6,16 +6,14 @@ import { text } from '../../util.ts';
 import { rentOption, ReservationItemType, ReservationType } from '../../types.ts';
 import ItemSelection from './ItemSelection.tsx';
 import ItemsTable from './ItemsTable.tsx';
+import { useLanguage } from '../../providers/LanguageProvider.tsx';
 
 interface RentalFormProps {
   reservation: ReservationType;
   handleReservationChange: (
-    // eslint-disable-next-line no-unused-vars
     name: keyof ReservationType,
-    // eslint-disable-next-line no-unused-vars
     value: string | ReservationItemType[]
   ) => void;
-  // eslint-disable-next-line no-unused-vars
   handleReservationSubmit: (reservation: ReservationType) => void;
 }
 
@@ -24,6 +22,7 @@ export default function RentalForm({
   handleReservationChange,
   handleReservationSubmit
 }: RentalFormProps) {
+  const { language: lang } = useLanguage();
   const [selectedItem, setSelectedItem] = useState<rentOption | null>(null);
 
   const handleAddItem = () => {
@@ -56,9 +55,9 @@ export default function RentalForm({
           const newAmount = increment ? item.amount + 1 : item.amount - 1;
           return newAmount > 0
             ? {
-                ...item,
-                amount: newAmount
-              }
+              ...item,
+              amount: newAmount
+            }
             : null;
         }
         return item;
@@ -70,9 +69,10 @@ export default function RentalForm({
   return (
     <div className="grid gap-5">
       <div className="grid gap-1">
-        <h2>{text('Rental Request', 'Huuraanvraag')}</h2>
+        <h2>{text(lang, 'Rental Request', 'Huuraanvraag')}</h2>
         <p>
           {text(
+            lang,
             'Select your preferred usage dates. Once your request is approved, you can coordinate with the Matcie to agree on the pick-up and drop-off dates.',
             'Selecteer de gewenste gebruiksdata. Zodra je aanvraag is goedgekeurd, kun je contact opnemen met de Matcie om de ophaal- en retourdata af te stemmen.'
           )}
@@ -81,12 +81,12 @@ export default function RentalForm({
       <div className="grid gap-3">
         <div className="grid grid-cols-2 gap-3">
           <DatePicker
-            label={text('Start Date', 'Startdatum')}
+            label={text(lang, 'Start Date', 'Startdatum')}
             value={moment(reservation.startDate)}
             onChange={(date) => handleReservationChange('startDate', date!.toISOString())}
           />
           <DatePicker
-            label={text('End Date', 'Einddatum')}
+            label={text(lang, 'End Date', 'Einddatum')}
             value={moment(reservation.endDate)}
             onChange={(date) => handleReservationChange('endDate', date!.toISOString())}
           />
@@ -103,7 +103,7 @@ export default function RentalForm({
       <TextField
         multiline
         value={reservation.remarks}
-        label={text('Remarks', 'Opmerkingen')}
+        label={text(lang, 'Remarks', 'Opmerkingen')}
         onChange={(e) => handleReservationChange('remarks', e.target.value)}
       />
 
@@ -117,10 +117,11 @@ export default function RentalForm({
             moment(reservation.endDate).isBefore(moment(reservation.startDate))
           }
         >
-          {text('Submit request*', 'Verstuur aanvraag*')}
+          {text(lang, 'Submit request*', 'Verstuur aanvraag*')}
         </Button>
         <p>
           {text(
+            lang,
             '* Please note that your request still needs to be approved by the Matcie. You can view your requests and their status on your account page.',
             '* Let op: je aanvraag moet nog worden goedgekeurd door de Matcie. Je kunt je aanvragen en de status ervan bekijken op je accountpagina.'
           )}

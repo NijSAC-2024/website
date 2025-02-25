@@ -15,6 +15,7 @@ import { DateTimePicker } from '@mui/x-date-pickers';
 import moment from 'moment';
 import OptionSelector from '../OptionSelector.tsx';
 import EditRegistrationQuestions from './EditRegistrationQuestions.tsx';
+import { useLanguage } from '../../providers/LanguageProvider.tsx';
 
 interface EditRegistrationProps {
   requiredMembershipStatus: MembershipStatus[];
@@ -43,6 +44,7 @@ export default function EditRegistrations({
   handleAddRegistrationQuestion,
   handleRemoveRegistrationQuestion
 }: EditRegistrationProps) {
+  const { language: lang } = useLanguage();
   const handleToggleRegistrations = () => {
     const now = new Date();
     handleFieldChange('registrationPeriod', { start: now, end: dates[0]?.start || now });
@@ -51,9 +53,9 @@ export default function EditRegistrations({
   return (
     <ContentCard className="xl:col-span-3">
       <div className="flex justify-between p-7">
-        <h1>{text('Registrations', 'Inschrijvingen')}</h1>
+        <h1>{text(lang, 'Registrations', 'Inschrijvingen')}</h1>
         <div className="flex items-center">
-          <p>{text('Allow registrations', 'Open voor inschrijvingen')}</p>
+          <p>{text(lang, 'Allow registrations', 'Open voor inschrijvingen')}</p>
           <Switch checked={!!registrationPeriod} onChange={handleToggleRegistrations} />
         </div>
       </div>
@@ -61,7 +63,7 @@ export default function EditRegistrations({
         <div className="grid p-7 gap-3 border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
           {/* Max Registrations and Registration Dates */}
           <div className="flex items-center">
-            <p>{text('Maximum registrations', 'Maximum inschrjvingen')}</p>
+            <p>{text(lang, 'Maximum registrations', 'Maximum inschrjvingen')}</p>
             <Switch
               checked={!!registrationMax}
               onChange={() => handleFieldChange('registrationMax', registrationMax ? 10 : null)}
@@ -71,14 +73,14 @@ export default function EditRegistrations({
             <TextField
               fullWidth
               type="number"
-              label={text('Maximum Registrations', 'Maximaal Aantal Inschrijvingen')}
+              label={text(lang, 'Maximum Registrations', 'Maximaal Aantal Inschrijvingen')}
               value={registrationMax || 10}
               onChange={(e) => handleFieldChange('registrationMax', parseInt(e.target.value))}
             />
           </Collapse>
           <div className="grid grid-cols-2 gap-3">
             <DateTimePicker
-              label={text('Start Date Registrations', 'Startdatum Inschrijvingen')}
+              label={text(lang, 'Start Date Registrations', 'Startdatum Inschrijvingen')}
               value={moment(registrationPeriod?.start)}
               onChange={(date) => handleFieldChange('registrationPeriod', {
                 start: date!.toDate(),
@@ -86,7 +88,7 @@ export default function EditRegistrations({
               })}
             />
             <DateTimePicker
-              label={text('End Date Registrations', 'Einddatum Inschrijvingen')}
+              label={text(lang, 'End Date Registrations', 'Einddatum Inschrijvingen')}
               value={moment(registrationPeriod?.end)}
               onChange={(date) => handleFieldChange('registrationPeriod', {
                 start: date!.toDate(),
@@ -97,7 +99,7 @@ export default function EditRegistrations({
           <OptionSelector
             options={memberOptions}
             onChange={(selected) => handleFieldChange('requiredMembershipStatus', selected)}
-            label={text('Necessary Membership Status', 'Benodigd Lidmaatschapstatus')}
+            label={text(lang, 'Necessary Membership Status', 'Benodigd Lidmaatschapstatus')}
             initialOptions={requiredMembershipStatus}
           />
 

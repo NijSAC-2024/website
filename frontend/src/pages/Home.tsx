@@ -4,8 +4,10 @@ import { enqueueSnackbar } from 'notistack';
 import { text } from '../util.ts';
 import GenericPage from './GenericPage.tsx';
 import ContentCard from '../components/ContentCard.tsx';
+import { useLanguage } from '../providers/LanguageProvider.tsx';
 
 export default function Home() {
+  const { language: lang } = useLanguage();
   const { isDarkMode, toggleTheme } = useThemeMode();
 
   const handleTestToken = async () => {
@@ -33,14 +35,14 @@ export default function Home() {
   return (
     <GenericPage>
       <ContentCard className="grid gap-5 p-7">
-        <h2>{text('Welcome to the NijSAC website.', 'Welkom op de NijSAC website.')}</h2>
+        <h2>{text(lang, 'Welcome to the NijSAC website.', 'Welkom op de NijSAC website.')}</h2>
         <Button variant="contained" onClick={handleTestToken}>
           Test token
         </Button>
         <div className="grid grid-cols-3">
-          <h3 className="mx-auto">{text('Light mode', 'Licht thema')}</h3>
+          <h3 className="mx-auto">{text(lang, 'Light mode', 'Licht thema')}</h3>
           <Switch className="mx-auto" checked={isDarkMode} onChange={toggleTheme} />
-          <h3 className="mx-auto">{text('Dark mode', 'Donker thema')}</h3>
+          <h3 className="mx-auto">{text(lang, 'Dark mode', 'Donker thema')}</h3>
         </div>
       </ContentCard>
     </GenericPage>

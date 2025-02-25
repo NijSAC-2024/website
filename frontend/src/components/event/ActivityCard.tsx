@@ -3,7 +3,7 @@ import GroupIcon from '@mui/icons-material/Group';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import moment from 'moment';
 import { Chip } from '@mui/material';
-import { text, getLabel } from '../../util.ts';
+import { getLabel, text } from '../../util.ts';
 import 'moment/dist/locale/nl';
 import { Activity, DateType } from '../../types.ts';
 import Markdown from 'react-markdown';
@@ -15,16 +15,13 @@ interface AgendaCardProps {
 }
 
 export default function ActivityCard({ activity, agendaPage }: AgendaCardProps) {
-  const { getLangCode } = useLanguage();
-  const langCode = getLangCode();
-  moment.locale(langCode);
+  const { language: lang } = useLanguage();
+  moment.locale(lang);
 
-  // console.log(activity)
+  console.log('activity: ', activity);
 
   const formatDate = (date: DateType): string => {
-    const { getLangCode } = useLanguage();
-    const langCode = getLangCode();
-    moment.locale(langCode);
+    moment.locale(lang);
 
     const start = new Date(date.start);
     const end = new Date(date.end);
@@ -76,7 +73,8 @@ export default function ActivityCard({ activity, agendaPage }: AgendaCardProps) 
   };
 
   return (
-    <div className="w-full rounded-2xl bg-inherit border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] flex flex-col relative justify-between">
+    <div
+      className="w-full rounded-2xl bg-inherit border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] flex flex-col relative justify-between">
       <Chip
         label={formatDate(activity.dates[0])}
         className="absolute uppercase font-semibold top-5 right-5"
@@ -85,7 +83,7 @@ export default function ActivityCard({ activity, agendaPage }: AgendaCardProps) 
       />
       {agendaPage && !activity.isPublished && (
         <Chip
-          label={text('Draft', 'Concept')}
+          label={text(lang, 'Draft', 'Concept')}
           className="absolute uppercase font-semibold top-5 left-5"
           color="primary"
         />
@@ -95,14 +93,14 @@ export default function ActivityCard({ activity, agendaPage }: AgendaCardProps) 
         <div className="flex justify-between">
           <div className="flex flex-wrap gap-1">
             <Chip
-              label={text(getLabel(activity.activityType))}
+              label={text(lang, getLabel(activity.activityType))}
               className="uppercase font-semibold"
               size="small"
             />
             {activity.metadata?.type?.map((type) => (
               <Chip
                 key={`${activity.id}-${type}`}
-                label={text(getLabel(type))}
+                label={text(lang, getLabel(type))}
                 className="uppercase font-semibold"
                 size="small"
               />
@@ -113,10 +111,11 @@ export default function ActivityCard({ activity, agendaPage }: AgendaCardProps) 
             {activity.location.name.en}
           </div>
         </div>
-        <h2>{text(activity.name.en, activity.name.nl)}</h2>
+        <h2>{text(lang, activity.name.en, activity.name.nl)}</h2>
         {agendaPage ? (
           <Markdown>
             {text(
+              lang,
               truncateMarkdown(activity.description?.en, 120),
               truncateMarkdown(activity.description?.nl, 120)
             )}
@@ -124,7 +123,7 @@ export default function ActivityCard({ activity, agendaPage }: AgendaCardProps) 
         ) : (
           activity.dates.length > 1 && (
             <>
-              <b>{text(getLabel(activity.activityType)) + text(' dates:', ' datums:')}</b>
+              <b>{text(lang, getLabel(activity.activityType)) + text(lang, ' dates:', ' datums:')}</b>
               {activity.dates.map((date) => (
                 <p>{formatDate(date)}</p>
               ))}
@@ -133,7 +132,8 @@ export default function ActivityCard({ activity, agendaPage }: AgendaCardProps) 
         )}
       </div>
       {activity.registrationPeriod?.start && activity.registrationPeriod?.end && (
-        <div className="p-5 flex justify-between items-center border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
+        <div
+          className="p-5 flex justify-between items-center border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
           <div className="flex items-center">
             <GroupIcon className="mr-2" />
             <p>

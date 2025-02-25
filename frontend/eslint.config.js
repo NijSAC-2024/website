@@ -1,5 +1,6 @@
 import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
+import hooksPlugin from 'eslint-plugin-react-hooks';
 
 export default tseslint.config(
   eslint.configs.recommended,
@@ -7,7 +8,9 @@ export default tseslint.config(
   {
     plugins: {
       'typescript-eslint': tseslint.plugin,
+      'react-hooks': hooksPlugin,
     },
+    ignores: ['eslint.config.js', 'vite.config.ts', 'tailwind.config.js'],
     languageOptions: {
       parserOptions: {
         parser: tseslint.parser,
@@ -17,6 +20,7 @@ export default tseslint.config(
       },
     },
     rules: {
+      ...hooksPlugin.configs.recommended.rules,
       indent: [
         "error",
         2

@@ -6,8 +6,10 @@ import { Location } from '../../types.ts';
 import { text } from '../../util.ts';
 import { apiFetch } from '../../api.ts';
 import { enqueueSnackbar } from 'notistack';
+import { useLanguage } from '../../providers/LanguageProvider.tsx';
 
 export default function EditLocation() {
+  const { language: lang } = useLanguage();
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState<Location[]>([]);
   const [loading, setLoading] = useState(false);
@@ -26,13 +28,13 @@ export default function EditLocation() {
 
     if (error) {
       switch (error.message) {
-        case 'Unauthorized':
-          enqueueSnackbar('Incorrect email or password.', { variant: 'error' });
-          break;
-        default:
-          enqueueSnackbar(`${error.message}: ${error.reference}`, {
-            variant: 'error'
-          });
+      case 'Unauthorized':
+        enqueueSnackbar('Incorrect email or password.', { variant: 'error' });
+        break;
+      default:
+        enqueueSnackbar(`${error.message}: ${error.reference}`, {
+          variant: 'error'
+        });
       }
     } else if (data) {
       setOptions(data);
@@ -51,13 +53,13 @@ export default function EditLocation() {
       onOpen={handleOpen}
       onClose={handleClose}
       isOptionEqualToValue={(option, value) => option.id === value.id}
-      getOptionLabel={(option) => option.nameEn}
+      getOptionLabel={(location) => text(lang, location.name)}
       options={options}
       loading={loading}
       renderInput={(params) => (
         <TextField
           {...params}
-          label={text('Location', 'Locatie')}
+          label={text(lang, 'Location', 'Locatie')}
           slotProps={{
             input: {
               ...params.InputProps,

@@ -1,6 +1,6 @@
-import React, { useContext } from 'react';
-import { StateContext } from '../hooks/useState';
+import React from 'react';
 import { matchName } from '../router';
+import { useAppState } from '../providers/AppStateProvider.tsx';
 
 interface LinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
   routeName?: string;
@@ -10,9 +10,8 @@ interface LinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
 }
 
 export default function Link({ routeName, params, keepParams, className, onClick, ...props }: LinkProps) {
-  const { state, navigate } = useContext(StateContext);
-  const currentRoute = state.route;
-  const currentParams = state.route.params;
+  const { navigate, route: currentRoute, } = useAppState();
+  const currentParams = currentRoute.params;
 
   const targetRouteName = routeName || currentRoute.name;
   const targetParams = keepParams ? { ...currentParams, ...(params || {}) } : params || {};

@@ -17,6 +17,7 @@ import Agenda from './pages/Agenda.tsx';
 import ErrorPage from './pages/ErrorPage.tsx';
 import AddEvent from './pages/AddEvent.tsx';
 import { useAppState } from './providers/AppStateProvider.tsx';
+import Event from './pages/Event.tsx';
 
 export default function App(): React.ReactElement {
   const { navigate, route } = useAppState();
@@ -133,6 +134,8 @@ export default function App(): React.ReactElement {
     component = <Agenda />;
   } else if (route.name == 'new_activity') {
     component = <AddEvent />;
+  } else if (route.name == 'activity') {
+    component = <Event />;
   } else {
     console.log('not found');
     component = <ErrorPage error={'Page not found'} />;

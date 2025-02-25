@@ -1,6 +1,5 @@
 /* global RequestInit */
 import { enqueueSnackbar } from 'notistack';
-import { text } from './util.ts';
 
 interface errorType {
   message: string;
@@ -29,7 +28,7 @@ async function apiFetchResponse(url: string, options: RequestInit = {}): Promise
         error = JSON.parse(errorText);
       } catch {
         error = {
-          message: text('An unexpected error occurred', 'Er is een onverwachte fout opgetreden'),
+          message: 'An unexpected error occurred',
           status: response.status,
           reference: `URL: ${url}`
         };

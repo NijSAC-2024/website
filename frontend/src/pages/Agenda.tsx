@@ -8,8 +8,10 @@ import AddIcon from '@mui/icons-material/Add';
 import Link from '../components/Link.tsx';
 import ActivityCard from '../components/event/ActivityCard.tsx';
 import { useApiState } from '../providers/ApiProvider.tsx';
+import { useLanguage } from '../providers/LanguageProvider.tsx';
 
 export default function Agenda() {
+  const { language: lang } = useLanguage();
   const { activities } = useApiState();
   const [selectedCategory, setSelectedCategory] = useState<ActivityType | 'all'>('all');
   const [selectedType, setSelectedType] = useState<WeekendType | 'all'>('all');
@@ -20,7 +22,7 @@ export default function Agenda() {
         <Link routeName={'new_activity'}>
           <Fab variant="extended" color="primary">
             <AddIcon className="mr-2" />
-            <p>{text('Add event', 'Voeg evenement toe')}</p>
+            <p>{text(lang, 'Add event', 'Voeg evenement toe')}</p>
           </Fab>
         </Link>
       </div>
@@ -31,51 +33,53 @@ export default function Agenda() {
               <h1>Agenda</h1>
               <p>
                 {text(
+                  lang,
                   'To register for events you must first log in.',
                   'Om je aan te melden voor evenementen moet je eerst ingelogd zijn.'
                 )}
               </p>
               <p>
                 {text(
+                  lang,
                   'Questions about activities or climbing weekends? Contact the board or the climbing commissioner.',
                   'Vragen over activiteiten of klimweekenden? Neem contact met het bestuur of de klimcommissaris.'
                 )}
               </p>
             </ContentCard>
             <ContentCard className="xl:col-span-1 lg:col-span-2 p-7">
-              <h2 className="mb-3">{text('Filter', 'Filteren')}</h2>
+              <h2 className="mb-3">{text(lang, 'Filter', 'Filteren')}</h2>
               <div className="grid gap-3">
                 <FormControl fullWidth>
-                  <InputLabel id="select-label">{text('Category', 'Categorie')}</InputLabel>
+                  <InputLabel id="select-label">{text(lang, 'Category', 'Categorie')}</InputLabel>
                   <Select
                     labelId="select-label"
                     value={selectedCategory}
-                    label={text('Category', 'Categorie')}
+                    label={text(lang, 'Category', 'Categorie')}
                     onChange={(e) => setSelectedCategory(e.target.value as ActivityType | 'all')}
                     variant="outlined"
                   >
-                    <MenuItem value="all">{text('All', 'Alles')}</MenuItem>
-                    <MenuItem value="activity">{text('Activities', 'Activiteiten')}</MenuItem>
-                    <MenuItem value="course">{text('Courses', 'Cursussen')}</MenuItem>
-                    <MenuItem value="training">{text('Trainings', 'Trainingen')}</MenuItem>
-                    <MenuItem value="weekend">{text('Weekends', 'Weekenden')}</MenuItem>
+                    <MenuItem value="all">{text(lang, 'All', 'Alles')}</MenuItem>
+                    <MenuItem value="activity">{text(lang, 'Activities', 'Activiteiten')}</MenuItem>
+                    <MenuItem value="course">{text(lang, 'Courses', 'Cursussen')}</MenuItem>
+                    <MenuItem value="training">{text(lang, 'Trainings', 'Trainingen')}</MenuItem>
+                    <MenuItem value="weekend">{text(lang, 'Weekends', 'Weekenden')}</MenuItem>
                   </Select>
                 </FormControl>
                 <FormControl fullWidth>
-                  <InputLabel id="select-label">{text('Type', 'Type')}</InputLabel>
+                  <InputLabel id="select-label">{text(lang, 'Type', 'Type')}</InputLabel>
                   <Select
                     labelId="select-label"
                     value={selectedType}
-                    label={text('Type', 'Type')}
+                    label={text(lang, 'Type', 'Type')}
                     onChange={(e) => setSelectedType(e.target.value as WeekendType | 'all')}
                     variant="outlined"
                   >
-                    <MenuItem value="all">{text('All', 'Alles')}</MenuItem>
-                    <MenuItem value="sp">{text('Single Pitch', 'Single Pitch')}</MenuItem>
-                    <MenuItem value="mp">{text('Multi Pitch', 'Multi Pitch')}</MenuItem>
-                    <MenuItem value="education">{text('Education', 'Educatie')}</MenuItem>
-                    <MenuItem value="boulder">{text('Bouldering', 'Boulderen')}</MenuItem>
-                    <MenuItem value="trad">{text('Trad', 'Trad')}</MenuItem>
+                    <MenuItem value="all">{text(lang, 'All', 'Alles')}</MenuItem>
+                    <MenuItem value="sp">{text(lang, 'Single Pitch', 'Single Pitch')}</MenuItem>
+                    <MenuItem value="mp">{text(lang, 'Multi Pitch', 'Multi Pitch')}</MenuItem>
+                    <MenuItem value="education">{text(lang, 'Education', 'Educatie')}</MenuItem>
+                    <MenuItem value="boulder">{text(lang, 'Bouldering', 'Boulderen')}</MenuItem>
+                    <MenuItem value="trad">{text(lang, 'Trad', 'Trad')}</MenuItem>
                   </Select>
                 </FormControl>
               </div>

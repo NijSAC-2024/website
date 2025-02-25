@@ -9,10 +9,12 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import { text } from '../../util.ts';
 import { apiFetch } from '../../api.ts';
+import { useLanguage } from '../../providers/LanguageProvider.tsx';
 
 const steps = ['Personal', 'Education', 'Financial', 'Emergency contact', 'Overview'];
 
 export default function SignupForm() {
+  const { language: lang } = useLanguage();
   const [activeStep, setActiveStep] = useState<number>(0);
   const [email, setEmail] = useState<string>('');
   const [firstName, setFirstName] = useState<string>('');
@@ -48,11 +50,11 @@ export default function SignupForm() {
 
     if (error) {
       switch (error.message) {
-        case 'Conflict':
-          enqueueSnackbar('Email is already in use.', { variant: 'error' });
-          break;
-        default:
-          enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
+      case 'Conflict':
+        enqueueSnackbar('Email is already in use.', { variant: 'error' });
+        break;
+      default:
+        enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
       }
       return;
     }
@@ -78,25 +80,25 @@ export default function SignupForm() {
           })}
         </Stepper>
         <ValidatedTextField
-          label={text('First Name', 'Voornaam')}
+          label={text(lang, 'First Name', 'Voornaam')}
           validator={nameValidator}
           onChange={(isValid) => (formValid.current.firstName = isValid)}
           setValue={setFirstName}
         />
         <ValidatedTextField
-          label={text('Last Name', 'Achternaam')}
+          label={text(lang, 'Last Name', 'Achternaam')}
           validator={nameValidator}
           onChange={(isValid) => (formValid.current.lastName = isValid)}
           setValue={setLastName}
         />
         <ValidatedTextField
-          label={text('Email', 'E-mail')}
+          label={text(lang, 'Email', 'E-mail')}
           validator={emailValidator}
           onChange={(isValid) => (formValid.current.email = isValid)}
           setValue={setEmail}
         />
         <ValidatedPassword
-          label={text('Password', 'Wachtwoord')}
+          label={text(lang, 'Password', 'Wachtwoord')}
           validator={passwordValidator}
           onChange={(isValid) => (formValid.current.password = isValid)}
           setValue={setPassword}
@@ -104,6 +106,7 @@ export default function SignupForm() {
         <FormControlLabel
           control={<Checkbox />}
           label={text(
+            lang,
             'I give permission to the NijSAC to save and process all personal data I enter on the site.',
             'Ik geef toestemming aan de NijSAC om alle persoonlijke informatie die ik invoer op de site op te slaan en te verwerken.'
           )}

@@ -8,6 +8,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AreYouSure from '../AreYouSure.tsx';
+import { useLanguage } from '../../providers/LanguageProvider.tsx';
 
 interface SaveButtonProps {
   name: Language;
@@ -22,6 +23,7 @@ export default function SaveButton({
   category,
   handleSave
 }: SaveButtonProps) {
+  const { language: lang } = useLanguage();
   const [isDraft, setIsDraft] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
 
@@ -45,8 +47,8 @@ export default function SaveButton({
                !category}
         >
           <SaveIcon className="mr-2" />
-          {text('Save Event', 'Evenement opslaan')}
-          <Tooltip title={isDraft ? null : text('More Options', 'Meer opties')}>
+          {text(lang, 'Save Event', 'Evenement opslaan')}
+          <Tooltip title={isDraft ? null : text(lang, 'More Options', 'Meer opties')}>
             <IconButton color="inherit" onClick={toggleIsDraft}>
               {isDraft ? <ExpandLessIcon /> : <ExpandMoreIcon />}
             </IconButton>
@@ -54,11 +56,11 @@ export default function SaveButton({
           <Collapse in={isDraft} timeout="auto" unmountOnExit>
             <Button color="inherit" onClick={() => handleSave(false)}>
               <SaveAsIcon className="mr-2" />
-              {text('Save As Draft', 'Opslaan als concept')}
+              {text(lang, 'Save As Draft', 'Opslaan als concept')}
             </Button>
             <Button color="inherit" onClick={toggleOpen}>
               <DeleteIcon className="mr-2" />
-              {text('Delete Event', 'Evenement verwijderen')}
+              {text(lang, 'Delete Event', 'Evenement verwijderen')}
             </Button>
           </Collapse>
         </Fab>
@@ -68,6 +70,7 @@ export default function SaveButton({
         onCancel={toggleOpen}
         onConfirm={handleDelete}
         message={text(
+          lang,
           'You are about to delete this event.',
           'Je staat op het punt dit evenement te verwijderen.'
         )}

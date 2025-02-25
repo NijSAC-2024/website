@@ -1,6 +1,6 @@
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { createContext, ReactNode, useContext, useState } from 'react';
 import { Route, } from '../types.ts';
-import { matchName, paramsToPath, parseLocation } from '../router.ts';
+import { matchName, paramsToPath } from '../router.ts';
 
 interface AppStateContextType {
   version: string,

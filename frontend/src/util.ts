@@ -1,17 +1,13 @@
-import { useLanguage } from './providers/LanguageProvider.tsx';
-import { Language, eventOptions } from './types.ts';
+import { Language, eventOptions, LanguageEnum } from './types.ts';
 
-export function text(english: string, dutch: string): string;
-export function text(languageType: Language): string;
-export function text(arg1: string | Language, arg2?: string): string {
-  const { language } = useLanguage();
-
+export function text(lang: LanguageEnum, english: string, dutch: string): string;
+export function text(lang: LanguageEnum, languageType: Language): string;
+export function text(lang: LanguageEnum, arg1: string | Language, arg2?: string): string {
   if (typeof arg1 === 'string' && typeof arg2 === 'string') {
-    return language ? arg1 : arg2;
+    return lang === 'en' ? arg1 : arg2;
   } else if (typeof arg1 === 'object' && arg1 !== null) {
-    return language ? arg1.en : arg1.nl;
+    return lang === 'en' ? arg1.en : arg1.nl;
   }
-
   throw new Error('Invalid arguments provided to text function');
 }
 

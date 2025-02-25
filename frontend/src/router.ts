@@ -41,6 +41,7 @@ export function matchPath(path: string): Route | undefined {
   for (const route of routes) {
     const match = new RegExp(`^${route[0].replace(/:([^\s/]+)/g, '(?<$1>[\\w-]+)')}$`);
     const matches = path.match(match);
+    console.log('matches: ', matches?.groups);
 
     if (matches !== null) {
       return { name: route[1], path: route[0], params: matches.groups };

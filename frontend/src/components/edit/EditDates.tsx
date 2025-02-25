@@ -5,13 +5,12 @@ import { Fab, Tooltip } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { DateType } from '../../types.ts';
+import { useLanguage } from '../../providers/LanguageProvider.tsx';
 
 interface EditDatesProps {
   dates: DateType[];
-  // eslint-disable-next-line no-unused-vars
   handleDateChange: (index: number, startDate: boolean, value: string) => void;
   handleAddDate: () => void;
-  // eslint-disable-next-line no-unused-vars
   handleRemoveDate: (index: number) => void;
 }
 
@@ -21,17 +20,19 @@ export default function EditDates({
   handleAddDate,
   handleRemoveDate
 }: EditDatesProps) {
+  const { language: lang } = useLanguage();
+
   return (
     <div className="grid gap-3">
       <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
         <DateTimePicker
-          label={text('Start Date', 'Startdatum')}
-          value={moment(dates[0].startDateTime)}
+          label={text(lang, 'Start Date', 'Startdatum')}
+          value={moment(dates[0].start)}
           onChange={(date) => handleDateChange(0, true, date!.toISOString())}
         />
         <DateTimePicker
-          label={text('End Date', 'Einddatum')}
-          value={moment(dates[0].endDateTime)}
+          label={text(lang, 'End Date', 'Einddatum')}
+          value={moment(dates[0].end)}
           onChange={(date) => handleDateChange(0, false, date!.toISOString())}
         />
       </div>
@@ -39,18 +40,18 @@ export default function EditDates({
         <div key={index} className="flex justify-between gap-3">
           <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
             <DateTimePicker
-              label={`${text('Start Date', 'Startdatum')} ${index + 2}`}
-              value={moment(date.startDateTime)}
+              label={`${text(lang, 'Start Date', 'Startdatum')} ${index + 2}`}
+              value={moment(date.start)}
               onChange={(date) => handleDateChange(index + 1, true, date!.toISOString())}
             />
             <DateTimePicker
-              label={`${text('End Date', 'Einddatum')} ${index + 2}`}
-              value={moment(date.endDateTime)}
+              label={`${text(lang, 'End Date', 'Einddatum')} ${index + 2}`}
+              value={moment(date.end)}
               onChange={(date) => handleDateChange(index + 1, false, date!.toISOString())}
             />
           </div>
           <div className="flex items-center">
-            <Tooltip title={text('Delete Date', 'Verwijder Datum')}>
+            <Tooltip title={text(lang, 'Delete Date', 'Verwijder Datum')}>
               <Fab size="small" color="error" onClick={() => handleRemoveDate(index + 1)}>
                 <DeleteIcon />
               </Fab>
@@ -59,7 +60,7 @@ export default function EditDates({
         </div>
       ))}
       <div className="flex justify-center">
-        <Tooltip title={text('Add Date', 'Voeg Datum Toe')}>
+        <Tooltip title={text(lang, 'Add Date', 'Voeg Datum Toe')}>
           <Fab size="small" color="primary" onClick={() => handleAddDate()}>
             <AddIcon />
           </Fab>

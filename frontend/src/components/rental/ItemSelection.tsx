@@ -5,7 +5,6 @@ import { text } from '../../util.ts';
 
 interface ItemSelectionProps {
   selectedItem: rentOption | null;
-  // eslint-disable-next-line no-unused-vars
   onItemSelect: (item: rentOption | null) => void;
   onAddItem: () => void;
 }
@@ -15,12 +14,11 @@ export default function ItemSelection({
   onItemSelect,
   onAddItem
 }: ItemSelectionProps) {
-  const { getLangCode } = useLanguage();
-  const langCode = getLangCode();
+  const { language: lang } = useLanguage();
 
   return (
     <>
-      {langCode === 'en' ? (
+      {lang === 'en' ? (
         <Autocomplete
           options={rentOptions}
           getOptionLabel={(option) => option.name.en}
@@ -34,7 +32,7 @@ export default function ItemSelection({
             );
           }}
           renderInput={(params) => (
-            <TextField {...params} placeholder={text('Select Item', 'Selecteer Artikel')} />
+            <TextField {...params} placeholder={text(lang, 'Select Item', 'Selecteer Artikel')} />
           )}
           onChange={(_event, newValue) => onItemSelect(newValue)}
         />
@@ -52,13 +50,13 @@ export default function ItemSelection({
             );
           }}
           renderInput={(params) => (
-            <TextField {...params} placeholder={text('Select Item', 'Selecteer Artikel')} />
+            <TextField {...params} placeholder={text(lang, 'Select Item', 'Selecteer Artikel')} />
           )}
           onChange={(_event, newValue) => onItemSelect(newValue)}
         />
       )}
       <Button variant="contained" onClick={onAddItem} disabled={!selectedItem} fullWidth>
-        {text('Add to request', 'Toevoegen aan aanvraag')}
+        {text(lang, 'Add to request', 'Toevoegen aan aanvraag')}
       </Button>
     </>
   );

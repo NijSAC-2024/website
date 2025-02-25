@@ -25,9 +25,8 @@ export default function RegisterButton({
   title
 }: RegisterButtonProps) {
   const { isLoggedIn, toggleAuthOpen } = useAuth();
-  const { getLangCode } = useLanguage();
-  const langCode = getLangCode();
-  moment.locale(langCode);
+  const { language: lang } = useLanguage();
+  moment.locale(lang);
   const [registerDialogOpen, setRegisterDialogOpen] = useState<boolean>(false);
 
   const toggleDialog = () => {
@@ -42,22 +41,22 @@ export default function RegisterButton({
     <>
       {registrationCount === registrationMax ? (
         <Button variant="contained" disabled>
-          {text('Full', 'Vol')}
+          {text(lang, 'Full', 'Vol')}
         </Button>
       ) : openTime > now ? (
         <div className="text-right grid">
-          <p>{text('Registrations open at ', 'Inschrijvingen openen op ')}</p>
+          <p>{text(lang, 'Registrations open at ', 'Inschrijvingen openen op ')}</p>
           <p>{moment(registrationOpenTime).format('DD MMM HH:mm')}</p>
         </div>
       ) : closeTime > now ? (
         <Button onClick={isLoggedIn ? toggleDialog : toggleAuthOpen} variant="contained">
           {isLoggedIn
-            ? text('Register', 'Inschrijven')
-            : text('Login to register', 'Login om in te schrijven')}
+            ? text(lang, 'Register', 'Inschrijven')
+            : text(lang, 'Login to register', 'Login om in te schrijven')}
         </Button>
       ) : (
         <div className="text-right grid">
-          <p>{text('Registrations closed at ', 'Inschrijvingen zijn gesloten sinds ')}</p>
+          <p>{text(lang, 'Registrations closed at ', 'Inschrijvingen zijn gesloten sinds ')}</p>
           <p>{moment(registrationCloseTime).format('DD MMM HH:mm')}</p>
         </div>
       )}
@@ -70,7 +69,7 @@ export default function RegisterButton({
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={toggleDialog}>{text('Close', 'Sluit')}</Button>
+          <Button onClick={toggleDialog}>{text(lang, 'Close', 'Sluit')}</Button>
         </DialogActions>
       </Dialog>
     </>
