@@ -1,4 +1,4 @@
-import { Route } from '../types';
+import { Route } from 'types';
 
 /**
  * This table contains a list of all named routes
@@ -10,8 +10,8 @@ export const routes = [
   ['/agenda/new',       'new_activity'],
   ['/agenda/:id',       'activity'],
   ['/about',            'about'],
-  ['/material-rental',  'material-rental'],
-  ['/not-found',        'not-found']
+  ['/material-rental',  'material_rental'],
+  ['/not-found',        'not_found']
 ];
 
 function toRouteObject(route: string[]): Route {

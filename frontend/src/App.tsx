@@ -10,19 +10,16 @@ import Info from './components/alerts/Info.tsx';
 import MainMenu from './components/menu/MainMenu.tsx';
 
 import { useLanguage } from './providers/LanguageProvider.tsx';
-import useInternalState, { StateContext } from './hooks/useState.ts';
 import { parseLocation } from './router.ts';
 import Home from './pages/Home.tsx';
 import Signup from './pages/Signup.tsx';
 import Agenda from './pages/Agenda.tsx';
 import ErrorPage from './pages/ErrorPage.tsx';
-import Event from './pages/Event.tsx';
-import EditEvent from './components/edit/EditEvent.tsx';
 import AddEvent from './pages/AddEvent.tsx';
+import { useAppState } from './providers/AppStateProvider.tsx';
 
 export default function App(): React.ReactElement {
-  const internalState = useInternalState();
-  const { navigate, state } = internalState;
+  const { navigate, route } = useAppState();
   const { isDarkMode, toggleTheme } = useThemeMode();
   const language = useLanguage();
 
@@ -102,7 +99,6 @@ export default function App(): React.ReactElement {
   // }
 
   useEffect(() => {
-
     // Listen to browser back and forward buttons
     window.addEventListener('popstate', (event) => {
       if (event.state && event.state.route !== window.location.pathname) {
@@ -113,12 +109,12 @@ export default function App(): React.ReactElement {
   }, []);
 
   useEffect(() => {
-
     // Update route on page load
     try {
       const newRoute = parseLocation(window.location);
-      if (state.route.name !== newRoute.name || state.route.params !== newRoute.params) {
+      if (route.name !== newRoute.name || route.params !== newRoute.params) {
         if (newRoute) {
+          console.log('Initial page: ', newRoute.name);
           navigate(newRoute.name, newRoute.params);
         }
       }
@@ -129,13 +125,13 @@ export default function App(): React.ReactElement {
   }, []);
 
   let component: React.ReactElement;
-  if (state.route.name == 'index') {
+  if (route.name == 'index') {
     component = <Home />;
-  } else if (state.route.name.startsWith('register')) {
+  } else if (route.name.startsWith('register')) {
     component = <Signup />;
-  } else if (state.route.name == 'agenda') {
+  } else if (route.name == 'agenda') {
     component = <Agenda />;
-  } else if (state.route.name == 'new_activity') {
+  } else if (route.name == 'new_activity') {
     component = <AddEvent />;
   } else {
     console.log('not found');
@@ -146,20 +142,18 @@ export default function App(): React.ReactElement {
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <MainMenu />
-      <StateContext.Provider value={internalState}>
-        <SnackbarProvider
-          maxSnack={3}
-          autoHideDuration={5000}
-          preventDuplicate
-          Components={{
-            success: Success,
-            error: Error,
-            warning: Warning,
-            info: Info
-          }}
-        />
-        {component}
-      </StateContext.Provider>
+      <SnackbarProvider
+        maxSnack={3}
+        autoHideDuration={5000}
+        preventDuplicate
+        Components={{
+          success: Success,
+          error: Error,
+          warning: Warning,
+          info: Info
+        }}
+      />
+      {component}
     </ThemeProvider>
   );
 }

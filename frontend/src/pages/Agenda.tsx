@@ -1,16 +1,16 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import GenericPage from './GenericPage.tsx';
 import ContentCard from '../components/ContentCard.tsx';
 import { text } from '../util.ts';
 import { Activity, ActivityType, WeekendType } from '../types.ts';
 import { Fab, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import { StateContext } from '../hooks/useState.ts';
 import Link from '../components/Link.tsx';
 import ActivityCard from '../components/event/ActivityCard.tsx';
+import { useApiState } from '../providers/ApiProvider.tsx';
 
 export default function Agenda() {
-  const { state } = useContext(StateContext);
+  const { activities } = useApiState();
   const [selectedCategory, setSelectedCategory] = useState<ActivityType | 'all'>('all');
   const [selectedType, setSelectedType] = useState<WeekendType | 'all'>('all');
 
@@ -80,7 +80,7 @@ export default function Agenda() {
                 </FormControl>
               </div>
             </ContentCard>
-            {state.activities && state.activities
+            {activities && activities
               .filter(
                 (activity: Activity) =>
                   (selectedCategory === 'all' || activity.activityType === selectedCategory) &&

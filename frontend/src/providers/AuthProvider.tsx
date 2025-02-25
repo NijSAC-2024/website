@@ -1,12 +1,13 @@
-import { createContext, useContext, ReactNode, useState } from 'react';
+import { createContext, ReactNode, useContext, useState } from 'react';
 import { enqueueSnackbar } from 'notistack';
-import { apiFetch } from '../api.ts';
+import { apiFetch, apiFetchVoid } from '../api.ts';
 import { User } from '../types.ts';
 
 interface AuthContextType {
   user: User | undefined;
   isLoggedIn: boolean;
   checkAuth: () => void;
+  login: (email: string, password: string) => void;
   logout: () => void;
   authOpen: boolean;
   toggleAuthOpen: () => void;
@@ -20,9 +21,7 @@ interface AuthProviderProps {
 
 export default function AuthProvider({ children }: AuthProviderProps) {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-
   const [user, setUser] = useState<User | undefined>(undefined);
-
   const [authOpen, setAuthOpen] = useState<boolean>(false);
 
   const toggleAuthOpen = () => {
@@ -56,8 +55,31 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
+  const login = async (email: string, password: string) => {
+    const { error } = await apiFetchVoid('/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    if (error) {
+      switch (error.message) {
+      case 'Unauthorized':
+        enqueueSnackbar('Incorrect email or password.', { variant: 'error' });
+        break;
+      default:
+        enqueueSnackbar(`${error.message}: ${error.reference}`, {
+          variant: 'error'
+        });
+      }
+    } else {
+      await checkAuth();
+      enqueueSnackbar('You logged in', { variant: 'success' });
+      toggleAuthOpen();
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isLoggedIn, checkAuth, logout, authOpen, toggleAuthOpen }}>
+    <AuthContext.Provider value={{ user, isLoggedIn, checkAuth, login, logout, authOpen, toggleAuthOpen }}>
       {children}
     </AuthContext.Provider>
   );

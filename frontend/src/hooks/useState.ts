@@ -1,7 +1,7 @@
-import { createContext, useEffect, useState } from 'react';
+import { createContext, useState } from 'react';
 import { matchName, paramsToPath, parseLocation } from '../router.ts';
 import { Activity, ActivityContent, Route, State } from '../types.ts';
-import { apiFetch } from '../api.ts';
+import { apiFetch, apiFetchVoid } from '../api.ts';
 import { enqueueSnackbar } from 'notistack';
 import { text } from '../util.ts';
 
@@ -14,6 +14,7 @@ try {
 
 export interface InternalState {
   state: State;
+  login: (email: string, password: string, onSuccess: () => void) => void;
   updateActivity: (content: ActivityContent, id: string) => void;
   createActivity: (content: ActivityContent) => void;
   navigate: (routeName: string, params?: Record<string, string>) => void;
@@ -22,9 +23,10 @@ export interface InternalState {
 function defaultInternalState(): InternalState {
   return {
     state: { version: 'development', route },
+    login: () => console.log('A fatal error occurred'),
     updateActivity: () => console.log('A fatal error occurred'),
     createActivity: () => console.log('A fatal error occurred'),
-    navigate: () => console.log('A fatal error occurred'),
+    navigate: () => console.log('A fatal error occurred')
   };
 }
 
@@ -52,12 +54,11 @@ export default function useInternalState(): InternalState {
     setState({ ...state, route });
   };
 
-  const updateActivity = (content: ActivityContent, id: string) =>
-  {
+  const updateActivity = (content: ActivityContent, id: string) => {
     apiFetch<Activity>(`/activity/${id}`, {
       method: 'PUT',
       body: JSON.stringify(content)
-    }).then(({error, data: activity}) => {
+    }).then(({ error, data: activity }) => {
       if (error) {
         enqueueSnackbar(`${error.message}: ${error.reference}`, {
           variant: 'error'
@@ -66,14 +67,13 @@ export default function useInternalState(): InternalState {
       setState({ ...state, activities: undefined, activity });
       enqueueSnackbar(text('Activity saved', 'Evenement opgeslagen'), { variant: 'success' });
     });
-  }
+  };
 
-  const createActivity = (content: ActivityContent) =>
-  {
+  const createActivity = (content: ActivityContent) => {
     apiFetch<Activity>('/activity', {
       method: 'POST',
       body: JSON.stringify(content)
-    }).then(({error, data: activity}) => {
+    }).then(({ error, data: activity }) => {
       if (error) {
         enqueueSnackbar(`${error.message}: ${error.reference}`, {
           variant: 'error'
@@ -82,29 +82,26 @@ export default function useInternalState(): InternalState {
       setState({ ...state, activities: undefined, activity });
       enqueueSnackbar(text('Activity saved', 'Evenement opgeslagen'), { variant: 'success' });
     });
+  };
+  
+
+  if (state.route.name === 'agenda' && !state.activities) {
+    apiFetch<Array<Activity>>('/activity')
+      .then(({ error, data: activities }) => {
+        if (error) {
+          enqueueSnackbar(`${error.message}: ${error.reference}`, {
+            variant: 'error'
+          });
+        }
+
+        setState({ ...state, activities });
+      });
   }
-
-  useEffect(() => {
-    // Load activities only once from the backend
-    // if (state.route.name === 'agenda' && !state.activities) {
-
-    // }
-  }, []);
-
-  apiFetch<Array<Activity>>('/activity')
-    .then(({ error, data: activities }) => {
-      if (error) {
-        enqueueSnackbar(`${error.message}: ${error.reference}`, {
-          variant: 'error'
-        });
-      }
-
-      setState({ ...state, activities });
-    });
 
 
   return {
     state,
+    login,
     updateActivity,
     createActivity,
     navigate
