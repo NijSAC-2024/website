@@ -97,32 +97,32 @@ export default function EditAgendaCard({
 
           {/* Title */}
           <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
-            {/*<TextField*/}
-            {/*  value={name.en}*/}
-            {/*  label={text('Title English*', 'Titel Engels*')}*/}
-            {/*  onChange={(e) => handleFieldChange('name', { ...name, en: e.target.value })}*/}
-            {/*/>*/}
-            {/*<TextField*/}
-            {/*  value={name.nl}*/}
-            {/*  label={text('Title Dutch*', 'Titel Nederlands*')}*/}
-            {/*  onChange={(e) => handleFieldChange('name', { ...name, nl: e.target.value })}*/}
-            {/*/>*/}
+            <TextField
+              value={name.en}
+              label={text(lang, 'Title English*', 'Titel Engels*')}
+              onChange={(e) => handleFieldChange('name', { ...name, en: e.target.value })}
+            />
+            <TextField
+              value={name.nl}
+              label={text(lang, 'Title Dutch*', 'Titel Nederlands*')}
+              onChange={(e) => handleFieldChange('name', { ...name, nl: e.target.value })}
+            />
           </div>
 
-          {/* Location */}
-          {/*<TextField*/}
-          {/*  value={location}*/}
-          {/*  label={text('Location*', 'Locatie*')}*/}
-          {/*  onChange={(e) => handleFieldChange('location', e.target.value)}*/}
-          {/*/>*/}
+          {/*Location*/}
+          <TextField
+            value={location}
+            label={text(lang, 'Location*', 'Locatie*')}
+            onChange={(e) => handleFieldChange('location', e.target.value)}
+          />
 
-          {/* Dates */}
-          {/*<EditDates*/}
-          {/*  dates={dates}*/}
-          {/*  handleAddDate={handleAddDate}*/}
-          {/*  handleDateChange={handleDateChange}*/}
-          {/*  handleRemoveDate={handleRemoveDate}*/}
-          {/*/>*/}
+          {/*Dates*/}
+          <EditDates
+            dates={dates}
+            handleAddDate={handleAddDate}
+            handleDateChange={handleDateChange}
+            handleRemoveDate={handleRemoveDate}
+          />
         </div>
       </div>
     </div>

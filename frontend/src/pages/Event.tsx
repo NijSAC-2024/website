@@ -61,7 +61,7 @@ export default function Event() {
                       experience={activity?.metadata?.experience || []}
                       gear={activity?.metadata?.gear || {en: '', nl: ''}}
                     />
-                    <RegistrationsCard allowsRegistrations={activity?.allowsRegistrations} />
+                    <RegistrationsCard />
                   </div>
                 </GenericPage>
               </>

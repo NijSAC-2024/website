@@ -30,6 +30,19 @@ export interface DateType {
   end: Date;
 }
 
+export interface Registration extends BasicUser{
+  attended?: boolean,
+  waitingListPosition?: number,
+  answers: Array<Answer>,
+  created: string,
+  updated: string,
+}
+
+export interface Answer {
+  questionId: string,
+  answer: string,
+}
+
 export interface Question {
   id: string;
   question: Language;
@@ -85,6 +98,13 @@ interface registrationType {
 
 export interface registrationsType {
   registrations: registrationType[];
+}
+
+export interface BasicUser {
+  userId: string,
+  firstName: string,
+  infix?: string,
+  lastName: string,
 }
 
 export interface User {
