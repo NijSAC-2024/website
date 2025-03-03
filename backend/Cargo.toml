@@ -14,7 +14,7 @@ tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
 sqlx = { version = "0.8.3", features = ["postgres", "runtime-tokio", "migrate", "macros", "time", "uuid"] }
 thiserror = "2.0.11"
 validator = { version = "0.20.0", features = ["derive"] }
-uuid = { version = "1.14.0", features = ["v7", "serde"] }
+uuid = { version = "1.15.1", features = ["v7", "serde"] }
 argon2 = "0.5.3"
 dotenvy = "0.15.7"
 serde = { version = "1.0.218", features = ["derive"] }
