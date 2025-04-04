@@ -59,6 +59,13 @@ export interface Activity extends Omit<ActivityContent, 'location'> {
   location: Location;
 }
 
+export function toActivityContent(activity: Activity): ActivityContent {
+  const location_id = activity.location.id;
+  const activityContent = (activity as unknown as ActivityContent);
+  activityContent.location = location_id;
+  return activityContent;
+}
+
 export interface ActivityContent {
   name: Language;
   image?: string;

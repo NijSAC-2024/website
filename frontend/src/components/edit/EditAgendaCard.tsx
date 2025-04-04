@@ -6,6 +6,7 @@ import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import { ChangeEvent } from 'react';
 import EditDates from './EditDates.tsx';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
+import { useApiState } from '../../providers/ApiProvider.tsx';
 
 interface EditAgendaCardProps {
   category: ActivityType;
@@ -36,6 +37,7 @@ export default function EditAgendaCard({
   handleRemoveDate
 }: EditAgendaCardProps) {
   const { language: lang } = useLanguage();
+  const { locations } = useApiState();
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -110,11 +112,15 @@ export default function EditAgendaCard({
           </div>
 
           {/*Location*/}
-          <TextField
+          <Select
             value={location}
             label={text(lang, 'Location*', 'Locatie*')}
             onChange={(e) => handleFieldChange('location', e.target.value)}
-          />
+          >
+            {locations?.map(l =>
+              <MenuItem value={l.id}>{text(lang, l.name)}</MenuItem>
+            )}
+          </Select>
 
           {/*Dates*/}
           <EditDates

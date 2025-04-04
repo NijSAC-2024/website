@@ -1,5 +1,5 @@
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import { Activity, ActivityContent, Registration } from '../types.ts';
+import { Activity, ActivityContent, Registration, Location } from '../types.ts';
 import { useAppState } from './AppStateProvider.tsx';
 import { apiFetch } from '../api.ts';
 import { enqueueSnackbar } from 'notistack';
@@ -7,6 +7,7 @@ import { useAuth } from './AuthProvider.tsx';
 
 interface ApiContextType {
   activities?: Activity[],
+  locations?: Location[],
   activity?: Activity,
   registrations?: Registration[],
   updateActivity: (id: string, activity: ActivityContent) => Promise<void>,
@@ -27,6 +28,7 @@ export default function ApiProvider({ children }: ApiProviderProps) {
   const [cache, setCache] = useState<boolean>(false);
   const [activities, setActivities] = useState<Array<Activity>>([]);
   const [activity, setActivity] = useState<Activity | undefined>(undefined);
+  const [locations, setLocations] = useState<Array<Location> | undefined>(undefined);
   const [registrations, setRegistrations] = useState<Array<Registration>>([]);
 
   const updateActivity = async (id: string, activity: ActivityContent) => {
@@ -84,6 +86,23 @@ export default function ApiProvider({ children }: ApiProviderProps) {
 
   useEffect(() => {
     if (route.name === 'activity') {
+      apiFetch<Array<Location>>('/location').then(
+        ({ error, data: locations }) => {
+          if (error) {
+            enqueueSnackbar(`${error.message}: ${error.reference}`, {
+              variant: 'error'
+            });
+          }
+          if (locations) {
+            setLocations(locations);
+          }
+        }
+      );
+    }
+  }, [cache, route.name]);
+
+  useEffect(() => {
+    if (route.name === 'activity') {
       apiFetch<Activity>(`/activity/${route.params!.id}`).then(
         ({ error, data: activity }) => {
           if (error) {
@@ -115,7 +134,7 @@ export default function ApiProvider({ children }: ApiProviderProps) {
   }, [cache, route.name, route.params, isLoggedIn]);
 
   return (
-    <ApiContext.Provider value={{ activities, activity, registrations, updateActivity, createActivity }}>
+    <ApiContext.Provider value={{ activities, activity, locations, registrations, updateActivity, createActivity }}>
       {children}
     </ApiContext.Provider>
   );

@@ -10,6 +10,7 @@ import DescriptionCard from '../components/event/DescriptionCard.tsx';
 import { useAppState } from '../providers/AppStateProvider.tsx';
 import { useApiState } from '../providers/ApiProvider.tsx';
 import { useLanguage } from '../providers/LanguageProvider.tsx';
+import { toActivityContent } from '../types.ts';
 
 export default function Event() {
   const { language: lang } = useLanguage();
@@ -29,7 +30,7 @@ export default function Event() {
         <>
           {
             isEditing ? (
-              <EditEvent activityContent={activity} />
+              <EditEvent activityContent={toActivityContent(activity)} />
             ) : (
               <>
                 <div className="fixed bottom-5 right-5 z-10">
