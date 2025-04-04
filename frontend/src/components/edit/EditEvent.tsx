@@ -85,6 +85,7 @@ export default function EditEvent({ activityContent: init }: EditEventProps) {
   const handleSave = async (bool: boolean) => {
     if (id) {
       await updateActivity(id, { ...activity, isPublished: bool });
+      navigate('agenda');
     } else {
       await createActivity({ ...activity, isPublished: bool });
     }

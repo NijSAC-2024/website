@@ -24,18 +24,19 @@ export default function EditDates({
 
   return (
     <div className="grid gap-3">
-      <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
-        <DateTimePicker
-          label={text(lang, 'Start Date', 'Startdatum')}
-          value={moment(dates[0].start)}
-          onChange={(date) => handleDateChange(0, true, date!.toISOString())}
-        />
-        <DateTimePicker
-          label={text(lang, 'End Date', 'Einddatum')}
-          value={moment(dates[0].end)}
-          onChange={(date) => handleDateChange(0, false, date!.toISOString())}
-        />
-      </div>
+      {dates.length > 0 &&
+        <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
+          <DateTimePicker
+            label={text(lang, 'Start Date', 'Startdatum')}
+            value={moment(dates[0].start)}
+            onChange={(date) => handleDateChange(0, true, date!.toISOString())}
+          />
+          <DateTimePicker
+            label={text(lang, 'End Date', 'Einddatum')}
+            value={moment(dates[0].end)}
+            onChange={(date) => handleDateChange(0, false, date!.toISOString())}
+          />
+        </div>}
       {dates.slice(1).map((date, index) => (
         <div key={index} className="flex justify-between gap-3">
           <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
