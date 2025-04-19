@@ -7,6 +7,8 @@ export interface ValidateProps {
 
 export type WeekendType = 'sp' | 'mp' | 'boulder' | 'trad' | 'education';
 
+export type ExperienceType = 'sp' | 'mp';
+
 export type ActivityType = 'activity' | 'course' | 'training' | 'weekend';
 
 export type MembershipStatus = 'pending' | 'member' | 'extraordinary' | 'nonMember';
@@ -16,7 +18,7 @@ export type QuestionType = 'shortText' | 'longText' | 'number' | 'time';
 export type LanguageEnum = 'nl' | 'en';
 
 export interface OptionsType {
-  id: WeekendType | ActivityType | MembershipStatus | QuestionType;
+  id: WeekendType | ActivityType | MembershipStatus | QuestionType | ExperienceType;
   label: Language;
 }
 
@@ -30,17 +32,17 @@ export interface DateType {
   end: Date;
 }
 
-export interface Registration extends BasicUser{
-  attended?: boolean,
-  waitingListPosition?: number,
-  answers: Array<Answer>,
-  created: string,
-  updated: string,
+export interface Registration extends BasicUser {
+  attended?: boolean;
+  waitingListPosition?: number;
+  answers: Array<Answer>;
+  created: string;
+  updated: string;
 }
 
 export interface Answer {
-  questionId: string,
-  answer: string,
+  questionId: string;
+  answer: string;
 }
 
 export interface Question {
@@ -48,6 +50,12 @@ export interface Question {
   question: Language;
   questionType: QuestionType;
   required: boolean;
+}
+
+export interface Metadata {
+  experience?: ExperienceType[];
+  type?: WeekendType[];
+  gear?: Language;
 }
 
 export interface Activity extends Omit<ActivityContent, 'location'> {
@@ -61,7 +69,7 @@ export interface Activity extends Omit<ActivityContent, 'location'> {
 
 export function toActivityContent(activity: Activity): ActivityContent {
   const location_id = activity.location.id;
-  const activityContent = (activity as unknown as ActivityContent);
+  const activityContent = activity as unknown as ActivityContent;
   activityContent.location = location_id;
   return activityContent;
 }
@@ -78,12 +86,8 @@ export interface ActivityContent {
   requiredMembershipStatus: MembershipStatus[];
   activityType: ActivityType;
   questions: Question[];
-  metadata?: {
-    experience?: string[];
-    type?: string[];
-    gear?: Language;
-  };
-  location: string,
+  metadata?: Metadata;
+  location: string;
 }
 
 export interface Location extends LocationContent {
@@ -108,10 +112,10 @@ export interface registrationsType {
 }
 
 export interface BasicUser {
-  userId: string,
-  firstName: string,
-  infix?: string,
-  lastName: string,
+  userId: string;
+  firstName: string;
+  infix?: string;
+  lastName: string;
 }
 
 export interface User {
@@ -154,7 +158,6 @@ export interface ReservationItemType {
   amount: number;
 }
 
-
 export interface Route {
   name: string;
   path: string;
@@ -165,11 +168,11 @@ export type RouteParams = Record<string, string>;
 export type Navigate = (name: string, params: RouteParams) => void;
 
 export interface State {
-  version: string,
-  route: Route,
-  user?: User,
-  activities?: Activity[],
-  activity?: Activity,
+  version: string;
+  route: Route;
+  user?: User;
+  activities?: Activity[];
+  activity?: Activity;
 }
 
 export type MenuType = 'association' | 'climbing' | 'alps' | 'language' | undefined;

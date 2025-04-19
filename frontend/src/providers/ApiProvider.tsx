@@ -6,12 +6,12 @@ import { enqueueSnackbar } from 'notistack';
 import { useAuth } from './AuthProvider.tsx';
 
 interface ApiContextType {
-  activities?: Activity[],
-  locations?: Location[],
-  activity?: Activity,
-  registrations?: Registration[],
-  updateActivity: (id: string, activity: ActivityContent) => Promise<void>,
-  createActivity: (activity: ActivityContent) => Promise<void>,
+  activities?: Activity[];
+  locations?: Location[];
+  activity?: Activity;
+  registrations?: Registration[];
+  updateActivity: (id: string, activity: ActivityContent) => Promise<void>;
+  createActivity: (activity: ActivityContent) => Promise<void>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -69,52 +69,46 @@ export default function ApiProvider({ children }: ApiProviderProps) {
 
   useEffect(() => {
     if (route.name === 'agenda') {
-      apiFetch<Array<Activity>>('/activity').then(
-        ({ error, data: activities }) => {
-          if (error) {
-            enqueueSnackbar(`${error.message}: ${error.reference}`, {
-              variant: 'error'
-            });
-          }
-          if (activities) {
-            setActivities(activities);
-          }
+      apiFetch<Array<Activity>>('/activity').then(({ error, data: activities }) => {
+        if (error) {
+          enqueueSnackbar(`${error.message}: ${error.reference}`, {
+            variant: 'error'
+          });
         }
-      );
+        if (activities) {
+          setActivities(activities);
+        }
+      });
     }
   }, [cache, route.name]);
 
   useEffect(() => {
     if (route.name === 'activity') {
-      apiFetch<Array<Location>>('/location').then(
-        ({ error, data: locations }) => {
-          if (error) {
-            enqueueSnackbar(`${error.message}: ${error.reference}`, {
-              variant: 'error'
-            });
-          }
-          if (locations) {
-            setLocations(locations);
-          }
+      apiFetch<Array<Location>>('/location').then(({ error, data: locations }) => {
+        if (error) {
+          enqueueSnackbar(`${error.message}: ${error.reference}`, {
+            variant: 'error'
+          });
         }
-      );
+        if (locations) {
+          setLocations(locations);
+        }
+      });
     }
   }, [cache, route.name]);
 
   useEffect(() => {
     if (route.name === 'activity') {
-      apiFetch<Activity>(`/activity/${route.params!.id}`).then(
-        ({ error, data: activity }) => {
-          if (error) {
-            enqueueSnackbar(`${error.message}: ${error.reference}`, {
-              variant: 'error'
-            });
-          }
-          if (activity) {
-            setActivity(activity);
-          }
+      apiFetch<Activity>(`/activity/${route.params!.id}`).then(({ error, data: activity }) => {
+        if (error) {
+          enqueueSnackbar(`${error.message}: ${error.reference}`, {
+            variant: 'error'
+          });
         }
-      );
+        if (activity) {
+          setActivity(activity);
+        }
+      });
       if (isLoggedIn) {
         apiFetch<Array<Registration>>(`/activity/${route.params!.id}/registration`).then(
           ({ error, data: registrations }) => {
@@ -129,12 +123,13 @@ export default function ApiProvider({ children }: ApiProviderProps) {
           }
         );
       }
-
     }
   }, [cache, route.name, route.params, isLoggedIn]);
 
   return (
-    <ApiContext.Provider value={{ activities, activity, locations, registrations, updateActivity, createActivity }}>
+    <ApiContext.Provider
+      value={{ activities, activity, locations, registrations, updateActivity, createActivity }}
+    >
       {children}
     </ApiContext.Provider>
   );

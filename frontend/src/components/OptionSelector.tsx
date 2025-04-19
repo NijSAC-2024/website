@@ -6,6 +6,7 @@ import {
   MenuItem,
   OutlinedInput,
   Select,
+  SelectChangeEvent,
   Checkbox
 } from '@mui/material';
 import { text } from '../util.ts';
@@ -23,13 +24,13 @@ export default function OptionSelector({
   options,
   selected,
   onChange,
-  label,
+  label
 }: OptionSelectorProps) {
   const { language: lang } = useLanguage();
   const [selectedOptions, setSelectedOptions] = useState<string[]>(selected || []);
 
-  const handleChange = (value: string[]) => {
-    // const selectedValues = value.split(',');
+  const handleChange = (event: SelectChangeEvent<string[]>) => {
+    const value = event.target.value as string[];
     setSelectedOptions(value);
     onChange(value);
   };
@@ -38,15 +39,15 @@ export default function OptionSelector({
     <FormControl>
       <InputLabel id="checkbox-select-label">{label}</InputLabel>
       <Select
+        labelId="checkbox-select-label"
         variant="outlined"
         multiple
         value={selectedOptions}
-        onChange={(e) => handleChange(e.target.value)}
+        onChange={handleChange}
         input={<OutlinedInput id="select-multiple-chip" label={label} />}
-        renderValue={(selected) => (
+        renderValue={(selected: string[]) => (
           <div className="flex flex-wrap gap-1">
             {selected.map((selected_id) => {
-              console.log('selected: ', selected);
               const option = options.find((opt) => opt.id === selected_id);
               return (
                 <Chip

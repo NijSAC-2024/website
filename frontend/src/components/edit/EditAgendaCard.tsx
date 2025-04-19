@@ -1,6 +1,14 @@
 import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import { text } from '../../util.ts';
-import { Activity, ActivityType, DateType, Language, typesOptions, WeekendType } from '../../types.ts';
+import {
+  Activity,
+  ActivityType,
+  DateType,
+  Language,
+  Metadata,
+  typesOptions,
+  WeekendType
+} from '../../types.ts';
 import OptionSelector from '../OptionSelector.tsx';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import { ChangeEvent } from 'react';
@@ -11,13 +19,13 @@ import { useApiState } from '../../providers/ApiProvider.tsx';
 interface EditAgendaCardProps {
   category: ActivityType;
   image?: string;
-  type: WeekendType[];
+  metadata: Metadata;
   name: Language;
   dates: DateType[];
   location: string;
   handleFieldChange: (
     name: keyof Activity,
-    value: Language | string | WeekendType[]
+    value: Metadata | ActivityType | Language | string
   ) => void;
   handleDateChange: (index: number, startDate: boolean, value: string) => void;
   handleAddDate: () => void;
@@ -27,7 +35,7 @@ interface EditAgendaCardProps {
 export default function EditAgendaCard({
   category,
   image = 'https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/76/52/1b/76521bcd-7c16-6404-b845-be35fc720792/AppIcon-0-0-1x_U007epad-0-85-220.png/1200x600wa.png',
-  type,
+  metadata,
   name,
   dates,
   location,
@@ -52,8 +60,7 @@ export default function EditAgendaCard({
   };
 
   return (
-    <div
-      className="w-full rounded-2xl bg-inherit border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] flex flex-col">
+    <div className="w-full rounded-2xl bg-inherit border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] flex flex-col">
       <div>
         <img className="w-full aspect-4/2 object-cover" src={image} alt="Event" />
       </div>
@@ -81,7 +88,7 @@ export default function EditAgendaCard({
                 value={category}
                 label={text(lang, 'Category*', 'Categorie*')}
                 variant="outlined"
-                onChange={(e) => handleFieldChange('activityType', e.target.value)}
+                onChange={(e) => handleFieldChange('activityType', e.target.value as ActivityType)}
               >
                 <MenuItem value="activity">{text(lang, 'Activity', 'Activiteit')}</MenuItem>
                 <MenuItem value="course">{text(lang, 'Course', 'Cursus')}</MenuItem>
@@ -91,8 +98,13 @@ export default function EditAgendaCard({
             </FormControl>
             <OptionSelector
               options={typesOptions}
-              selected={type}
-              onChange={(selectedTypes) => handleFieldChange('type', selectedTypes)}
+              selected={metadata?.type}
+              onChange={(selectedTypes) =>
+                handleFieldChange('metadata', {
+                  ...metadata,
+                  type: selectedTypes
+                } as Metadata)
+              }
               label={'Type'}
             />
           </div>
@@ -112,15 +124,18 @@ export default function EditAgendaCard({
           </div>
 
           {/*Location*/}
-          <Select
-            value={location}
-            label={text(lang, 'Location*', 'Locatie*')}
-            onChange={(e) => handleFieldChange('location', e.target.value)}
-          >
-            {locations?.map(l =>
-              <MenuItem value={l.id}>{text(lang, l.name)}</MenuItem>
-            )}
-          </Select>
+          <FormControl fullWidth>
+            <InputLabel id="select-label">{text(lang, 'Location*', 'Locatie*')}</InputLabel>
+            <Select
+              labelId="select-label"
+              value={location}
+              label={text(lang, 'Location*', 'Locatie*')}
+              onChange={(e) => handleFieldChange('location', e.target.value as string)}
+              variant="outlined"
+            >
+              {locations?.map((l) => <MenuItem value={l.id}>{text(lang, l.name)}</MenuItem>)}
+            </Select>
+          </FormControl>
 
           {/*Dates*/}
           <EditDates

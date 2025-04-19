@@ -2,23 +2,25 @@ import MarkdownEditor from '../markdown/MarkdownEditor.tsx';
 import { TextField } from '@mui/material';
 import { text } from '../../util.ts';
 import OptionSelector from '../OptionSelector.tsx';
-import { Activity, experienceOptions, Language, WeekendType } from '../../types.ts';
+import {
+  Activity,
+  DateType,
+  experienceOptions,
+  Language,
+  Metadata,
+  WeekendType
+} from '../../types.ts';
 import ContentCard from '../ContentCard.tsx';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 
 interface EditDescriptionProps {
   description?: Language;
-  gear?: Language;
-  experience?: WeekendType[];
-  handleFieldChange: (
-    name: keyof Activity,
-    value: Language | string | WeekendType[]
-  ) => void;
+  metadata?: Metadata;
+  handleFieldChange: (name: keyof Activity, value: Metadata | Language) => void;
 }
 export default function EditDescription({
   description,
-  gear,
-  experience,
+  metadata,
   handleFieldChange
 }: EditDescriptionProps) {
   const { language: lang } = useLanguage();
@@ -39,24 +41,45 @@ export default function EditDescription({
         <TextField
           multiline
           fullWidth
-          value={gear?.en}
+          value={metadata?.gear?.en}
           label={text(lang, 'Necessary Gear English ', 'Benodigde Uitrusting Engels')}
-          placeholder={text(lang, 'Separated by commas', 'Gescheiden door komma\'s')}
-          onChange={(e) => handleFieldChange('gear', { ...gear, en: e.target.value })}
+          placeholder={text(lang, 'Separated by commas', "Gescheiden door komma's")}
+          onChange={(e) =>
+            handleFieldChange('metadata', {
+              ...metadata,
+              gear: {
+                ...metadata?.gear,
+                en: e.target.value
+              }
+            } as Metadata)
+          }
         />
         <TextField
           multiline
           fullWidth
-          value={gear?.nl}
+          value={metadata?.gear?.nl}
           label={text(lang, 'Necessary Gear Dutch', 'Benodigde Uitrusting Nederlands')}
-          placeholder={text(lang, 'Separated by commas', 'Gescheiden door komma\'s')}
-          onChange={(e) => handleFieldChange('gear', { ...gear, nl: e.target.value })}
+          placeholder={text(lang, 'Separated by commas', "Gescheiden door komma's")}
+          onChange={(e) =>
+            handleFieldChange('metadata', {
+              ...metadata,
+              gear: {
+                ...metadata?.gear,
+                en: e.target.value
+              }
+            } as Metadata)
+          }
         />
         <div className="xl:col-span-2 grid">
           <OptionSelector
             options={experienceOptions}
-            selected={experience}
-            onChange={(selected) => handleFieldChange('experience', selected)}
+            selected={metadata?.experience}
+            onChange={(selected) =>
+              handleFieldChange('metadata', {
+                ...metadata,
+                experience: selected
+              } as Metadata)
+            }
             label={text(lang, 'Necessary Experience', 'Benodigde Ervaring')}
           />
         </div>

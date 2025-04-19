@@ -6,7 +6,6 @@ import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import { useApiState } from '../../providers/ApiProvider.tsx';
 import { useAuth } from '../../providers/AuthProvider.tsx';
 
-
 export default function RegistrationsCard() {
   const { registrations } = useApiState();
   const { language: lang } = useLanguage();

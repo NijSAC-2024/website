@@ -1,11 +1,11 @@
 import { createContext, ReactNode, useContext, useState } from 'react';
-import { Route, } from '../types.ts';
+import { Route } from '../types.ts';
 import { matchName, paramsToPath } from '../router.ts';
 
 interface AppStateContextType {
-  version: string,
-  route: Route,
-  navigate: (routeName: string, params?: Record<string, string>) => void,
+  version: string;
+  route: Route;
+  navigate: (routeName: string, params?: Record<string, string>) => void;
 }
 
 const AppStateContext = createContext<AppStateContextType | undefined>(undefined);

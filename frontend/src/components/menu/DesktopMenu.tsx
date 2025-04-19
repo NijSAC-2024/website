@@ -33,18 +33,19 @@ export default function DesktopMenu({ handleLoginOpen }: DesktopMenuProps) {
   };
 
   const navigateSubmenu = (page: string) => {
-    navigate(page)
+    navigate(page);
     handleMenuClose();
   };
 
   return (
     <Toolbar className="flex justify-between w-[80%] max-w-[1000px] mx-auto">
       <div className="flex items-center">
-        <Link routeName={'home'}><img
-          src={'/images/logo.svg'}
-          alt="Logo"
-          className="hover:opacity-50 hover:cursor-pointer h-24 mr-4"
-        />
+        <Link routeName={'home'}>
+          <img
+            src={'/images/logo.svg'}
+            alt="Logo"
+            className="hover:opacity-50 hover:cursor-pointer h-24 mr-4"
+          />
         </Link>
         <Button color="inherit" onClick={() => navigate('agenda')}>
           {text(lang, 'Agenda', 'Agenda')}
@@ -76,11 +77,15 @@ export default function DesktopMenu({ handleLoginOpen }: DesktopMenuProps) {
           {text(lang, 'Climbing', 'Klimmen')} <ExpandMoreIcon />
         </Button>
         <Menu anchorEl={anchorEl} open={openMenu === 'climbing'} onClose={handleMenuClose}>
-          <MenuItem onClick={handleMenuClose}>{text(lang, 'Indoor Climbing', 'Indoor Klimmen')}</MenuItem>
+          <MenuItem onClick={handleMenuClose}>
+            {text(lang, 'Indoor Climbing', 'Indoor Klimmen')}
+          </MenuItem>
           <MenuItem onClick={handleMenuClose}>
             {text(lang, 'Outdoor Climbing', 'Buiten Klimmen')}
           </MenuItem>
-          <MenuItem onClick={handleMenuClose}>{text(lang, 'Climbing Areas', 'Klimgebieden')}</MenuItem>
+          <MenuItem onClick={handleMenuClose}>
+            {text(lang, 'Climbing Areas', 'Klimgebieden')}
+          </MenuItem>
           <MenuItem onClick={() => navigateSubmenu('/material-rental')}>
             {text(lang, 'Material Rental', 'Materiaalverhuur')}
           </MenuItem>
@@ -97,7 +102,9 @@ export default function DesktopMenu({ handleLoginOpen }: DesktopMenuProps) {
         <Menu anchorEl={anchorEl} open={openMenu === 'alps'} onClose={handleMenuClose}>
           {/* Summer */}
           <p className="px-3 py-1 text-gray-500">{text(lang, 'Summer', 'Zomer')}</p>
-          <MenuItem onClick={handleMenuClose}>{text(lang, 'Mountaineering', 'Bergbeklimmen')}</MenuItem>
+          <MenuItem onClick={handleMenuClose}>
+            {text(lang, 'Mountaineering', 'Bergbeklimmen')}
+          </MenuItem>
           <MenuItem onClick={handleMenuClose}>{text(lang, 'Canyoning', 'Canyoning')}</MenuItem>
           <MenuItem onClick={handleMenuClose}>{text(lang, 'Via Ferrata', 'Via Ferrata')}</MenuItem>
           <MenuItem onClick={handleMenuClose}>{text(lang, 'Hiking', 'Wandelen')}</MenuItem>

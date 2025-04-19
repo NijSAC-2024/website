@@ -55,9 +55,9 @@ export default function RentalForm({
           const newAmount = increment ? item.amount + 1 : item.amount - 1;
           return newAmount > 0
             ? {
-              ...item,
-              amount: newAmount
-            }
+                ...item,
+                amount: newAmount
+              }
             : null;
         }
         return item;

@@ -4,14 +4,14 @@ import { Route } from 'types';
  * This table contains a list of all named routes
  */
 export const routes = [
-  ['/',                 'index'],
-  ['/register',         'register'],
-  ['/agenda',           'agenda'],
-  ['/agenda/new',       'new_activity'],
-  ['/agenda/:id',       'activity'],
-  ['/about',            'about'],
-  ['/material-rental',  'material_rental'],
-  ['/not-found',        'not_found']
+  ['/', 'index'],
+  ['/register', 'register'],
+  ['/agenda', 'agenda'],
+  ['/agenda/new', 'new_activity'],
+  ['/agenda/:id', 'activity'],
+  ['/about', 'about'],
+  ['/material-rental', 'material_rental'],
+  ['/not-found', 'not_found']
 ];
 
 function toRouteObject(route: string[]): Route {
@@ -35,7 +35,7 @@ export function matchPath(path: string): Route | undefined {
 
   const simple = simpleMatchPath(path);
   if (simple) {
-    return simple
+    return simple;
   }
 
   for (const route of routes) {

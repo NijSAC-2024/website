@@ -3,12 +3,13 @@ import EditEvent from '../components/edit/EditEvent.tsx';
 import { ActivityContent } from '../types.ts';
 
 export default function AddEvent() {
+  const now = new Date();
   const activity: ActivityContent = {
     name: {
       en: 'New activity',
       nl: 'Nieuwe activiteit'
     },
-    dates: [],
+    dates: [{ start: now, end: now }],
     isPublished: false,
     requiredMembershipStatus: ['member'],
     activityType: 'activity',

@@ -140,7 +140,7 @@ export default function SingupOptions({
           <p>
             {text(
               lang,
-              'By choosing this option, you are willing to donate 20 euros per year to the NijSAC without becoming a member. You will not be able to participate in any of the NijSAC\'s activities.',
+              "By choosing this option, you are willing to donate 20 euros per year to the NijSAC without becoming a member. You will not be able to participate in any of the NijSAC's activities.",
               'Door voor deze optie te kiezen, bent u bereid 20 euro per jaar aan de NijSAC te doneren zonder lid te worden. U kunt dan aan geen van de activiteiten van de NijSAC deelnemen.'
             )}
           </p>

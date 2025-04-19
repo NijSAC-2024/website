@@ -17,12 +17,7 @@ interface SaveButtonProps {
   handleSave: (isPublished: boolean) => void;
 }
 
-export default function SaveButton({
-  name,
-  location,
-  category,
-  handleSave
-}: SaveButtonProps) {
+export default function SaveButton({ name, location, category, handleSave }: SaveButtonProps) {
   const { language: lang } = useLanguage();
   const [isDraft, setIsDraft] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
@@ -38,32 +33,32 @@ export default function SaveButton({
 
   return (
     <>
-      <div className="fixed bottom-5 right-5 z-10">
-        <Fab variant="extended" color="primary" onClick={() => handleSave(true)}
-          disabled={
-            !name.en ||
-               !name.nl ||
-               !location ||
-               !category}
-        >
+      <div className="fixed bottom-5 right-5 z-10 dark:bg-[#90caf9] rounded-3xl py-1 px-3 dark:text-black">
+        <Button color="inherit" onClick={() => handleSave(true)}>
           <SaveIcon className="mr-2" />
           {text(lang, 'Save Event', 'Evenement opslaan')}
-          <Tooltip title={isDraft ? null : text(lang, 'More Options', 'Meer opties')}>
-            <IconButton color="inherit" onClick={toggleIsDraft}>
-              {isDraft ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-            </IconButton>
-          </Tooltip>
-          <Collapse in={isDraft} timeout="auto" unmountOnExit>
-            <Button color="inherit" onClick={() => handleSave(false)}>
-              <SaveAsIcon className="mr-2" />
-              {text(lang, 'Save As Draft', 'Opslaan als concept')}
-            </Button>
-            <Button color="inherit" onClick={toggleOpen}>
-              <DeleteIcon className="mr-2" />
-              {text(lang, 'Delete Event', 'Evenement verwijderen')}
-            </Button>
-          </Collapse>
-        </Fab>
+        </Button>
+        <Tooltip title={isDraft ? null : text(lang, 'More Options', 'Meer opties')}>
+          <IconButton color="inherit" onClick={toggleIsDraft}>
+            {isDraft ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+          </IconButton>
+        </Tooltip>
+        <Collapse in={isDraft} timeout="auto" unmountOnExit>
+          <div className="grid">
+            <div className="flex justify-self-start">
+              <Button color="inherit" onClick={() => handleSave(false)}>
+                <SaveAsIcon className="mr-2" />
+                {text(lang, 'Save As Draft', 'Opslaan als concept')}
+              </Button>
+            </div>
+            <div className="flex justify-self-start">
+              <Button color="inherit" onClick={toggleOpen}>
+                <DeleteIcon className="mr-2" />
+                {text(lang, 'Delete Event', 'Evenement verwijderen')}
+              </Button>
+            </div>
+          </div>
+        </Collapse>
       </div>
       <AreYouSure
         open={open}
@@ -74,8 +69,8 @@ export default function SaveButton({
           'You are about to delete this event.',
           'Je staat op het punt dit evenement te verwijderen.'
         )}
-      />;
+      />
+      ;
     </>
-  )
-  ;
+  );
 }

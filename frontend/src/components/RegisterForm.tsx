@@ -28,7 +28,11 @@ export default function RegisterForm({
         {moment(registrationCloseTime).format('DD MMM HH:mm')}
       </p>
       {registrationQuestions.map((question, index) => (
-        <TextField key={index} fullWidth label={text(lang, question.question.en, question.question.nl)} />
+        <TextField
+          key={index}
+          fullWidth
+          label={text(lang, question.question.en, question.question.nl)}
+        />
       ))}
       <Button variant="contained" fullWidth>
         {text(lang, 'Register', 'Inschrijven')}

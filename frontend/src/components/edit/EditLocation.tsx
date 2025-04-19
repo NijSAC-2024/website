@@ -18,23 +18,20 @@ export default function EditLocation() {
     setOpen(true);
 
     setLoading(true);
-    const { error, data } = await apiFetch<Location[]>(
-      '/location?reusable=true&limit=2&offset=0',
-      {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
-      }
-    );
+    const { error, data } = await apiFetch<Location[]>('/location?reusable=true&limit=2&offset=0', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    });
 
     if (error) {
       switch (error.message) {
-      case 'Unauthorized':
-        enqueueSnackbar('Incorrect email or password.', { variant: 'error' });
-        break;
-      default:
-        enqueueSnackbar(`${error.message}: ${error.reference}`, {
-          variant: 'error'
-        });
+        case 'Unauthorized':
+          enqueueSnackbar('Incorrect email or password.', { variant: 'error' });
+          break;
+        default:
+          enqueueSnackbar(`${error.message}: ${error.reference}`, {
+            variant: 'error'
+          });
       }
     } else if (data) {
       setOptions(data);

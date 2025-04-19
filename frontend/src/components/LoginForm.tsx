@@ -42,7 +42,6 @@ export default function LoginForm({ onClose }: LoginFormProps) {
     console.log('checked', email, password, passwordError, emailError);
   };
 
-
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (emailError || passwordError) {

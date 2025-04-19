@@ -63,13 +63,13 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     });
     if (error) {
       switch (error.message) {
-      case 'Unauthorized':
-        enqueueSnackbar('Incorrect email or password.', { variant: 'error' });
-        break;
-      default:
-        enqueueSnackbar(`${error.message}: ${error.reference}`, {
-          variant: 'error'
-        });
+        case 'Unauthorized':
+          enqueueSnackbar('Incorrect email or password.', { variant: 'error' });
+          break;
+        default:
+          enqueueSnackbar(`${error.message}: ${error.reference}`, {
+            variant: 'error'
+          });
       }
     } else {
       await checkAuth();
@@ -79,7 +79,9 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoggedIn, checkAuth, login, logout, authOpen, toggleAuthOpen }}>
+    <AuthContext.Provider
+      value={{ user, isLoggedIn, checkAuth, login, logout, authOpen, toggleAuthOpen }}
+    >
       {children}
     </AuthContext.Provider>
   );

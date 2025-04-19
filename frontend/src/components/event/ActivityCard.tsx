@@ -35,11 +35,7 @@ export default function ActivityCard({ activity, agendaPage }: AgendaCardProps) 
 
     if (start === end) return moment(start).utc().format('DD MMM HH:mm');
     else if (startDay === endDay) {
-      return (
-        moment(start).utc().format('DD MMM HH:mm') +
-        ' - ' +
-        moment(end).utc().format('HH:mm')
-      );
+      return moment(start).utc().format('DD MMM HH:mm') + ' - ' + moment(end).utc().format('HH:mm');
     } else if (!agendaPage) {
       return (
         moment(start).utc().format('DD MMM HH:mm') +
@@ -50,9 +46,7 @@ export default function ActivityCard({ activity, agendaPage }: AgendaCardProps) 
       if (startMonth === endMonth) {
         return moment(start).format('DD') + ' - ' + moment(end).format('DD MMM');
       } else {
-        return (
-          moment(start).format('DD MMM') + ' - ' + moment(end).format('DD MMM')
-        );
+        return moment(start).format('DD MMM') + ' - ' + moment(end).format('DD MMM');
       }
     }
   };
@@ -75,8 +69,7 @@ export default function ActivityCard({ activity, agendaPage }: AgendaCardProps) 
   };
 
   return (
-    <div
-      className="w-full rounded-2xl bg-inherit border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] flex flex-col relative justify-between">
+    <div className="w-full rounded-2xl bg-inherit border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] flex flex-col relative justify-between">
       <div
         onClick={() => navigate('activity', { id: activity.id })}
         className={agendaPage ? 'hover:cursor-pointer' : ''}
@@ -94,7 +87,11 @@ export default function ActivityCard({ activity, agendaPage }: AgendaCardProps) 
             color="primary"
           />
         )}
-        <img className="w-full aspect-[4/2] object-cover" src={activity.image} alt="not available" />
+        <img
+          className="w-full aspect-[4/2] object-cover"
+          src={activity.image}
+          alt="not available"
+        />
         <div className="p-5 grid space-y-1">
           <div className="flex justify-between">
             <div className="flex flex-wrap gap-1">
@@ -129,7 +126,9 @@ export default function ActivityCard({ activity, agendaPage }: AgendaCardProps) 
           ) : (
             activity.dates.length > 1 && (
               <>
-                <b>{text(lang, getLabel(activity.activityType)) + text(lang, ' dates:', ' datums:')}</b>
+                <b>
+                  {text(lang, getLabel(activity.activityType)) + text(lang, ' dates:', ' datums:')}
+                </b>
                 {activity.dates.map((date) => (
                   <p>{formatDate(date)}</p>
                 ))}
@@ -138,8 +137,7 @@ export default function ActivityCard({ activity, agendaPage }: AgendaCardProps) 
           )}
         </div>
         {activity.registrationPeriod?.start && activity.registrationPeriod?.end && (
-          <div
-            className="p-5 flex justify-between items-center border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
+          <div className="p-5 flex justify-between items-center border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
             <div className="flex items-center">
               <GroupIcon className="mr-2" />
               <p>

@@ -1,4 +1,14 @@
-import { Activity, ActivityContent, DateType, Language, Question, WeekendType } from '../../types.ts';
+import {
+  Activity,
+  ActivityContent,
+  ActivityType,
+  DateType,
+  Language,
+  MembershipStatus,
+  Metadata,
+  Question,
+  WeekendType
+} from '../../types.ts';
 import { Button } from '@mui/material';
 import { text } from '../../util.ts';
 import { useState } from 'react';
@@ -24,11 +34,27 @@ export default function EditEvent({ activityContent: init }: EditEventProps) {
 
   const id = route.params?.id;
 
-  const updateEvent = (changes: Partial<Activity>) => {
-    setActivity((prev) => ({ ...prev, ...changes }));
+  const updateEvent = (changes: Partial<ActivityContent>) => {
+    setActivity((prev: ActivityContent) => ({
+      ...prev,
+      ...changes
+    }));
   };
 
-  const handleFieldChange = (name: keyof ActivityContent, value: string | number | boolean | DateType | WeekendType[] | null) => {
+  const handleFieldChange = (
+    name: keyof ActivityContent,
+    value:
+      | string
+      | number
+      | boolean
+      | DateType
+      | WeekendType[]
+      | ActivityType
+      | Metadata
+      | Language
+      | MembershipStatus[]
+      | null
+  ) => {
     updateEvent({
       [name]: value
     });
@@ -45,10 +71,7 @@ export default function EditEvent({ activityContent: init }: EditEventProps) {
   const handleAddDate = () => {
     const now = new Date();
     updateEvent({
-      dates: [
-        ...activity.dates,
-        { start: now, end: now }
-      ]
+      dates: [...activity.dates, { start: now, end: now }]
     });
   };
 
@@ -73,7 +96,12 @@ export default function EditEvent({ activityContent: init }: EditEventProps) {
     updateEvent({
       questions: [
         ...activity.questions,
-        { id: crypto.randomUUID(), questionType: 'shortText', question: { en: '', nl: '' }, required: false }
+        {
+          id: crypto.randomUUID(),
+          questionType: 'shortText',
+          question: { en: '', nl: '' },
+          required: false
+        }
       ]
     });
 
@@ -119,7 +147,7 @@ export default function EditEvent({ activityContent: init }: EditEventProps) {
           image={activity.image}
           category={activity.activityType}
           name={activity.name}
-          type={activity.metadata?.type || []}
+          metadata={activity.metadata as Metadata}
           location={activity.location}
           handleFieldChange={handleFieldChange}
           handleDateChange={handleDateChange}
@@ -129,8 +157,7 @@ export default function EditEvent({ activityContent: init }: EditEventProps) {
 
         <EditDescription
           description={activity.description}
-          gear={activity.metadata?.gear}
-          experience={activity.metadata?.experience}
+          metadata={activity.metadata}
           handleFieldChange={handleFieldChange}
         />
 
@@ -143,7 +170,8 @@ export default function EditEvent({ activityContent: init }: EditEventProps) {
           handleRegistrationQuestionChange={handleRegistrationQuestionChange}
           handleAddRegistrationQuestion={handleAddRegistrationQuestion}
           handleRemoveRegistrationQuestion={handleRemoveRegistrationQuestion}
-          dates={activity.dates} />
+          dates={activity.dates}
+        />
       </div>
     </GenericPage>
   );

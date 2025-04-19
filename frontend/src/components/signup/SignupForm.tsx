@@ -50,11 +50,11 @@ export default function SignupForm() {
 
     if (error) {
       switch (error.message) {
-      case 'Conflict':
-        enqueueSnackbar('Email is already in use.', { variant: 'error' });
-        break;
-      default:
-        enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
+        case 'Conflict':
+          enqueueSnackbar('Email is already in use.', { variant: 'error' });
+          break;
+        default:
+          enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
       }
       return;
     }

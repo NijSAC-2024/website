@@ -9,8 +9,15 @@ interface LinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
   onClick?: () => void;
 }
 
-export default function Link({ routeName, params, keepParams, className, onClick, ...props }: LinkProps) {
-  const { navigate, route: currentRoute, } = useAppState();
+export default function Link({
+  routeName,
+  params,
+  keepParams,
+  className,
+  onClick,
+  ...props
+}: LinkProps) {
+  const { navigate, route: currentRoute } = useAppState();
   const currentParams = currentRoute.params;
 
   const targetRouteName = routeName || currentRoute.name;
@@ -26,9 +33,8 @@ export default function Link({ routeName, params, keepParams, className, onClick
     navigate(targetRouteName, targetParams);
   };
   return (
-    <a {...props} href={route?.path || '/not-found'} className={fullClassName}
-      onClick={click}>
+    <a {...props} href={route?.path || '/not-found'} className={fullClassName} onClick={click}>
       {props.children}
-    </a>);
+    </a>
+  );
 }
-

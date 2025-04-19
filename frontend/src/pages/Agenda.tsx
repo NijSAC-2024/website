@@ -84,24 +84,24 @@ export default function Agenda() {
                 </FormControl>
               </div>
             </ContentCard>
-            {activities && activities
-              .filter(
-                (activity: Activity) =>
-                  (selectedCategory === 'all' || activity.activityType === selectedCategory) &&
-                  (selectedType === 'all' || activity.metadata?.type?.includes(selectedType))
-              )
-              .sort(
-                (a: Activity, b: Activity) =>
-                  a.dates[0].start.valueOf() -
-                  b.dates[0].start.valueOf()
-              )
-              .map((activity: Activity) => (
-                <ActivityCard activity={activity} agendaPage={true} key={activity.id} />
-              ))}
+            {activities &&
+              activities
+                .filter(
+                  (activity: Activity) =>
+                    (selectedCategory === 'all' || activity.activityType === selectedCategory) &&
+                    (selectedType === 'all' || activity.metadata?.type?.includes(selectedType))
+                )
+                .sort(
+                  (a: Activity, b: Activity) =>
+                    a.dates[0].start.valueOf() - b.dates[0].start.valueOf()
+                )
+                .map((activity: Activity) => (
+                  <ActivityCard activity={activity} agendaPage={true} />
+                ))}
           </div>
         </div>
       </GenericPage>
       ;
     </>
-  )
+  );
 }

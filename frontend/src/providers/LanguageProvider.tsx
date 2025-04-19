@@ -17,7 +17,9 @@ interface LanguageProviderProps {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export default function LanguageProvider({ children }: LanguageProviderProps) {
-  const [language, setLanguage] = useState<LanguageEnum>(navigator.language.slice(0, 2) === 'nl' ? 'nl' : 'en');
+  const [language, setLanguage] = useState<LanguageEnum>(
+    navigator.language.slice(0, 2) === 'nl' ? 'nl' : 'en'
+  );
 
   const setEnglish = () => {
     setLanguage('en');
@@ -43,7 +45,7 @@ export default function LanguageProvider({ children }: LanguageProviderProps) {
   // );
 
   return (
-    <LanguageContext.Provider value={{language, setDutch, setEnglish, toggleLanguage}}>
+    <LanguageContext.Provider value={{ language, setDutch, setEnglish, toggleLanguage }}>
       <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={language}>
         {children}
       </LocalizationProvider>

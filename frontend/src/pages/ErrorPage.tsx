@@ -2,10 +2,10 @@ import GenericPage from './GenericPage.tsx';
 import ContentCard from '../components/ContentCard.tsx';
 
 interface ErrorPageProbs {
-  error?: string,
+  error?: string;
 }
 
-export default function ErrorPage({error}: ErrorPageProbs) {
+export default function ErrorPage({ error }: ErrorPageProbs) {
   console.error(error);
 
   return (

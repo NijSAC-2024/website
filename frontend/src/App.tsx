@@ -106,7 +106,6 @@ export default function App(): React.ReactElement {
         navigate(event.state.route.name, event.state.route.params);
       }
     });
-
   }, []);
 
   useEffect(() => {

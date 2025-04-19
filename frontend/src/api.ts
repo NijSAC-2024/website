@@ -12,7 +12,10 @@ interface ApiResponse<T> {
   error?: errorType;
 }
 
-async function apiFetchResponse(url: string, options: RequestInit = {}): Promise<ApiResponse<Response>> {
+async function apiFetchResponse(
+  url: string,
+  options: RequestInit = {}
+): Promise<ApiResponse<Response>> {
   try {
     const response = await fetch('/api' + url, {
       credentials: 'include',
@@ -61,7 +64,10 @@ export async function apiFetch<T>(url: string, options: RequestInit = {}): Promi
   return { data: content };
 }
 
-export async function apiFetchVoid(url: string, options: RequestInit = {}): Promise<ApiResponse<void>> {
+export async function apiFetchVoid(
+  url: string,
+  options: RequestInit = {}
+): Promise<ApiResponse<void>> {
   const { data, error } = await apiFetchResponse(url, options);
   if (error || !data) {
     return { error };

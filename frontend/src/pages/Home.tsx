@@ -13,22 +13,22 @@ export default function Home() {
   const handleTestToken = async () => {
     const response = await fetch('/api/whoami');
     switch (response.status) {
-    case 200: {
-      const body = await response.json();
-      enqueueSnackbar('Your email is: ' + body.email, {
-        variant: 'success'
-      });
-      break;
-    }
-    case 401:
-      enqueueSnackbar('Please log in and try again.', {
-        variant: 'error'
-      });
-      break;
-    default:
-      enqueueSnackbar('Something went wrong. Please try again later.', {
-        variant: 'error'
-      });
+      case 200: {
+        const body = await response.json();
+        enqueueSnackbar('Your email is: ' + body.email, {
+          variant: 'success'
+        });
+        break;
+      }
+      case 401:
+        enqueueSnackbar('Please log in and try again.', {
+          variant: 'error'
+        });
+        break;
+      default:
+        enqueueSnackbar('Something went wrong. Please try again later.', {
+          variant: 'error'
+        });
     }
   };
 

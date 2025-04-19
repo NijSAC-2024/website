@@ -23,7 +23,10 @@ interface EditRegistrationProps {
   registrationMax?: number;
   registrationPeriod?: DateType;
   questions: Question[];
-  handleFieldChange: (name: keyof ActivityContent, value: string | boolean | WeekendType[] | DateType | number | null) => void;
+  handleFieldChange: (
+    name: keyof ActivityContent,
+    value: MembershipStatus[] | DateType | number | null
+  ) => void;
   handleRegistrationQuestionChange: (
     id: string,
     name: keyof Question,
@@ -66,7 +69,7 @@ export default function EditRegistrations({
             <p>{text(lang, 'Maximum registrations', 'Maximum inschrjvingen')}</p>
             <Switch
               checked={!!registrationMax}
-              onChange={() => handleFieldChange('registrationMax', registrationMax ? 10 : null)}
+              onChange={(_, checked) => handleFieldChange('registrationMax', checked ? 10 : null)}
             />
           </div>
           <Collapse in={!!registrationMax} timeout="auto" unmountOnExit>
@@ -82,25 +85,31 @@ export default function EditRegistrations({
             <DateTimePicker
               label={text(lang, 'Start Date Registrations', 'Startdatum Inschrijvingen')}
               value={moment(registrationPeriod?.start)}
-              onChange={(date) => handleFieldChange('registrationPeriod', {
-                start: date!.toDate(),
-                end: registrationPeriod!.end
-              })}
+              onChange={(date) =>
+                handleFieldChange('registrationPeriod', {
+                  start: date!.toDate(),
+                  end: registrationPeriod!.end
+                })
+              }
             />
             <DateTimePicker
               label={text(lang, 'End Date Registrations', 'Einddatum Inschrijvingen')}
               value={moment(registrationPeriod?.end)}
-              onChange={(date) => handleFieldChange('registrationPeriod', {
-                start: date!.toDate(),
-                end: registrationPeriod!.end
-              })}
+              onChange={(date) =>
+                handleFieldChange('registrationPeriod', {
+                  start: date!.toDate(),
+                  end: registrationPeriod!.end
+                })
+              }
             />
           </div>
           <OptionSelector
             options={memberOptions}
-            onChange={(selected) => handleFieldChange('requiredMembershipStatus', selected)}
+            selected={requiredMembershipStatus}
+            onChange={(selected) =>
+              handleFieldChange('requiredMembershipStatus', selected as MembershipStatus[])
+            }
             label={text(lang, 'Necessary Membership Status', 'Benodigd Lidmaatschapstatus')}
-            initialOptions={requiredMembershipStatus}
           />
 
           {/* Registration Questions */}

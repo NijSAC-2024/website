@@ -161,7 +161,10 @@ export default function MobileMenu({
           {/* Climbing */}
           <ListItem onClick={() => toggleMenu('climbing')} disablePadding>
             <ListItemButton>
-              <ListItemText primary={text(lang, 'Climbing', 'Klimmen')} className="uppercase px-10" />
+              <ListItemText
+                primary={text(lang, 'Climbing', 'Klimmen')}
+                className="uppercase px-10"
+              />
               <ListItemIcon>
                 {openMenu === 'climbing' ? <ExpandLess /> : <ExpandMore />}
               </ListItemIcon>
@@ -354,15 +357,15 @@ export default function MobileMenu({
             <>
               <ListItem onClick={handleLoginOpen} disablePadding>
                 <ListItemButton>
-                  <ListItemText primary={text(lang, 'Login', 'Login')} className="uppercase px-10" />
+                  <ListItemText
+                    primary={text(lang, 'Login', 'Login')}
+                    className="uppercase px-10"
+                  />
                   <ListItemIcon></ListItemIcon>
                 </ListItemButton>
               </ListItem>
               <ListItem className="px-10 pb-3 pt-2" disablePadding>
-                <Button
-                  variant="contained"
-                  onClick={() => router.navigate().then(toggleDropdown)}
-                >
+                <Button variant="contained" onClick={() => router.navigate().then(toggleDropdown)}>
                   {text(lang, 'Become a member', 'Lid worden')}
                 </Button>
               </ListItem>
