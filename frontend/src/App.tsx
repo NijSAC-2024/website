@@ -79,25 +79,25 @@ export default function App(): React.ReactElement {
   });
 
   // DEBUG: on "ctrl-,", flip the theme, on "ctrl-.", flip the language
-  // const eventListener = (e: KeyboardEvent) => {
-  //   if (e.ctrlKey && e.key === ',') {
-  //     toggleTheme();
-  //   }
-  //
-  //   if (e.ctrlKey && e.key === '.') {
-  //     language.toggleLanguage();
-  //   }
-  // };
-  //
-  // if (import.meta.env.MODE === 'development') {
-  //   useEffect(() => {
-  //     addEventListener('keydown', eventListener);
-  //
-  //     return () => {
-  //       removeEventListener('keydown', eventListener);
-  //     };
-  //   });
-  // }
+  const eventListener = (e: KeyboardEvent) => {
+    if (e.ctrlKey && e.key === ',') {
+      toggleTheme();
+    }
+
+    if (e.ctrlKey && e.key === '.') {
+      language.toggleLanguage();
+    }
+  };
+
+  if (import.meta.env.MODE === 'development') {
+    useEffect(() => {
+      addEventListener('keydown', eventListener);
+
+      return () => {
+        removeEventListener('keydown', eventListener);
+      };
+    });
+  }
 
   useEffect(() => {
     // Listen to browser back and forward buttons

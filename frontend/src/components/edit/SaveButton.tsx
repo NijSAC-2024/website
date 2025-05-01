@@ -11,39 +11,36 @@ import AreYouSure from '../AreYouSure.tsx';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 
 interface SaveButtonProps {
-  name: Language;
-  location: string;
-  category: ActivityType;
   handleSave: (isPublished: boolean) => void;
 }
 
-export default function SaveButton({ name, location, category, handleSave }: SaveButtonProps) {
+export default function SaveButton({handleSave }: SaveButtonProps) {
   const { language: lang } = useLanguage();
-  const [isDraft, setIsDraft] = useState<boolean>(false);
-  const [open, setOpen] = useState<boolean>(false);
+  const [menuOpen, setMenuOpen] = useState<boolean>(false);
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
 
   const handleDelete = () => {
     console.log('Delete Event');
-    toggleOpen();
+    toggleDialog();
   };
 
-  const toggleOpen = () => setOpen((prev) => !prev);
+  const toggleDialog = () => setDialogOpen((prevState) => !prevState);
 
-  const toggleIsDraft = () => setIsDraft((prevState) => !prevState);
+  const toggleMenu = () => setMenuOpen((prevState) => !prevState);
 
   return (
     <>
-      <div className="fixed bottom-5 right-5 z-10 dark:bg-[#90caf9] rounded-3xl py-1 px-3 dark:text-black">
+      <div className="fixed bottom-5 right-5 z-10 hover:dark:bg-[#42a5f5] hover:bg-[#1565c0] hover:shadow-2xl shadow-xl duration-300 dark:bg-[#90caf9] bg-[#1976d2] text-white rounded-3xl py-1 px-3 dark:text-black">
         <Button color="inherit" onClick={() => handleSave(true)}>
           <SaveIcon className="mr-2" />
           {text(lang, 'Save Event', 'Evenement opslaan')}
         </Button>
-        <Tooltip title={isDraft ? null : text(lang, 'More Options', 'Meer opties')}>
-          <IconButton color="inherit" onClick={toggleIsDraft}>
-            {isDraft ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+        <Tooltip title={menuOpen ? text(lang, 'Less Options', 'Minder opties') : text(lang, 'More Options', 'Meer opties')} placement="top">
+          <IconButton color="inherit" onClick={toggleMenu}>
+            {menuOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
           </IconButton>
         </Tooltip>
-        <Collapse in={isDraft} timeout="auto" unmountOnExit>
+        <Collapse in={menuOpen} timeout="auto" unmountOnExit>
           <div className="grid">
             <div className="flex justify-self-start">
               <Button color="inherit" onClick={() => handleSave(false)}>
@@ -52,7 +49,7 @@ export default function SaveButton({ name, location, category, handleSave }: Sav
               </Button>
             </div>
             <div className="flex justify-self-start">
-              <Button color="inherit" onClick={toggleOpen}>
+              <Button color="inherit" onClick={toggleDialog}>
                 <DeleteIcon className="mr-2" />
                 {text(lang, 'Delete Event', 'Evenement verwijderen')}
               </Button>
@@ -61,8 +58,8 @@ export default function SaveButton({ name, location, category, handleSave }: Sav
         </Collapse>
       </div>
       <AreYouSure
-        open={open}
-        onCancel={toggleOpen}
+        open={dialogOpen}
+        onCancel={toggleDialog}
         onConfirm={handleDelete}
         message={text(
           lang,

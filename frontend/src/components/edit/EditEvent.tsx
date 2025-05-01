@@ -122,9 +122,6 @@ export default function EditEvent({ activityContent: init }: EditEventProps) {
   return (
     <GenericPage image={activity.image}>
       <SaveButton
-        name={activity.name}
-        location={activity.location}
-        category={activity.activityType}
         handleSave={handleSave}
       />
 
