@@ -9,7 +9,7 @@ export type WeekendType = 'sp' | 'mp' | 'boulder' | 'trad' | 'education';
 
 export type ExperienceType = 'sp' | 'mp';
 
-export type ActivityType = 'activity' | 'course' | 'training' | 'weekend';
+export type EventType = 'activity' | 'course' | 'training' | 'weekend';
 
 export type MembershipStatus = 'pending' | 'member' | 'extraordinary' | 'nonMember';
 
@@ -18,7 +18,7 @@ export type QuestionType = 'shortText' | 'longText' | 'number' | 'time';
 export type LanguageEnum = 'nl' | 'en';
 
 export interface OptionsType {
-  id: WeekendType | ActivityType | MembershipStatus | QuestionType | ExperienceType;
+  id: WeekendType | EventType | MembershipStatus | QuestionType | ExperienceType;
   label: Language;
 }
 
@@ -58,7 +58,7 @@ export interface Metadata {
   gear?: Language;
 }
 
-export interface Activity extends Omit<ActivityContent, 'location'> {
+export interface Event extends Omit<EventContent, 'location'> {
   id: string;
   created: string;
   updated: string;
@@ -67,14 +67,14 @@ export interface Activity extends Omit<ActivityContent, 'location'> {
   location: Location;
 }
 
-export function toActivityContent(activity: Activity): ActivityContent {
-  const location_id = activity.location.id;
-  const activityContent = activity as unknown as ActivityContent;
-  activityContent.location = location_id;
-  return activityContent;
+export function toEventContent(event: Event): EventContent {
+  const location_id = event.location.id;
+  const eventContent = event as unknown as EventContent;
+  eventContent.location = location_id;
+  return eventContent;
 }
 
-export interface ActivityContent {
+export interface EventContent {
   name: Language;
   image?: string;
   description?: Language;
@@ -84,7 +84,7 @@ export interface ActivityContent {
   waitingListMax?: number;
   isPublished: boolean;
   requiredMembershipStatus: MembershipStatus[];
-  activityType: ActivityType;
+  eventType: EventType;
   questions: Question[];
   metadata?: Metadata;
   location: string;
@@ -171,8 +171,8 @@ export interface State {
   version: string;
   route: Route;
   user?: User;
-  activities?: Activity[];
-  activity?: Activity;
+  activities?: Event[];
+  event?: Event;
 }
 
 export type MenuType = 'association' | 'climbing' | 'alps' | 'language' | undefined;

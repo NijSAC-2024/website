@@ -1,13 +1,12 @@
 import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import { text } from '../../util.ts';
 import {
-  Activity,
-  ActivityType,
+  Event,
+  EventType,
   DateType,
   Language,
   Metadata,
-  typesOptions,
-  WeekendType
+  typesOptions
 } from '../../types.ts';
 import OptionSelector from '../OptionSelector.tsx';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
@@ -17,15 +16,15 @@ import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import { useApiState } from '../../providers/ApiProvider.tsx';
 
 interface EditAgendaCardProps {
-  category: ActivityType;
+  category: EventType;
   image?: string;
   metadata: Metadata;
   name: Language;
   dates: DateType[];
   location: string;
   handleFieldChange: (
-    name: keyof Activity,
-    value: Metadata | ActivityType | Language | string
+    name: keyof Event,
+    value: Metadata | EventType | Language | string
   ) => void;
   handleDateChange: (index: number, startDate: boolean, value: string) => void;
   handleAddDate: () => void;
@@ -88,7 +87,7 @@ export default function EditAgendaCard({
                 value={category}
                 label={text(lang, 'Category*', 'Categorie*')}
                 variant="outlined"
-                onChange={(e) => handleFieldChange('activityType', e.target.value as ActivityType)}
+                onChange={(e) => handleFieldChange('eventType', e.target.value as EventType)}
               >
                 <MenuItem value="activity">{text(lang, 'Activity', 'Activiteit')}</MenuItem>
                 <MenuItem value="course">{text(lang, 'Course', 'Cursus')}</MenuItem>
@@ -133,10 +132,12 @@ export default function EditAgendaCard({
               onChange={(e) => handleFieldChange('location', e.target.value as string)}
               variant="outlined"
             >
-              {locations?.map((l) => <MenuItem value={l.id}>{text(lang, l.name)}</MenuItem>)}
+              {locations?.map((l) => <MenuItem key={l.id} value={l.id}>{text(lang, l.name)}</MenuItem>)}
             </Select>
           </FormControl>
 
+          <hr/>
+          Dates
           {/*Dates*/}
           <EditDates
             dates={dates}

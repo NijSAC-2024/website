@@ -7,8 +7,8 @@ export const routes = [
   ['/', 'index'],
   ['/register', 'register'],
   ['/agenda', 'agenda'],
-  ['/agenda/new', 'new_activity'],
-  ['/agenda/:id', 'activity'],
+  ['/agenda/new', 'new_event'],
+  ['/agenda/:id', 'event'],
   ['/about', 'about'],
   ['/material-rental', 'material_rental'],
   ['/not-found', 'not_found']

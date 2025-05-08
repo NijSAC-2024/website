@@ -3,7 +3,7 @@ import { TextField } from '@mui/material';
 import { text } from '../../util.ts';
 import OptionSelector from '../OptionSelector.tsx';
 import {
-  Activity,
+  Event,
   DateType,
   experienceOptions,
   Language,
@@ -16,7 +16,7 @@ import { useLanguage } from '../../providers/LanguageProvider.tsx';
 interface EditDescriptionProps {
   description?: Language;
   metadata?: Metadata;
-  handleFieldChange: (name: keyof Activity, value: Metadata | Language) => void;
+  handleFieldChange: (name: keyof Event, value: Metadata | Language) => void;
 }
 export default function EditDescription({
   description,

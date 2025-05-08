@@ -1,7 +1,7 @@
 import {
-  Activity,
-  ActivityContent,
-  ActivityType,
+  Event,
+  EventContent,
+  EventType,
   DateType,
   Language,
   MembershipStatus,
@@ -22,47 +22,47 @@ import { useApiState } from '../../providers/ApiProvider.tsx';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 
 interface EditEventProps {
-  activityContent: ActivityContent;
+  eventContent: EventContent;
 }
 
-export default function EditEvent({ activityContent: init }: EditEventProps) {
+export default function EditEvent({ eventContent: init }: EditEventProps) {
   const { language: lang } = useLanguage();
-  const { createActivity, updateActivity } = useApiState();
+  const { createEvent, updateEvent } = useApiState();
   const { route } = useAppState();
   const { navigate } = useAppState();
-  const [activity, setActivity] = useState<ActivityContent>(init);
+  const [event, setEvent] = useState<EventContent>(init);
 
   const id = route.params?.id;
 
-  const updateEvent = (changes: Partial<ActivityContent>) => {
-    setActivity((prev: ActivityContent) => ({
+  const handleEventChange = (changes: Partial<EventContent>) => {
+    setEvent((prev: EventContent) => ({
       ...prev,
       ...changes
     }));
   };
 
   const handleFieldChange = (
-    name: keyof ActivityContent,
+    name: keyof EventContent,
     value:
       | string
       | number
       | boolean
       | DateType
       | WeekendType[]
-      | ActivityType
+      | EventType
       | Metadata
       | Language
       | MembershipStatus[]
       | null
   ) => {
-    updateEvent({
+    handleEventChange({
       [name]: value
     });
   };
 
   const handleDateChange = (index: number, startDate: boolean, value: string) => {
-    updateEvent({
-      dates: activity.dates.map((date, idx) =>
+    handleEventChange({
+      dates: event.dates.map((date, idx) =>
         idx === index ? { ...date, [startDate ? 'startDateTime' : 'endDateTime']: value } : date
       )
     });
@@ -70,14 +70,14 @@ export default function EditEvent({ activityContent: init }: EditEventProps) {
 
   const handleAddDate = () => {
     const now = new Date();
-    updateEvent({
-      dates: [...activity.dates, { start: now, end: now }]
+    handleEventChange({
+      dates: [...event.dates, { start: now, end: now }]
     });
   };
 
   const handleRemoveDate = (index: number) =>
-    updateEvent({
-      dates: activity.dates.filter((_, idx) => idx !== index)
+    handleEventChange({
+      dates: event.dates.filter((_, idx) => idx !== index)
     });
 
   const handleRegistrationQuestionChange = (
@@ -85,17 +85,17 @@ export default function EditEvent({ activityContent: init }: EditEventProps) {
     name: keyof Question,
     value: Language | boolean
   ) => {
-    updateEvent({
-      questions: activity.questions.map((question) =>
+    handleEventChange({
+      questions: event.questions.map((question) =>
         question.id === id ? { ...question, [name]: value } : question
       )
     });
   };
 
   const handleAddRegistrationQuestion = () =>
-    updateEvent({
+    handleEventChange({
       questions: [
-        ...activity.questions,
+        ...event.questions,
         {
           id: crypto.randomUUID(),
           questionType: 'shortText',
@@ -106,21 +106,21 @@ export default function EditEvent({ activityContent: init }: EditEventProps) {
     });
 
   const handleRemoveRegistrationQuestion = (id: string) =>
-    updateEvent({
-      questions: activity.questions.filter((q) => q.id !== id)
+    handleEventChange({
+      questions: event.questions.filter((q) => q.id !== id)
     });
 
   const handleSave = async (bool: boolean) => {
     if (id) {
-      await updateActivity(id, { ...activity, isPublished: bool });
+      await updateEvent(id, { ...event, isPublished: bool });
       navigate('agenda');
     } else {
-      await createActivity({ ...activity, isPublished: bool });
+      await createEvent({ ...event, isPublished: bool });
     }
   };
 
   return (
-    <GenericPage image={activity.image}>
+    <GenericPage image={event.image}>
       <SaveButton
         handleSave={handleSave}
       />
@@ -132,7 +132,7 @@ export default function EditEvent({ activityContent: init }: EditEventProps) {
               {text(lang, 'Back to Agenda', 'Terug naar Agenda')}
             </Button>
           </div>
-          {!activity.isPublished && (
+          {!event.isPublished && (
             <Button variant="contained">
               <b>{text(lang, 'Draft', 'Concept')}</b>
             </Button>
@@ -140,12 +140,12 @@ export default function EditEvent({ activityContent: init }: EditEventProps) {
         </div>
 
         <EditAgendaCard
-          dates={activity.dates}
-          image={activity.image}
-          category={activity.activityType}
-          name={activity.name}
-          metadata={activity.metadata as Metadata}
-          location={activity.location}
+          dates={event.dates}
+          image={event.image}
+          category={event.eventType}
+          name={event.name}
+          metadata={event.metadata as Metadata}
+          location={event.location}
           handleFieldChange={handleFieldChange}
           handleDateChange={handleDateChange}
           handleAddDate={handleAddDate}
@@ -153,21 +153,21 @@ export default function EditEvent({ activityContent: init }: EditEventProps) {
         />
 
         <EditDescription
-          description={activity.description}
-          metadata={activity.metadata}
+          description={event.description}
+          metadata={event.metadata}
           handleFieldChange={handleFieldChange}
         />
 
         <EditRegistrations
-          requiredMembershipStatus={activity.requiredMembershipStatus}
-          registrationMax={activity.registrationMax}
-          registrationPeriod={activity.registrationPeriod}
-          questions={activity.questions}
+          requiredMembershipStatus={event.requiredMembershipStatus}
+          registrationMax={event.registrationMax}
+          registrationPeriod={event.registrationPeriod}
+          questions={event.questions}
           handleFieldChange={handleFieldChange}
           handleRegistrationQuestionChange={handleRegistrationQuestionChange}
           handleAddRegistrationQuestion={handleAddRegistrationQuestion}
           handleRemoveRegistrationQuestion={handleRemoveRegistrationQuestion}
-          dates={activity.dates}
+          dates={event.dates}
         />
       </div>
     </GenericPage>

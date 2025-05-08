@@ -1,11 +1,11 @@
-mod activity;
+mod event;
 mod file;
 mod location;
 mod material;
 mod user;
 
 use crate::error::Error;
-pub use activity::*;
+pub use event::*;
 use axum::{
     extract::{
         rejection::{JsonRejection, QueryRejection},

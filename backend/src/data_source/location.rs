@@ -31,8 +31,8 @@ struct PgLocation {
     name_nl: String,
     name_en: String,
     reusable: bool,
-    description_nl: Option<String>,
-    description_en: Option<String>,
+    description_nl: String,
+    description_en: String,
     created: OffsetDateTime,
     updated: OffsetDateTime,
 }
@@ -49,12 +49,10 @@ impl From<PgLocation> for Location {
                     nl: pg.name_nl,
                 },
                 reusable: pg.reusable,
-                description: pg.description_en.map(|en| Language {
-                    en,
-                    nl: pg.description_nl.expect(
-                        "If a english description exists in the DB, there must also exist a dutch",
-                    ),
-                }),
+                description: Language {
+                    en: pg.description_en,
+                    nl: pg.description_nl,
+                },
             },
         }
     }
@@ -86,8 +84,8 @@ impl LocationStore {
             id,
             new.name.nl,
             new.name.en,
-            new.description.as_ref().map(|d| d.nl.clone()),
-            new.description.map(|d| d.en),
+            new.description.nl,
+            new.description.en,
             new.reusable
         )
             .fetch_one(&self.db)
@@ -112,8 +110,8 @@ impl LocationStore {
             **id,
             updated.name.nl,
             updated.name.en,
-            updated.description.as_ref().map(|d| d.nl.clone()),
-            updated.description.map(|d| d.en),
+            updated.description.nl,
+            updated.description.en,
             updated.reusable
         )
         .fetch_one(&self.db)
@@ -168,13 +166,13 @@ impl LocationStore {
 
     pub async fn used_by(&self, id: &LocationId) -> AppResult<UsedBy> {
         struct PgUsedBy {
-            activity: Uuid,
+            event: Uuid,
         }
 
         Ok(sqlx::query_as!(
             PgUsedBy,
             r#"
-            SELECT id as activity FROM activity WHERE location_id = $1
+            SELECT id as event FROM event WHERE location_id = $1
             "#,
             **id
         )
@@ -182,7 +180,7 @@ impl LocationStore {
         .await?
         .into_iter()
         .fold(UsedBy { activities: vec![] }, |mut used_by, pg| {
-            used_by.activities.push(pg.activity.into());
+            used_by.activities.push(pg.event.into());
             used_by
         }))
     }

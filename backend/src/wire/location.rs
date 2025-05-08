@@ -1,4 +1,4 @@
-use crate::{activity::ActivityId, Language};
+use crate::{event::EventId, Language};
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 use std::ops::Deref;
@@ -39,19 +39,20 @@ pub struct Location {
 }
 
 #[skip_serializing_none]
-#[derive(Serialize, Deserialize, Debug, Validate)]
+#[derive(Serialize, Deserialize, Debug, Validate, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct LocationContent {
     #[validate(nested)]
     pub name: Language,
     pub reusable: bool,
     #[validate(nested)]
-    pub description: Option<Language>,
+    #[serde(default)]
+    pub description: Language,
 }
 
 #[skip_serializing_none]
 #[derive(Serialize, Debug, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct UsedBy {
-    pub activities: Vec<ActivityId>,
+    pub activities: Vec<EventId>,
 }

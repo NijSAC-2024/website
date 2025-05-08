@@ -2,7 +2,7 @@ import { Button, Collapse, Fab, IconButton, Tooltip } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import { text } from '../../util.ts';
 import SaveAsIcon from '@mui/icons-material/SaveAs';
-import { ActivityType, Language } from '../../types.ts';
+import { EventType, Language } from '../../types.ts';
 import { useState } from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';

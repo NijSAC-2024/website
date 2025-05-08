@@ -2,7 +2,7 @@ import React from 'react';
 import { text } from '../../util.ts';
 import { Collapse, Switch, TextField } from '@mui/material';
 import {
-  ActivityContent,
+  EventContent,
   DateType,
   Language,
   memberOptions,
@@ -24,7 +24,7 @@ interface EditRegistrationProps {
   registrationPeriod?: DateType;
   questions: Question[];
   handleFieldChange: (
-    name: keyof ActivityContent,
+    name: keyof EventContent,
     value: MembershipStatus[] | DateType | number | null
   ) => void;
   handleRegistrationQuestionChange: (

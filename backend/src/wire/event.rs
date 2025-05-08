@@ -9,15 +9,15 @@ use validator::{Validate, ValidationError};
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
 #[serde(transparent)]
-pub struct ActivityId(Uuid);
+pub struct EventId(Uuid);
 
-impl From<Uuid> for ActivityId {
+impl From<Uuid> for EventId {
     fn from(id: Uuid) -> Self {
         Self(id)
     }
 }
 
-impl Deref for ActivityId {
+impl Deref for EventId {
     type Target = Uuid;
 
     fn deref(&self) -> &Self::Target {
@@ -25,9 +25,9 @@ impl Deref for ActivityId {
     }
 }
 
-impl From<ActivityId> for Uuid {
-    fn from(activity_id: ActivityId) -> Self {
-        activity_id.0
+impl From<EventId> for Uuid {
+    fn from(event_id: EventId) -> Self {
+        event_id.0
     }
 }
 
@@ -51,7 +51,7 @@ impl FromStr for ActivityType {
             "weekend" => ActivityType::Weekend,
             "training" => ActivityType::Training,
             _ => return Err(Error::Other(format!(
-                "Invalid activity type {s}: Must be one of activity, course, weekend, or training"
+                "Invalid event type {s}: Must be one of event, course, weekend, or training"
             ))),
         })
     }
@@ -60,11 +60,11 @@ impl FromStr for ActivityType {
 #[skip_serializing_none]
 #[derive(Serialize, Debug, Validate)]
 #[serde(rename_all = "camelCase")]
-pub struct Activity<T>
+pub struct Event<T>
 where
     T: Validate,
 {
-    pub id: ActivityId,
+    pub id: EventId,
     #[serde(with = "time::serde::rfc3339")]
     pub created: OffsetDateTime,
     #[serde(with = "time::serde::rfc3339")]
@@ -73,18 +73,19 @@ where
     pub waiting_list_count: i64,
     #[serde(flatten)]
     #[validate(nested)]
-    pub content: ActivityContent<T>,
+    pub content: EventContent<T>,
 }
 
 #[skip_serializing_none]
 #[derive(Serialize, Deserialize, Debug, Validate)]
 #[serde(rename_all = "camelCase")]
-pub struct ActivityContent<T> {
+pub struct EventContent<T> {
     #[validate(nested)]
     pub name: Language,
     pub image: Option<FileId>,
     #[validate(nested)]
-    pub description: Option<Language>,
+    #[serde(default)]
+    pub description: Language,
     #[validate(nested)]
     pub dates: Vec<Date>,
     pub registration_period: Option<Date>,
@@ -94,9 +95,10 @@ pub struct ActivityContent<T> {
     pub waiting_list_max: Option<i32>,
     pub is_published: bool,
     pub required_membership_status: Vec<MembershipStatus>,
-    pub activity_type: ActivityType,
+    pub event_type: ActivityType,
     #[validate[nested]]
     pub questions: Vec<Question>,
+    #[serde(default)]
     pub metadata: serde_json::Value,
     pub location: T,
 }
@@ -111,8 +113,8 @@ pub struct Date {
     pub end: OffsetDateTime,
 }
 
-fn validate_date(activity: &Date) -> Result<(), ValidationError> {
-    if activity.start > activity.end {
+fn validate_date(event: &Date) -> Result<(), ValidationError> {
+    if event.start > event.end {
         Err(ValidationError::new("date").with_message(Cow::Borrowed("Start cannot be after end")))
     } else {
         Ok(())

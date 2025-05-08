@@ -1,17 +1,17 @@
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import { Activity, ActivityContent, Registration, Location } from '../types.ts';
+import { Event, EventContent, Registration, Location } from '../types.ts';
 import { useAppState } from './AppStateProvider.tsx';
 import { apiFetch } from '../api.ts';
 import { enqueueSnackbar } from 'notistack';
 import { useAuth } from './AuthProvider.tsx';
 
 interface ApiContextType {
-  activities?: Activity[];
+  events?: Event[];
   locations?: Location[];
-  activity?: Activity;
+  event?: Event;
   registrations?: Registration[];
-  updateActivity: (id: string, activity: ActivityContent) => Promise<void>;
-  createActivity: (activity: ActivityContent) => Promise<void>;
+  updateEvent: (id: string, event: EventContent) => Promise<void>;
+  createEvent: (event: EventContent) => Promise<void>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -26,15 +26,15 @@ export default function ApiProvider({ children }: ApiProviderProps) {
   // We use this boolean to invalidate cached API calls whenever an item gets updated.
   // The `useEffects` depend on the boolean to trigger a reload on any change
   const [cache, setCache] = useState<boolean>(false);
-  const [activities, setActivities] = useState<Array<Activity>>([]);
-  const [activity, setActivity] = useState<Activity | undefined>(undefined);
+  const [events, setEvents] = useState<Array<Event>>([]);
+  const [event, setEvent] = useState<Event | undefined>(undefined);
   const [locations, setLocations] = useState<Array<Location> | undefined>(undefined);
   const [registrations, setRegistrations] = useState<Array<Registration>>([]);
 
-  const updateActivity = async (id: string, activity: ActivityContent) => {
-    const { error, data: updatedActivity } = await apiFetch<Activity>(`/activity/${id}`, {
+  const updateEvent = async (id: string, event: EventContent) => {
+    const { error, data: updatedEvent } = await apiFetch<Event>(`/event/${id}`, {
       method: 'PUT',
-      body: JSON.stringify(activity)
+      body: JSON.stringify(event)
     });
     if (error) {
       enqueueSnackbar(`${error.message}: ${error.reference}`, {
@@ -42,17 +42,17 @@ export default function ApiProvider({ children }: ApiProviderProps) {
       });
       return;
     }
-    setActivity(updatedActivity);
+    setEvent(updatedEvent);
     setCache(!cache);
     enqueueSnackbar('saved', {
       variant: 'success'
     });
   };
 
-  const createActivity = async (activity: ActivityContent) => {
-    const { error, data: updatedActivity } = await apiFetch<Activity>('/activity', {
+  const createEvent = async (event: EventContent) => {
+    const { error, data: updatedEvent } = await apiFetch<Event>('/event', {
       method: 'POST',
-      body: JSON.stringify(activity)
+      body: JSON.stringify(event)
     });
     if (error) {
       enqueueSnackbar(`${error.message}: ${error.reference}`, {
@@ -60,7 +60,7 @@ export default function ApiProvider({ children }: ApiProviderProps) {
       });
       return;
     }
-    setActivity(updatedActivity);
+    setEvent(updatedEvent);
     setCache(!cache);
     enqueueSnackbar('saved', {
       variant: 'success'
@@ -69,21 +69,21 @@ export default function ApiProvider({ children }: ApiProviderProps) {
 
   useEffect(() => {
     if (route.name === 'agenda') {
-      apiFetch<Array<Activity>>('/activity').then(({ error, data: activities }) => {
+      apiFetch<Array<Event>>('/event').then(({ error, data: events }) => {
         if (error) {
           enqueueSnackbar(`${error.message}: ${error.reference}`, {
             variant: 'error'
           });
         }
-        if (activities) {
-          setActivities(activities);
+        if (events) {
+          setEvents(events);
         }
       });
     }
   }, [cache, route.name]);
 
   useEffect(() => {
-    if (route.name === 'activity') {
+    if (route.name === 'event' || route.name == 'new_event') {
       apiFetch<Array<Location>>('/location').then(({ error, data: locations }) => {
         if (error) {
           enqueueSnackbar(`${error.message}: ${error.reference}`, {
@@ -98,19 +98,19 @@ export default function ApiProvider({ children }: ApiProviderProps) {
   }, [cache, route.name]);
 
   useEffect(() => {
-    if (route.name === 'activity') {
-      apiFetch<Activity>(`/activity/${route.params!.id}`).then(({ error, data: activity }) => {
+    if (route.name === 'event') {
+      apiFetch<Event>(`/event/${route.params!.id}`).then(({ error, data: event }) => {
         if (error) {
           enqueueSnackbar(`${error.message}: ${error.reference}`, {
             variant: 'error'
           });
         }
-        if (activity) {
-          setActivity(activity);
+        if (event) {
+          setEvent(event);
         }
       });
       if (isLoggedIn) {
-        apiFetch<Array<Registration>>(`/activity/${route.params!.id}/registration`).then(
+        apiFetch<Array<Registration>>(`/event/${route.params!.id}/registration`).then(
           ({ error, data: registrations }) => {
             if (error) {
               enqueueSnackbar(`${error.message}: ${error.reference}`, {
@@ -128,7 +128,7 @@ export default function ApiProvider({ children }: ApiProviderProps) {
 
   return (
     <ApiContext.Provider
-      value={{ activities, activity, locations, registrations, updateActivity, createActivity }}
+      value={{ events, event, locations, registrations, updateEvent, createEvent }}
     >
       {children}
     </ApiContext.Provider>

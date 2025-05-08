@@ -131,9 +131,9 @@ export default function App(): React.ReactElement {
     component = <Signup />;
   } else if (route.name == 'agenda') {
     component = <Agenda />;
-  } else if (route.name == 'new_activity') {
+  } else if (route.name == 'new_event') {
     component = <AddEvent />;
-  } else if (route.name == 'activity') {
+  } else if (route.name == 'event') {
     component = <Event />;
   } else {
     console.log('not found');

@@ -2,24 +2,24 @@ import React, { useState } from 'react';
 import GenericPage from './GenericPage.tsx';
 import ContentCard from '../components/ContentCard.tsx';
 import { text } from '../util.ts';
-import { Activity, ActivityType, WeekendType } from '../types.ts';
+import { Event, EventType, WeekendType } from '../types.ts';
 import { Fab, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import Link from '../components/Link.tsx';
-import ActivityCard from '../components/event/ActivityCard.tsx';
+import EventCard from '../components/event/EventCard.tsx';
 import { useApiState } from '../providers/ApiProvider.tsx';
 import { useLanguage } from '../providers/LanguageProvider.tsx';
 
 export default function Agenda() {
   const { language: lang } = useLanguage();
-  const { activities } = useApiState();
-  const [selectedCategory, setSelectedCategory] = useState<ActivityType | 'all'>('all');
+  const { events } = useApiState();
+  const [selectedCategory, setSelectedCategory] = useState<EventType | 'all'>('all');
   const [selectedType, setSelectedType] = useState<WeekendType | 'all'>('all');
 
   return (
     <>
       <div className="fixed bottom-5 right-5 z-10">
-        <Link routeName={'new_activity'}>
+        <Link routeName={'new_event'}>
           <Fab variant="extended" color="primary">
             <AddIcon className="mr-2" />
             <p>{text(lang, 'Add event', 'Voeg evenement toe')}</p>
@@ -55,7 +55,7 @@ export default function Agenda() {
                     labelId="select-label"
                     value={selectedCategory}
                     label={text(lang, 'Category', 'Categorie')}
-                    onChange={(e) => setSelectedCategory(e.target.value as ActivityType | 'all')}
+                    onChange={(e) => setSelectedCategory(e.target.value as EventType | 'all')}
                     variant="outlined"
                   >
                     <MenuItem value="all">{text(lang, 'All', 'Alles')}</MenuItem>
@@ -84,19 +84,19 @@ export default function Agenda() {
                 </FormControl>
               </div>
             </ContentCard>
-            {activities &&
-              activities
+            {events &&
+              events
                 .filter(
-                  (activity: Activity) =>
-                    (selectedCategory === 'all' || activity.activityType === selectedCategory) &&
-                    (selectedType === 'all' || activity.metadata?.type?.includes(selectedType))
+                  (event: Event) =>
+                    (selectedCategory === 'all' || event.eventType === selectedCategory) &&
+                    (selectedType === 'all' || event.metadata?.type?.includes(selectedType))
                 )
                 .sort(
-                  (a: Activity, b: Activity) =>
+                  (a: Event, b: Event) =>
                     a.dates[0].start.valueOf() - b.dates[0].start.valueOf()
                 )
-                .map((activity: Activity) => (
-                  <ActivityCard activity={activity} agendaPage={true} />
+                .map((event: Event) => (
+                  <EventCard key={event.id} event={event} agendaPage={true} />
                 ))}
           </div>
         </div>

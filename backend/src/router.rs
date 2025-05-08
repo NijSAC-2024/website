@@ -1,8 +1,8 @@
 use crate::{
     api::{
-        create_activity, create_registration, delete_activity, delete_registration, delete_user,
-        get_activities, get_activity, get_activity_registrations, get_all_users, get_material_list,
-        get_registration, get_user_materials, register, update_activity, update_pwd,
+        create_event, create_registration, delete_event, delete_registration, delete_user,
+        get_activities, get_event, get_event_registrations, get_all_users, get_material_list,
+        get_registration, get_user_materials, register, update_event, update_pwd,
         update_registration, update_user, update_user_material, who_am_i,
     },
     auth::{login, logout},
@@ -21,12 +21,12 @@ use tower_http::{trace, trace::TraceLayer};
 use tracing::Level;
 
 pub fn create_router(state: AppState) -> Router {
-    let memory_router = MemoryServe::new(load_assets!("../frontend/dist"))
-        .index_file(Some("/index.html"))
-        .into_router();
+    // let memory_router = MemoryServe::new(load_assets!("../frontend/dist"))
+    //     .index_file(Some("/index.html"))
+    //     .into_router();
 
     Router::new()
-        .merge(memory_router)
+        // .merge(memory_router)
         .nest("/api", api_router())
         .layer(
             TraceLayer::new_for_http()
@@ -58,19 +58,19 @@ fn api_router() -> Router<AppState> {
         .route("/user/{:id}/material", get(get_material_list))
         .route("/user/{:id}/getMaterial", get(get_user_materials))
         .route("/user/{:id}/material/update", put(update_user_material))
-        .route("/activity", get(get_activities).post(create_activity))
+        .route("/event", get(get_activities).post(create_event))
         .route(
-            "/activity/{:id}",
-            get(get_activity)
-                .put(update_activity)
-                .delete(delete_activity),
+            "/event/{:id}",
+            get(get_event)
+                .put(update_event)
+                .delete(delete_event),
         )
         .route(
-            "/activity/{:id}/registration",
-            get(get_activity_registrations),
+            "/event/{:id}/registration",
+            get(get_event_registrations),
         )
         .route(
-            "/activity/{:activity_id}/registration/{:user_id}",
+            "/event/{:event_id}/registration/{:user_id}",
             get(get_registration)
                 .post(create_registration)
                 .put(update_registration)
