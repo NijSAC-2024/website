@@ -7,8 +7,7 @@ import {
   Language,
   memberOptions,
   MembershipStatus,
-  Question,
-  WeekendType
+  Question
 } from '../../types.ts';
 import ContentCard from '../ContentCard.tsx';
 import { DateTimePicker } from '@mui/x-date-pickers';
@@ -50,7 +49,10 @@ export default function EditRegistrations({
   const { language: lang } = useLanguage();
   const handleToggleRegistrations = () => {
     const now = new Date();
-    handleFieldChange('registrationPeriod', { start: now, end: dates[0]?.start || now });
+    handleFieldChange('registrationPeriod', {
+      start: now,
+      end: dates[0]?.start || now
+    });
   };
 
   return (

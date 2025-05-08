@@ -128,7 +128,14 @@ export default function ApiProvider({ children }: ApiProviderProps) {
 
   return (
     <ApiContext.Provider
-      value={{ events, event, locations, registrations, updateEvent, createEvent }}
+      value={{
+        events,
+        event,
+        locations,
+        registrations,
+        updateEvent,
+        createEvent
+      }}
     >
       {children}
     </ApiContext.Provider>

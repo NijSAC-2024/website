@@ -64,7 +64,9 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     if (error) {
       switch (error.message) {
         case 'Unauthorized':
-          enqueueSnackbar('Incorrect email or password.', { variant: 'error' });
+          enqueueSnackbar('Incorrect email or password.', {
+            variant: 'error'
+          });
           break;
         default:
           enqueueSnackbar(`${error.message}: ${error.reference}`, {
@@ -80,7 +82,15 @@ export default function AuthProvider({ children }: AuthProviderProps) {
 
   return (
     <AuthContext.Provider
-      value={{ user, isLoggedIn, checkAuth, login, logout, authOpen, toggleAuthOpen }}
+      value={{
+        user,
+        isLoggedIn,
+        checkAuth,
+        login,
+        logout,
+        authOpen,
+        toggleAuthOpen
+      }}
     >
       {children}
     </AuthContext.Provider>

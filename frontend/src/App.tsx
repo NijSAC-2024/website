@@ -89,15 +89,13 @@ export default function App(): React.ReactElement {
     }
   };
 
-  if (import.meta.env.MODE === 'development') {
-    useEffect(() => {
-      addEventListener('keydown', eventListener);
+  useEffect(() => {
+    addEventListener('keydown', eventListener);
 
-      return () => {
-        removeEventListener('keydown', eventListener);
-      };
-    });
-  }
+    return () => {
+      removeEventListener('keydown', eventListener);
+    };
+  });
 
   useEffect(() => {
     // Listen to browser back and forward buttons

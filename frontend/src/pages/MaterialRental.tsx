@@ -142,7 +142,9 @@ export default function MaterialRental() {
                 {rentOptions.map((row) => (
                   <TableRow
                     key={row.name.en}
-                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                    sx={{
+                      '&:last-child td, &:last-child th': { border: 0 }
+                    }}
                   >
                     <TableCell component="th" scope="row">
                       {text(lang, row.name.en, row.name.nl)}

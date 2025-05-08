@@ -1,13 +1,6 @@
 import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import { text } from '../../util.ts';
-import {
-  Event,
-  EventType,
-  DateType,
-  Language,
-  Metadata,
-  typesOptions
-} from '../../types.ts';
+import { Event, EventType, DateType, Language, Metadata, typesOptions } from '../../types.ts';
 import OptionSelector from '../OptionSelector.tsx';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import { ChangeEvent } from 'react';
@@ -22,10 +15,7 @@ interface EditAgendaCardProps {
   name: Language;
   dates: DateType[];
   location: string;
-  handleFieldChange: (
-    name: keyof Event,
-    value: Metadata | EventType | Language | string
-  ) => void;
+  handleFieldChange: (name: keyof Event, value: Metadata | EventType | Language | string) => void;
   handleDateChange: (index: number, startDate: boolean, value: string) => void;
   handleAddDate: () => void;
   handleRemoveDate: (index: number) => void;
@@ -77,7 +67,6 @@ export default function EditAgendaCard({
             {text(lang, 'Upload Image', 'Afbeelding Uploaden')}
             <input type="file" accept="image/*" hidden onChange={handleImageChange} />
           </Button>
-
           {/* Category and Type */}
           <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
             <FormControl fullWidth>
@@ -107,21 +96,29 @@ export default function EditAgendaCard({
               label={'Type'}
             />
           </div>
-
           {/* Title */}
           <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
             <TextField
               value={name.en}
               label={text(lang, 'Title English*', 'Titel Engels*')}
-              onChange={(e) => handleFieldChange('name', { ...name, en: e.target.value })}
+              onChange={(e) =>
+                handleFieldChange('name', {
+                  ...name,
+                  en: e.target.value
+                })
+              }
             />
             <TextField
               value={name.nl}
               label={text(lang, 'Title Dutch*', 'Titel Nederlands*')}
-              onChange={(e) => handleFieldChange('name', { ...name, nl: e.target.value })}
+              onChange={(e) =>
+                handleFieldChange('name', {
+                  ...name,
+                  nl: e.target.value
+                })
+              }
             />
           </div>
-
           {/*Location*/}
           <FormControl fullWidth>
             <InputLabel id="select-label">{text(lang, 'Location*', 'Locatie*')}</InputLabel>
@@ -132,11 +129,14 @@ export default function EditAgendaCard({
               onChange={(e) => handleFieldChange('location', e.target.value as string)}
               variant="outlined"
             >
-              {locations?.map((l) => <MenuItem key={l.id} value={l.id}>{text(lang, l.name)}</MenuItem>)}
+              {locations?.map((l) => (
+                <MenuItem key={l.id} value={l.id}>
+                  {text(lang, l.name)}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
-
-          <hr/>
+          <hr />
           Dates
           {/*Dates*/}
           <EditDates

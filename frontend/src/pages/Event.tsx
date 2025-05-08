@@ -59,7 +59,12 @@ export default function Event() {
                   <DescriptionCard
                     descriptionMarkdown={event?.description}
                     experience={event?.metadata?.experience || []}
-                    gear={event?.metadata?.gear || { en: '', nl: '' }}
+                    gear={
+                      event?.metadata?.gear || {
+                        en: '',
+                        nl: ''
+                      }
+                    }
                   />
                   <RegistrationsCard />
                 </div>

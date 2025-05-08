@@ -16,7 +16,10 @@ interface MembershipType {
 
 export default function Signup() {
   const { language: lang } = useLanguage();
-  const [membership, setMembership] = useState<MembershipType>({ en: 'Member', nl: 'Lid' });
+  const [membership, setMembership] = useState<MembershipType>({
+    en: 'Member',
+    nl: 'Lid'
+  });
   const [selectedMembership, setSelectedMembership] = useState<boolean>(false);
 
   const handleExtraordinaryMember = () => {

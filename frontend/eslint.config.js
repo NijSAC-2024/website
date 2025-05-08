@@ -18,7 +18,7 @@ export default tseslint.config(eslint.configs.recommended, ...tseslint.configs.r
   },
   rules: {
     ...hooksPlugin.configs.recommended.rules,
-    indent: ['error', 2],
+    indent: ['error', 4],
     quotes: ['error', 'single']
   }
 });

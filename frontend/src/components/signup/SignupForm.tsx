@@ -38,7 +38,9 @@ export default function SignupForm() {
 
   const handleSubmit = async () => {
     if (Object.values(formValid.current).some((isValid) => !isValid)) {
-      enqueueSnackbar('Please fill in all fields correctly.', { variant: 'error' });
+      enqueueSnackbar('Please fill in all fields correctly.', {
+        variant: 'error'
+      });
       return;
     }
 
@@ -51,15 +53,21 @@ export default function SignupForm() {
     if (error) {
       switch (error.message) {
         case 'Conflict':
-          enqueueSnackbar('Email is already in use.', { variant: 'error' });
+          enqueueSnackbar('Email is already in use.', {
+            variant: 'error'
+          });
           break;
         default:
-          enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
+          enqueueSnackbar(`${error.message}: ${error.reference}`, {
+            variant: 'error'
+          });
       }
       return;
     }
 
-    enqueueSnackbar(`Created account: ${firstName} ${lastName}`, { variant: 'success' });
+    enqueueSnackbar(`Created account: ${firstName} ${lastName}`, {
+      variant: 'success'
+    });
     await router.navigate();
   };
 

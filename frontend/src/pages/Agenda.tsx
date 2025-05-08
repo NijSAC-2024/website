@@ -92,8 +92,7 @@ export default function Agenda() {
                     (selectedType === 'all' || event.metadata?.type?.includes(selectedType))
                 )
                 .sort(
-                  (a: Event, b: Event) =>
-                    a.dates[0].start.valueOf() - b.dates[0].start.valueOf()
+                  (a: Event, b: Event) => a.dates[0].start.valueOf() - b.dates[0].start.valueOf()
                 )
                 .map((event: Event) => (
                   <EventCard key={event.id} event={event} agendaPage={true} />

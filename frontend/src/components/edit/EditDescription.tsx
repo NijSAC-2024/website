@@ -2,14 +2,7 @@ import MarkdownEditor from '../markdown/MarkdownEditor.tsx';
 import { TextField } from '@mui/material';
 import { text } from '../../util.ts';
 import OptionSelector from '../OptionSelector.tsx';
-import {
-  Event,
-  DateType,
-  experienceOptions,
-  Language,
-  Metadata,
-  WeekendType
-} from '../../types.ts';
+import { Event, experienceOptions, Language, Metadata } from '../../types.ts';
 import ContentCard from '../ContentCard.tsx';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 

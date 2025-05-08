@@ -87,11 +87,7 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
             color="primary"
           />
         )}
-        <img
-          className="w-full aspect-[4/2] object-cover"
-          src={event.image}
-          alt="not available"
-        />
+        <img className="w-full aspect-[4/2] object-cover" src={event.image} alt="not available" />
         <div className="p-5 grid space-y-1">
           <div className="flex justify-between">
             <div className="flex flex-wrap gap-1">
@@ -126,9 +122,7 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
           ) : (
             event.dates.length > 1 && (
               <>
-                <b>
-                  {text(lang, getLabel(event.eventType)) + text(lang, ' dates:', ' datums:')}
-                </b>
+                <b>{text(lang, getLabel(event.eventType)) + text(lang, ' dates:', ' datums:')}</b>
                 {event.dates.map((date) => (
                   <p>{formatDate(date)}</p>
                 ))}

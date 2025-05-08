@@ -15,8 +15,3 @@ export const passwordValidator = (value: string): string | false => {
   if (value.length < 10) return 'Password must be at least 10 characters long';
   return false;
 };
-
-// eslint-disable-next-line no-unused-vars,@typescript-eslint/no-unused-vars
-export const noneValidator = (_value: string): string | false => {
-  return false;
-};

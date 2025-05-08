@@ -1,5 +1,4 @@
 import {
-  Event,
   EventContent,
   EventType,
   DateType,
@@ -63,7 +62,12 @@ export default function EditEvent({ eventContent: init }: EditEventProps) {
   const handleDateChange = (index: number, startDate: boolean, value: string) => {
     handleEventChange({
       dates: event.dates.map((date, idx) =>
-        idx === index ? { ...date, [startDate ? 'startDateTime' : 'endDateTime']: value } : date
+        idx === index
+          ? {
+              ...date,
+              [startDate ? 'startDateTime' : 'endDateTime']: value
+            }
+          : date
       )
     });
   };
@@ -121,9 +125,7 @@ export default function EditEvent({ eventContent: init }: EditEventProps) {
 
   return (
     <GenericPage image={event.image}>
-      <SaveButton
-        handleSave={handleSave}
-      />
+      <SaveButton handleSave={handleSave} />
 
       <div className="grid xl:grid-cols-3 gap-5 mt-[-9.3rem]">
         <div className="xl:col-span-3 mb-[-0.5rem] flex justify-between">

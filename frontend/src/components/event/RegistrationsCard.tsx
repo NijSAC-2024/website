@@ -21,7 +21,11 @@ export default function RegistrationsCard() {
               {registrations?.map((registration) => (
                 <TableRow
                   key={registration.userId}
-                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                  sx={{
+                    '&:last-child td, &:last-child th': {
+                      border: 0
+                    }
+                  }}
                 >
                   <TableCell>{registration.firstName}</TableCell>
                 </TableRow>

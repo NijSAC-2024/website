@@ -22,7 +22,10 @@ export default function ThemeProvider({ children }: ThemeProviderProps) {
   });
 
   useEffect(() => {
-    setThemeCookie('theme', isDarkMode.toString(), { secure: true, sameSite: 'strict' });
+    setThemeCookie('theme', isDarkMode.toString(), {
+      secure: true,
+      sameSite: 'strict'
+    });
 
     const rootElement = document.querySelector('#root');
     if (rootElement) {

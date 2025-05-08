@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import { text } from '../../util.ts';
 import { MenuType } from '../../types.ts';

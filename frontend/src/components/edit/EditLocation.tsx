@@ -26,7 +26,9 @@ export default function EditLocation() {
     if (error) {
       switch (error.message) {
         case 'Unauthorized':
-          enqueueSnackbar('Incorrect email or password.', { variant: 'error' });
+          enqueueSnackbar('Incorrect email or password.', {
+            variant: 'error'
+          });
           break;
         default:
           enqueueSnackbar(`${error.message}: ${error.reference}`, {

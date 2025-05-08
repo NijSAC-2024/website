@@ -192,7 +192,10 @@ export const experienceOptions: OptionsType[] = [
 
 export const memberOptions: OptionsType[] = [
   { id: 'member', label: { en: 'Member', nl: 'Lid' } },
-  { id: 'extraordinary', label: { en: 'Extraordinary Member', nl: 'Buitengewoon Lid' } },
+  {
+    id: 'extraordinary',
+    label: { en: 'Extraordinary Member', nl: 'Buitengewoon Lid' }
+  },
   { id: 'nonMember', label: { en: 'Non Member', nl: 'Niet Lid' } },
   { id: 'pending', label: { en: 'Pending', nl: 'In afwachting' } }
 ];
@@ -210,9 +213,18 @@ export const eventOptions = [
 ];
 
 export const rentOptions: rentOption[] = [
-  { name: { en: 'Belay device (ATC or smart)', nl: 'Zekerapparaat (ATC of smart)' }, price: 0.5 },
   {
-    name: { en: 'Carabiner (screw or safebiner)', nl: 'Karabiner (schroefbiner of safebiner)' },
+    name: {
+      en: 'Belay device (ATC or smart)',
+      nl: 'Zekerapparaat (ATC of smart)'
+    },
+    price: 0.5
+  },
+  {
+    name: {
+      en: 'Carabiner (screw or safebiner)',
+      nl: 'Karabiner (schroefbiner of safebiner)'
+    },
     price: 0.5
   },
   { name: { en: 'Sling', nl: 'Schlinge' }, price: 0.5 },
@@ -228,7 +240,10 @@ export const rentOptions: rentOption[] = [
   { name: { en: 'Ice axe', nl: 'Pickel' }, price: 0.5 },
   { name: { en: 'Ice drill', nl: 'IJsboor' }, price: 1.0 },
   {
-    name: { en: 'Crampons (incl. crampon cover)', nl: 'Stijgijzers (incl. stijgijzerhoes)' },
+    name: {
+      en: 'Crampons (incl. crampon cover)',
+      nl: 'Stijgijzers (incl. stijgijzerhoes)'
+    },
     price: 0.5
   },
   { name: { en: 'Tarp', nl: 'Tarp' }, price: 1.5 },
@@ -238,23 +253,35 @@ export const rentOptions: rentOption[] = [
     remark: { en: '(per week)', nl: '(per week)' }
   },
   {
-    name: { en: 'Nuts (per set incl. nut tool)', nl: 'Nuts (per bos incl. nuttenfrutter)' },
+    name: {
+      en: 'Nuts (per set incl. nut tool)',
+      nl: 'Nuts (per bos incl. nuttenfrutter)'
+    },
     price: 0.5
   },
   { name: { en: 'Camalot/Friend', nl: 'Camalot/Friend' }, price: 0.5 },
   { name: { en: 'Other trad gear', nl: 'Overig trad gear' }, price: 1.0 },
-  { name: { en: 'Quickdraws (per 6)', nl: 'Setjes (per 6 stuks)' }, price: 0.5 },
+  {
+    name: { en: 'Quickdraws (per 6)', nl: 'Setjes (per 6 stuks)' },
+    price: 0.5
+  },
   { name: { en: 'Crash pad', nl: 'Crashpad' }, price: 3.5 },
   { name: { en: 'Single rope', nl: 'Enkeltouw' }, price: 1.5 },
   { name: { en: 'Alpine rope', nl: 'Alpien touw' }, price: 1.5 },
-  { name: { en: 'Double rope (per strand)', nl: 'Dubbeltouw (per streng)' }, price: 1.0 },
+  {
+    name: { en: 'Double rope (per strand)', nl: 'Dubbeltouw (per streng)' },
+    price: 1.0
+  },
   { name: { en: 'Training rope', nl: 'Oefentouw' }, price: 0.0 },
   { name: { en: 'Stove', nl: 'Brander' }, price: 0.5 },
   { name: { en: 'Cooking gear', nl: 'Kookgerei' }, price: 0.0 },
   {
     name: { en: 'Topo', nl: 'Topo' },
     price: 0.0,
-    remark: { en: '(€5.00 per month after 1 month)', nl: '(€5,00 per maand na 1 maand)' }
+    remark: {
+      en: '(€5.00 per month after 1 month)',
+      nl: '(€5,00 per maand na 1 maand)'
+    }
   },
   {
     name: {

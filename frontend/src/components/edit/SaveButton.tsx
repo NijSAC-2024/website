@@ -1,8 +1,7 @@
-import { Button, Collapse, Fab, IconButton, Tooltip } from '@mui/material';
+import { Button, Collapse, IconButton, Tooltip } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import { text } from '../../util.ts';
 import SaveAsIcon from '@mui/icons-material/SaveAs';
-import { EventType, Language } from '../../types.ts';
 import { useState } from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
@@ -14,7 +13,7 @@ interface SaveButtonProps {
   handleSave: (isPublished: boolean) => void;
 }
 
-export default function SaveButton({handleSave }: SaveButtonProps) {
+export default function SaveButton({ handleSave }: SaveButtonProps) {
   const { language: lang } = useLanguage();
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
@@ -35,7 +34,14 @@ export default function SaveButton({handleSave }: SaveButtonProps) {
           <SaveIcon className="mr-2" />
           {text(lang, 'Save Event', 'Evenement opslaan')}
         </Button>
-        <Tooltip title={menuOpen ? text(lang, 'Less Options', 'Minder opties') : text(lang, 'More Options', 'Meer opties')} placement="top">
+        <Tooltip
+          title={
+            menuOpen
+              ? text(lang, 'Less Options', 'Minder opties')
+              : text(lang, 'More Options', 'Meer opties')
+          }
+          placement="top"
+        >
           <IconButton color="inherit" onClick={toggleMenu}>
             {menuOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
           </IconButton>

@@ -22,7 +22,10 @@ export default function MarkdownEditor({
   const [value, setValue] = useState('1');
   const [markdownContent, setMarkdownContent] = useState<Language>(initialMarkdown);
 
-  const textareaRef = useRef<{ en: HTMLTextAreaElement | null; nl: HTMLTextAreaElement | null }>({
+  const textareaRef = useRef<{
+    en: HTMLTextAreaElement | null;
+    nl: HTMLTextAreaElement | null;
+  }>({
     en: null,
     nl: null
   });
