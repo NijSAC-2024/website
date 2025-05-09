@@ -63,7 +63,7 @@ export default function Event() {
 
                   <EventCard event={event} agendaPage={false} />
                   <DescriptionCard
-                    descriptionMarkdown={event?.description}
+                    descriptionMarkdown={event?.description || { en: '', nl: '' }}
                     experience={event?.metadata?.experience || []}
                     gear={
                       event?.metadata?.gear || {

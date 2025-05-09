@@ -46,7 +46,7 @@ export default function MainMenu() {
       </div>
       <Dialog open={authOpen} onClose={toggleAuthOpen} fullWidth>
         <DialogContent>
-          <LoginForm onClose={toggleAuthOpen} />
+          <LoginForm />
         </DialogContent>
         <DialogActions>
           <Button onClick={toggleAuthOpen}>

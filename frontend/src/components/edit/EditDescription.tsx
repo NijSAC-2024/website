@@ -1,14 +1,14 @@
 import MarkdownEditor from '../markdown/MarkdownEditor.tsx';
 import { TextField } from '@mui/material';
 import OptionSelector from '../OptionSelector.tsx';
-import { Event, experienceOptions, Language, Metadata } from '../../types.ts';
+import { EventContent, experienceOptions, Language, Metadata } from '../../types.ts';
 import ContentCard from '../ContentCard.tsx';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 
 interface EditDescriptionProps {
   description?: Language;
   metadata?: Metadata;
-  handleFieldChange: (name: keyof Event, value: Metadata | Language) => void;
+  handleFieldChange: (name: keyof EventContent, value: Metadata | Language) => void;
 }
 
 export default function EditDescription({

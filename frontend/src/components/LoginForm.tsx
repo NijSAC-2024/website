@@ -3,11 +3,8 @@ import { Box, Button, FormControl, FormLabel, TextField } from '@mui/material';
 import { useAuth } from '../providers/AuthProvider.tsx';
 import { useLanguage } from '../providers/LanguageProvider.tsx';
 
-interface LoginFormProps {
-  onClose: () => void;
-}
 
-export default function LoginForm({ onClose }: LoginFormProps) {
+export default function LoginForm() {
   const { login } = useAuth();
   const { text } = useLanguage();
 
@@ -51,7 +48,6 @@ export default function LoginForm({ onClose }: LoginFormProps) {
     login(
       data.get('email')?.toString() || '',
       data.get('password')?.toString() || '',
-      onClose
     );
   };
 

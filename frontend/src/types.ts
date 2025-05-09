@@ -37,8 +37,8 @@ export interface Language {
 }
 
 export interface DateType {
-  start: Date;
-  end: Date;
+  start: string;
+  end: string;
 }
 
 export interface Registration extends BasicUser {

@@ -78,7 +78,7 @@ export default function EditEvent({ eventContent: init }: EditEventProps) {
   const handleAddDate = () => {
     const now = new Date();
     handleEventChange({
-      dates: [...event.dates, { start: now, end: now }]
+      dates: [...event.dates, { start: now.toISOString(), end: now.toISOString() }]
     });
   };
 

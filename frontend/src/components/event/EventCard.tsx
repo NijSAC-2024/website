@@ -133,8 +133,8 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
           {agendaPage ? (
             <Markdown>
               {text(
-                truncateMarkdown(event.description?.en, 120),
-                truncateMarkdown(event.description?.nl, 120)
+                truncateMarkdown(event.description?.en || '', 120),
+                truncateMarkdown(event.description?.nl || '', 120)
               )}
             </Markdown>
           ) : (

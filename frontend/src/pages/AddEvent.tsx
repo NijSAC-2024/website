@@ -8,7 +8,7 @@ export default function AddEvent() {
       en: 'New event',
       nl: 'Nieuwe activiteit',
     },
-    dates: [{ start: now, end: now }],
+    dates: [{ start: now.toISOString(), end: now.toISOString() }],
     isPublished: false,
     requiredMembershipStatus: ['member'],
     eventType: 'activity',

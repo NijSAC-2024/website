@@ -1,5 +1,5 @@
 import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
-import { DateType, Event, EventType, Language, Metadata, typesOptions } from '../../types.ts';
+import { DateType, EventContent, EventType, Language, Metadata, typesOptions } from '../../types.ts';
 import OptionSelector from '../OptionSelector.tsx';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import { ChangeEvent } from 'react';
@@ -15,7 +15,7 @@ interface EditAgendaCardProps {
   dates: DateType[];
   location: string;
   handleFieldChange: (
-    name: keyof Event,
+    name: keyof EventContent,
     value: Metadata | EventType | Language | string
   ) => void;
   handleDateChange: (index: number, startDate: boolean, value: string) => void;
