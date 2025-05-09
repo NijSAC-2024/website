@@ -9,7 +9,6 @@ import {
   SelectChangeEvent,
   Checkbox,
 } from '@mui/material';
-import { text } from '../util.ts';
 import { OptionsType } from '../types.ts';
 import { useLanguage } from '../providers/LanguageProvider.tsx';
 
@@ -26,7 +25,7 @@ export default function OptionSelector({
   onChange,
   label,
 }: OptionSelectorProps) {
-  const { language: lang } = useLanguage();
+  const { text } = useLanguage();
   const [selectedOptions, setSelectedOptions] = useState<string[]>(
     selected || [],
   );
@@ -56,7 +55,7 @@ export default function OptionSelector({
                   key={selected_id}
                   label={
                     option
-                      ? text(lang, option.label.en, option.label.nl)
+                      ? text( option.label.en, option.label.nl)
                       : selected_id
                   }
                   className="uppercase font-semibold"
@@ -70,7 +69,7 @@ export default function OptionSelector({
         {options.map((option) => (
           <MenuItem key={option.id} value={option.id}>
             <Checkbox checked={selectedOptions.includes(option.id)} />
-            {text(lang, option.label.en, option.label.nl)}
+            {text(option.label.en, option.label.nl)}
           </MenuItem>
         ))}
       </Select>

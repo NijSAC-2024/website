@@ -1,5 +1,4 @@
 import { Button, Dialog, DialogActions, DialogContent } from '@mui/material';
-import { text } from '../util.ts';
 import { useAuth } from '../providers/AuthProvider.tsx';
 import { Language, Question } from '../types.ts';
 import { useState } from 'react';
@@ -22,10 +21,10 @@ export default function RegisterButton({
   registrationOpenTime,
   registrationCloseTime,
   questions,
-  title,
+  title
 }: RegisterButtonProps) {
   const { isLoggedIn, toggleAuthOpen } = useAuth();
-  const { language: lang } = useLanguage();
+  const { text, lang } = useLanguage();
   moment.locale(lang);
   const [registerDialogOpen, setRegisterDialogOpen] = useState<boolean>(false);
 
@@ -41,12 +40,12 @@ export default function RegisterButton({
     <>
       {registrationCount === registrationMax ? (
         <Button variant="contained" disabled>
-          {text(lang, 'Full', 'Vol')}
+          {text('Full', 'Vol')}
         </Button>
       ) : openTime > now ? (
         <div className="text-right grid">
           <p>
-            {text(lang, 'Registrations open at ', 'Inschrijvingen openen op ')}
+            {text('Registrations open at ', 'Inschrijvingen openen op ')}
           </p>
           <p>{moment(registrationOpenTime).format('DD MMM HH:mm')}</p>
         </div>
@@ -56,16 +55,15 @@ export default function RegisterButton({
           variant="contained"
         >
           {isLoggedIn
-            ? text(lang, 'Register', 'Inschrijven')
-            : text(lang, 'Login to register', 'Login om in te schrijven')}
+            ? text('Register', 'Inschrijven')
+            : text('Login to register', 'Login om in te schrijven')}
         </Button>
       ) : (
         <div className="text-right grid">
           <p>
             {text(
-              lang,
               'Registrations closed at ',
-              'Inschrijvingen zijn gesloten sinds ',
+              'Inschrijvingen zijn gesloten sinds '
             )}
           </p>
           <p>{moment(registrationCloseTime).format('DD MMM HH:mm')}</p>
@@ -80,7 +78,7 @@ export default function RegisterButton({
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={toggleDialog}>{text(lang, 'Close', 'Sluit')}</Button>
+          <Button onClick={toggleDialog}>{text('Close', 'Sluit')}</Button>
         </DialogActions>
       </Dialog>
     </>

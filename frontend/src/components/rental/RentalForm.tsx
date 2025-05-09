@@ -1,13 +1,8 @@
 import { useState } from 'react';
-import { TextField, Button } from '@mui/material';
+import { Button, TextField } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import moment from 'moment';
-import { text } from '../../util.ts';
-import {
-  rentOption,
-  ReservationItemType,
-  ReservationType,
-} from '../../types.ts';
+import { rentOption, ReservationItemType, ReservationType } from '../../types.ts';
 import ItemSelection from './ItemSelection.tsx';
 import ItemsTable from './ItemsTable.tsx';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
@@ -16,7 +11,7 @@ interface RentalFormProps {
   reservation: ReservationType;
   handleReservationChange: (
     name: keyof ReservationType,
-    value: string | ReservationItemType[],
+    value: string | ReservationItemType[]
   ) => void;
   handleReservationSubmit: (reservation: ReservationType) => void;
 }
@@ -24,15 +19,15 @@ interface RentalFormProps {
 export default function RentalForm({
   reservation,
   handleReservationChange,
-  handleReservationSubmit,
+  handleReservationSubmit
 }: RentalFormProps) {
-  const { language: lang } = useLanguage();
+  const { text } = useLanguage();
   const [selectedItem, setSelectedItem] = useState<rentOption | null>(null);
 
   const handleAddItem = () => {
     if (selectedItem) {
       const existingItemIndex = reservation.items.findIndex(
-        (item) => item.name.en === selectedItem.name.en,
+        (item) => item.name.en === selectedItem.name.en
       );
 
       if (existingItemIndex !== -1) {
@@ -45,8 +40,8 @@ export default function RentalForm({
           {
             name: selectedItem.name,
             price: selectedItem.price,
-            amount: 1,
-          },
+            amount: 1
+          }
         ]);
       }
     }
@@ -54,48 +49,47 @@ export default function RentalForm({
 
   const handleAmountChange = (name: string, increment: boolean) => {
     const updatedReservation = reservation.items
-      .map((item) => {
-        if (item.name.en === name) {
-          const newAmount = increment ? item.amount + 1 : item.amount - 1;
-          return newAmount > 0
-            ? {
-              ...item,
-              amount: newAmount,
-            }
-            : null;
-        }
-        return item;
-      })
-      .filter((item) => item !== null);
+                                          .map((item) => {
+                                            if (item.name.en === name) {
+                                              const newAmount = increment ? item.amount + 1 : item.amount - 1;
+                                              return newAmount > 0
+                                                ? {
+                                                  ...item,
+                                                  amount: newAmount
+                                                }
+                                                : null;
+                                            }
+                                            return item;
+                                          })
+                                          .filter((item) => item !== null);
     handleReservationChange(
       'items',
-      updatedReservation as ReservationItemType[],
+      updatedReservation as ReservationItemType[]
     );
   };
 
   return (
     <div className="grid gap-5">
       <div className="grid gap-1">
-        <h2>{text(lang, 'Rental Request', 'Huuraanvraag')}</h2>
+        <h2>{text('Rental Request', 'Huuraanvraag')}</h2>
         <p>
           {text(
-            lang,
             'Select your preferred usage dates. Once your request is approved, you can coordinate with the Matcie to agree on the pick-up and drop-off dates.',
-            'Selecteer de gewenste gebruiksdata. Zodra je aanvraag is goedgekeurd, kun je contact opnemen met de Matcie om de ophaal- en retourdata af te stemmen.',
+            'Selecteer de gewenste gebruiksdata. Zodra je aanvraag is goedgekeurd, kun je contact opnemen met de Matcie om de ophaal- en retourdata af te stemmen.'
           )}
         </p>
       </div>
       <div className="grid gap-3">
         <div className="grid grid-cols-2 gap-3">
           <DatePicker
-            label={text(lang, 'Start Date', 'Startdatum')}
+            label={text('Start Date', 'Startdatum')}
             value={moment(reservation.startDate)}
             onChange={(date) =>
               handleReservationChange('startDate', date!.toISOString())
             }
           />
           <DatePicker
-            label={text(lang, 'End Date', 'Einddatum')}
+            label={text('End Date', 'Einddatum')}
             value={moment(reservation.endDate)}
             onChange={(date) =>
               handleReservationChange('endDate', date!.toISOString())
@@ -117,7 +111,7 @@ export default function RentalForm({
       <TextField
         multiline
         value={reservation.remarks}
-        label={text(lang, 'Remarks', 'Opmerkingen')}
+        label={text('Remarks', 'Opmerkingen')}
         onChange={(e) => handleReservationChange('remarks', e.target.value)}
       />
 
@@ -131,13 +125,12 @@ export default function RentalForm({
             moment(reservation.endDate).isBefore(moment(reservation.startDate))
           }
         >
-          {text(lang, 'Submit request*', 'Verstuur aanvraag*')}
+          {text('Submit request*', 'Verstuur aanvraag*')}
         </Button>
         <p>
           {text(
-            lang,
             '* Please note that your request still needs to be approved by the Matcie. You can view your requests and their status on your account page.',
-            '* Let op: je aanvraag moet nog worden goedgekeurd door de Matcie. Je kunt je aanvragen en de status ervan bekijken op je accountpagina.',
+            '* Let op: je aanvraag moet nog worden goedgekeurd door de Matcie. Je kunt je aanvragen en de status ervan bekijken op je accountpagina.'
           )}
         </p>
       </div>

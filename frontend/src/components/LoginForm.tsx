@@ -1,6 +1,5 @@
 import React from 'react';
 import { Box, Button, FormControl, FormLabel, TextField } from '@mui/material';
-import { text } from '../util.ts';
 import { useAuth } from '../providers/AuthProvider.tsx';
 import { useLanguage } from '../providers/LanguageProvider.tsx';
 
@@ -10,7 +9,7 @@ interface LoginFormProps {
 
 export default function LoginForm({ onClose }: LoginFormProps) {
   const { login } = useAuth();
-  const { language: lang } = useLanguage();
+  const { text } = useLanguage();
 
   const [emailError, setEmailError] = React.useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
@@ -52,14 +51,14 @@ export default function LoginForm({ onClose }: LoginFormProps) {
     login(
       data.get('email')?.toString() || '',
       data.get('password')?.toString() || '',
-      onClose,
+      onClose
     );
   };
 
   return (
     <>
       <Box className="grid gap-2.5" component="form" onSubmit={handleSubmit}>
-        <h1>{text(lang, 'Login', 'Inloggen')}</h1>
+        <h1>{text('Login', 'Inloggen')}</h1>
         <FormControl>
           <FormLabel htmlFor="email">Email</FormLabel>
           <TextField
@@ -77,7 +76,7 @@ export default function LoginForm({ onClose }: LoginFormProps) {
         </FormControl>
         <FormControl>
           <FormLabel htmlFor="password">
-            {text(lang, 'Password', 'Wachtwoord')}
+            {text('Password', 'Wachtwoord')}
           </FormLabel>
           <TextField
             required
@@ -94,7 +93,7 @@ export default function LoginForm({ onClose }: LoginFormProps) {
           />
         </FormControl>
         <Button variant="contained" type="submit" onClick={validateInputs}>
-          {text(lang, 'Login', 'Inloggen')}
+          {text('Login', 'Inloggen')}
         </Button>
       </Box>
     </>

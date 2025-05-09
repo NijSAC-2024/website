@@ -1,6 +1,5 @@
 import { Button, Collapse, IconButton, Tooltip } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
-import { text } from '../../util.ts';
 import SaveAsIcon from '@mui/icons-material/SaveAs';
 import { useState } from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -14,7 +13,7 @@ interface SaveButtonProps {
 }
 
 export default function SaveButton({ handleSave }: SaveButtonProps) {
-  const { language: lang } = useLanguage();
+  const { text } = useLanguage();
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
 
@@ -29,16 +28,17 @@ export default function SaveButton({ handleSave }: SaveButtonProps) {
 
   return (
     <>
-      <div className="fixed bottom-5 right-5 z-10 hover:dark:bg-[#42a5f5] hover:bg-[#1565c0] hover:shadow-2xl shadow-xl duration-300 dark:bg-[#90caf9] bg-[#1976d2] text-white rounded-3xl py-1 px-3 dark:text-black">
+      <div
+        className="fixed bottom-5 right-5 z-10 hover:dark:bg-[#42a5f5] hover:bg-[#1565c0] hover:shadow-2xl shadow-xl duration-300 dark:bg-[#90caf9] bg-[#1976d2] text-white rounded-3xl py-1 px-3 dark:text-black">
         <Button color="inherit" onClick={() => handleSave(true)}>
           <SaveIcon className="mr-2" />
-          {text(lang, 'Save Event', 'Evenement opslaan')}
+          {text('Save Event', 'Evenement opslaan')}
         </Button>
         <Tooltip
           title={
             menuOpen
-              ? text(lang, 'Less Options', 'Minder opties')
-              : text(lang, 'More Options', 'Meer opties')
+              ? text('Less Options', 'Minder opties')
+              : text('More Options', 'Meer opties')
           }
           placement="top"
         >
@@ -51,13 +51,13 @@ export default function SaveButton({ handleSave }: SaveButtonProps) {
             <div className="flex justify-self-start">
               <Button color="inherit" onClick={() => handleSave(false)}>
                 <SaveAsIcon className="mr-2" />
-                {text(lang, 'Save As Draft', 'Opslaan als concept')}
+                {text('Save As Draft', 'Opslaan als concept')}
               </Button>
             </div>
             <div className="flex justify-self-start">
               <Button color="inherit" onClick={toggleDialog}>
                 <DeleteIcon className="mr-2" />
-                {text(lang, 'Delete Event', 'Evenement verwijderen')}
+                {text('Delete Event', 'Evenement verwijderen')}
               </Button>
             </div>
           </div>
@@ -68,9 +68,8 @@ export default function SaveButton({ handleSave }: SaveButtonProps) {
         onCancel={toggleDialog}
         onConfirm={handleDelete}
         message={text(
-          lang,
           'You are about to delete this event.',
-          'Je staat op het punt dit evenement te verwijderen.',
+          'Je staat op het punt dit evenement te verwijderen.'
         )}
       />
       ;

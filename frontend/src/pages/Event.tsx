@@ -2,7 +2,6 @@ import { useState } from 'react';
 import GenericPage from './GenericPage.tsx';
 import EventCard from '../components/event/EventCard.tsx';
 import EditIcon from '@mui/icons-material/Edit';
-import { text } from '../util.ts';
 import { Button, Chip, Fab } from '@mui/material';
 import EditEvent from '../components/edit/EditEvent.tsx';
 import RegistrationsCard from '../components/event/RegistrationsCard.tsx';
@@ -13,7 +12,7 @@ import { useLanguage } from '../providers/LanguageProvider.tsx';
 import { toEventContent } from '../types.ts';
 
 export default function Event() {
-  const { language: lang } = useLanguage();
+  const { text } = useLanguage();
   const { navigate } = useAppState();
   const { event } = useApiState();
 
@@ -39,7 +38,7 @@ export default function Event() {
                   onClick={toggleIsEditing}
                 >
                   <EditIcon className="mr-2" />
-                  {text(lang, 'Edit event', 'Evenement bewerken')}
+                  {text('Edit event', 'Evenement bewerken')}
                 </Fab>
               </div>
               <GenericPage image={event?.image}>
@@ -50,12 +49,12 @@ export default function Event() {
                         color="inherit"
                         onClick={() => navigate('/agenda')}
                       >
-                        {text(lang, 'Back to Agenda', 'Terug naar Agenda')}
+                        {text('Back to Agenda', 'Terug naar Agenda')}
                       </Button>
                     </div>
                     {!event?.isPublished && (
                       <Chip
-                        label={text(lang, 'Draft', 'Concept')}
+                        label={text('Draft', 'Concept')}
                         className="uppercase font-semibold"
                         color="primary"
                       />
@@ -69,7 +68,7 @@ export default function Event() {
                     gear={
                       event?.metadata?.gear || {
                         en: '',
-                        nl: '',
+                        nl: ''
                       }
                     }
                   />

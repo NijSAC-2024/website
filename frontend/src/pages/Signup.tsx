@@ -1,7 +1,6 @@
 import GenericPage from './GenericPage.tsx';
 import ContentCard from '../components/ContentCard.tsx';
 import SignupForm from '../components/signup/SignupForm.tsx';
-import { text } from '../util.ts';
 import { Button, Chip, Collapse } from '@mui/material';
 import { useState } from 'react';
 import SignupOptions from '../components/signup/SingupOptions.tsx';
@@ -9,16 +8,17 @@ import { useLanguage } from '../providers/LanguageProvider.tsx';
 
 type MembershipTypeEN = 'Member' | 'Extraordinary Member' | 'Donor';
 type MembershipTypeNL = 'Lid' | 'Buitengewoon Lid' | 'Donateur';
+
 interface MembershipType {
   en: MembershipTypeEN;
   nl: MembershipTypeNL;
 }
 
 export default function Signup() {
-  const { language: lang } = useLanguage();
+  const { text } = useLanguage();
   const [membership, setMembership] = useState<MembershipType>({
     en: 'Member',
-    nl: 'Lid',
+    nl: 'Lid'
   });
   const [selectedMembership, setSelectedMembership] = useState<boolean>(false);
 
@@ -43,23 +43,22 @@ export default function Signup() {
       <ContentCard>
         <div className="px-7 pt-7 pb-5">
           <h1>
-            {text(lang, 'Register for the NijSAC', 'Inschrijven bij de NijSAC')}
+            {text('Register for the NijSAC', 'Inschrijven bij de NijSAC')}
           </h1>
           <Collapse in={selectedMembership} timeout="auto" unmountOnExit>
             <div className="pt-3 flex items-center gap-1">
               <Chip
                 label={
                   text(
-                    lang,
                     'Selected membership: ',
-                    'Geselecteerd lidmaatschap: ',
-                  ) + text(lang, membership.en, membership.nl)
+                    'Geselecteerd lidmaatschap: '
+                  ) + text(membership.en, membership.nl)
                 }
                 color="primary"
               />
               <div className=""></div>
               <Button onClick={handleChange}>
-                {text(lang, 'Change', 'Verander')}
+                {text('Change', 'Verander')}
               </Button>
             </div>
           </Collapse>

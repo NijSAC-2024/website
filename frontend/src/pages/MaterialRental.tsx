@@ -1,6 +1,5 @@
 import GenericPage from './GenericPage.tsx';
 import ContentCard from '../components/ContentCard.tsx';
-import { text } from '../util.ts';
 import {
   Button,
   Dialog,
@@ -11,7 +10,7 @@ import {
   TableBody,
   TableCell,
   TableHead,
-  TableRow,
+  TableRow
 } from '@mui/material';
 import { rentOptions, ReservationItemType, ReservationType } from '../types.ts';
 import { useState } from 'react';
@@ -20,14 +19,14 @@ import { useAuth } from '../providers/AuthProvider.tsx';
 import { useLanguage } from '../providers/LanguageProvider.tsx';
 
 export default function MaterialRental() {
-  const { language: lang } = useLanguage();
+  const { text } = useLanguage();
   const { isLoggedIn, toggleAuthOpen } = useAuth();
   const [rentFormOpen, setRentFormOpen] = useState<boolean>(false);
   const now = new Date();
   const [reservation, setReservation] = useState<ReservationType>({
     startDate: now.toISOString(),
     endDate: now.toISOString(),
-    items: [],
+    items: []
   });
 
   const handleReservationSubmit = (reservation: ReservationType) => {
@@ -37,7 +36,7 @@ export default function MaterialRental() {
     setReservation({
       startDate: now.toISOString(),
       endDate: now.toISOString(),
-      items: [],
+      items: []
     });
   };
 
@@ -47,10 +46,10 @@ export default function MaterialRental() {
 
   const handleReservationChange = (
     name: keyof ReservationType,
-    value: string | ReservationItemType[],
+    value: string | ReservationItemType[]
   ) => {
     updateReservation({
-      [name]: value,
+      [name]: value
     });
   };
 
@@ -62,56 +61,49 @@ export default function MaterialRental() {
     <>
       <GenericPage>
         <ContentCard className="p-7">
-          <h1>{text(lang, 'Material Rental', 'Materiaalverhuur')}</h1>
+          <h1>{text('Material Rental', 'Materiaalverhuur')}</h1>
           <p>
             {text(
-              lang,
               'The NijSAC has an extensive material depot that contains both summer and winter material. As a NijSAC member or extraordinary member it is possible to rent material from this. Priority is given in this order. You can fill in a rental request and (unless otherwise stated) pick the material up and return it to the mathok. In addition, the NijSAC also rents topo\'s, guides and maps. See below for all possibilities.',
-              'De NijSAC beschikt over een uitgebreid materiaal voorraad met zowel zomer- als wintermateriaal. Als NijSAC-lid of buitengewoon lid is het mogelijk om hier materiaal van te huren. In deze volgorde wordt prioriteit gegeven. U kunt een huuraanvraag indienen en (tenzij anders vermeld) het materiaal ophalen en terugbrengen bij het mathok. Daarnaast verhuurt de NijSAC ook topo\'s, gidsen en kaarten. Zie onder voor alle mogelijkheden.',
+              'De NijSAC beschikt over een uitgebreid materiaal voorraad met zowel zomer- als wintermateriaal. Als NijSAC-lid of buitengewoon lid is het mogelijk om hier materiaal van te huren. In deze volgorde wordt prioriteit gegeven. U kunt een huuraanvraag indienen en (tenzij anders vermeld) het materiaal ophalen en terugbrengen bij het mathok. Daarnaast verhuurt de NijSAC ook topo\'s, gidsen en kaarten. Zie onder voor alle mogelijkheden.'
             )}
           </p>
 
           <div className="mt-5">
-            <h2>{text(lang, 'Conditions for rental', 'Huurvoorwaarden')}</h2>
+            <h2>{text('Conditions for rental', 'Huurvoorwaarden')}</h2>
             <p>
               {text(
-                lang,
                 'By making a rental reservation you agree to the ',
-                'Door het maken van een huurreservering gaat je akkoord met het ',
+                'Door het maken van een huurreservering gaat je akkoord met het '
               )}
               <Link href={'https://nijsac.nl/api/file/serve/66be0721c0839'}>
                 {text(
-                  lang,
                   'material regulations (Dutch)',
-                  'materiaalregelement',
+                  'materiaalregelement'
                 )}
               </Link>
               {text(
-                lang,
                 '. A short summary of the rental conditions:',
-                '. Een korte samenvatting van de huurvoorwaarden:',
+                '. Een korte samenvatting van de huurvoorwaarden:'
               )}
             </p>
             <ul className="list-disc ml-5">
               <li>
                 {text(
-                  lang,
                   'The treasurer sends the rent to be transferred via an invoice.',
-                  'De penningmeester verstuurt de over te dragen huur via een factuur.',
+                  'De penningmeester verstuurt de over te dragen huur via een factuur.'
                 )}
               </li>
               <li>
                 {text(
-                  lang,
                   'The rented property is collected and returned to the Climbing Commissioner. The tenant is responsible for this.',
-                  'Het gehuurde wordt opgehaald en teruggegeven aan de klimcommissaris. De huurder is hiervoor verantwoordelijk.',
+                  'Het gehuurde wordt opgehaald en teruggegeven aan de klimcommissaris. De huurder is hiervoor verantwoordelijk.'
                 )}
               </li>
               <li>
                 {text(
-                  lang,
                   'Return the materials quickly after use. Return it as it was rented. If material is returned too late, is lost or damaged due to carelessness, the amount due will be recovered from the tenants. Any damage will be noted in advance.',
-                  'Breng de materialen na gebruik snel terug. Breng het terug zoals het werd verhuurd. Indien materiaal te laat wordt ingeleverd, door onzorgvuldigheid verloren gaat of beschadigd raakt, wordt het verschuldigde bedrag op de huurders verhaald. Eventuele schade wordt vooraf vermeld.',
+                  'Breng de materialen na gebruik snel terug. Breng het terug zoals het werd verhuurd. Indien materiaal te laat wordt ingeleverd, door onzorgvuldigheid verloren gaat of beschadigd raakt, wordt het verschuldigde bedrag op de huurders verhaald. Eventuele schade wordt vooraf vermeld.'
                 )}
               </li>
             </ul>
@@ -123,25 +115,23 @@ export default function MaterialRental() {
               variant="contained"
             >
               {isLoggedIn
-                ? text(lang, 'Make Request', 'Dien aanvraag in')
+                ? text('Make Request', 'Dien aanvraag in')
                 : text(
-                  lang,
                   'Login to make a request',
-                  'Login om een aanvraag in te dienen',
+                  'Login om een aanvraag in te dienen'
                 )}
             </Button>
           </div>
           <div className="mt-5">
-            <h2>{text(lang, 'Costs overview', 'Kostenoverzicht')}</h2>
+            <h2>{text('Costs overview', 'Kostenoverzicht')}</h2>
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>{text(lang, 'Material', 'Materiaal')}</TableCell>
+                  <TableCell>{text('Material', 'Materiaal')}</TableCell>
                   <TableCell>
                     {text(
-                      lang,
                       'Rental price per day of use, unless otherwise stated',
-                      'Huurprijs per gebruiksdag, tenzij anders aangegeven',
+                      'Huurprijs per gebruiksdag, tenzij anders aangegeven'
                     )}
                   </TableCell>
                 </TableRow>
@@ -151,17 +141,17 @@ export default function MaterialRental() {
                   <TableRow
                     key={row.name.en}
                     sx={{
-                      '&:last-child td, &:last-child th': { border: 0 },
+                      '&:last-child td, &:last-child th': { border: 0 }
                     }}
                   >
                     <TableCell component="th" scope="row">
-                      {text(lang, row.name.en, row.name.nl)}
+                      {text(row.name.en, row.name.nl)}
                     </TableCell>
                     <TableCell>
                       {'€' +
                         row.price +
                         ' ' +
-                        text(lang, row.remark?.en || '', row.remark?.nl || '')}
+                        text(row.remark?.en || '', row.remark?.nl || '')}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -179,7 +169,7 @@ export default function MaterialRental() {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={toggleDialog}>{text(lang, 'Close', 'Sluit')}</Button>
+          <Button onClick={toggleDialog}>{text('Close', 'Sluit')}</Button>
         </DialogActions>
       </Dialog>
     </>

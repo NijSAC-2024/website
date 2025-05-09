@@ -1,7 +1,7 @@
 import { createContext, ReactNode, useContext, useState } from 'react';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers';
-import { LanguageEnum } from '../types.ts';
+import { Language, LanguageEnum } from '../types.ts';
 
 interface LanguageContextType {
   language: LanguageEnum;
@@ -15,12 +15,12 @@ interface LanguageProviderProps {
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(
-  undefined,
+  undefined
 );
 
 export default function LanguageProvider({ children }: LanguageProviderProps) {
   const [language, setLanguage] = useState<LanguageEnum>(
-    navigator.language.slice(0, 2) === 'nl' ? 'nl' : 'en',
+    navigator.language.slice(0, 2) === 'nl' ? 'nl' : 'en'
   );
 
   const setEnglish = () => {
@@ -33,18 +33,6 @@ export default function LanguageProvider({ children }: LanguageProviderProps) {
 
   const toggleLanguage = () => (language === 'nl' ? setEnglish() : setDutch());
 
-  // const value = useMemo(
-  //   () => {
-  //     const toggleLanguage = () => (language === 'nl' ? setEnglish() : setDutch());
-  //     return {
-  //       language,
-  //       setDutch,
-  //       setEnglish,
-  //       toggleLanguage
-  //     };
-  //   },
-  //   [language]
-  // );
 
   return (
     <LanguageContext.Provider
@@ -60,10 +48,32 @@ export default function LanguageProvider({ children }: LanguageProviderProps) {
   );
 }
 
-export const useLanguage = (): LanguageContextType => {
+export const useLanguage = (): {
+  text: (en: string | Language, nl?: string) => string,
+  lang: LanguageEnum,
+  setDutch: () => void;
+  setEnglish: () => void;
+  toggleLanguage: () => void;
+} => {
   const context = useContext(LanguageContext);
   if (!context) {
     throw new Error('useLanguage must be used within a LanguageProvider');
   }
-  return context;
+
+  const text = function(en: string | Language, nl?: string): string {
+    if (typeof en === 'string') {
+      nl = nl || en;
+      return context.language === 'nl' ? nl : en;
+    } else {
+      return context.language === 'nl' ? en.nl : en.en;
+    }
+  };
+
+  return {
+    text,
+    lang: context.language,
+    setDutch: context.setDutch,
+    setEnglish: context.setEnglish,
+    toggleLanguage: context.toggleLanguage
+  };
 };

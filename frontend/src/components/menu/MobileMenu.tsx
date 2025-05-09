@@ -8,13 +8,12 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Toolbar,
+  Toolbar
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useState } from 'react';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
-import { text } from '../../util.ts';
 import { MenuType } from '../../types.ts';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import { useAuth } from '../../providers/AuthProvider.tsx';
@@ -30,12 +29,11 @@ interface MobileMenuProps {
 export default function MobileMenu({
   handleLoginOpen,
   dropdownOpen,
-  toggleDropdown,
+  toggleDropdown
 }: MobileMenuProps) {
-  const { language: lang } = useLanguage();
+  const { text, setEnglish, setDutch } = useLanguage();
   const { navigate } = useAppState();
   const { isLoggedIn } = useAuth();
-  const { setEnglish, setDutch } = useLanguage();
   const [openMenu, setOpenMenu] = useState<MenuType>(undefined);
 
   const toggleMenu = (menu: MenuType) => {
@@ -102,7 +100,7 @@ export default function MobileMenu({
               onClick={() => router.navigate().then(toggleDropdown)}
             >
               <ListItemText
-                primary={text(lang, 'Agenda', 'Agenda')}
+                primary={text('Agenda', 'Agenda')}
                 className="uppercase px-10"
               />
             </ListItemButton>
@@ -114,7 +112,7 @@ export default function MobileMenu({
           <ListItem onClick={() => toggleMenu('association')} disablePadding>
             <ListItemButton>
               <ListItemText
-                primary={text(lang, 'Association', 'Vereniging')}
+                primary={text('Association', 'Vereniging')}
                 className="uppercase px-10"
               />
               <ListItemIcon>
@@ -133,7 +131,7 @@ export default function MobileMenu({
                   <ListItemText
                     primary={
                       <p className="text-[#1976d2] dark:text-[#90caf9] px-14 text-sm">
-                        {text(lang, 'About the NijSAC', 'Over de NijSAC')}
+                        {text('About the NijSAC', 'Over de NijSAC')}
                       </p>
                     }
                   />
@@ -144,7 +142,7 @@ export default function MobileMenu({
                   <ListItemText
                     primary={
                       <p className="text-[#1976d2] dark:text-[#90caf9] px-14 text-sm">
-                        {text(lang, 'Board', 'Bestuur')}
+                        {text('Board', 'Bestuur')}
                       </p>
                     }
                   />
@@ -155,7 +153,7 @@ export default function MobileMenu({
                   <ListItemText
                     primary={
                       <p className="text-[#1976d2] dark:text-[#90caf9] px-14 text-sm">
-                        {text(lang, 'Committees', 'Commissies')}
+                        {text('Committees', 'Commissies')}
                       </p>
                     }
                   />
@@ -166,7 +164,7 @@ export default function MobileMenu({
                   <ListItemText
                     primary={
                       <p className="text-[#1976d2] dark:text-[#90caf9] px-14 text-sm">
-                        {text(lang, 'Introduction', 'Introductie')}
+                        {text('Introduction', 'Introductie')}
                       </p>
                     }
                   />
@@ -179,7 +177,7 @@ export default function MobileMenu({
           <ListItem onClick={() => toggleMenu('climbing')} disablePadding>
             <ListItemButton>
               <ListItemText
-                primary={text(lang, 'Climbing', 'Klimmen')}
+                primary={text('Climbing', 'Klimmen')}
                 className="uppercase px-10"
               />
               <ListItemIcon>
@@ -194,7 +192,7 @@ export default function MobileMenu({
                   <ListItemText
                     primary={
                       <p className="text-[#1976d2] dark:text-[#90caf9] px-14 text-sm">
-                        {text(lang, 'Indoor Climbing', 'Indoor Klimmen')}
+                        {text('Indoor Climbing', 'Indoor Klimmen')}
                       </p>
                     }
                   />
@@ -205,7 +203,7 @@ export default function MobileMenu({
                   <ListItemText
                     primary={
                       <p className="text-[#1976d2] dark:text-[#90caf9] px-14 text-sm">
-                        {text(lang, 'Outdoor Climbing', 'Buiten Klimmen')}
+                        {text('Outdoor Climbing', 'Buiten Klimmen')}
                       </p>
                     }
                   />
@@ -216,7 +214,7 @@ export default function MobileMenu({
                   <ListItemText
                     primary={
                       <p className="text-[#1976d2] dark:text-[#90caf9] px-14 text-sm">
-                        {text(lang, 'Climbing Areas', 'Klimgebieden')}
+                        {text('Climbing Areas', 'Klimgebieden')}
                       </p>
                     }
                   />
@@ -229,7 +227,7 @@ export default function MobileMenu({
                   <ListItemText
                     primary={
                       <p className="text-[#1976d2] dark:text-[#90caf9] px-14 text-sm">
-                        {text(lang, 'Material Rental', 'Materiaalverhuur')}
+                        {text('Material Rental', 'Materiaalverhuur')}
                       </p>
                     }
                   />
@@ -242,7 +240,7 @@ export default function MobileMenu({
           <ListItem onClick={() => toggleMenu('alps')} disablePadding>
             <ListItemButton>
               <ListItemText
-                primary={text(lang, 'Alps', 'Alpen')}
+                primary={text('Alps', 'Alpen')}
                 className="uppercase px-10"
               />
               <ListItemIcon>
@@ -254,7 +252,7 @@ export default function MobileMenu({
             <List disablePadding>
               <ListItem disablePadding>
                 <p className="px-14 text-sm text-gray-500 dark:text-gray-400">
-                  {text(lang, 'Summer', 'Zomer')}
+                  {text('Summer', 'Zomer')}
                 </p>
               </ListItem>
               <ListItem disablePadding>
@@ -262,7 +260,7 @@ export default function MobileMenu({
                   <ListItemText
                     primary={
                       <p className="text-[#1976d2] dark:text-[#90caf9] px-14 text-sm">
-                        {text(lang, 'Mountaineering', 'Bergbeklimmen')}
+                        {text('Mountaineering', 'Bergbeklimmen')}
                       </p>
                     }
                   />
@@ -273,7 +271,7 @@ export default function MobileMenu({
                   <ListItemText
                     primary={
                       <p className="text-[#1976d2] dark:text-[#90caf9] px-14 text-sm">
-                        {text(lang, 'Canyoning', 'Canyoning')}
+                        {text('Canyoning', 'Canyoning')}
                       </p>
                     }
                   />
@@ -284,7 +282,7 @@ export default function MobileMenu({
                   <ListItemText
                     primary={
                       <p className="text-[#1976d2] dark:text-[#90caf9] px-14 text-sm">
-                        {text(lang, 'Via Ferrata', 'Via Ferrata')}
+                        {text('Via Ferrata', 'Via Ferrata')}
                       </p>
                     }
                   />
@@ -295,7 +293,7 @@ export default function MobileMenu({
                   <ListItemText
                     primary={
                       <p className="text-[#1976d2] dark:text-[#90caf9] px-14 text-sm">
-                        {text(lang, 'Hiking', 'Wandelen')}
+                        {text('Hiking', 'Wandelen')}
                       </p>
                     }
                   />
@@ -303,7 +301,7 @@ export default function MobileMenu({
               </ListItem>
               <ListItem disablePadding>
                 <p className=" px-14 text-sm text-gray-500 dark:text-gray-400">
-                  {text(lang, 'Winter', 'Winter')}
+                  {text('Winter', 'Winter')}
                 </p>
               </ListItem>
               <ListItem disablePadding>
@@ -311,7 +309,7 @@ export default function MobileMenu({
                   <ListItemText
                     primary={
                       <p className="text-[#1976d2] dark:text-[#90caf9] px-14 text-sm">
-                        {text(lang, 'Ice Climbing', 'Off Piste Skiën')}
+                        {text('Ice Climbing', 'Off Piste Skiën')}
                       </p>
                     }
                   />
@@ -322,7 +320,7 @@ export default function MobileMenu({
                   <ListItemText
                     primary={
                       <p className="text-[#1976d2] dark:text-[#90caf9] px-14 text-sm">
-                        {text(lang, 'Off Piste Skiing', 'Toerskiën')}
+                        {text('Off Piste Skiing', 'Toerskiën')}
                       </p>
                     }
                   />
@@ -333,7 +331,7 @@ export default function MobileMenu({
                   <ListItemText
                     primary={
                       <p className="text-[#1976d2] dark:text-[#90caf9] px-14 text-sm">
-                        {text(lang, 'Tour Skiing', 'Canyoning')}
+                        {text('Tour Skiing', 'Canyoning')}
                       </p>
                     }
                   />
@@ -348,7 +346,7 @@ export default function MobileMenu({
           <ListItem onClick={() => toggleMenu('language')} disablePadding>
             <ListItemButton>
               <ListItemText
-                primary={text(lang, 'Language', 'Taal')}
+                primary={text('Language', 'Taal')}
                 className="uppercase px-10"
               />
               <ListItemIcon>
@@ -389,7 +387,7 @@ export default function MobileMenu({
               <ListItem onClick={handleLoginOpen} disablePadding>
                 <ListItemButton>
                   <ListItemText
-                    primary={text(lang, 'Login', 'Login')}
+                    primary={text('Login', 'Login')}
                     className="uppercase px-10"
                   />
                   <ListItemIcon></ListItemIcon>
@@ -400,7 +398,7 @@ export default function MobileMenu({
                   variant="contained"
                   onClick={() => router.navigate().then(toggleDropdown)}
                 >
-                  {text(lang, 'Become a member', 'Lid worden')}
+                  {text('Become a member', 'Lid worden')}
                 </Button>
               </ListItem>
             </>

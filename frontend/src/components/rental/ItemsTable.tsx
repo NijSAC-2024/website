@@ -1,18 +1,5 @@
-import {
-  IconButton,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-} from '@mui/material';
-import {
-  Language,
-  rentOptions,
-  ReservationItemType,
-  ReservationType,
-} from '../../types';
-import { text } from '../../util';
+import { IconButton, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import { Language, rentOptions, ReservationItemType, ReservationType } from '../../types';
 import RemoveIcon from '@mui/icons-material/Remove';
 import AddIcon from '@mui/icons-material/Add';
 import moment from 'moment/moment';
@@ -25,12 +12,12 @@ interface ItemsTableProps {
 
 export default function ItemsTable({
   reservation,
-  onAmountChange,
+  onAmountChange
 }: ItemsTableProps) {
-  const { language: lang } = useLanguage();
+  const { text } = useLanguage();
   const findRemark = (itemName: Language): Language => {
     const rentOption = rentOptions.find(
-      (option) => option.name.en === itemName.en,
+      (option) => option.name.en === itemName.en
     );
     return rentOption?.remark || { en: '', nl: '' };
   };
@@ -51,13 +38,15 @@ export default function ItemsTable({
   const calculateItemTotal = (
     price: number,
     days: number,
-    remark?: { en: string; nl: string },
+    remark?: { en: string; nl: string }
   ) => {
     if (remark?.en.includes('per month after 1 month')) {
       const months = Math.max(Math.round(days / 30), 1);
       if (months > 1) {
         return 5 * (months - 1);
-      } else {return 0;}
+      } else {
+        return 0;
+      }
     } else if (remark?.en.includes('per month')) {
       const months = Math.max(Math.round(days / 30), 1);
       return price * months;
@@ -72,7 +61,9 @@ export default function ItemsTable({
   };
 
   const calculateDays = (): number => {
-    if (!reservation.startDate || !reservation.endDate) {return 0;}
+    if (!reservation.startDate || !reservation.endDate) {
+      return 0;
+    }
     return (
       moment(reservation.endDate).diff(moment(reservation.startDate), 'days') +
       1
@@ -85,10 +76,10 @@ export default function ItemsTable({
         {reservation.items.length > 0 && (
           <TableHead>
             <TableRow>
-              <TableCell>{text(lang, 'Material', 'Materiaal')}</TableCell>
-              <TableCell>{text(lang, 'Price', 'Prijs')}</TableCell>
-              <TableCell>{text(lang, 'Amount', 'Aantal')}</TableCell>
-              <TableCell>{text(lang, 'Total', 'Totaal')}</TableCell>
+              <TableCell>{text('Material', 'Materiaal')}</TableCell>
+              <TableCell>{text('Price', 'Prijs')}</TableCell>
+              <TableCell>{text('Amount', 'Aantal')}</TableCell>
+              <TableCell>{text('Total', 'Totaal')}</TableCell>
             </TableRow>
           </TableHead>
         )}
@@ -124,20 +115,18 @@ export default function ItemsTable({
       <h4>
         {text(
           'Total price for ' + calculateDays() + ' day(s):',
-          'Totale prijs voor ' + calculateDays() + ' dag(en):',
+          'Totale prijs voor ' + calculateDays() + ' dag(en):'
         )}
-        {` €${reservation.items
-          .reduce((sum, item) => {
-            return (
-              sum +
-              calculateItemTotal(
-                item.price * item.amount,
-                calculateDays(),
-                findRemark(item.name),
-              )
-            );
-          }, 0)
-          .toFixed(2)}`}
+        {` €${reservation.items.reduce((sum, item) => {
+          return (
+            sum +
+            calculateItemTotal(
+              item.price * item.amount,
+              calculateDays(),
+              findRemark(item.name)
+            )
+          );
+        }, 0).toFixed(2)}`}
       </h4>
     </div>
   );

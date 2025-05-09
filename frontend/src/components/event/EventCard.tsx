@@ -3,9 +3,9 @@ import GroupIcon from '@mui/icons-material/Group';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import moment from 'moment';
 import { Chip } from '@mui/material';
-import { getLabel, text } from '../../util.ts';
+import { getLabel } from '../../util.ts';
 import 'moment/dist/locale/nl';
-import { Event, DateType } from '../../types.ts';
+import { DateType, Event } from '../../types.ts';
 import Markdown from 'react-markdown';
 import RegisterButton from '../RegisterButton.tsx';
 import { useAppState } from '../../providers/AppStateProvider.tsx';
@@ -17,7 +17,7 @@ interface AgendaCardProps {
 
 export default function EventCard({ event, agendaPage }: AgendaCardProps) {
   const { navigate } = useAppState();
-  const { language: lang } = useLanguage();
+  const { text, lang } = useLanguage();
   moment.locale(lang);
 
   console.log('event: ', event);
@@ -33,8 +33,9 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
     const startMonth = start.getMonth();
     const endMonth = end.getMonth();
 
-    if (start === end) {return moment(start).utc().format('DD MMM HH:mm');}
-    else if (startDay === endDay) {
+    if (start === end) {
+      return moment(start).utc().format('DD MMM HH:mm');
+    } else if (startDay === endDay) {
       return (
         moment(start).utc().format('DD MMM HH:mm') +
         ' - ' +
@@ -60,12 +61,14 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
   };
 
   const truncateMarkdown = (markdown: string, maxLength: number): string => {
-    if (markdown.length <= maxLength) {return markdown;}
+    if (markdown.length <= maxLength) {
+      return markdown;
+    }
 
     let truncated = markdown.slice(0, maxLength);
     const lastCut = Math.max(
       truncated.lastIndexOf(' '),
-      truncated.lastIndexOf('\n'),
+      truncated.lastIndexOf('\n')
     );
     truncated = lastCut > -1 ? truncated.slice(0, lastCut) : truncated;
 
@@ -73,14 +76,15 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
     if (unmatchedTags) {
       truncated = truncated.slice(
         0,
-        truncated.lastIndexOf((truncated.match(/(\*\*|\*|_|`)/g) || []).pop()!),
+        truncated.lastIndexOf((truncated.match(/(\*\*|\*|_|`)/g) || []).pop()!)
       );
     }
     return truncated.trim() + '…';
   };
 
   return (
-    <div className="w-full rounded-2xl bg-inherit border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] flex flex-col relative justify-between">
+    <div
+      className="w-full rounded-2xl bg-inherit border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] flex flex-col relative justify-between">
       <div
         onClick={() => navigate('event', { id: event.id })}
         className={agendaPage ? 'hover:cursor-pointer' : ''}
@@ -93,7 +97,7 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
         />
         {agendaPage && !event.isPublished && (
           <Chip
-            label={text(lang, 'Draft', 'Concept')}
+            label={text('Draft', 'Concept')}
             className="absolute uppercase font-semibold top-5 left-5"
             color="primary"
           />
@@ -107,14 +111,14 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
           <div className="flex justify-between">
             <div className="flex flex-wrap gap-1">
               <Chip
-                label={text(lang, getLabel(event.eventType))}
+                label={text(getLabel(event.eventType))}
                 className="uppercase font-semibold"
                 size="small"
               />
               {event.metadata?.type?.map((type) => (
                 <Chip
                   key={`${event.id}-${type}`}
-                  label={text(lang, getLabel(type))}
+                  label={text(getLabel(type))}
                   className="uppercase font-semibold"
                   size="small"
                 />
@@ -125,21 +129,20 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
               {event.location.name.en}
             </div>
           </div>
-          <h2>{text(lang, event.name.en, event.name.nl)}</h2>
+          <h2>{text(event.name.en, event.name.nl)}</h2>
           {agendaPage ? (
             <Markdown>
               {text(
-                lang,
                 truncateMarkdown(event.description?.en, 120),
-                truncateMarkdown(event.description?.nl, 120),
+                truncateMarkdown(event.description?.nl, 120)
               )}
             </Markdown>
           ) : (
             event.dates.length > 1 && (
               <>
                 <b>
-                  {text(lang, getLabel(event.eventType)) +
-                    text(lang, ' dates:', ' datums:')}
+                  {text(getLabel(event.eventType)) +
+                    text(' dates:', ' datums:')}
                 </b>
                 {event.dates.map((date) => (
                   <p>{formatDate(date)}</p>
@@ -149,7 +152,8 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
           )}
         </div>
         {event.registrationPeriod?.start && event.registrationPeriod?.end && (
-          <div className="p-5 flex justify-between items-center border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
+          <div
+            className="p-5 flex justify-between items-center border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
             <div className="flex items-center">
               <GroupIcon className="mr-2" />
               <p>

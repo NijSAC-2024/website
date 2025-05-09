@@ -1,26 +1,18 @@
 import { ChangeEvent, MouseEvent, useState } from 'react';
-import {
-  FormControl,
-  IconButton,
-  InputAdornment,
-  InputLabel,
-  OutlinedInput,
-  FormHelperText,
-} from '@mui/material';
+import { FormControl, FormHelperText, IconButton, InputAdornment, InputLabel, OutlinedInput } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { ValidateProps } from '../types.ts';
-import { text } from '../util.ts';
 import { useLanguage } from '../providers/LanguageProvider.tsx';
 
 export default function ValidatedPassword({
   label,
   validator,
   onChange,
-  setValue,
+  setValue
 }: ValidateProps) {
-  const { language: lang } = useLanguage();
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [error, setError] = useState<string | false>(false);
+  const { text } = useLanguage();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (event: MouseEvent<HTMLButtonElement>) => {
@@ -37,7 +29,7 @@ export default function ValidatedPassword({
 
   return (
     <FormControl variant="outlined" className="w-full" error={!!error}>
-      <InputLabel>{text(lang, 'Password', 'Wachtwoord')}</InputLabel>
+      <InputLabel>{text('Password', 'Wachtwoord')}</InputLabel>
       <OutlinedInput
         id="outlined-adornment-password"
         type={showPassword ? 'text' : 'password'}

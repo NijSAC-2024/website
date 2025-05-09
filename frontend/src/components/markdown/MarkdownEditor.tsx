@@ -4,7 +4,6 @@ import { Tab, TextField } from '@mui/material';
 import TextCard from '../TextCard.tsx';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import MarkdownEditorToolbar from './MarkdownEditorToolbar.tsx';
-import { text } from '../../util.ts';
 import remarkGfm from 'remark-gfm';
 import { Language } from '../../types.ts';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
@@ -16,9 +15,9 @@ interface MarkdownEditorProps {
 
 export default function MarkdownEditor({
   initialMarkdown = { en: '', nl: '' },
-  handleMarkdown,
+  handleMarkdown
 }: MarkdownEditorProps) {
-  const { language: lang } = useLanguage();
+  const { text } = useLanguage();
   const [value, setValue] = useState('1');
   const [markdownContent, setMarkdownContent] =
     useState<Language>(initialMarkdown);
@@ -28,7 +27,7 @@ export default function MarkdownEditor({
     nl: HTMLTextAreaElement | null;
   }>({
     en: null,
-    nl: null,
+    nl: null
   });
 
   const handleChange = (_event: SyntheticEvent, newValue: string) => {
@@ -37,11 +36,11 @@ export default function MarkdownEditor({
 
   const handleInputChange = (
     event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
-    langCode: 'en' | 'nl',
+    langCode: 'en' | 'nl'
   ) => {
     const updatedMarkdown = {
       ...markdownContent,
-      [langCode]: event.target.value,
+      [langCode]: event.target.value
     };
     setMarkdownContent(updatedMarkdown);
     handleMarkdown(updatedMarkdown);
@@ -51,7 +50,9 @@ export default function MarkdownEditor({
     const textarea = textareaRef.current[langCode];
     const currentContent = markdownContent[langCode];
 
-    if (!textarea) {return;}
+    if (!textarea) {
+      return;
+    }
 
     const selectionStart = textarea.selectionStart;
     const selectionEnd = textarea.selectionEnd;
@@ -60,7 +61,7 @@ export default function MarkdownEditor({
 
     const isInlineSyntax = ['**', '~~', '`', '_'].includes(syntax);
     const isBlockSyntax = ['### ', '> ', '- ', '1. ', '- [ ] '].includes(
-      syntax,
+      syntax
     );
     const isSpecialSyntax = ['[](url)', '![](url)'].includes(syntax);
 
@@ -99,7 +100,7 @@ export default function MarkdownEditor({
 
     const updatedMarkdown = {
       ...markdownContent,
-      [langCode]: newContent,
+      [langCode]: newContent
     };
     setMarkdownContent(updatedMarkdown);
     handleMarkdown(updatedMarkdown);
@@ -114,9 +115,9 @@ export default function MarkdownEditor({
     <>
       <TabContext value={value}>
         <TabList onChange={handleChange}>
-          <Tab label={text(lang, 'Edit', 'Bewerken')} value="1" />
-          <Tab label={text(lang, 'Preview', 'Voorbeeld')} value="2" />
-          <Tab label={text(lang, 'Combined', 'Gecombineerd')} value="3" />
+          <Tab label={text('Edit', 'Bewerken')} value="1" />
+          <Tab label={text('Preview', 'Voorbeeld')} value="2" />
+          <Tab label={text('Combined', 'Gecombineerd')} value="3" />
         </TabList>
         <TabPanel value="1">
           <MarkdownEditorToolbar
@@ -131,9 +132,8 @@ export default function MarkdownEditor({
               inputRef={(el) => (textareaRef.current.en = el)}
               className="flex-1 p-2 border rounded resize-none font-mono"
               placeholder={text(
-                lang,
                 'Insert English here',
-                'Type hier Engels',
+                'Type hier Engels'
               )}
             />
           </div>
@@ -149,9 +149,8 @@ export default function MarkdownEditor({
               inputRef={(el) => (textareaRef.current.nl = el)}
               className="flex-1 p-2 border rounded resize-none font-mono"
               placeholder={text(
-                lang,
                 'Insert Dutch here',
-                'Type hier Nederlands',
+                'Type hier Nederlands'
               )}
             />
           </div>
@@ -179,9 +178,8 @@ export default function MarkdownEditor({
               inputRef={(el) => (textareaRef.current.en = el)}
               className="flex-1 p-2 border rounded resize-none font-mono"
               placeholder={text(
-                lang,
                 'Insert English here',
-                'Type hier Engels',
+                'Type hier Engels'
               )}
             />
             <TextCard className="p-4">
@@ -202,9 +200,8 @@ export default function MarkdownEditor({
               inputRef={(el) => (textareaRef.current.nl = el)}
               className="flex-1 p-2 border rounded resize-none font-mono"
               placeholder={text(
-                lang,
                 'Insert Dutch here',
-                'Type hier Nederlands',
+                'Type hier Nederlands'
               )}
             />
             <TextCard className="p-4">

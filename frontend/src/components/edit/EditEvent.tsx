@@ -1,15 +1,14 @@
 import {
+  DateType,
   EventContent,
   EventType,
-  DateType,
   Language,
   MembershipStatus,
   Metadata,
   Question,
-  WeekendType,
+  WeekendType
 } from '../../types.ts';
 import { Button } from '@mui/material';
-import { text } from '../../util.ts';
 import { useState } from 'react';
 import EditRegistrations from './EditRegistrations.tsx';
 import EditAgendaCard from './EditAgendaCard.tsx';
@@ -25,7 +24,7 @@ interface EditEventProps {
 }
 
 export default function EditEvent({ eventContent: init }: EditEventProps) {
-  const { language: lang } = useLanguage();
+  const { text } = useLanguage();
   const { createEvent, updateEvent } = useApiState();
   const { route } = useAppState();
   const { navigate } = useAppState();
@@ -36,7 +35,7 @@ export default function EditEvent({ eventContent: init }: EditEventProps) {
   const handleEventChange = (changes: Partial<EventContent>) => {
     setEvent((prev: EventContent) => ({
       ...prev,
-      ...changes,
+      ...changes
     }));
   };
 
@@ -52,51 +51,51 @@ export default function EditEvent({ eventContent: init }: EditEventProps) {
       | Metadata
       | Language
       | MembershipStatus[]
-      | null,
+      | null
   ) => {
     handleEventChange({
-      [name]: value,
+      [name]: value
     });
   };
 
   const handleDateChange = (
     index: number,
     startDate: boolean,
-    value: string,
+    value: string
   ) => {
     handleEventChange({
       dates: event.dates.map((date, idx) =>
         idx === index
           ? {
             ...date,
-            [startDate ? 'startDateTime' : 'endDateTime']: value,
+            [startDate ? 'startDateTime' : 'endDateTime']: value
           }
-          : date,
-      ),
+          : date
+      )
     });
   };
 
   const handleAddDate = () => {
     const now = new Date();
     handleEventChange({
-      dates: [...event.dates, { start: now, end: now }],
+      dates: [...event.dates, { start: now, end: now }]
     });
   };
 
   const handleRemoveDate = (index: number) =>
     handleEventChange({
-      dates: event.dates.filter((_, idx) => idx !== index),
+      dates: event.dates.filter((_, idx) => idx !== index)
     });
 
   const handleRegistrationQuestionChange = (
     id: string,
     name: keyof Question,
-    value: Language | boolean,
+    value: Language | boolean
   ) => {
     handleEventChange({
       questions: event.questions.map((question) =>
-        question.id === id ? { ...question, [name]: value } : question,
-      ),
+        question.id === id ? { ...question, [name]: value } : question
+      )
     });
   };
 
@@ -108,14 +107,14 @@ export default function EditEvent({ eventContent: init }: EditEventProps) {
           id: crypto.randomUUID(),
           questionType: 'shortText',
           question: { en: '', nl: '' },
-          required: false,
-        },
-      ],
+          required: false
+        }
+      ]
     });
 
   const handleRemoveRegistrationQuestion = (id: string) =>
     handleEventChange({
-      questions: event.questions.filter((q) => q.id !== id),
+      questions: event.questions.filter((q) => q.id !== id)
     });
 
   const handleSave = async (bool: boolean) => {
@@ -135,12 +134,12 @@ export default function EditEvent({ eventContent: init }: EditEventProps) {
         <div className="xl:col-span-3 mb-[-0.5rem] flex justify-between">
           <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">
             <Button color="inherit" onClick={() => navigate('agenda')}>
-              {text(lang, 'Back to Agenda', 'Terug naar Agenda')}
+              {text('Back to Agenda', 'Terug naar Agenda')}
             </Button>
           </div>
           {!event.isPublished && (
             <Button variant="contained">
-              <b>{text(lang, 'Draft', 'Concept')}</b>
+              <b>{text('Draft', 'Concept')}</b>
             </Button>
           )}
         </div>

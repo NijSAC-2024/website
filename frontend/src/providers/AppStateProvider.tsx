@@ -9,7 +9,7 @@ interface AppStateContextType {
 }
 
 const AppStateContext = createContext<AppStateContextType | undefined>(
-  undefined,
+  undefined
 );
 
 interface AppStateProviderProps {
@@ -18,7 +18,7 @@ interface AppStateProviderProps {
 
 export default function AppStateProvider({ children }: AppStateProviderProps) {
   const [version, _setVersion] = useState<string>('development');
-  const [route, setRoute] = useState<Route>(matchName('index'));
+  const [route, setRoute] = useState<Route>({ path: '/', name: 'index', params: {} });
 
   const navigate = (routeName: string, params?: Record<string, string>) => {
     const route = matchName(routeName);

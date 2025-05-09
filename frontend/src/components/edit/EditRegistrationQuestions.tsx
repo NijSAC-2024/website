@@ -1,4 +1,3 @@
-import { text } from '../../util.ts';
 import { Checkbox, Fab, TextField } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -11,7 +10,7 @@ interface EditRegistrationQuestionProps {
   handleRegistrationQuestionChange: (
     id: string,
     name: keyof Question,
-    value: Language | boolean,
+    value: Language | boolean
   ) => void;
   handleAddRegistrationQuestion: () => void;
   handleRemoveRegistrationQuestion: (id: string) => void;
@@ -21,15 +20,15 @@ export default function EditRegistrationQuestions({
   registrationQuestions,
   handleRegistrationQuestionChange,
   handleAddRegistrationQuestion,
-  handleRemoveRegistrationQuestion,
+  handleRemoveRegistrationQuestion
 }: EditRegistrationQuestionProps) {
-  const { language: lang } = useLanguage();
+  const { text } = useLanguage();
 
   return (
     <>
-      <h3>{text(lang, 'Registration Questions', 'Inschrijfvragen')}</h3>
+      <h3>{text('Registration Questions', 'Inschrijfvragen')}</h3>
       {registrationQuestions.length === 0 ? (
-        <p>{text(lang, 'No questions yet.', 'Nog geen vragen.')}</p>
+        <p>{text('No questions yet.', 'Nog geen vragen.')}</p>
       ) : (
         <div className="grid gap-2">
           {registrationQuestions.map((question, index) => (
@@ -38,11 +37,11 @@ export default function EditRegistrationQuestions({
                 <TextField
                   multiline
                   value={question.question.en}
-                  label={`${text(lang, 'Question', 'Vraag')} ${index + 1} ${text(lang, 'English', 'Engels')}`}
+                  label={`${text('Question', 'Vraag')} ${index + 1} ${text('English', 'Engels')}`}
                   onChange={(e) =>
                     handleRegistrationQuestionChange(question.id, 'question', {
                       en: e.target.value,
-                      nl: question.question.nl,
+                      nl: question.question.nl
                     })
                   }
                   fullWidth
@@ -50,31 +49,31 @@ export default function EditRegistrationQuestions({
                 <TextField
                   multiline
                   value={question.question.nl}
-                  label={`${text(lang, 'Question', 'Vraag')} ${index + 1} ${text(lang, 'Dutch', 'Nederlands')}`}
+                  label={`${text('Question', 'Vraag')} ${index + 1} ${text('Dutch', 'Nederlands')}`}
                   onChange={(e) =>
                     handleRegistrationQuestionChange(question.id, 'question', {
                       en: question.question.en,
-                      nl: e.target.value,
+                      nl: e.target.value
                     })
                   }
                   fullWidth
                 />
               </div>
               <div className="flex">
-                <Tooltip title={text(lang, 'Required', 'Verplicht')}>
+                <Tooltip title={text('Required', 'Verplicht')}>
                   <Checkbox
                     checked={question.required}
                     onChange={() =>
                       handleRegistrationQuestionChange(
                         question.id,
                         'required',
-                        !question.required,
+                        !question.required
                       )
                     }
                   />
                 </Tooltip>
                 <Tooltip
-                  title={text(lang, 'Delete Question', 'Verwijder Vraag')}
+                  title={text('Delete Question', 'Verwijder Vraag')}
                 >
                   <Fab
                     size="small"
@@ -92,7 +91,7 @@ export default function EditRegistrationQuestions({
         </div>
       )}
       <div className="flex justify-center">
-        <Tooltip title={text(lang, 'Add Question', 'Voeg Vraag Toe')}>
+        <Tooltip title={text('Add Question', 'Voeg Vraag Toe')}>
           <Fab
             size="small"
             color="primary"

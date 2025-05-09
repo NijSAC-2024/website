@@ -3,13 +3,12 @@ import Autocomplete from '@mui/material/Autocomplete';
 import CircularProgress from '@mui/material/CircularProgress';
 import { Fragment, useState } from 'react';
 import { Location } from '../../types.ts';
-import { text } from '../../util.ts';
 import { apiFetch } from '../../api.ts';
 import { enqueueSnackbar } from 'notistack';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 
 export default function EditLocation() {
-  const { language: lang } = useLanguage();
+  const { text } = useLanguage();
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState<Location[]>([]);
   const [loading, setLoading] = useState(false);
@@ -22,20 +21,20 @@ export default function EditLocation() {
       '/location?reusable=true&limit=2&offset=0',
       {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      },
+        headers: { 'Content-Type': 'application/json' }
+      }
     );
 
     if (error) {
       switch (error.message) {
       case 'Unauthorized':
         enqueueSnackbar('Incorrect email or password.', {
-          variant: 'error',
+          variant: 'error'
         });
         break;
       default:
         enqueueSnackbar(`${error.message}: ${error.reference}`, {
-          variant: 'error',
+          variant: 'error'
         });
       }
     } else if (data) {
@@ -55,13 +54,13 @@ export default function EditLocation() {
       onOpen={handleOpen}
       onClose={handleClose}
       isOptionEqualToValue={(option, value) => option.id === value.id}
-      getOptionLabel={(location) => text(lang, location.name)}
+      getOptionLabel={(location) => text(location.name)}
       options={options}
       loading={loading}
       renderInput={(params) => (
         <TextField
           {...params}
-          label={text(lang, 'Location', 'Locatie')}
+          label={text('Location', 'Locatie')}
           slotProps={{
             input: {
               ...params.InputProps,
@@ -72,8 +71,8 @@ export default function EditLocation() {
                   ) : null}
                   {params.InputProps.endAdornment}
                 </Fragment>
-              ),
-            },
+              )
+            }
           }}
         />
       )}

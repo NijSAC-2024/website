@@ -1,6 +1,5 @@
 import MarkdownEditor from '../markdown/MarkdownEditor.tsx';
 import { TextField } from '@mui/material';
-import { text } from '../../util.ts';
 import OptionSelector from '../OptionSelector.tsx';
 import { Event, experienceOptions, Language, Metadata } from '../../types.ts';
 import ContentCard from '../ContentCard.tsx';
@@ -11,12 +10,13 @@ interface EditDescriptionProps {
   metadata?: Metadata;
   handleFieldChange: (name: keyof Event, value: Metadata | Language) => void;
 }
+
 export default function EditDescription({
   description,
   metadata,
-  handleFieldChange,
+  handleFieldChange
 }: EditDescriptionProps) {
-  const { language: lang } = useLanguage();
+  const { text } = useLanguage();
 
   const handleMarkdown = (markdown: Language) => {
     handleFieldChange('description', markdown);
@@ -33,28 +33,27 @@ export default function EditDescription({
       </div>
 
       {/* Gear and Experience */}
-      <div className="grid xl:grid-cols-2 gap-3 px-7 py-5 border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
+      <div
+        className="grid xl:grid-cols-2 gap-3 px-7 py-5 border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
         <TextField
           multiline
           fullWidth
           value={metadata?.gear?.en}
           label={text(
-            lang,
             'Necessary Gear English ',
-            'Benodigde Uitrusting Engels',
+            'Benodigde Uitrusting Engels'
           )}
           placeholder={text(
-            lang,
             'Separated by commas',
-            'Gescheiden door komma\'s',
+            'Gescheiden door komma\'s'
           )}
           onChange={(e) =>
             handleFieldChange('metadata', {
               ...metadata,
               gear: {
                 ...metadata?.gear,
-                en: e.target.value,
-              },
+                en: e.target.value
+              }
             } as Metadata)
           }
         />
@@ -63,22 +62,20 @@ export default function EditDescription({
           fullWidth
           value={metadata?.gear?.nl}
           label={text(
-            lang,
             'Necessary Gear Dutch',
-            'Benodigde Uitrusting Nederlands',
+            'Benodigde Uitrusting Nederlands'
           )}
           placeholder={text(
-            lang,
             'Separated by commas',
-            'Gescheiden door komma\'s',
+            'Gescheiden door komma\'s'
           )}
           onChange={(e) =>
             handleFieldChange('metadata', {
               ...metadata,
               gear: {
                 ...metadata?.gear,
-                en: e.target.value,
-              },
+                en: e.target.value
+              }
             } as Metadata)
           }
         />
@@ -89,10 +86,10 @@ export default function EditDescription({
             onChange={(selected) =>
               handleFieldChange('metadata', {
                 ...metadata,
-                experience: selected,
+                experience: selected
               } as Metadata)
             }
-            label={text(lang, 'Necessary Experience', 'Benodigde Ervaring')}
+            label={text('Necessary Experience', 'Benodigde Ervaring')}
           />
         </div>
       </div>

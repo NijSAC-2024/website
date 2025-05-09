@@ -1,22 +1,13 @@
-import {
-  Avatar,
-  Divider,
-  IconButton,
-  ListItemIcon,
-  Menu,
-  MenuItem,
-  Tooltip,
-} from '@mui/material';
+import { Avatar, Divider, IconButton, ListItemIcon, Menu, MenuItem, Tooltip } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { MouseEvent, useState } from 'react';
 import { useAuth } from '../../providers/AuthProvider.tsx';
-import { text } from '../../util.ts';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 
 export default function UserMenu() {
-  const { language: lang } = useLanguage();
+  const { text } = useLanguage();
   const { user, logout } = useAuth();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -51,20 +42,20 @@ export default function UserMenu() {
           <ListItemIcon>
             <AccountCircleIcon />
           </ListItemIcon>
-          {text(lang, 'My account', 'Mijn account')}
+          {text('My account', 'Mijn account')}
         </MenuItem>
         <Divider />
         <MenuItem onClick={handleClose}>
           <ListItemIcon>
             <SettingsIcon fontSize="small" />
           </ListItemIcon>
-          {text(lang, 'Settings', 'Instellingen')}
+          {text('Settings', 'Instellingen')}
         </MenuItem>
         <MenuItem onClick={logout}>
           <ListItemIcon>
             <LogoutIcon fontSize="small" />
           </ListItemIcon>
-          {text(lang, 'Logout', 'Uitloggen')}
+          {text('Logout', 'Uitloggen')}
         </MenuItem>
       </Menu>
     </>
