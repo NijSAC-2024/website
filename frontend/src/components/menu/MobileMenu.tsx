@@ -83,7 +83,10 @@ export default function MobileMenu({
             src={'/images/logo.svg'}
             alt="Logo"
             className="hover:opacity-50 hover:cursor-pointer h-24"
-            onClick={() => router.navigate().then(toggleDropdown)}
+            onClick={() => {
+              navigate('index');
+              toggleDropdown();
+            }}
           />
           <IconButton size="large" color="inherit" onClick={toggleDropdown}>
             {dropdownOpen ? (
@@ -97,8 +100,10 @@ export default function MobileMenu({
           {/* Agenda */}
           <ListItem disablePadding>
             <ListItemButton
-              onClick={() => router.navigate().then(toggleDropdown)}
-            >
+              onClick={() => {
+                navigate('agenda');
+                toggleDropdown();
+              }}>
               <ListItemText
                 primary={text('Agenda', 'Agenda')}
                 className="uppercase px-10"
@@ -396,7 +401,10 @@ export default function MobileMenu({
               <ListItem className="px-10 pb-3 pt-2" disablePadding>
                 <Button
                   variant="contained"
-                  onClick={() => router.navigate().then(toggleDropdown)}
+                  onClick={() => {
+                    navigate('register');
+                    toggleDropdown();
+                  }}
                 >
                   {text('Become a member', 'Lid worden')}
                 </Button>

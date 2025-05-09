@@ -37,7 +37,7 @@ export default function DesktopMenu({ handleLoginOpen }: DesktopMenuProps) {
   return (
     <Toolbar className="flex justify-between w-[80%] max-w-[1000px] mx-auto">
       <div className="flex items-center">
-        <Link routeName={'home'}>
+        <Link routeName={'index'}>
           <img
             src={'/images/logo.svg'}
             alt="Logo"
