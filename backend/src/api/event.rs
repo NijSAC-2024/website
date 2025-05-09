@@ -1,9 +1,9 @@
 use crate::{
-    event::{Event, EventContent, Answer, Date, NewRegistration, Question, Registration},
     api::{ApiResult, ValidatedJson},
     auth::{role::Role, session::Session},
     data_source::event::EventStore,
     error::{AppResult, Error},
+    event::{Answer, Date, Event, EventContent, NewRegistration, Question, Registration},
     location::{Location, LocationId},
     user::UserId,
     wire::event::EventId,

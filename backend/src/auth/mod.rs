@@ -29,6 +29,6 @@ pub async fn logout(
     jar = jar.remove(Cookie::from(COOKIE_NAME));
     if let Some(session) = session {
         session.delete(&db).await?;
-    } 
+    }
     Ok(jar)
 }

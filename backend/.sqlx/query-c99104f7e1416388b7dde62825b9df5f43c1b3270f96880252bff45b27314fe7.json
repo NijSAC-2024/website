@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT user_id,\n                   u.first_name,\n                   u.infix,\n                   u.last_name,\n                   answers,\n                   attended,\n                   waiting_list_position,\n                   u.created,\n                   u.updated\n            FROM activity_registration ar\n                JOIN \"user\" u ON ar.user_id = u.id\n            WHERE ar.activity_id = $1\n              AND user_id = $2\n            ",
+  "query": "\n            SELECT user_id,\n                   u.first_name,\n                   u.infix,\n                   u.last_name,\n                   answers,\n                   attended,\n                   waiting_list_position,\n                   u.created,\n                   u.updated\n            FROM event_registration ar\n                JOIN \"user\" u ON ar.user_id = u.id\n            WHERE ar.event_id = $1\n              AND user_id = $2\n            ",
   "describe": {
     "columns": [
       {
@@ -67,5 +67,5 @@
       false
     ]
   },
-  "hash": "df44e5455b317475fa2e537908440d3765f827c50153fa374a7a30ec6fb8920a"
+  "hash": "c99104f7e1416388b7dde62825b9df5f43c1b3270f96880252bff45b27314fe7"
 }

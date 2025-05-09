@@ -1,7 +1,7 @@
 use crate::{
     api::{
         create_event, create_registration, delete_event, delete_registration, delete_user,
-        get_activities, get_event, get_event_registrations, get_all_users, get_material_list,
+        get_activities, get_all_users, get_event, get_event_registrations, get_material_list,
         get_registration, get_user_materials, register, update_event, update_pwd,
         update_registration, update_user, update_user_material, who_am_i,
     },
@@ -21,12 +21,12 @@ use tower_http::{trace, trace::TraceLayer};
 use tracing::Level;
 
 pub fn create_router(state: AppState) -> Router {
-    // let memory_router = MemoryServe::new(load_assets!("../frontend/dist"))
-    //     .index_file(Some("/index.html"))
-    //     .into_router();
+    let memory_router = MemoryServe::new(load_assets!("../frontend/dist"))
+        .index_file(Some("/index.html"))
+        .into_router();
 
     Router::new()
-        // .merge(memory_router)
+        .merge(memory_router)
         .nest("/api", api_router())
         .layer(
             TraceLayer::new_for_http()
@@ -61,14 +61,9 @@ fn api_router() -> Router<AppState> {
         .route("/event", get(get_activities).post(create_event))
         .route(
             "/event/{:id}",
-            get(get_event)
-                .put(update_event)
-                .delete(delete_event),
+            get(get_event).put(update_event).delete(delete_event),
         )
-        .route(
-            "/event/{:id}/registration",
-            get(get_event_registrations),
-        )
+        .route("/event/{:id}/registration", get(get_event_registrations))
         .route(
             "/event/{:event_id}/registration/{:user_id}",
             get(get_registration)

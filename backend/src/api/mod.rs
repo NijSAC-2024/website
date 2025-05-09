@@ -5,7 +5,6 @@ mod material;
 mod user;
 
 use crate::error::Error;
-pub use event::*;
 use axum::{
     extract::{
         rejection::{JsonRejection, QueryRejection},
@@ -14,6 +13,7 @@ use axum::{
     http::request::Parts,
     Json,
 };
+pub use event::*;
 pub use file::*;
 pub use location::*;
 pub use material::*;

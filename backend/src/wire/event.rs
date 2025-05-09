@@ -50,9 +50,11 @@ impl FromStr for ActivityType {
             "course" => ActivityType::Course,
             "weekend" => ActivityType::Weekend,
             "training" => ActivityType::Training,
-            _ => return Err(Error::Other(format!(
-                "Invalid event type {s}: Must be one of event, course, weekend, or training"
-            ))),
+            _ => {
+                return Err(Error::Other(format!(
+                    "Invalid event type {s}: Must be one of event, course, weekend, or training"
+                )))
+            }
         })
     }
 }

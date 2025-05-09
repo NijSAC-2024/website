@@ -1,11 +1,11 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT id as activity FROM activity WHERE location_id = $1\n            ",
+  "query": "\n            SELECT id as event FROM event WHERE location_id = $1\n            ",
   "describe": {
     "columns": [
       {
         "ordinal": 0,
-        "name": "activity",
+        "name": "event",
         "type_info": "Uuid"
       }
     ],
@@ -18,5 +18,5 @@
       false
     ]
   },
-  "hash": "624e6a2056206b843d98585f08ad937243f8258245d2aa4500d404337e35a69e"
+  "hash": "a66b961e75ec40950325784115a913d2548c1589e3cca7061f1254b1b8cf6021"
 }

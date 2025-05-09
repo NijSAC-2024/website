@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT waiting_list_position as pos FROM activity_registration WHERE activity_id = $1 AND user_id = $2\n            ",
+  "query": "\n            SELECT waiting_list_position as pos FROM event_registration WHERE event_id = $1 AND user_id = $2\n            ",
   "describe": {
     "columns": [
       {
@@ -19,5 +19,5 @@
       true
     ]
   },
-  "hash": "00c2538b7eb9f7fdd0e3a9989391134e86f65e2cbbe158fd858d6d06f0ae73fc"
+  "hash": "1a42aad7f18bbc9acaf2498850978ac032412bd1c5317c9e3f1457a509153818"
 }

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            UPDATE activity SET\n                  location_id = $2,\n                  name_nl = $3,\n                  name_en = $4,\n                  image = $5,\n                  description_nl = $6,\n                  description_en = $7,\n                  registration_start = $8,\n                  registration_end = $9,\n                  registration_max = $10,\n                  waiting_list_max = $11,\n                  is_published = $12,\n                  required_membership_status = $13::membership_status[],\n                  activity_type = $14,\n                  questions = $15,\n                  metadata = $16,\n                  updated = now()\n            WHERE id = $1\n            ",
+  "query": "\n            UPDATE event SET\n                  location_id = $2,\n                  name_nl = $3,\n                  name_en = $4,\n                  image = $5,\n                  description_nl = $6,\n                  description_en = $7,\n                  registration_start = $8,\n                  registration_end = $9,\n                  registration_max = $10,\n                  waiting_list_max = $11,\n                  is_published = $12,\n                  required_membership_status = $13::membership_status[],\n                  event_type = $14,\n                  questions = $15,\n                  metadata = $16,\n                  updated = now()\n            WHERE id = $1\n            ",
   "describe": {
     "columns": [],
     "parameters": {
@@ -44,5 +44,5 @@
     },
     "nullable": []
   },
-  "hash": "13d7c7ba089f098854790e709def4c0bb193205afacca0c4a1eeb3ae8b8b4849"
+  "hash": "f4d980f36e56d48d89a5a9dd7b174a070505b63a9e8f7c4fcb0cef4f2ceda2a6"
 }
