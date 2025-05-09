@@ -1,4 +1,3 @@
-import React from 'react';
 import ContentCard from '../ContentCard.tsx';
 import { text } from '../../util.ts';
 import { Table, TableBody, TableCell, TableRow } from '@mui/material';
@@ -23,8 +22,8 @@ export default function RegistrationsCard() {
                   key={registration.userId}
                   sx={{
                     '&:last-child td, &:last-child th': {
-                      border: 0
-                    }
+                      border: 0,
+                    },
                   }}
                 >
                   <TableCell>{registration.firstName}</TableCell>

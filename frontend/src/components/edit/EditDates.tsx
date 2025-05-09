@@ -18,7 +18,7 @@ export default function EditDates({
   dates,
   handleDateChange,
   handleAddDate,
-  handleRemoveDate
+  handleRemoveDate,
 }: EditDatesProps) {
   const { language: lang } = useLanguage();
 
@@ -44,17 +44,25 @@ export default function EditDates({
             <DateTimePicker
               label={`${text(lang, 'Start Date', 'Startdatum')} ${index + 2}`}
               value={moment(date.start)}
-              onChange={(date) => handleDateChange(index + 1, true, date!.toISOString())}
+              onChange={(date) =>
+                handleDateChange(index + 1, true, date!.toISOString())
+              }
             />
             <DateTimePicker
               label={`${text(lang, 'End Date', 'Einddatum')} ${index + 2}`}
               value={moment(date.end)}
-              onChange={(date) => handleDateChange(index + 1, false, date!.toISOString())}
+              onChange={(date) =>
+                handleDateChange(index + 1, false, date!.toISOString())
+              }
             />
           </div>
           <div className="flex items-center">
             <Tooltip title={text(lang, 'Delete Date', 'Verwijder Datum')}>
-              <Fab size="small" color="error" onClick={() => handleRemoveDate(index + 1)}>
+              <Fab
+                size="small"
+                color="error"
+                onClick={() => handleRemoveDate(index + 1)}
+              >
                 <DeleteIcon />
               </Fab>
             </Tooltip>

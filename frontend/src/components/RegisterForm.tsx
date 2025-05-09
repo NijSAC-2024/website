@@ -14,14 +14,20 @@ interface RegisterFormProps {
 export default function RegisterForm({
   registrationQuestions,
   title,
-  registrationCloseTime
+  registrationCloseTime,
 }: RegisterFormProps) {
   const { language: lang } = useLanguage();
   moment.locale(lang);
 
   return (
     <div className="grid gap-3">
-      <h1>{text(lang, 'Registration for ' + title.en, 'Inschrijving voor ' + title.nl)}</h1>
+      <h1>
+        {text(
+          lang,
+          'Registration for ' + title.en,
+          'Inschrijving voor ' + title.nl,
+        )}
+      </h1>
       <p>
         <AccessAlarmIcon className=" mr-2" />
         {text(lang, 'Registrations close at ', 'Inschrijvingen sluiten op ')}

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Button, Menu, MenuItem, Toolbar } from '@mui/material';
 import { text } from '../../util.ts';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -59,13 +58,23 @@ export default function DesktopMenu({ handleLoginOpen }: DesktopMenuProps) {
         >
           {text(lang, 'Association', 'Vereniging')} <ExpandMoreIcon />
         </Button>
-        <Menu anchorEl={anchorEl} open={openMenu === 'association'} onClose={handleMenuClose}>
+        <Menu
+          anchorEl={anchorEl}
+          open={openMenu === 'association'}
+          onClose={handleMenuClose}
+        >
           <MenuItem onClick={handleMenuClose}>
             {text(lang, 'About the NijSAC', 'Over de NijSAC')}
           </MenuItem>
-          <MenuItem onClick={handleMenuClose}>{text(lang, 'Board', 'Bestuur')}</MenuItem>
-          <MenuItem onClick={handleMenuClose}>{text(lang, 'Committees', 'Commissies')}</MenuItem>
-          <MenuItem onClick={handleMenuClose}>{text(lang, 'Introduction', 'Introductie')}</MenuItem>
+          <MenuItem onClick={handleMenuClose}>
+            {text(lang, 'Board', 'Bestuur')}
+          </MenuItem>
+          <MenuItem onClick={handleMenuClose}>
+            {text(lang, 'Committees', 'Commissies')}
+          </MenuItem>
+          <MenuItem onClick={handleMenuClose}>
+            {text(lang, 'Introduction', 'Introductie')}
+          </MenuItem>
         </Menu>
 
         {/* Climbing Dropdown */}
@@ -76,7 +85,11 @@ export default function DesktopMenu({ handleLoginOpen }: DesktopMenuProps) {
         >
           {text(lang, 'Climbing', 'Klimmen')} <ExpandMoreIcon />
         </Button>
-        <Menu anchorEl={anchorEl} open={openMenu === 'climbing'} onClose={handleMenuClose}>
+        <Menu
+          anchorEl={anchorEl}
+          open={openMenu === 'climbing'}
+          onClose={handleMenuClose}
+        >
           <MenuItem onClick={handleMenuClose}>
             {text(lang, 'Indoor Climbing', 'Indoor Klimmen')}
           </MenuItem>
@@ -99,22 +112,40 @@ export default function DesktopMenu({ handleLoginOpen }: DesktopMenuProps) {
         >
           {text(lang, 'Alps', 'Alpen')} <ExpandMoreIcon />
         </Button>
-        <Menu anchorEl={anchorEl} open={openMenu === 'alps'} onClose={handleMenuClose}>
+        <Menu
+          anchorEl={anchorEl}
+          open={openMenu === 'alps'}
+          onClose={handleMenuClose}
+        >
           {/* Summer */}
-          <p className="px-3 py-1 text-gray-500">{text(lang, 'Summer', 'Zomer')}</p>
+          <p className="px-3 py-1 text-gray-500">
+            {text(lang, 'Summer', 'Zomer')}
+          </p>
           <MenuItem onClick={handleMenuClose}>
             {text(lang, 'Mountaineering', 'Bergbeklimmen')}
           </MenuItem>
-          <MenuItem onClick={handleMenuClose}>{text(lang, 'Canyoning', 'Canyoning')}</MenuItem>
-          <MenuItem onClick={handleMenuClose}>{text(lang, 'Via Ferrata', 'Via Ferrata')}</MenuItem>
-          <MenuItem onClick={handleMenuClose}>{text(lang, 'Hiking', 'Wandelen')}</MenuItem>
+          <MenuItem onClick={handleMenuClose}>
+            {text(lang, 'Canyoning', 'Canyoning')}
+          </MenuItem>
+          <MenuItem onClick={handleMenuClose}>
+            {text(lang, 'Via Ferrata', 'Via Ferrata')}
+          </MenuItem>
+          <MenuItem onClick={handleMenuClose}>
+            {text(lang, 'Hiking', 'Wandelen')}
+          </MenuItem>
           {/* Winter */}
-          <p className="px-3 py-1 mt-2 text-gray-500">{text(lang, 'Winter', 'Winter')}</p>
-          <MenuItem onClick={handleMenuClose}>{text(lang, 'Ice Climbing', 'Ijsklimmen')}</MenuItem>
+          <p className="px-3 py-1 mt-2 text-gray-500">
+            {text(lang, 'Winter', 'Winter')}
+          </p>
+          <MenuItem onClick={handleMenuClose}>
+            {text(lang, 'Ice Climbing', 'Ijsklimmen')}
+          </MenuItem>
           <MenuItem onClick={handleMenuClose}>
             {text(lang, 'Off Piste Skiing', 'Off Piste Skiën')}
           </MenuItem>
-          <MenuItem onClick={handleMenuClose}>{text(lang, 'Tour Skiing', 'Toerskiën')}</MenuItem>
+          <MenuItem onClick={handleMenuClose}>
+            {text(lang, 'Tour Skiing', 'Toerskiën')}
+          </MenuItem>
         </Menu>
       </div>
       <div className="flex items-center">
@@ -127,7 +158,11 @@ export default function DesktopMenu({ handleLoginOpen }: DesktopMenuProps) {
           {text(lang, 'EN', 'NL')}
           <ExpandMoreIcon />
         </Button>
-        <Menu anchorEl={anchorEl} open={openMenu === 'language'} onClose={handleMenuClose}>
+        <Menu
+          anchorEl={anchorEl}
+          open={openMenu === 'language'}
+          onClose={handleMenuClose}
+        >
           <MenuItem
             onClick={() => {
               setEnglish();

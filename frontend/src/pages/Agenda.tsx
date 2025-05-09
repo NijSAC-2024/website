@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import GenericPage from './GenericPage.tsx';
 import ContentCard from '../components/ContentCard.tsx';
 import { text } from '../util.ts';
@@ -13,7 +13,9 @@ import { useLanguage } from '../providers/LanguageProvider.tsx';
 export default function Agenda() {
   const { language: lang } = useLanguage();
   const { events } = useApiState();
-  const [selectedCategory, setSelectedCategory] = useState<EventType | 'all'>('all');
+  const [selectedCategory, setSelectedCategory] = useState<EventType | 'all'>(
+    'all',
+  );
   const [selectedType, setSelectedType] = useState<WeekendType | 'all'>('all');
 
   return (
@@ -35,14 +37,14 @@ export default function Agenda() {
                 {text(
                   lang,
                   'To register for events you must first log in.',
-                  'Om je aan te melden voor evenementen moet je eerst ingelogd zijn.'
+                  'Om je aan te melden voor evenementen moet je eerst ingelogd zijn.',
                 )}
               </p>
               <p>
                 {text(
                   lang,
                   'Questions about activities or climbing weekends? Contact the board or the climbing commissioner.',
-                  'Vragen over activiteiten of klimweekenden? Neem contact met het bestuur of de klimcommissaris.'
+                  'Vragen over activiteiten of klimweekenden? Neem contact met het bestuur of de klimcommissaris.',
                 )}
               </p>
             </ContentCard>
@@ -50,36 +52,66 @@ export default function Agenda() {
               <h2 className="mb-3">{text(lang, 'Filter', 'Filteren')}</h2>
               <div className="grid gap-3">
                 <FormControl fullWidth>
-                  <InputLabel id="select-label">{text(lang, 'Category', 'Categorie')}</InputLabel>
+                  <InputLabel id="select-label">
+                    {text(lang, 'Category', 'Categorie')}
+                  </InputLabel>
                   <Select
                     labelId="select-label"
                     value={selectedCategory}
                     label={text(lang, 'Category', 'Categorie')}
-                    onChange={(e) => setSelectedCategory(e.target.value as EventType | 'all')}
+                    onChange={(e) =>
+                      setSelectedCategory(e.target.value as EventType | 'all')
+                    }
                     variant="outlined"
                   >
-                    <MenuItem value="all">{text(lang, 'All', 'Alles')}</MenuItem>
-                    <MenuItem value="activity">{text(lang, 'Activities', 'Activiteiten')}</MenuItem>
-                    <MenuItem value="course">{text(lang, 'Courses', 'Cursussen')}</MenuItem>
-                    <MenuItem value="training">{text(lang, 'Trainings', 'Trainingen')}</MenuItem>
-                    <MenuItem value="weekend">{text(lang, 'Weekends', 'Weekenden')}</MenuItem>
+                    <MenuItem value="all">
+                      {text(lang, 'All', 'Alles')}
+                    </MenuItem>
+                    <MenuItem value="activity">
+                      {text(lang, 'Activities', 'Activiteiten')}
+                    </MenuItem>
+                    <MenuItem value="course">
+                      {text(lang, 'Courses', 'Cursussen')}
+                    </MenuItem>
+                    <MenuItem value="training">
+                      {text(lang, 'Trainings', 'Trainingen')}
+                    </MenuItem>
+                    <MenuItem value="weekend">
+                      {text(lang, 'Weekends', 'Weekenden')}
+                    </MenuItem>
                   </Select>
                 </FormControl>
                 <FormControl fullWidth>
-                  <InputLabel id="select-label">{text(lang, 'Type', 'Type')}</InputLabel>
+                  <InputLabel id="select-label">
+                    {text(lang, 'Type', 'Type')}
+                  </InputLabel>
                   <Select
                     labelId="select-label"
                     value={selectedType}
                     label={text(lang, 'Type', 'Type')}
-                    onChange={(e) => setSelectedType(e.target.value as WeekendType | 'all')}
+                    onChange={(e) =>
+                      setSelectedType(e.target.value as WeekendType | 'all')
+                    }
                     variant="outlined"
                   >
-                    <MenuItem value="all">{text(lang, 'All', 'Alles')}</MenuItem>
-                    <MenuItem value="sp">{text(lang, 'Single Pitch', 'Single Pitch')}</MenuItem>
-                    <MenuItem value="mp">{text(lang, 'Multi Pitch', 'Multi Pitch')}</MenuItem>
-                    <MenuItem value="education">{text(lang, 'Education', 'Educatie')}</MenuItem>
-                    <MenuItem value="boulder">{text(lang, 'Bouldering', 'Boulderen')}</MenuItem>
-                    <MenuItem value="trad">{text(lang, 'Trad', 'Trad')}</MenuItem>
+                    <MenuItem value="all">
+                      {text(lang, 'All', 'Alles')}
+                    </MenuItem>
+                    <MenuItem value="sp">
+                      {text(lang, 'Single Pitch', 'Single Pitch')}
+                    </MenuItem>
+                    <MenuItem value="mp">
+                      {text(lang, 'Multi Pitch', 'Multi Pitch')}
+                    </MenuItem>
+                    <MenuItem value="education">
+                      {text(lang, 'Education', 'Educatie')}
+                    </MenuItem>
+                    <MenuItem value="boulder">
+                      {text(lang, 'Bouldering', 'Boulderen')}
+                    </MenuItem>
+                    <MenuItem value="trad">
+                      {text(lang, 'Trad', 'Trad')}
+                    </MenuItem>
                   </Select>
                 </FormControl>
               </div>
@@ -88,11 +120,14 @@ export default function Agenda() {
               events
                 .filter(
                   (event: Event) =>
-                    (selectedCategory === 'all' || event.eventType === selectedCategory) &&
-                    (selectedType === 'all' || event.metadata?.type?.includes(selectedType))
+                    (selectedCategory === 'all' ||
+                      event.eventType === selectedCategory) &&
+                    (selectedType === 'all' ||
+                      event.metadata?.type?.includes(selectedType)),
                 )
                 .sort(
-                  (a: Event, b: Event) => a.dates[0].start.valueOf() - b.dates[0].start.valueOf()
+                  (a: Event, b: Event) =>
+                    a.dates[0].start.valueOf() - b.dates[0].start.valueOf(),
                 )
                 .map((event: Event) => (
                   <EventCard key={event.id} event={event} agendaPage={true} />

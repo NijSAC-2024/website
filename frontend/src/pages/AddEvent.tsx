@@ -1,4 +1,3 @@
-import React from 'react';
 import EditEvent from '../components/edit/EditEvent.tsx';
 import { EventContent } from '../types.ts';
 
@@ -7,14 +6,14 @@ export default function AddEvent() {
   const event: EventContent = {
     name: {
       en: 'New event',
-      nl: 'Nieuwe activiteit'
+      nl: 'Nieuwe activiteit',
     },
     dates: [{ start: now, end: now }],
     isPublished: false,
     requiredMembershipStatus: ['member'],
     eventType: 'activity',
     questions: [],
-    location: ''
+    location: '',
   };
   return <EditEvent eventContent={event} />;
 }

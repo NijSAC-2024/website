@@ -14,7 +14,7 @@ interface EditDescriptionProps {
 export default function EditDescription({
   description,
   metadata,
-  handleFieldChange
+  handleFieldChange,
 }: EditDescriptionProps) {
   const { language: lang } = useLanguage();
 
@@ -26,7 +26,10 @@ export default function EditDescription({
     <ContentCard className="xl:col-span-2 flex flex-col justify-between">
       {/* Description */}
       <div>
-        <MarkdownEditor initialMarkdown={description} handleMarkdown={handleMarkdown} />
+        <MarkdownEditor
+          initialMarkdown={description}
+          handleMarkdown={handleMarkdown}
+        />
       </div>
 
       {/* Gear and Experience */}
@@ -35,15 +38,23 @@ export default function EditDescription({
           multiline
           fullWidth
           value={metadata?.gear?.en}
-          label={text(lang, 'Necessary Gear English ', 'Benodigde Uitrusting Engels')}
-          placeholder={text(lang, 'Separated by commas', "Gescheiden door komma's")}
+          label={text(
+            lang,
+            'Necessary Gear English ',
+            'Benodigde Uitrusting Engels',
+          )}
+          placeholder={text(
+            lang,
+            'Separated by commas',
+            'Gescheiden door komma\'s',
+          )}
           onChange={(e) =>
             handleFieldChange('metadata', {
               ...metadata,
               gear: {
                 ...metadata?.gear,
-                en: e.target.value
-              }
+                en: e.target.value,
+              },
             } as Metadata)
           }
         />
@@ -51,15 +62,23 @@ export default function EditDescription({
           multiline
           fullWidth
           value={metadata?.gear?.nl}
-          label={text(lang, 'Necessary Gear Dutch', 'Benodigde Uitrusting Nederlands')}
-          placeholder={text(lang, 'Separated by commas', "Gescheiden door komma's")}
+          label={text(
+            lang,
+            'Necessary Gear Dutch',
+            'Benodigde Uitrusting Nederlands',
+          )}
+          placeholder={text(
+            lang,
+            'Separated by commas',
+            'Gescheiden door komma\'s',
+          )}
           onChange={(e) =>
             handleFieldChange('metadata', {
               ...metadata,
               gear: {
                 ...metadata?.gear,
-                en: e.target.value
-              }
+                en: e.target.value,
+              },
             } as Metadata)
           }
         />
@@ -70,7 +89,7 @@ export default function EditDescription({
             onChange={(selected) =>
               handleFieldChange('metadata', {
                 ...metadata,
-                experience: selected
+                experience: selected,
               } as Metadata)
             }
             label={text(lang, 'Necessary Experience', 'Benodigde Ervaring')}

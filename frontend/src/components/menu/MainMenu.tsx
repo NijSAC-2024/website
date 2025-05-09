@@ -1,5 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Button, DialogContent, Dialog, DialogActions, useMediaQuery } from '@mui/material';
+import {
+  Button,
+  DialogContent,
+  Dialog,
+  DialogActions,
+  useMediaQuery,
+} from '@mui/material';
 import LoginForm from '../LoginForm.tsx';
 import { text } from '../../util.ts';
 
@@ -50,7 +56,9 @@ export default function MainMenu() {
           <LoginForm onClose={toggleAuthOpen} />
         </DialogContent>
         <DialogActions>
-          <Button onClick={toggleAuthOpen}>{text(lang, 'Close', 'Sluit')}</Button>
+          <Button onClick={toggleAuthOpen}>
+            {text(lang, 'Close', 'Sluit')}
+          </Button>
         </DialogActions>
       </Dialog>
     </>

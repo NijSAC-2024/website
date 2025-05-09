@@ -1,4 +1,4 @@
-import { Route } from 'types';
+import { Route } from './types.ts';
 
 /**
  * This table contains a list of all named routes
@@ -39,7 +39,9 @@ export function matchPath(path: string): Route | undefined {
   }
 
   for (const route of routes) {
-    const match = new RegExp(`^${route[0].replace(/:([^\s/]+)/g, '(?<$1>[\\w-]+)')}$`);
+    const match = new RegExp(
+      `^${route[0].replace(/:([^\s/]+)/g, '(?<$1>[\\w-]+)')}$`
+    );
     const matches = path.match(match);
     console.log('matches: ', matches?.groups);
 
@@ -49,7 +51,7 @@ export function matchPath(path: string): Route | undefined {
   }
 }
 
-export function paramsToPath(route: Route, params?: any): Route {
+export function paramsToPath(route: Route, params?: { [k: string]: string }): Route {
   if (params) {
     for (const param of Object.entries(params)) {
       route.path = route.path.replaceAll(':' + param[0], param[1] as string);

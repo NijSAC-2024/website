@@ -177,7 +177,7 @@ jobs:
 
   # Frontend
   lint-frontend:
-    name: Format and lint frontend
+    name: Lint frontend
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -186,11 +186,10 @@ jobs:
       - uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a # 4.2.0
         with:
           node-version: '22'
-      - name: prettier
+      - name: eslint
         working-directory: frontend
         run: |
           npm install
-          npx prettier --check "src/**/*.{js,jsx,ts,tsx,css,scss,html}"
           npx eslint "src/**/*.{js,jsx,ts,tsx}"
 
   outdated-frontend:

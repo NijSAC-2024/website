@@ -8,14 +8,16 @@ interface AppStateContextType {
   navigate: (routeName: string, params?: Record<string, string>) => void;
 }
 
-const AppStateContext = createContext<AppStateContextType | undefined>(undefined);
+const AppStateContext = createContext<AppStateContextType | undefined>(
+  undefined,
+);
 
 interface AppStateProviderProps {
   children: ReactNode;
 }
 
 export default function AppStateProvider({ children }: AppStateProviderProps) {
-  const [version, setVersion] = useState<string>('development');
+  const [version, _setVersion] = useState<string>('development');
   const [route, setRoute] = useState<Route>(matchName('index'));
 
   const navigate = (routeName: string, params?: Record<string, string>) => {

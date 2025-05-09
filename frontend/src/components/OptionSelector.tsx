@@ -7,7 +7,7 @@ import {
   OutlinedInput,
   Select,
   SelectChangeEvent,
-  Checkbox
+  Checkbox,
 } from '@mui/material';
 import { text } from '../util.ts';
 import { OptionsType } from '../types.ts';
@@ -24,10 +24,12 @@ export default function OptionSelector({
   options,
   selected,
   onChange,
-  label
+  label,
 }: OptionSelectorProps) {
   const { language: lang } = useLanguage();
-  const [selectedOptions, setSelectedOptions] = useState<string[]>(selected || []);
+  const [selectedOptions, setSelectedOptions] = useState<string[]>(
+    selected || [],
+  );
 
   const handleChange = (event: SelectChangeEvent<string[]>) => {
     const value = event.target.value as string[];
@@ -52,7 +54,11 @@ export default function OptionSelector({
               return (
                 <Chip
                   key={selected_id}
-                  label={option ? text(lang, option.label.en, option.label.nl) : selected_id}
+                  label={
+                    option
+                      ? text(lang, option.label.en, option.label.nl)
+                      : selected_id
+                  }
                   className="uppercase font-semibold"
                   size="small"
                 />

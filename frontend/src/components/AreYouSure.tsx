@@ -10,14 +10,24 @@ interface AreYouSureProps {
   onCancel: () => void;
 }
 
-export default function AreYouSure({ open, title, message, onConfirm, onCancel }: AreYouSureProps) {
+export default function AreYouSure({
+  open,
+  title,
+  message,
+  onConfirm,
+  onCancel,
+}: AreYouSureProps) {
   const { language: lang } = useLanguage();
 
   if (!title) {
     title = text(lang, 'Are you sure?', 'Weet je het zeker?');
   }
   if (!message) {
-    message = text(lang, 'Do you really want to proceed?', 'Wil je echt doorgaan?');
+    message = text(
+      lang,
+      'Do you really want to proceed?',
+      'Wil je echt doorgaan?',
+    );
   }
 
   return (

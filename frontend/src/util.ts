@@ -1,8 +1,16 @@
 import { Language, eventOptions, LanguageEnum } from './types.ts';
 
-export function text(lang: LanguageEnum, english: string, dutch: string): string;
+export function text(
+  lang: LanguageEnum,
+  english: string,
+  dutch: string,
+): string;
 export function text(lang: LanguageEnum, languageType: Language): string;
-export function text(lang: LanguageEnum, arg1: string | Language, arg2?: string): string {
+export function text(
+  lang: LanguageEnum,
+  arg1: string | Language,
+  arg2?: string,
+): string {
   if (typeof arg1 === 'string' && typeof arg2 === 'string') {
     return lang === 'en' ? arg1 : arg2;
   } else if (typeof arg1 === 'object' && arg1 !== null) {

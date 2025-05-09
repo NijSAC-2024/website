@@ -11,7 +11,7 @@ import {
   Image as ImageIcon,
   Link as LinkIcon,
   StrikethroughS as StrikethroughIcon,
-  Title as TitleIcon
+  Title as TitleIcon,
 } from '@mui/icons-material';
 import { text } from '../../util.ts';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
@@ -20,7 +20,9 @@ interface MarkdownEditorToolbarProps {
   insertMarkdown: (syntax: string) => void;
 }
 
-export default function MarkdownEditorToolbar({ insertMarkdown }: MarkdownEditorToolbarProps) {
+export default function MarkdownEditorToolbar({
+  insertMarkdown,
+}: MarkdownEditorToolbarProps) {
   const { language: lang } = useLanguage();
   return (
     <div className="flex items-center space-x-2">

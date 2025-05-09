@@ -33,9 +33,13 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
     const startMonth = start.getMonth();
     const endMonth = end.getMonth();
 
-    if (start === end) return moment(start).utc().format('DD MMM HH:mm');
+    if (start === end) {return moment(start).utc().format('DD MMM HH:mm');}
     else if (startDay === endDay) {
-      return moment(start).utc().format('DD MMM HH:mm') + ' - ' + moment(end).utc().format('HH:mm');
+      return (
+        moment(start).utc().format('DD MMM HH:mm') +
+        ' - ' +
+        moment(end).utc().format('HH:mm')
+      );
     } else if (!agendaPage) {
       return (
         moment(start).utc().format('DD MMM HH:mm') +
@@ -44,25 +48,32 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
       );
     } else {
       if (startMonth === endMonth) {
-        return moment(start).format('DD') + ' - ' + moment(end).format('DD MMM');
+        return (
+          moment(start).format('DD') + ' - ' + moment(end).format('DD MMM')
+        );
       } else {
-        return moment(start).format('DD MMM') + ' - ' + moment(end).format('DD MMM');
+        return (
+          moment(start).format('DD MMM') + ' - ' + moment(end).format('DD MMM')
+        );
       }
     }
   };
 
   const truncateMarkdown = (markdown: string, maxLength: number): string => {
-    if (markdown.length <= maxLength) return markdown;
+    if (markdown.length <= maxLength) {return markdown;}
 
     let truncated = markdown.slice(0, maxLength);
-    const lastCut = Math.max(truncated.lastIndexOf(' '), truncated.lastIndexOf('\n'));
+    const lastCut = Math.max(
+      truncated.lastIndexOf(' '),
+      truncated.lastIndexOf('\n'),
+    );
     truncated = lastCut > -1 ? truncated.slice(0, lastCut) : truncated;
 
     const unmatchedTags = (truncated.match(/(\*\*|\*|_|`)/g) || []).length % 2;
     if (unmatchedTags) {
       truncated = truncated.slice(
         0,
-        truncated.lastIndexOf((truncated.match(/(\*\*|\*|_|`)/g) || []).pop()!)
+        truncated.lastIndexOf((truncated.match(/(\*\*|\*|_|`)/g) || []).pop()!),
       );
     }
     return truncated.trim() + '…';
@@ -87,7 +98,11 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
             color="primary"
           />
         )}
-        <img className="w-full aspect-[4/2] object-cover" src={event.image} alt="not available" />
+        <img
+          className="w-full aspect-[4/2] object-cover"
+          src={event.image}
+          alt="not available"
+        />
         <div className="p-5 grid space-y-1">
           <div className="flex justify-between">
             <div className="flex flex-wrap gap-1">
@@ -116,13 +131,16 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
               {text(
                 lang,
                 truncateMarkdown(event.description?.en, 120),
-                truncateMarkdown(event.description?.nl, 120)
+                truncateMarkdown(event.description?.nl, 120),
               )}
             </Markdown>
           ) : (
             event.dates.length > 1 && (
               <>
-                <b>{text(lang, getLabel(event.eventType)) + text(lang, ' dates:', ' datums:')}</b>
+                <b>
+                  {text(lang, getLabel(event.eventType)) +
+                    text(lang, ' dates:', ' datums:')}
+                </b>
                 {event.dates.map((date) => (
                   <p>{formatDate(date)}</p>
                 ))}

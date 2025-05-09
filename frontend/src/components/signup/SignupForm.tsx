@@ -3,7 +3,11 @@ import { Button, Checkbox, FormControlLabel } from '@mui/material';
 import ValidatedPassword from '../ValidatedPassword.tsx';
 import { enqueueSnackbar } from 'notistack';
 import ValidatedTextField from '../ValidatedTextField.tsx';
-import { emailValidator, nameValidator, passwordValidator } from '../../validator.ts';
+import {
+  emailValidator,
+  nameValidator,
+  passwordValidator,
+} from '../../validator.ts';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
@@ -11,7 +15,13 @@ import { text } from '../../util.ts';
 import { apiFetch } from '../../api.ts';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 
-const steps = ['Personal', 'Education', 'Financial', 'Emergency contact', 'Overview'];
+const steps = [
+  'Personal',
+  'Education',
+  'Financial',
+  'Emergency contact',
+  'Overview',
+];
 
 export default function SignupForm() {
   const { language: lang } = useLanguage();
@@ -25,7 +35,7 @@ export default function SignupForm() {
     email: false,
     firstName: false,
     lastName: false,
-    password: false
+    password: false,
   });
 
   const handleNext = () => {
@@ -39,7 +49,7 @@ export default function SignupForm() {
   const handleSubmit = async () => {
     if (Object.values(formValid.current).some((isValid) => !isValid)) {
       enqueueSnackbar('Please fill in all fields correctly.', {
-        variant: 'error'
+        variant: 'error',
       });
       return;
     }
@@ -47,26 +57,26 @@ export default function SignupForm() {
     const { error } = await apiFetch<void>('/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, firstName, lastName, password })
+      body: JSON.stringify({ email, firstName, lastName, password }),
     });
 
     if (error) {
       switch (error.message) {
-        case 'Conflict':
-          enqueueSnackbar('Email is already in use.', {
-            variant: 'error'
-          });
-          break;
-        default:
-          enqueueSnackbar(`${error.message}: ${error.reference}`, {
-            variant: 'error'
-          });
+      case 'Conflict':
+        enqueueSnackbar('Email is already in use.', {
+          variant: 'error',
+        });
+        break;
+      default:
+        enqueueSnackbar(`${error.message}: ${error.reference}`, {
+          variant: 'error',
+        });
       }
       return;
     }
 
     enqueueSnackbar(`Created account: ${firstName} ${lastName}`, {
-      variant: 'success'
+      variant: 'success',
     });
     await router.navigate();
   };
@@ -116,11 +126,15 @@ export default function SignupForm() {
           label={text(
             lang,
             'I give permission to the NijSAC to save and process all personal data I enter on the site.',
-            'Ik geef toestemming aan de NijSAC om alle persoonlijke informatie die ik invoer op de site op te slaan en te verwerken.'
+            'Ik geef toestemming aan de NijSAC om alle persoonlijke informatie die ik invoer op de site op te slaan en te verwerken.',
           )}
         />
         <div className="flex justify-between">
-          <Button color="inherit" disabled={activeStep === 0} onClick={handleBack}>
+          <Button
+            color="inherit"
+            disabled={activeStep === 0}
+            onClick={handleBack}
+          >
             Back
           </Button>
           {activeStep === steps.length - 1 ? (

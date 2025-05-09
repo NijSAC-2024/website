@@ -8,7 +8,7 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Toolbar
+  Toolbar,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -30,7 +30,7 @@ interface MobileMenuProps {
 export default function MobileMenu({
   handleLoginOpen,
   dropdownOpen,
-  toggleDropdown
+  toggleDropdown,
 }: MobileMenuProps) {
   const { language: lang } = useLanguage();
   const { navigate } = useAppState();
@@ -67,7 +67,11 @@ export default function MobileMenu({
           }}
         />
         <IconButton size="large" color="inherit" onClick={toggleDropdown}>
-          {dropdownOpen ? <CloseIcon fontSize="large" /> : <MenuIcon fontSize="large" />}
+          {dropdownOpen ? (
+            <CloseIcon fontSize="large" />
+          ) : (
+            <MenuIcon fontSize="large" />
+          )}
         </IconButton>
       </Toolbar>
       <Collapse
@@ -84,14 +88,23 @@ export default function MobileMenu({
             onClick={() => router.navigate().then(toggleDropdown)}
           />
           <IconButton size="large" color="inherit" onClick={toggleDropdown}>
-            {dropdownOpen ? <CloseIcon fontSize="large" /> : <MenuIcon fontSize="large" />}
+            {dropdownOpen ? (
+              <CloseIcon fontSize="large" />
+            ) : (
+              <MenuIcon fontSize="large" />
+            )}
           </IconButton>
         </Toolbar>
         <List disablePadding>
           {/* Agenda */}
           <ListItem disablePadding>
-            <ListItemButton onClick={() => router.navigate().then(toggleDropdown)}>
-              <ListItemText primary={text(lang, 'Agenda', 'Agenda')} className="uppercase px-10" />
+            <ListItemButton
+              onClick={() => router.navigate().then(toggleDropdown)}
+            >
+              <ListItemText
+                primary={text(lang, 'Agenda', 'Agenda')}
+                className="uppercase px-10"
+              />
             </ListItemButton>
           </ListItem>
 
@@ -109,7 +122,11 @@ export default function MobileMenu({
               </ListItemIcon>
             </ListItemButton>
           </ListItem>
-          <Collapse in={openMenu === 'association'} timeout="auto" unmountOnExit>
+          <Collapse
+            in={openMenu === 'association'}
+            timeout="auto"
+            unmountOnExit
+          >
             <List disablePadding>
               <ListItem disablePadding>
                 <ListItemButton>
@@ -206,7 +223,9 @@ export default function MobileMenu({
                 </ListItemButton>
               </ListItem>
               <ListItem disablePadding>
-                <ListItemButton onClick={() => navigateSubmenu('/material-rental')}>
+                <ListItemButton
+                  onClick={() => navigateSubmenu('/material-rental')}
+                >
                   <ListItemText
                     primary={
                       <p className="text-[#1976d2] dark:text-[#90caf9] px-14 text-sm">
@@ -222,8 +241,13 @@ export default function MobileMenu({
           {/* Alps */}
           <ListItem onClick={() => toggleMenu('alps')} disablePadding>
             <ListItemButton>
-              <ListItemText primary={text(lang, 'Alps', 'Alpen')} className="uppercase px-10" />
-              <ListItemIcon>{openMenu === 'alps' ? <ExpandLess /> : <ExpandMore />}</ListItemIcon>
+              <ListItemText
+                primary={text(lang, 'Alps', 'Alpen')}
+                className="uppercase px-10"
+              />
+              <ListItemIcon>
+                {openMenu === 'alps' ? <ExpandLess /> : <ExpandMore />}
+              </ListItemIcon>
             </ListItemButton>
           </ListItem>
           <Collapse in={openMenu === 'alps'} timeout="auto" unmountOnExit>
@@ -323,7 +347,10 @@ export default function MobileMenu({
           {/* Language */}
           <ListItem onClick={() => toggleMenu('language')} disablePadding>
             <ListItemButton>
-              <ListItemText primary={text(lang, 'Language', 'Taal')} className="uppercase px-10" />
+              <ListItemText
+                primary={text(lang, 'Language', 'Taal')}
+                className="uppercase px-10"
+              />
               <ListItemIcon>
                 {openMenu === 'language' ? <ExpandLess /> : <ExpandMore />}
               </ListItemIcon>
@@ -335,7 +362,9 @@ export default function MobileMenu({
                 <ListItemButton onClick={setEnglish}>
                   <ListItemText
                     primary={
-                      <p className="text-[#1976d2] dark:text-[#90caf9] px-14 text-sm">English</p>
+                      <p className="text-[#1976d2] dark:text-[#90caf9] px-14 text-sm">
+                        English
+                      </p>
                     }
                   />
                 </ListItemButton>
@@ -344,7 +373,9 @@ export default function MobileMenu({
                 <ListItemButton onClick={setDutch}>
                   <ListItemText
                     primary={
-                      <p className="text-[#1976d2] dark:text-[#90caf9] px-14 text-sm">Nederlands</p>
+                      <p className="text-[#1976d2] dark:text-[#90caf9] px-14 text-sm">
+                        Nederlands
+                      </p>
                     }
                   />
                 </ListItemButton>
@@ -365,7 +396,10 @@ export default function MobileMenu({
                 </ListItemButton>
               </ListItem>
               <ListItem className="px-10 pb-3 pt-2" disablePadding>
-                <Button variant="contained" onClick={() => router.navigate().then(toggleDropdown)}>
+                <Button
+                  variant="contained"
+                  onClick={() => router.navigate().then(toggleDropdown)}
+                >
                   {text(lang, 'Become a member', 'Lid worden')}
                 </Button>
               </ListItem>

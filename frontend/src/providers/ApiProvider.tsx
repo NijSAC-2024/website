@@ -1,4 +1,10 @@
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import { Event, EventContent, Registration, Location } from '../types.ts';
 import { useAppState } from './AppStateProvider.tsx';
 import { apiFetch } from '../api.ts';
@@ -28,42 +34,47 @@ export default function ApiProvider({ children }: ApiProviderProps) {
   const [cache, setCache] = useState<boolean>(false);
   const [events, setEvents] = useState<Array<Event>>([]);
   const [event, setEvent] = useState<Event | undefined>(undefined);
-  const [locations, setLocations] = useState<Array<Location> | undefined>(undefined);
+  const [locations, setLocations] = useState<Array<Location> | undefined>(
+    undefined,
+  );
   const [registrations, setRegistrations] = useState<Array<Registration>>([]);
 
   const updateEvent = async (id: string, event: EventContent) => {
-    const { error, data: updatedEvent } = await apiFetch<Event>(`/event/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(event)
-    });
+    const { error, data: updatedEvent } = await apiFetch<Event>(
+      `/event/${id}`,
+      {
+        method: 'PUT',
+        body: JSON.stringify(event),
+      },
+    );
     if (error) {
       enqueueSnackbar(`${error.message}: ${error.reference}`, {
-        variant: 'error'
+        variant: 'error',
       });
       return;
     }
     setEvent(updatedEvent);
     setCache(!cache);
     enqueueSnackbar('saved', {
-      variant: 'success'
+      variant: 'success',
     });
   };
 
   const createEvent = async (event: EventContent) => {
     const { error, data: updatedEvent } = await apiFetch<Event>('/event', {
       method: 'POST',
-      body: JSON.stringify(event)
+      body: JSON.stringify(event),
     });
     if (error) {
       enqueueSnackbar(`${error.message}: ${error.reference}`, {
-        variant: 'error'
+        variant: 'error',
       });
       return;
     }
     setEvent(updatedEvent);
     setCache(!cache);
     enqueueSnackbar('saved', {
-      variant: 'success'
+      variant: 'success',
     });
   };
 
@@ -72,7 +83,7 @@ export default function ApiProvider({ children }: ApiProviderProps) {
       apiFetch<Array<Event>>('/event').then(({ error, data: events }) => {
         if (error) {
           enqueueSnackbar(`${error.message}: ${error.reference}`, {
-            variant: 'error'
+            variant: 'error',
           });
         }
         if (events) {
@@ -84,44 +95,48 @@ export default function ApiProvider({ children }: ApiProviderProps) {
 
   useEffect(() => {
     if (route.name === 'event' || route.name == 'new_event') {
-      apiFetch<Array<Location>>('/location').then(({ error, data: locations }) => {
-        if (error) {
-          enqueueSnackbar(`${error.message}: ${error.reference}`, {
-            variant: 'error'
-          });
-        }
-        if (locations) {
-          setLocations(locations);
-        }
-      });
+      apiFetch<Array<Location>>('/location').then(
+        ({ error, data: locations }) => {
+          if (error) {
+            enqueueSnackbar(`${error.message}: ${error.reference}`, {
+              variant: 'error',
+            });
+          }
+          if (locations) {
+            setLocations(locations);
+          }
+        },
+      );
     }
   }, [cache, route.name]);
 
   useEffect(() => {
     if (route.name === 'event') {
-      apiFetch<Event>(`/event/${route.params!.id}`).then(({ error, data: event }) => {
-        if (error) {
-          enqueueSnackbar(`${error.message}: ${error.reference}`, {
-            variant: 'error'
-          });
-        }
-        if (event) {
-          setEvent(event);
-        }
-      });
-      if (isLoggedIn) {
-        apiFetch<Array<Registration>>(`/event/${route.params!.id}/registration`).then(
-          ({ error, data: registrations }) => {
-            if (error) {
-              enqueueSnackbar(`${error.message}: ${error.reference}`, {
-                variant: 'error'
-              });
-            }
-            if (registrations) {
-              setRegistrations(registrations);
-            }
+      apiFetch<Event>(`/event/${route.params!.id}`).then(
+        ({ error, data: event }) => {
+          if (error) {
+            enqueueSnackbar(`${error.message}: ${error.reference}`, {
+              variant: 'error',
+            });
           }
-        );
+          if (event) {
+            setEvent(event);
+          }
+        },
+      );
+      if (isLoggedIn) {
+        apiFetch<Array<Registration>>(
+          `/event/${route.params!.id}/registration`,
+        ).then(({ error, data: registrations }) => {
+          if (error) {
+            enqueueSnackbar(`${error.message}: ${error.reference}`, {
+              variant: 'error',
+            });
+          }
+          if (registrations) {
+            setRegistrations(registrations);
+          }
+        });
       }
     }
   }, [cache, route.name, route.params, isLoggedIn]);
@@ -134,7 +149,7 @@ export default function ApiProvider({ children }: ApiProviderProps) {
         locations,
         registrations,
         updateEvent,
-        createEvent
+        createEvent,
       }}
     >
       {children}

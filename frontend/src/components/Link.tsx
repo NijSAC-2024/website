@@ -21,7 +21,9 @@ export default function Link({
   const currentParams = currentRoute.params;
 
   const targetRouteName = routeName || currentRoute.name;
-  const targetParams = keepParams ? { ...currentParams, ...(params || {}) } : params || {};
+  const targetParams = keepParams
+    ? { ...currentParams, ...(params || {}) }
+    : params || {};
   const route = matchName(targetRouteName);
   const active = currentRoute.name === targetRouteName;
   const fullClassName = `${className || ''} ${active ? 'active' : ''}`.trim();
@@ -33,7 +35,12 @@ export default function Link({
     navigate(targetRouteName, targetParams);
   };
   return (
-    <a {...props} href={route?.path || '/not-found'} className={fullClassName} onClick={click}>
+    <a
+      {...props}
+      href={route?.path || '/not-found'}
+      className={fullClassName}
+      onClick={click}
+    >
       {props.children}
     </a>
   );

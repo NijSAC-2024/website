@@ -46,11 +46,11 @@ export default function AuthProvider({ children }: AuthProviderProps) {
       setIsLoggedIn(false);
       setUser(undefined);
       enqueueSnackbar('You logged out.', {
-        variant: 'success'
+        variant: 'success',
       });
     } else {
       enqueueSnackbar(`${error.message}: ${error.reference}`, {
-        variant: 'error'
+        variant: 'error',
       });
     }
   };
@@ -59,19 +59,19 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     const { error } = await apiFetchVoid('/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ email, password }),
     });
     if (error) {
       switch (error.message) {
-        case 'Unauthorized':
-          enqueueSnackbar('Incorrect email or password.', {
-            variant: 'error'
-          });
-          break;
-        default:
-          enqueueSnackbar(`${error.message}: ${error.reference}`, {
-            variant: 'error'
-          });
+      case 'Unauthorized':
+        enqueueSnackbar('Incorrect email or password.', {
+          variant: 'error',
+        });
+        break;
+      default:
+        enqueueSnackbar(`${error.message}: ${error.reference}`, {
+          variant: 'error',
+        });
       }
     } else {
       await checkAuth();
@@ -89,7 +89,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
         login,
         logout,
         authOpen,
-        toggleAuthOpen
+        toggleAuthOpen,
       }}
     >
       {children}

@@ -7,12 +7,12 @@ export default defineConfig({
     proxy: {
       '/api': {
         target: process?.env?.REMOTE_API ?? 'http://localhost:3000',
-        changeOrigin: true
-      }
+        changeOrigin: true,
+      },
     },
     watch: {
-      usePolling: true
-    }
+      usePolling: true,
+    },
   },
-  plugins: [react(), tailwindcss()]
+  plugins: [react(), tailwindcss()],
 });

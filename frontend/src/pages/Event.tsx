@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import GenericPage from './GenericPage.tsx';
 import EventCard from '../components/event/EventCard.tsx';
 import EditIcon from '@mui/icons-material/Edit';
@@ -33,7 +33,11 @@ export default function Event() {
           ) : (
             <>
               <div className="fixed bottom-5 right-5 z-10">
-                <Fab variant="extended" color="primary" onClick={toggleIsEditing}>
+                <Fab
+                  variant="extended"
+                  color="primary"
+                  onClick={toggleIsEditing}
+                >
                   <EditIcon className="mr-2" />
                   {text(lang, 'Edit event', 'Evenement bewerken')}
                 </Fab>
@@ -42,7 +46,10 @@ export default function Event() {
                 <div className="grid xl:grid-cols-3 gap-5 mt-[-9.3rem]">
                   <div className="xl:col-span-3 mb-[-0.5rem] flex justify-between items-center">
                     <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">
-                      <Button color="inherit" onClick={() => navigate('/agenda')}>
+                      <Button
+                        color="inherit"
+                        onClick={() => navigate('/agenda')}
+                      >
                         {text(lang, 'Back to Agenda', 'Terug naar Agenda')}
                       </Button>
                     </div>
@@ -62,7 +69,7 @@ export default function Event() {
                     gear={
                       event?.metadata?.gear || {
                         en: '',
-                        nl: ''
+                        nl: '',
                       }
                     }
                   />

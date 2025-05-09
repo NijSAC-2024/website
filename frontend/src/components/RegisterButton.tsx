@@ -22,7 +22,7 @@ export default function RegisterButton({
   registrationOpenTime,
   registrationCloseTime,
   questions,
-  title
+  title,
 }: RegisterButtonProps) {
   const { isLoggedIn, toggleAuthOpen } = useAuth();
   const { language: lang } = useLanguage();
@@ -45,18 +45,29 @@ export default function RegisterButton({
         </Button>
       ) : openTime > now ? (
         <div className="text-right grid">
-          <p>{text(lang, 'Registrations open at ', 'Inschrijvingen openen op ')}</p>
+          <p>
+            {text(lang, 'Registrations open at ', 'Inschrijvingen openen op ')}
+          </p>
           <p>{moment(registrationOpenTime).format('DD MMM HH:mm')}</p>
         </div>
       ) : closeTime > now ? (
-        <Button onClick={isLoggedIn ? toggleDialog : toggleAuthOpen} variant="contained">
+        <Button
+          onClick={isLoggedIn ? toggleDialog : toggleAuthOpen}
+          variant="contained"
+        >
           {isLoggedIn
             ? text(lang, 'Register', 'Inschrijven')
             : text(lang, 'Login to register', 'Login om in te schrijven')}
         </Button>
       ) : (
         <div className="text-right grid">
-          <p>{text(lang, 'Registrations closed at ', 'Inschrijvingen zijn gesloten sinds ')}</p>
+          <p>
+            {text(
+              lang,
+              'Registrations closed at ',
+              'Inschrijvingen zijn gesloten sinds ',
+            )}
+          </p>
           <p>{moment(registrationCloseTime).format('DD MMM HH:mm')}</p>
         </div>
       )}

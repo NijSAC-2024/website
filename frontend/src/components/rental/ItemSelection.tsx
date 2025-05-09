@@ -12,7 +12,7 @@ interface ItemSelectionProps {
 export default function ItemSelection({
   selectedItem,
   onItemSelect,
-  onAddItem
+  onAddItem,
 }: ItemSelectionProps) {
   const { language: lang } = useLanguage();
 
@@ -32,7 +32,10 @@ export default function ItemSelection({
             );
           }}
           renderInput={(params) => (
-            <TextField {...params} placeholder={text(lang, 'Select Item', 'Selecteer Artikel')} />
+            <TextField
+              {...params}
+              placeholder={text(lang, 'Select Item', 'Selecteer Artikel')}
+            />
           )}
           onChange={(_event, newValue) => onItemSelect(newValue)}
         />
@@ -50,12 +53,20 @@ export default function ItemSelection({
             );
           }}
           renderInput={(params) => (
-            <TextField {...params} placeholder={text(lang, 'Select Item', 'Selecteer Artikel')} />
+            <TextField
+              {...params}
+              placeholder={text(lang, 'Select Item', 'Selecteer Artikel')}
+            />
           )}
           onChange={(_event, newValue) => onItemSelect(newValue)}
         />
       )}
-      <Button variant="contained" onClick={onAddItem} disabled={!selectedItem} fullWidth>
+      <Button
+        variant="contained"
+        onClick={onAddItem}
+        disabled={!selectedItem}
+        fullWidth
+      >
         {text(lang, 'Add to request', 'Toevoegen aan aanvraag')}
       </Button>
     </>

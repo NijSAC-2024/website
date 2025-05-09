@@ -16,18 +16,19 @@ interface MarkdownEditorProps {
 
 export default function MarkdownEditor({
   initialMarkdown = { en: '', nl: '' },
-  handleMarkdown
+  handleMarkdown,
 }: MarkdownEditorProps) {
   const { language: lang } = useLanguage();
   const [value, setValue] = useState('1');
-  const [markdownContent, setMarkdownContent] = useState<Language>(initialMarkdown);
+  const [markdownContent, setMarkdownContent] =
+    useState<Language>(initialMarkdown);
 
   const textareaRef = useRef<{
     en: HTMLTextAreaElement | null;
     nl: HTMLTextAreaElement | null;
   }>({
     en: null,
-    nl: null
+    nl: null,
   });
 
   const handleChange = (_event: SyntheticEvent, newValue: string) => {
@@ -36,11 +37,11 @@ export default function MarkdownEditor({
 
   const handleInputChange = (
     event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
-    langCode: 'en' | 'nl'
+    langCode: 'en' | 'nl',
   ) => {
     const updatedMarkdown = {
       ...markdownContent,
-      [langCode]: event.target.value
+      [langCode]: event.target.value,
     };
     setMarkdownContent(updatedMarkdown);
     handleMarkdown(updatedMarkdown);
@@ -50,7 +51,7 @@ export default function MarkdownEditor({
     const textarea = textareaRef.current[langCode];
     const currentContent = markdownContent[langCode];
 
-    if (!textarea) return;
+    if (!textarea) {return;}
 
     const selectionStart = textarea.selectionStart;
     const selectionEnd = textarea.selectionEnd;
@@ -58,7 +59,9 @@ export default function MarkdownEditor({
     const selectedText = currentContent.slice(selectionStart, selectionEnd);
 
     const isInlineSyntax = ['**', '~~', '`', '_'].includes(syntax);
-    const isBlockSyntax = ['### ', '> ', '- ', '1. ', '- [ ] '].includes(syntax);
+    const isBlockSyntax = ['### ', '> ', '- ', '1. ', '- [ ] '].includes(
+      syntax,
+    );
     const isSpecialSyntax = ['[](url)', '![](url)'].includes(syntax);
 
     let newContent = currentContent;
@@ -96,7 +99,7 @@ export default function MarkdownEditor({
 
     const updatedMarkdown = {
       ...markdownContent,
-      [langCode]: newContent
+      [langCode]: newContent,
     };
     setMarkdownContent(updatedMarkdown);
     handleMarkdown(updatedMarkdown);
@@ -116,7 +119,9 @@ export default function MarkdownEditor({
           <Tab label={text(lang, 'Combined', 'Gecombineerd')} value="3" />
         </TabList>
         <TabPanel value="1">
-          <MarkdownEditorToolbar insertMarkdown={(syntax) => insertMarkdown(syntax, 'en')} />
+          <MarkdownEditorToolbar
+            insertMarkdown={(syntax) => insertMarkdown(syntax, 'en')}
+          />
           <div className="grid mb-4">
             <TextField
               multiline
@@ -125,10 +130,16 @@ export default function MarkdownEditor({
               onChange={(e) => handleInputChange(e, 'en')}
               inputRef={(el) => (textareaRef.current.en = el)}
               className="flex-1 p-2 border rounded resize-none font-mono"
-              placeholder={text(lang, 'Insert English here', 'Type hier Engels')}
+              placeholder={text(
+                lang,
+                'Insert English here',
+                'Type hier Engels',
+              )}
             />
           </div>
-          <MarkdownEditorToolbar insertMarkdown={(syntax) => insertMarkdown(syntax, 'nl')} />
+          <MarkdownEditorToolbar
+            insertMarkdown={(syntax) => insertMarkdown(syntax, 'nl')}
+          />
           <div className="grid">
             <TextField
               multiline
@@ -137,18 +148,28 @@ export default function MarkdownEditor({
               onChange={(e) => handleInputChange(e, 'nl')}
               inputRef={(el) => (textareaRef.current.nl = el)}
               className="flex-1 p-2 border rounded resize-none font-mono"
-              placeholder={text(lang, 'Insert Dutch here', 'Type hier Nederlands')}
+              placeholder={text(
+                lang,
+                'Insert Dutch here',
+                'Type hier Nederlands',
+              )}
             />
           </div>
         </TabPanel>
         <TabPanel value="2">
           <div className="grid gap-5">
-            <Markdown remarkPlugins={[remarkGfm]}>{markdownContent.en}</Markdown>
-            <Markdown remarkPlugins={[remarkGfm]}>{markdownContent.nl}</Markdown>
+            <Markdown remarkPlugins={[remarkGfm]}>
+              {markdownContent.en}
+            </Markdown>
+            <Markdown remarkPlugins={[remarkGfm]}>
+              {markdownContent.nl}
+            </Markdown>
           </div>
         </TabPanel>
         <TabPanel value="3">
-          <MarkdownEditorToolbar insertMarkdown={(syntax) => insertMarkdown(syntax, 'en')} />
+          <MarkdownEditorToolbar
+            insertMarkdown={(syntax) => insertMarkdown(syntax, 'en')}
+          />
           <div className="grid grid-cols-2 gap-2 mb-4">
             <TextField
               multiline
@@ -157,13 +178,21 @@ export default function MarkdownEditor({
               onChange={(e) => handleInputChange(e, 'en')}
               inputRef={(el) => (textareaRef.current.en = el)}
               className="flex-1 p-2 border rounded resize-none font-mono"
-              placeholder={text(lang, 'Insert English here', 'Type hier Engels')}
+              placeholder={text(
+                lang,
+                'Insert English here',
+                'Type hier Engels',
+              )}
             />
             <TextCard className="p-4">
-              <Markdown remarkPlugins={[remarkGfm]}>{markdownContent.en}</Markdown>
+              <Markdown remarkPlugins={[remarkGfm]}>
+                {markdownContent.en}
+              </Markdown>
             </TextCard>
           </div>
-          <MarkdownEditorToolbar insertMarkdown={(syntax) => insertMarkdown(syntax, 'nl')} />
+          <MarkdownEditorToolbar
+            insertMarkdown={(syntax) => insertMarkdown(syntax, 'nl')}
+          />
           <div className="grid grid-cols-2 gap-2">
             <TextField
               multiline
@@ -172,10 +201,16 @@ export default function MarkdownEditor({
               onChange={(e) => handleInputChange(e, 'nl')}
               inputRef={(el) => (textareaRef.current.nl = el)}
               className="flex-1 p-2 border rounded resize-none font-mono"
-              placeholder={text(lang, 'Insert Dutch here', 'Type hier Nederlands')}
+              placeholder={text(
+                lang,
+                'Insert Dutch here',
+                'Type hier Nederlands',
+              )}
             />
             <TextCard className="p-4">
-              <Markdown remarkPlugins={[remarkGfm]}>{markdownContent.nl}</Markdown>
+              <Markdown remarkPlugins={[remarkGfm]}>
+                {markdownContent.nl}
+              </Markdown>
             </TextCard>
           </div>
         </TabPanel>

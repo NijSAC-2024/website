@@ -14,7 +14,7 @@ interface DescriptionCardProps {
 export default function DescriptionCard({
   descriptionMarkdown,
   gear,
-  experience
+  experience,
 }: DescriptionCardProps) {
   const { language: lang } = useLanguage();
   return (
@@ -33,27 +33,27 @@ export default function DescriptionCard({
             <div className="flex flex-wrap gap-1 mt-1">
               {lang === 'en'
                 ? gear.en
-                    .split(',')
-                    .map((item) => item.trim())
-                    .map((gear, index) => (
-                      <Chip
-                        key={index}
-                        label={gear}
-                        className="uppercase font-semibold"
-                        size="small"
-                      />
-                    ))
+                  .split(',')
+                  .map((item) => item.trim())
+                  .map((gear, index) => (
+                    <Chip
+                      key={index}
+                      label={gear}
+                      className="uppercase font-semibold"
+                      size="small"
+                    />
+                  ))
                 : gear.nl
-                    .split(',')
-                    .map((item) => item.trim())
-                    .map((gear, index) => (
-                      <Chip
-                        key={index}
-                        label={gear}
-                        className="uppercase font-semibold"
-                        size="small"
-                      />
-                    ))}
+                  .split(',')
+                  .map((item) => item.trim())
+                  .map((gear, index) => (
+                    <Chip
+                      key={index}
+                      label={gear}
+                      className="uppercase font-semibold"
+                      size="small"
+                    />
+                  ))}
             </div>
           </div>
         )}

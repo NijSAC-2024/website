@@ -49,7 +49,11 @@ export default function LoginForm({ onClose }: LoginFormProps) {
       return;
     }
     const data = new FormData(event.currentTarget);
-    login(data.get('email')?.toString() || '', data.get('password')?.toString() || '', onClose);
+    login(
+      data.get('email')?.toString() || '',
+      data.get('password')?.toString() || '',
+      onClose,
+    );
   };
 
   return (
@@ -72,7 +76,9 @@ export default function LoginForm({ onClose }: LoginFormProps) {
           />
         </FormControl>
         <FormControl>
-          <FormLabel htmlFor="password">{text(lang, 'Password', 'Wachtwoord')}</FormLabel>
+          <FormLabel htmlFor="password">
+            {text(lang, 'Password', 'Wachtwoord')}
+          </FormLabel>
           <TextField
             required
             fullWidth

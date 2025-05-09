@@ -14,11 +14,13 @@ interface LanguageProviderProps {
   children: ReactNode;
 }
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+const LanguageContext = createContext<LanguageContextType | undefined>(
+  undefined,
+);
 
 export default function LanguageProvider({ children }: LanguageProviderProps) {
   const [language, setLanguage] = useState<LanguageEnum>(
-    navigator.language.slice(0, 2) === 'nl' ? 'nl' : 'en'
+    navigator.language.slice(0, 2) === 'nl' ? 'nl' : 'en',
   );
 
   const setEnglish = () => {
@@ -45,8 +47,13 @@ export default function LanguageProvider({ children }: LanguageProviderProps) {
   // );
 
   return (
-    <LanguageContext.Provider value={{ language, setDutch, setEnglish, toggleLanguage }}>
-      <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={language}>
+    <LanguageContext.Provider
+      value={{ language, setDutch, setEnglish, toggleLanguage }}
+    >
+      <LocalizationProvider
+        dateAdapter={AdapterMoment}
+        adapterLocale={language}
+      >
         {children}
       </LocalizationProvider>
     </LanguageContext.Provider>

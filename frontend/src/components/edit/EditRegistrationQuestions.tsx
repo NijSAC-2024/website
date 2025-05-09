@@ -11,7 +11,7 @@ interface EditRegistrationQuestionProps {
   handleRegistrationQuestionChange: (
     id: string,
     name: keyof Question,
-    value: Language | boolean
+    value: Language | boolean,
   ) => void;
   handleAddRegistrationQuestion: () => void;
   handleRemoveRegistrationQuestion: (id: string) => void;
@@ -21,7 +21,7 @@ export default function EditRegistrationQuestions({
   registrationQuestions,
   handleRegistrationQuestionChange,
   handleAddRegistrationQuestion,
-  handleRemoveRegistrationQuestion
+  handleRemoveRegistrationQuestion,
 }: EditRegistrationQuestionProps) {
   const { language: lang } = useLanguage();
 
@@ -42,7 +42,7 @@ export default function EditRegistrationQuestions({
                   onChange={(e) =>
                     handleRegistrationQuestionChange(question.id, 'question', {
                       en: e.target.value,
-                      nl: question.question.nl
+                      nl: question.question.nl,
                     })
                   }
                   fullWidth
@@ -54,7 +54,7 @@ export default function EditRegistrationQuestions({
                   onChange={(e) =>
                     handleRegistrationQuestionChange(question.id, 'question', {
                       en: question.question.en,
-                      nl: e.target.value
+                      nl: e.target.value,
                     })
                   }
                   fullWidth
@@ -65,15 +65,23 @@ export default function EditRegistrationQuestions({
                   <Checkbox
                     checked={question.required}
                     onChange={() =>
-                      handleRegistrationQuestionChange(question.id, 'required', !question.required)
+                      handleRegistrationQuestionChange(
+                        question.id,
+                        'required',
+                        !question.required,
+                      )
                     }
                   />
                 </Tooltip>
-                <Tooltip title={text(lang, 'Delete Question', 'Verwijder Vraag')}>
+                <Tooltip
+                  title={text(lang, 'Delete Question', 'Verwijder Vraag')}
+                >
                   <Fab
                     size="small"
                     color="error"
-                    onClick={() => handleRemoveRegistrationQuestion(question.id)}
+                    onClick={() =>
+                      handleRemoveRegistrationQuestion(question.id)
+                    }
                   >
                     <DeleteIcon />
                   </Fab>
@@ -85,7 +93,11 @@ export default function EditRegistrationQuestions({
       )}
       <div className="flex justify-center">
         <Tooltip title={text(lang, 'Add Question', 'Voeg Vraag Toe')}>
-          <Fab size="small" color="primary" onClick={() => handleAddRegistrationQuestion()}>
+          <Fab
+            size="small"
+            color="primary"
+            onClick={() => handleAddRegistrationQuestion()}
+          >
             <AddIcon />
           </Fab>
         </Tooltip>

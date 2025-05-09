@@ -1,10 +1,11 @@
-import { createContext, useContext, useEffect, useMemo, ReactNode, useState } from 'react';
+import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
 import { useCookies } from 'react-cookie';
 
 interface ThemeContextType {
   isDarkMode: boolean;
   toggleTheme: () => void;
 }
+
 interface ThemeProviderProps {
   children: ReactNode;
 }
@@ -49,7 +50,9 @@ export default function ThemeProvider({ children }: ThemeProviderProps) {
     [isDarkMode]
   );
 
-  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+  return (
+    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
+  );
 }
 
 export const useThemeMode = (): ThemeContextType => {

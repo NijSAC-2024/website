@@ -1,6 +1,20 @@
-import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
+import {
+  Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+} from '@mui/material';
 import { text } from '../../util.ts';
-import { Event, EventType, DateType, Language, Metadata, typesOptions } from '../../types.ts';
+import {
+  Event,
+  EventType,
+  DateType,
+  Language,
+  Metadata,
+  typesOptions,
+} from '../../types.ts';
 import OptionSelector from '../OptionSelector.tsx';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import { ChangeEvent } from 'react';
@@ -15,7 +29,10 @@ interface EditAgendaCardProps {
   name: Language;
   dates: DateType[];
   location: string;
-  handleFieldChange: (name: keyof Event, value: Metadata | EventType | Language | string) => void;
+  handleFieldChange: (
+    name: keyof Event,
+    value: Metadata | EventType | Language | string,
+  ) => void;
   handleDateChange: (index: number, startDate: boolean, value: string) => void;
   handleAddDate: () => void;
   handleRemoveDate: (index: number) => void;
@@ -31,7 +48,7 @@ export default function EditAgendaCard({
   handleFieldChange,
   handleDateChange,
   handleAddDate,
-  handleRemoveDate
+  handleRemoveDate,
 }: EditAgendaCardProps) {
   const { language: lang } = useLanguage();
   const { locations } = useApiState();
@@ -51,7 +68,11 @@ export default function EditAgendaCard({
   return (
     <div className="w-full rounded-2xl bg-inherit border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] flex flex-col">
       <div>
-        <img className="w-full aspect-4/2 object-cover" src={image} alt="Event" />
+        <img
+          className="w-full aspect-4/2 object-cover"
+          src={image}
+          alt="Event"
+        />
       </div>
       <div className="p-5">
         <div className="grid gap-5">
@@ -65,23 +86,40 @@ export default function EditAgendaCard({
           >
             <PhotoCameraIcon className="mr-2" />
             {text(lang, 'Upload Image', 'Afbeelding Uploaden')}
-            <input type="file" accept="image/*" hidden onChange={handleImageChange} />
+            <input
+              type="file"
+              accept="image/*"
+              hidden
+              onChange={handleImageChange}
+            />
           </Button>
           {/* Category and Type */}
           <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
             <FormControl fullWidth>
-              <InputLabel id="select-label">{text(lang, 'Category*', 'Categorie*')}</InputLabel>
+              <InputLabel id="select-label">
+                {text(lang, 'Category*', 'Categorie*')}
+              </InputLabel>
               <Select
                 labelId="select-label"
                 value={category}
                 label={text(lang, 'Category*', 'Categorie*')}
                 variant="outlined"
-                onChange={(e) => handleFieldChange('eventType', e.target.value as EventType)}
+                onChange={(e) =>
+                  handleFieldChange('eventType', e.target.value as EventType)
+                }
               >
-                <MenuItem value="activity">{text(lang, 'Activity', 'Activiteit')}</MenuItem>
-                <MenuItem value="course">{text(lang, 'Course', 'Cursus')}</MenuItem>
-                <MenuItem value="training">{text(lang, 'Training', 'Training')}</MenuItem>
-                <MenuItem value="weekend">{text(lang, 'Weekend', 'Weekend')}</MenuItem>
+                <MenuItem value="activity">
+                  {text(lang, 'Activity', 'Activiteit')}
+                </MenuItem>
+                <MenuItem value="course">
+                  {text(lang, 'Course', 'Cursus')}
+                </MenuItem>
+                <MenuItem value="training">
+                  {text(lang, 'Training', 'Training')}
+                </MenuItem>
+                <MenuItem value="weekend">
+                  {text(lang, 'Weekend', 'Weekend')}
+                </MenuItem>
               </Select>
             </FormControl>
             <OptionSelector
@@ -90,7 +128,7 @@ export default function EditAgendaCard({
               onChange={(selectedTypes) =>
                 handleFieldChange('metadata', {
                   ...metadata,
-                  type: selectedTypes
+                  type: selectedTypes,
                 } as Metadata)
               }
               label={'Type'}
@@ -104,7 +142,7 @@ export default function EditAgendaCard({
               onChange={(e) =>
                 handleFieldChange('name', {
                   ...name,
-                  en: e.target.value
+                  en: e.target.value,
                 })
               }
             />
@@ -114,19 +152,23 @@ export default function EditAgendaCard({
               onChange={(e) =>
                 handleFieldChange('name', {
                   ...name,
-                  nl: e.target.value
+                  nl: e.target.value,
                 })
               }
             />
           </div>
           {/*Location*/}
           <FormControl fullWidth>
-            <InputLabel id="select-label">{text(lang, 'Location*', 'Locatie*')}</InputLabel>
+            <InputLabel id="select-label">
+              {text(lang, 'Location*', 'Locatie*')}
+            </InputLabel>
             <Select
               labelId="select-label"
               value={location}
               label={text(lang, 'Location*', 'Locatie*')}
-              onChange={(e) => handleFieldChange('location', e.target.value as string)}
+              onChange={(e) =>
+                handleFieldChange('location', e.target.value as string)
+              }
               variant="outlined"
             >
               {locations?.map((l) => (

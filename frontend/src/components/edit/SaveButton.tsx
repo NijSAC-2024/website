@@ -70,7 +70,7 @@ export default function SaveButton({ handleSave }: SaveButtonProps) {
         message={text(
           lang,
           'You are about to delete this event.',
-          'Je staat op het punt dit evenement te verwijderen.'
+          'Je staat op het punt dit evenement te verwijderen.',
         )}
       />
       ;

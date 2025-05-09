@@ -26,39 +26,39 @@ export default function App(): React.ReactElement {
 
   const darkTheme = createTheme({
     palette: {
-      mode: isDarkMode ? 'dark' : 'light'
+      mode: isDarkMode ? 'dark' : 'light',
     },
     components: {
       MuiButton: {
         styleOverrides: {
           root: {
             borderRadius: 20,
-            padding: '0.5rem 1rem'
-          }
-        }
+            padding: '0.5rem 1rem',
+          },
+        },
       },
       MuiOutlinedInput: {
         styleOverrides: {
           root: {
             '& .MuiOutlinedInput-notchedOutline': {
-              borderRadius: 12
-            }
-          }
-        }
+              borderRadius: 12,
+            },
+          },
+        },
       },
       MuiMenu: {
         styleOverrides: {
           paper: {
-            borderRadius: 12
-          }
-        }
+            borderRadius: 12,
+          },
+        },
       },
       MuiAutocomplete: {
         styleOverrides: {
           paper: {
-            borderRadius: 12
-          }
-        }
+            borderRadius: 12,
+          },
+        },
       },
       MuiDialog: {
         styleOverrides: {
@@ -67,15 +67,19 @@ export default function App(): React.ReactElement {
               borderRadius: 16,
               padding: '0.6rem',
               background: isDarkMode ? '#121212' : 'white',
-              borderBottom: isDarkMode ? '2px solid #90caf9' : '3px solid #1976d2'
+              borderBottom: isDarkMode
+                ? '2px solid #90caf9'
+                : '3px solid #1976d2',
             },
             '& .MuiBackdrop-root': {
-              backgroundColor: isDarkMode ? 'rgb(0,0,0,0.5)' : 'rgb(255,255,255,0.5)'
-            }
-          }
-        }
-      }
-    }
+              backgroundColor: isDarkMode
+                ? 'rgb(0,0,0,0.5)'
+                : 'rgb(255,255,255,0.5)',
+            },
+          },
+        },
+      },
+    },
   });
 
   // DEBUG: on "ctrl-,", flip the theme, on "ctrl-.", flip the language
@@ -150,7 +154,7 @@ export default function App(): React.ReactElement {
           success: Success,
           error: Error,
           warning: Warning,
-          info: Info
+          info: Info,
         }}
       />
       {component}
