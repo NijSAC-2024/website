@@ -1,10 +1,10 @@
 use crate::{
+    AppState, Pagination,
     auth::role::MembershipStatus,
     data_source::Count,
     error::{AppResult, Error},
     user::BasicUser,
     wire::user::{User, UserContent, UserId},
-    AppState, Pagination,
 };
 use axum::{extract::FromRequestParts, http::request::Parts};
 use sqlx::PgPool;
@@ -395,7 +395,7 @@ impl UserStore {
 
         sqlx::query!(
             r#"
-            UPDATE activity
+            UPDATE event
             SET created_by = '00000000-0000-0000-0000-000000000000' -- deleted user
             WHERE created_by = $1
             "#,
@@ -406,7 +406,7 @@ impl UserStore {
 
         sqlx::query!(
             r#"
-            UPDATE activity_registration
+            UPDATE event_registration
             SET user_id = '00000000-0000-0000-0000-000000000000' -- deleted user
             WHERE user_id = $1
             "#,

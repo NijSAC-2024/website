@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO date (event_id, start, \"end\") VALUES ($1, unnest($2::timestamptz[]), unnest($3::timestamptz[]))\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "TimestamptzArray",
+        "TimestamptzArray"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "f92aec11c44c50c55816830257b324cd4372a05bc8c8ecb0be79b95482434ccb"
+}

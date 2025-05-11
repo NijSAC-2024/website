@@ -1,11 +1,10 @@
-import { createContext, useContext, useMemo, ReactNode, useState } from 'react';
+import { createContext, ReactNode, useContext, useState } from 'react';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers';
-// import { enqueueSnackbar } from 'notistack';
+import { Language, LanguageEnum } from '../types.ts';
 
 interface LanguageContextType {
-  language: boolean;
-  getLangCode: () => string;
+  language: LanguageEnum;
   setDutch: () => void;
   setEnglish: () => void;
   toggleLanguage: () => void;
@@ -15,53 +14,66 @@ interface LanguageProviderProps {
   children: ReactNode;
 }
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+const LanguageContext = createContext<LanguageContextType | undefined>(
+  undefined
+);
 
 export default function LanguageProvider({ children }: LanguageProviderProps) {
-  const [language, setLanguage] = useState<boolean>(navigator.language.slice(0, 2) !== 'nl');
+  const [language, setLanguage] = useState<LanguageEnum>(
+    navigator.language.slice(0, 2) === 'nl' ? 'nl' : 'en'
+  );
 
   const setEnglish = () => {
-    setLanguage(true);
-    // enqueueSnackbar('Changed language to English.', {
-    //   variant: 'info'
-    // });
+    setLanguage('en');
   };
 
   const setDutch = () => {
-    // enqueueSnackbar('Taal veranderd naar Nederlands.', {
-    //   variant: 'info'
-    // });
-    setLanguage(false);
+    setLanguage('nl');
   };
 
-  const getLangCode = () => (language ? 'en' : 'nl');
+  const toggleLanguage = () => (language === 'nl' ? setEnglish() : setDutch());
 
-  const toggleLanguage = () => (language ? setDutch() : setEnglish());
-
-  const value = useMemo(
-    () => ({
-      language,
-      getLangCode,
-      setDutch,
-      setEnglish,
-      toggleLanguage
-    }),
-    [language]
-  );
 
   return (
-    <LanguageContext.Provider value={value}>
-      <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={getLangCode()}>
+    <LanguageContext.Provider
+      value={{ language, setDutch, setEnglish, toggleLanguage }}
+    >
+      <LocalizationProvider
+        dateAdapter={AdapterMoment}
+        adapterLocale={language}
+      >
         {children}
       </LocalizationProvider>
     </LanguageContext.Provider>
   );
 }
 
-export const useLanguage = (): LanguageContextType => {
+export const useLanguage = (): {
+  text: (en: string | Language, nl?: string) => string,
+  lang: LanguageEnum,
+  setDutch: () => void;
+  setEnglish: () => void;
+  toggleLanguage: () => void;
+} => {
   const context = useContext(LanguageContext);
   if (!context) {
     throw new Error('useLanguage must be used within a LanguageProvider');
   }
-  return context;
+
+  const text = function(en: string | Language, nl?: string): string {
+    if (typeof en === 'string') {
+      nl = nl || en;
+      return context.language === 'nl' ? nl : en;
+    } else {
+      return context.language === 'nl' ? en.nl : en.en;
+    }
+  };
+
+  return {
+    text,
+    lang: context.language,
+    setDutch: context.setDutch,
+    setEnglish: context.setEnglish,
+    toggleLanguage: context.toggleLanguage
+  };
 };

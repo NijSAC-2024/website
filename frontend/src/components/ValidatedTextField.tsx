@@ -6,7 +6,7 @@ export default function ValidatedTextField({
   label,
   validator,
   onChange,
-  setValue
+  setValue,
 }: ValidateProps) {
   const [error, setError] = useState<string | false>(false);
 

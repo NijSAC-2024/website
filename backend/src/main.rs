@@ -1,8 +1,8 @@
-use nijsac_website_backend::{create_router, AppState};
+use nijsac_website_backend::{AppState, create_router};
 use std::net::SocketAddr;
 use tokio::{net::TcpListener, signal};
 use tracing::info;
-use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
+use tracing_subscriber::{EnvFilter, fmt, layer::SubscriberExt, util::SubscriberInitExt};
 
 #[tokio::main]
 async fn main() {

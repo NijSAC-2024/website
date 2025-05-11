@@ -3,9 +3,8 @@ use crate::{
     error::Error,
 };
 use argon2::{
-    password_hash,
-    password_hash::{rand_core::OsRng, SaltString},
-    Argon2, PasswordHash, PasswordHasher, PasswordVerifier,
+    Argon2, PasswordHash, PasswordHasher, PasswordVerifier, password_hash,
+    password_hash::{SaltString, rand_core::OsRng},
 };
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
@@ -45,14 +44,14 @@ impl Display for UserId {
 #[derive(Serialize, Deserialize, Debug, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct User {
-    pub(crate) id: UserId,
+    pub id: UserId,
     #[serde(with = "time::serde::rfc3339")]
-    pub(crate) created: OffsetDateTime,
+    pub created: OffsetDateTime,
     #[serde(with = "time::serde::rfc3339")]
-    pub(crate) updated: OffsetDateTime,
+    pub updated: OffsetDateTime,
     #[serde(flatten)]
     #[validate(nested)]
-    pub(crate) content: UserContent,
+    pub content: UserContent,
 }
 
 #[skip_serializing_none]

@@ -1,9 +1,9 @@
 use argon2::password_hash;
 use axum::{
+    Json,
     extract::rejection::{JsonRejection, QueryRejection},
     http::StatusCode,
     response::{IntoResponse, Response},
-    Json,
 };
 use serde::{Serialize, Serializer};
 use sqlx::error::DatabaseError;

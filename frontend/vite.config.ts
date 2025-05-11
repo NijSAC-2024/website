@@ -1,24 +1,18 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import tailwindcss from 'tailwindcss';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        // eslint-disable-next-line no-undef
         target: process?.env?.REMOTE_API ?? 'http://localhost:3000',
-        changeOrigin: true
-      }
+        changeOrigin: true,
+      },
     },
     watch: {
-      usePolling: true
-    }
+      usePolling: true,
+    },
   },
-  plugins: [react()],
-  css: {
-    postcss: {
-      plugins: [tailwindcss()]
-    }
-  }
+  plugins: [react(), tailwindcss()],
 });

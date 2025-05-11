@@ -1,13 +1,14 @@
-import { useState, useEffect } from 'react';
-import { Button, DialogContent, Dialog, DialogActions, useMediaQuery } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { Button, Dialog, DialogActions, DialogContent, useMediaQuery } from '@mui/material';
 import LoginForm from '../LoginForm.tsx';
-import { text } from '../../util.ts';
 
 import DesktopMenu from './DesktopMenu.tsx';
 import MobileMenu from './MobileMenu.tsx';
 import { useAuth } from '../../providers/AuthProvider.tsx';
+import { useLanguage } from '../../providers/LanguageProvider.tsx';
 
 export default function MainMenu() {
+  const { text } = useLanguage();
   const { authOpen, toggleAuthOpen } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
   const [offset, setOffset] = useState<number>(window.scrollY);
@@ -45,10 +46,12 @@ export default function MainMenu() {
       </div>
       <Dialog open={authOpen} onClose={toggleAuthOpen} fullWidth>
         <DialogContent>
-          <LoginForm onClose={toggleAuthOpen} />
+          <LoginForm />
         </DialogContent>
         <DialogActions>
-          <Button onClick={toggleAuthOpen}>{text('Close', 'Sluit')}</Button>
+          <Button onClick={toggleAuthOpen}>
+            {text('Close', 'Sluit')}
+          </Button>
         </DialogActions>
       </Dialog>
     </>

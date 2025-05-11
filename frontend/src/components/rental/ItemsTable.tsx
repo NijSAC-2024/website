@@ -1,23 +1,28 @@
 import { IconButton, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import { LanguageType, rentOptions, ReservationItemType, ReservationType } from '../../types';
-import { text } from '../../util';
+import { Language, rentOptions, ReservationItemType, ReservationType } from '../../types';
 import RemoveIcon from '@mui/icons-material/Remove';
 import AddIcon from '@mui/icons-material/Add';
 import moment from 'moment/moment';
+import { useLanguage } from '../../providers/LanguageProvider.tsx';
 
 interface ItemsTableProps {
   reservation: ReservationType;
-  // eslint-disable-next-line no-unused-vars
   onAmountChange: (name: string, increment: boolean) => void;
 }
 
-export default function ItemsTable({ reservation, onAmountChange }: ItemsTableProps) {
-  const findRemark = (itemName: LanguageType): LanguageType => {
-    const rentOption = rentOptions.find((option) => option.name.en === itemName.en);
+export default function ItemsTable({
+  reservation,
+  onAmountChange
+}: ItemsTableProps) {
+  const { text } = useLanguage();
+  const findRemark = (itemName: Language): Language => {
+    const rentOption = rentOptions.find(
+      (option) => option.name.en === itemName.en
+    );
     return rentOption?.remark || { en: '', nl: '' };
   };
 
-  const findInterval = (remark?: { en: string; nl: string }): LanguageType => {
+  const findInterval = (remark?: { en: string; nl: string }): Language => {
     if (remark?.en.includes('per month after 1 month')) {
       return { en: 'month', nl: 'maand' };
     } else if (remark?.en.includes('per month')) {
@@ -30,12 +35,18 @@ export default function ItemsTable({ reservation, onAmountChange }: ItemsTablePr
       return { en: 'day', nl: 'dag' };
     }
   };
-  const calculateItemTotal = (price: number, days: number, remark?: { en: string; nl: string }) => {
+  const calculateItemTotal = (
+    price: number,
+    days: number,
+    remark?: { en: string; nl: string }
+  ) => {
     if (remark?.en.includes('per month after 1 month')) {
       const months = Math.max(Math.round(days / 30), 1);
       if (months > 1) {
         return 5 * (months - 1);
-      } else return 0;
+      } else {
+        return 0;
+      }
     } else if (remark?.en.includes('per month')) {
       const months = Math.max(Math.round(days / 30), 1);
       return price * months;
@@ -50,12 +61,17 @@ export default function ItemsTable({ reservation, onAmountChange }: ItemsTablePr
   };
 
   const calculateDays = (): number => {
-    if (!reservation.startDate || !reservation.endDate) return 0;
-    return moment(reservation.endDate).diff(moment(reservation.startDate), 'days') + 1;
+    if (!reservation.startDate || !reservation.endDate) {
+      return 0;
+    }
+    return (
+      moment(reservation.endDate).diff(moment(reservation.startDate), 'days') +
+      1
+    );
   };
 
   return (
-    <div className="grid space-y-4">
+    <div className="grid gap-4">
       <Table>
         {reservation.items.length > 0 && (
           <TableHead>
@@ -101,14 +117,16 @@ export default function ItemsTable({ reservation, onAmountChange }: ItemsTablePr
           'Total price for ' + calculateDays() + ' day(s):',
           'Totale prijs voor ' + calculateDays() + ' dag(en):'
         )}
-        {` €${reservation.items
-          .reduce((sum, item) => {
-            return (
-              sum +
-              calculateItemTotal(item.price * item.amount, calculateDays(), findRemark(item.name))
-            );
-          }, 0)
-          .toFixed(2)}`}
+        {` €${reservation.items.reduce((sum, item) => {
+          return (
+            sum +
+            calculateItemTotal(
+              item.price * item.amount,
+              calculateDays(),
+              findRemark(item.name)
+            )
+          );
+        }, 0).toFixed(2)}`}
       </h4>
     </div>
   );

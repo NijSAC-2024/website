@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE event\n            SET created_by = '00000000-0000-0000-0000-000000000000' -- deleted user\n            WHERE created_by = $1\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "322188507f73024ebf571c18abd85d22d9b1aaa4c53f2a256015ee70ddbb1800"
+}

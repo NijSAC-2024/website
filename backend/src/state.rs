@@ -1,8 +1,9 @@
 use crate::error::{AppResult, Error};
 use axum::{extract::FromRequestParts, http::request::Parts};
-use object_store::{memory::InMemory, ObjectStore};
-use sqlx::{postgres::PgPoolOptions, PgPool};
+use object_store::{ObjectStore, memory::InMemory};
+use sqlx::{PgPool, postgres::PgPoolOptions};
 use std::{env, ops::Deref, sync::Arc};
+use tracing::error;
 
 pub struct Config {
     database_url: String,
@@ -13,7 +14,7 @@ impl Config {
     fn from_env() -> Result<Config, env::VarError> {
         dotenvy::dotenv().ok();
         Ok(Self {
-            database_url: env::var("DATABASE_URL")?,
+            database_url: env::var("DATABASE_URL").expect("DATABASE_URL env var must be set"),
             version: env::var("VERSION").unwrap_or_else(|_| "development".to_string()),
         })
     }
@@ -44,7 +45,8 @@ impl AppState {
         let pool = PgPoolOptions::new()
             .max_connections(5)
             .connect(&config.database_url)
-            .await?;
+            .await
+            .inspect_err(|err| error!("Cannot connect to database: {err}"))?;
 
         // TODO use a proper storage layer
         let object_store = InMemory::new();

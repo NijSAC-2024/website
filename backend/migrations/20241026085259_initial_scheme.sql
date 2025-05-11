@@ -50,31 +50,31 @@ create table location
     id             uuid primary key,
     name_nl        text        not null,
     name_en        text        not null,
-    description_nl text,
-    description_en text,
+    description_nl text        not null default '',
+    description_en text        not null default '',
     reusable       bool        not null,
     created        timestamptz not null,
     updated        timestamptz not null
 );
 
-create table activity --Activity base
+create table event --event base
 (
     id                         uuid primary key,
-    location_id                uuid        not null references location (id),
-    name_nl                    text        not null,
-    name_en                    text        not null,
+    location_id                uuid                not null references location (id),
+    name_nl                    text                not null,
+    name_en                    text                not null,
     image                      uuid references file (id),
-    description_nl             text,
-    description_en             text,                 -- location also has its own description
-    registration_start         timestamptz not null,
-    registration_end           timestamptz not null,
-    registration_max           integer     not null,
-    waiting_list_max           integer     not null,
-    is_published               boolean     not null default true,
+    description_nl             text                not null default '',
+    description_en             text                not null default '', -- location also has its own description
+    registration_start         timestamptz,
+    registration_end           timestamptz,
+    registration_max           integer,
+    waiting_list_max           integer,
+    is_published               boolean             not null default true,
     -- Courses only members, climbing activities only extraordinary, activities only donors, some for all
     -- Null means that everyone, also externals can participate
-    required_membership_status membership_status[]  default '{"member"}',
-    activity_type              text        not null,
+    required_membership_status membership_status[] not null default '{"member"}',
+    event_type                 text                not null,
     -- example scheme:
     -- [
     --   {
@@ -85,27 +85,27 @@ create table activity --Activity base
     --     "required": false
     --   }
     -- ]
-    questions                  jsonb       not null, -- if no questions are asked, use an empty array
+    questions                  jsonb               not null,            -- if no questions are asked, use an empty array
     -- example scheme:
     -- { "weekendType": "singlePitch" }
-    metadata                   jsonb       not null, -- if no metadata is given, use an empty object
-    created_by                 uuid        not null references "user" (id),
-    created                    timestamptz not null,
-    updated                    timestamptz not null
+    metadata                   jsonb               not null,            -- if no metadata is given, use an empty object
+    created_by                 uuid                not null references "user" (id),
+    created                    timestamptz         not null,
+    updated                    timestamptz         not null
 );
 
 create table date
 (
-    activity_id uuid        not null references activity (id) on delete cascade,
-    start       timestamptz not null,
-    "end"       timestamptz not null,
+    event_id uuid        not null references event (id) on delete cascade,
+    start    timestamptz not null,
+    "end"    timestamptz not null,
     constraint pk_date
-        primary key (activity_id, start)
+        primary key (event_id, start)
 );
 
-create table activity_registration
+create table event_registration
 (
-    activity_id           uuid        not null references activity (id) on delete cascade,
+    event_id              uuid        not null references event (id) on delete cascade,
     user_id               uuid        not null references "user" (id), -- On deletion, we want to replace it with a 'deleted' user
 
     -- Answers to the questions. Example scheme:
@@ -122,10 +122,10 @@ create table activity_registration
     waiting_list_position integer,
     created               timestamptz not null,
     updated               timestamptz not null,
-    constraint activity_registration_pk
-        primary key (activity_id, user_id),
+    constraint event_registration_pk
+        primary key (event_id, user_id),
     constraint consistent_waiting_list
-        unique (activity_id, waiting_list_position)
+        unique (event_id, waiting_list_position)
 );
 
 create type basic_user as

@@ -4,9 +4,10 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { MouseEvent, useState } from 'react';
 import { useAuth } from '../../providers/AuthProvider.tsx';
-import { text } from '../../util.ts';
+import { useLanguage } from '../../providers/LanguageProvider.tsx';
 
 export default function UserMenu() {
+  const { text } = useLanguage();
   const { user, logout } = useAuth();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);

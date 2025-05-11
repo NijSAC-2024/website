@@ -1,19 +1,19 @@
 use crate::{
+    AppState,
     auth::{
-        role::{MembershipStatus, Roles},
         COOKIE_NAME,
+        role::{MembershipStatus, Roles},
     },
     error::{AppResult, Error},
     user::UserId,
     wire::user::UserCredentials,
-    AppState,
 };
 use argon2::PasswordHash;
 use axum::{
     extract::{FromRequestParts, OptionalFromRequestParts},
     http::request::Parts,
 };
-use axum_extra::extract::{cookie::Cookie, CookieJar};
+use axum_extra::extract::{CookieJar, cookie::Cookie};
 use rand::distr::{Alphanumeric, SampleString};
 use sqlx::PgPool;
 use time::OffsetDateTime;
@@ -185,6 +185,8 @@ impl FromRequestParts<AppState> for Session {
             .await
             .map_err(|_| Self::Rejection::BadRequest("Cannot decode cookies"))?;
 
+        trace!("Cookies: {:?}", jar);
+
         let session_cookie = jar
             .get(COOKIE_NAME)
             .ok_or(Self::Rejection::Unauthorized)?
@@ -210,6 +212,10 @@ impl OptionalFromRequestParts<AppState> for Session {
             Some(c) => c.value(),
         };
 
-        Ok(Some(Session::get(session_cookie, state.pool()).await?))
+        match Session::get(session_cookie, state.pool()).await {
+            Ok(session) => Ok(Some(session)),
+            Err(Error::Unauthorized) => Ok(None),
+            Err(err) => Err(err),
+        }
     }
 }

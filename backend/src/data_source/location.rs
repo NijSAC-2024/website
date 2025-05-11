@@ -1,8 +1,8 @@
 use crate::{
+    AppState, Language, LocationFilter,
     data_source::Count,
     error::{AppResult, Error},
     location::{Location, LocationContent, LocationId, UsedBy},
-    AppState, LocationFilter,
 };
 use axum::{extract::FromRequestParts, http::request::Parts};
 use sqlx::PgPool;
@@ -31,8 +31,8 @@ struct PgLocation {
     name_nl: String,
     name_en: String,
     reusable: bool,
-    description_nl: Option<String>,
-    description_en: Option<String>,
+    description_nl: String,
+    description_en: String,
     created: OffsetDateTime,
     updated: OffsetDateTime,
 }
@@ -44,11 +44,15 @@ impl From<PgLocation> for Location {
             created: pg.created,
             updated: pg.updated,
             content: LocationContent {
-                name_nl: pg.name_nl,
-                name_en: pg.name_en,
+                name: Language {
+                    en: pg.name_en,
+                    nl: pg.name_nl,
+                },
                 reusable: pg.reusable,
-                description_nl: pg.description_nl,
-                description_en: pg.description_en,
+                description: Language {
+                    en: pg.description_en,
+                    nl: pg.description_nl,
+                },
             },
         }
     }
@@ -78,10 +82,10 @@ impl LocationStore {
             RETURNING *
             "#,
             id,
-            new.name_nl,
-            new.name_en,
-            new.description_nl,
-            new.description_en,
+            new.name.nl,
+            new.name.en,
+            new.description.nl,
+            new.description.en,
             new.reusable
         )
             .fetch_one(&self.db)
@@ -104,10 +108,10 @@ impl LocationStore {
             RETURNING *
             "#,
             **id,
-            updated.name_nl,
-            updated.name_en,
-            updated.description_nl,
-            updated.description_en,
+            updated.name.nl,
+            updated.name.en,
+            updated.description.nl,
+            updated.description.en,
             updated.reusable
         )
         .fetch_one(&self.db)
@@ -162,13 +166,13 @@ impl LocationStore {
 
     pub async fn used_by(&self, id: &LocationId) -> AppResult<UsedBy> {
         struct PgUsedBy {
-            activity: Uuid,
+            event: Uuid,
         }
 
         Ok(sqlx::query_as!(
             PgUsedBy,
             r#"
-            SELECT id as activity FROM activity WHERE location_id = $1
+            SELECT id as event FROM event WHERE location_id = $1
             "#,
             **id
         )
@@ -176,7 +180,7 @@ impl LocationStore {
         .await?
         .into_iter()
         .fold(UsedBy { activities: vec![] }, |mut used_by, pg| {
-            used_by.activities.push(pg.activity.into());
+            used_by.activities.push(pg.event.into());
             used_by
         }))
     }

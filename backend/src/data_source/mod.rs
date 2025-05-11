@@ -1,4 +1,4 @@
-pub(crate) mod activity;
+pub(crate) mod event;
 mod file;
 mod location;
 mod material;

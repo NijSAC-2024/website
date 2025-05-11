@@ -6,5 +6,9 @@ interface TextCardProps {
 }
 
 export default function TextCard({ children, className }: TextCardProps) {
-  return <div className={className + ' bg-[#ebebeb] dark:bg-[#2e2e2e] rounded-xl'}>{children}</div>;
+  return (
+    <div className={className + ' bg-[#ebebeb] dark:bg-[#2e2e2e] rounded-xl'}>
+      {children}
+    </div>
+  );
 }

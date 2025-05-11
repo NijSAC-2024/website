@@ -1,45 +1,31 @@
 import ContentCard from '../ContentCard.tsx';
-import { text } from '../../util.ts';
 import { Table, TableBody, TableCell, TableRow } from '@mui/material';
+import { useLanguage } from '../../providers/LanguageProvider.tsx';
+import { useApiState } from '../../providers/ApiProvider.tsx';
 import { useAuth } from '../../providers/AuthProvider.tsx';
-import { AgendaEventType, registrationsType } from '../../types.ts';
 
-interface RegistrationsCardProps {
-  agendaEvent: AgendaEventType;
-}
-export default function RegistrationsCard({ agendaEvent }: RegistrationsCardProps) {
+export default function RegistrationsCard() {
+  const { registrations } = useApiState();
+  const { text } = useLanguage();
   const { isLoggedIn } = useAuth();
-
-  const registrations: registrationsType = {
-    registrations: [
-      {
-        eid: 1,
-        name: 'Lukas Nieuweboer'
-      },
-      {
-        eid: 2,
-        name: 'Asia Piotrowska'
-      },
-      {
-        eid: 3,
-        name: 'Robin Put'
-      }
-    ]
-  };
 
   return (
     <>
-      {agendaEvent.allowsRegistrations && isLoggedIn && (
+      {isLoggedIn && (
         <ContentCard className="xl:col-span-3 p-7">
           <h1>{text('Participants', 'Deelnemers')}</h1>
           <Table>
             <TableBody>
-              {registrations.registrations.map((registraton) => (
+              {registrations?.map((registration) => (
                 <TableRow
-                  key={registraton.eid}
-                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                  key={registration.userId}
+                  sx={{
+                    '&:last-child td, &:last-child th': {
+                      border: 0
+                    }
+                  }}
                 >
-                  <TableCell>{registraton.name}</TableCell>
+                  <TableCell>{registration.firstName}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

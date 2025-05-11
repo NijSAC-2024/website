@@ -10,16 +10,15 @@ import {
   ListItemText,
   Toolbar
 } from '@mui/material';
-import router from '../../router.tsx';
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useState } from 'react';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
-import { text } from '../../util.ts';
 import { MenuType } from '../../types.ts';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import { useAuth } from '../../providers/AuthProvider.tsx';
 import UserMenu from './UserMenu.tsx';
+import { useAppState } from '../../providers/AppStateProvider.tsx';
 
 interface MobileMenuProps {
   handleLoginOpen: () => void;
@@ -32,8 +31,9 @@ export default function MobileMenu({
   dropdownOpen,
   toggleDropdown
 }: MobileMenuProps) {
+  const { text, setEnglish, setDutch } = useLanguage();
+  const { navigate } = useAppState();
   const { isLoggedIn } = useAuth();
-  const { setEnglish, setDutch } = useLanguage();
   const [openMenu, setOpenMenu] = useState<MenuType>(undefined);
 
   const toggleMenu = (menu: MenuType) => {
@@ -44,11 +44,10 @@ export default function MobileMenu({
     }
   };
 
-  const navigateSubmenu = (address: string) => {
-    router
-      .navigate(address)
-      .then(toggleDropdown)
-      .then(() => setOpenMenu(undefined));
+  const navigateSubmenu = (page: string) => {
+    toggleDropdown();
+    setOpenMenu(undefined);
+    navigate(page);
   };
 
   return (
@@ -58,10 +57,19 @@ export default function MobileMenu({
           src={'/images/logo.svg'}
           alt="Logo"
           className="hover:opacity-50 hover:cursor-pointer h-24"
-          onClick={() => router.navigate('/').then(dropdownOpen ? toggleDropdown : null)}
+          onClick={() => {
+            if (dropdownOpen) {
+              toggleDropdown();
+            }
+            navigate('home');
+          }}
         />
         <IconButton size="large" color="inherit" onClick={toggleDropdown}>
-          {dropdownOpen ? <CloseIcon fontSize="large" /> : <MenuIcon fontSize="large" />}
+          {dropdownOpen ? (
+            <CloseIcon fontSize="large" />
+          ) : (
+            <MenuIcon fontSize="large" />
+          )}
         </IconButton>
       </Toolbar>
       <Collapse
@@ -75,17 +83,31 @@ export default function MobileMenu({
             src={'/images/logo.svg'}
             alt="Logo"
             className="hover:opacity-50 hover:cursor-pointer h-24"
-            onClick={() => router.navigate('/').then(toggleDropdown)}
+            onClick={() => {
+              navigate('index');
+              toggleDropdown();
+            }}
           />
           <IconButton size="large" color="inherit" onClick={toggleDropdown}>
-            {dropdownOpen ? <CloseIcon fontSize="large" /> : <MenuIcon fontSize="large" />}
+            {dropdownOpen ? (
+              <CloseIcon fontSize="large" />
+            ) : (
+              <MenuIcon fontSize="large" />
+            )}
           </IconButton>
         </Toolbar>
         <List disablePadding>
           {/* Agenda */}
           <ListItem disablePadding>
-            <ListItemButton onClick={() => router.navigate('/agenda').then(toggleDropdown)}>
-              <ListItemText primary={text('Agenda', 'Agenda')} className="uppercase px-10" />
+            <ListItemButton
+              onClick={() => {
+                navigate('agenda');
+                toggleDropdown();
+              }}>
+              <ListItemText
+                primary={text('Agenda', 'Agenda')}
+                className="uppercase px-10"
+              />
             </ListItemButton>
           </ListItem>
 
@@ -103,7 +125,11 @@ export default function MobileMenu({
               </ListItemIcon>
             </ListItemButton>
           </ListItem>
-          <Collapse in={openMenu === 'association'} timeout="auto" unmountOnExit>
+          <Collapse
+            in={openMenu === 'association'}
+            timeout="auto"
+            unmountOnExit
+          >
             <List disablePadding>
               <ListItem disablePadding>
                 <ListItemButton>
@@ -155,7 +181,10 @@ export default function MobileMenu({
           {/* Climbing */}
           <ListItem onClick={() => toggleMenu('climbing')} disablePadding>
             <ListItemButton>
-              <ListItemText primary={text('Climbing', 'Klimmen')} className="uppercase px-10" />
+              <ListItemText
+                primary={text('Climbing', 'Klimmen')}
+                className="uppercase px-10"
+              />
               <ListItemIcon>
                 {openMenu === 'climbing' ? <ExpandLess /> : <ExpandMore />}
               </ListItemIcon>
@@ -197,7 +226,9 @@ export default function MobileMenu({
                 </ListItemButton>
               </ListItem>
               <ListItem disablePadding>
-                <ListItemButton onClick={() => navigateSubmenu('/material-rental')}>
+                <ListItemButton
+                  onClick={() => navigateSubmenu('/material-rental')}
+                >
                   <ListItemText
                     primary={
                       <p className="text-[#1976d2] dark:text-[#90caf9] px-14 text-sm">
@@ -213,8 +244,13 @@ export default function MobileMenu({
           {/* Alps */}
           <ListItem onClick={() => toggleMenu('alps')} disablePadding>
             <ListItemButton>
-              <ListItemText primary={text('Alps', 'Alpen')} className="uppercase px-10" />
-              <ListItemIcon>{openMenu === 'alps' ? <ExpandLess /> : <ExpandMore />}</ListItemIcon>
+              <ListItemText
+                primary={text('Alps', 'Alpen')}
+                className="uppercase px-10"
+              />
+              <ListItemIcon>
+                {openMenu === 'alps' ? <ExpandLess /> : <ExpandMore />}
+              </ListItemIcon>
             </ListItemButton>
           </ListItem>
           <Collapse in={openMenu === 'alps'} timeout="auto" unmountOnExit>
@@ -314,7 +350,10 @@ export default function MobileMenu({
           {/* Language */}
           <ListItem onClick={() => toggleMenu('language')} disablePadding>
             <ListItemButton>
-              <ListItemText primary={text('Language', 'Taal')} className="uppercase px-10" />
+              <ListItemText
+                primary={text('Language', 'Taal')}
+                className="uppercase px-10"
+              />
               <ListItemIcon>
                 {openMenu === 'language' ? <ExpandLess /> : <ExpandMore />}
               </ListItemIcon>
@@ -326,7 +365,9 @@ export default function MobileMenu({
                 <ListItemButton onClick={setEnglish}>
                   <ListItemText
                     primary={
-                      <p className="text-[#1976d2] dark:text-[#90caf9] px-14 text-sm">English</p>
+                      <p className="text-[#1976d2] dark:text-[#90caf9] px-14 text-sm">
+                        English
+                      </p>
                     }
                   />
                 </ListItemButton>
@@ -335,7 +376,9 @@ export default function MobileMenu({
                 <ListItemButton onClick={setDutch}>
                   <ListItemText
                     primary={
-                      <p className="text-[#1976d2] dark:text-[#90caf9] px-14 text-sm">Nederlands</p>
+                      <p className="text-[#1976d2] dark:text-[#90caf9] px-14 text-sm">
+                        Nederlands
+                      </p>
                     }
                   />
                 </ListItemButton>
@@ -348,14 +391,20 @@ export default function MobileMenu({
             <>
               <ListItem onClick={handleLoginOpen} disablePadding>
                 <ListItemButton>
-                  <ListItemText primary={text('Login', 'Login')} className="uppercase px-10" />
+                  <ListItemText
+                    primary={text('Login', 'Login')}
+                    className="uppercase px-10"
+                  />
                   <ListItemIcon></ListItemIcon>
                 </ListItemButton>
               </ListItem>
               <ListItem className="px-10 pb-3 pt-2" disablePadding>
                 <Button
                   variant="contained"
-                  onClick={() => router.navigate('/register').then(toggleDropdown)}
+                  onClick={() => {
+                    navigate('register');
+                    toggleDropdown();
+                  }}
                 >
                   {text('Become a member', 'Lid worden')}
                 </Button>

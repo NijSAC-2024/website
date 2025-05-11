@@ -1,103 +1,178 @@
-import { AgendaEventType, OptionType, LanguageType } from '../../types.ts';
-import { Button, Fab } from '@mui/material';
-import SaveIcon from '@mui/icons-material/Save';
-import { text } from '../../util.ts';
+import {
+  DateType,
+  EventContent,
+  EventType,
+  Language,
+  MembershipStatus,
+  Metadata,
+  Question,
+  WeekendType
+} from '../../types.ts';
+import { Button } from '@mui/material';
 import { useState } from 'react';
 import EditRegistrations from './EditRegistrations.tsx';
 import EditAgendaCard from './EditAgendaCard.tsx';
 import EditDescription from './EditDescription.tsx';
-import router from '../../router.tsx';
 import GenericPage from '../../pages/GenericPage.tsx';
-import moment from 'moment';
+import SaveButton from './SaveButton.tsx';
+import { useAppState } from '../../providers/AppStateProvider.tsx';
+import { useApiState } from '../../providers/ApiProvider.tsx';
+import { useLanguage } from '../../providers/LanguageProvider.tsx';
 
 interface EditEventProps {
-  agendaEvent: AgendaEventType;
-  // eslint-disable-next-line no-unused-vars
-  handleUpdate: (updatedAgendaEvent: AgendaEventType) => void;
+  eventContent: EventContent;
 }
 
-export default function EditEvent({ agendaEvent, handleUpdate }: EditEventProps) {
-  const [updatedAgendaEvent, setUpdatedAgendaEvent] = useState<AgendaEventType>({ ...agendaEvent });
+export default function EditEvent({ eventContent: init }: EditEventProps) {
+  const { text } = useLanguage();
+  const { createEvent, updateEvent } = useApiState();
+  const { route } = useAppState();
+  const { navigate } = useAppState();
+  const [event, setEvent] = useState<EventContent>(init);
 
-  const updateAgendaEvent = (changes: Partial<AgendaEventType>) => {
-    setUpdatedAgendaEvent((prev) => ({ ...prev, ...changes }));
+  const id = route.params?.id;
+
+  const handleEventChange = (changes: Partial<EventContent>) => {
+    setEvent((prev: EventContent) => ({
+      ...prev,
+      ...changes
+    }));
   };
 
   const handleFieldChange = (
-    name: keyof AgendaEventType,
-    value: LanguageType | string | boolean | LanguageType[] | OptionType[]
+    name: keyof EventContent,
+    value:
+      | string
+      | number
+      | boolean
+      | DateType
+      | WeekendType[]
+      | EventType
+      | Metadata
+      | Language
+      | MembershipStatus[]
+      | null
   ) => {
-    updateAgendaEvent({
+    handleEventChange({
       [name]: value
     });
   };
 
-  const handleRegistrationFieldsChange = (langCode: 'en' | 'nl', index: number, value: string) => {
-    updateAgendaEvent({
-      registrationFields: updatedAgendaEvent.registrationFields.map((field, idx) =>
-        idx === index ? { ...field, [langCode]: value } : field
+  const handleDateChange = (
+    index: number,
+    startDate: boolean,
+    value: string
+  ) => {
+    handleEventChange({
+      dates: event.dates.map((date, idx) =>
+        idx === index
+          ? {
+            ...date,
+            [startDate ? 'startDateTime' : 'endDateTime']: value
+          }
+          : date
       )
     });
   };
 
-  const handleAddRegistrationField = () =>
-    setUpdatedAgendaEvent((prev) => ({
-      ...prev,
-      registrationFields: [...prev.registrationFields, { en: '', nl: '' }]
-    }));
+  const handleAddDate = () => {
+    const now = new Date();
+    handleEventChange({
+      dates: [...event.dates, { start: now.toISOString(), end: now.toISOString() }]
+    });
+  };
 
-  const handleRemoveRegistrationField = (index: number) =>
-    setUpdatedAgendaEvent((prev) => ({
-      ...prev,
-      registrationFields: prev.registrationFields.filter((_, idx) => idx !== index)
-    }));
+  const handleRemoveDate = (index: number) =>
+    handleEventChange({
+      dates: event.dates.filter((_, idx) => idx !== index)
+    });
+
+  const handleRegistrationQuestionChange = (
+    id: string,
+    name: keyof Question,
+    value: Language | boolean
+  ) => {
+    handleEventChange({
+      questions: event.questions.map((question) =>
+        question.id === id ? { ...question, [name]: value } : question
+      )
+    });
+  };
+
+  const handleAddRegistrationQuestion = () =>
+    handleEventChange({
+      questions: [
+        ...event.questions,
+        {
+          id: crypto.randomUUID(),
+          questionType: 'shortText',
+          question: { en: '', nl: '' },
+          required: false
+        }
+      ]
+    });
+
+  const handleRemoveRegistrationQuestion = (id: string) =>
+    handleEventChange({
+      questions: event.questions.filter((q) => q.id !== id)
+    });
+
+  const handleSave = async (bool: boolean) => {
+    if (id) {
+      await updateEvent(id, { ...event, isPublished: bool });
+      navigate('agenda');
+    } else {
+      await createEvent({ ...event, isPublished: bool });
+    }
+  };
 
   return (
-    <GenericPage image={updatedAgendaEvent.image}>
+    <GenericPage image={event.image}>
+      <SaveButton handleSave={handleSave} />
+
       <div className="grid xl:grid-cols-3 gap-5 mt-[-9.3rem]">
-        <div className="xl:col-span-3 mb-[-0.5rem]">
+        <div className="xl:col-span-3 mb-[-0.5rem] flex justify-between">
           <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">
-            <Button color="inherit" onClick={() => router.navigate('/agenda')}>
+            <Button color="inherit" onClick={() => navigate('agenda')}>
               {text('Back to Agenda', 'Terug naar Agenda')}
             </Button>
           </div>
-        </div>
-        <div className="fixed bottom-5 right-5 z-10">
-          <Fab
-            variant="extended"
-            color="primary"
-            onClick={() => handleUpdate(updatedAgendaEvent)}
-            disabled={
-              !updatedAgendaEvent.title.en ||
-              !updatedAgendaEvent.title.nl ||
-              !updatedAgendaEvent.location ||
-              !updatedAgendaEvent.category ||
-              moment(updatedAgendaEvent.endDateTime).isBefore(
-                moment(updatedAgendaEvent.startDateTime)
-              )
-            }
-          >
-            <SaveIcon className="mr-2" />
-            {text('Save Event', 'Evenement opslaan')}
-          </Fab>
+          {!event.isPublished && (
+            <Button variant="contained">
+              <b>{text('Draft', 'Concept')}</b>
+            </Button>
+          )}
         </div>
 
         <EditAgendaCard
-          updatedAgendaEvent={updatedAgendaEvent}
+          dates={event.dates}
+          image={event.image}
+          category={event.eventType}
+          name={event.name}
+          metadata={event.metadata as Metadata}
+          location={event.location}
           handleFieldChange={handleFieldChange}
+          handleDateChange={handleDateChange}
+          handleAddDate={handleAddDate}
+          handleRemoveDate={handleRemoveDate}
         />
 
         <EditDescription
-          updatedAgendaEvent={updatedAgendaEvent}
+          description={event.description}
+          metadata={event.metadata}
           handleFieldChange={handleFieldChange}
         />
 
         <EditRegistrations
-          updatedAgendaEvent={updatedAgendaEvent}
+          requiredMembershipStatus={event.requiredMembershipStatus}
+          registrationMax={event.registrationMax}
+          registrationPeriod={event.registrationPeriod}
+          questions={event.questions}
           handleFieldChange={handleFieldChange}
-          handleRegistrationFieldsChange={handleRegistrationFieldsChange}
-          handleAddRegistrationField={handleAddRegistrationField}
-          handleRemoveRegistrationField={handleRemoveRegistrationField}
+          handleRegistrationQuestionChange={handleRegistrationQuestionChange}
+          handleAddRegistrationQuestion={handleAddRegistrationQuestion}
+          handleRemoveRegistrationQuestion={handleRemoveRegistrationQuestion}
+          dates={event.dates}
         />
       </div>
     </GenericPage>

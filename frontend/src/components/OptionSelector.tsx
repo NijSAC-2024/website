@@ -6,50 +6,58 @@ import {
   MenuItem,
   OutlinedInput,
   Select,
-  Checkbox
+  SelectChangeEvent,
+  Checkbox,
 } from '@mui/material';
-import { text } from '../util.ts';
-import { OptionsType, OptionType } from '../types.ts';
+import { OptionsType } from '../types.ts';
+import { useLanguage } from '../providers/LanguageProvider.tsx';
 
 interface OptionSelectorProps {
   options: OptionsType[];
-  // eslint-disable-next-line no-unused-vars
-  onChange: (selectedOptions: OptionType[]) => void;
+  selected?: string[];
+  onChange: (selectedOptions: string[]) => void;
   label: string;
-  initialOptions: OptionType[];
 }
 
 export default function OptionSelector({
   options,
+  selected,
   onChange,
   label,
-  initialOptions
 }: OptionSelectorProps) {
-  const [selectedOptions, setSelectedOptions] = useState<OptionType[]>(initialOptions);
+  const { text } = useLanguage();
+  const [selectedOptions, setSelectedOptions] = useState<string[]>(
+    selected || [],
+  );
 
-  const handleChange = (value: string | OptionType[]) => {
-    const selectedValues = typeof value === 'string' ? value.split(',') : value;
-    setSelectedOptions(selectedValues as OptionType[]);
-    onChange(selectedValues as OptionType[]);
+  const handleChange = (event: SelectChangeEvent<string[]>) => {
+    const value = event.target.value as string[];
+    setSelectedOptions(value);
+    onChange(value);
   };
 
   return (
     <FormControl>
       <InputLabel id="checkbox-select-label">{label}</InputLabel>
       <Select
+        labelId="checkbox-select-label"
         variant="outlined"
         multiple
         value={selectedOptions}
-        onChange={(e) => handleChange(e.target.value)}
+        onChange={handleChange}
         input={<OutlinedInput id="select-multiple-chip" label={label} />}
-        renderValue={(selected) => (
+        renderValue={(selected: string[]) => (
           <div className="flex flex-wrap gap-1">
-            {selected.map((id) => {
-              const option = options.find((opt) => opt.id === id);
+            {selected.map((selected_id) => {
+              const option = options.find((opt) => opt.id === selected_id);
               return (
                 <Chip
-                  key={id}
-                  label={option ? text(option.label.en, option.label.nl) : id}
+                  key={selected_id}
+                  label={
+                    option
+                      ? text( option.label.en, option.label.nl)
+                      : selected_id
+                  }
                   className="uppercase font-semibold"
                   size="small"
                 />

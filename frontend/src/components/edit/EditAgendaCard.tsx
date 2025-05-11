@@ -1,45 +1,42 @@
-import { FormControl, InputLabel, MenuItem, Select, TextField, Button } from '@mui/material';
-import { text } from '../../util.ts';
-import { DateTimePicker } from '@mui/x-date-pickers';
-import moment from 'moment/moment';
-import {
-  AgendaEventType,
-  OptionsType,
-  OptionType,
-  LanguageType,
-  typesOptions
-} from '../../types.ts';
+import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
+import { DateType, EventContent, EventType, Language, Metadata, typesOptions } from '../../types.ts';
 import OptionSelector from '../OptionSelector.tsx';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import { ChangeEvent } from 'react';
+import EditDates from './EditDates.tsx';
+import { useLanguage } from '../../providers/LanguageProvider.tsx';
+import { useApiState } from '../../providers/ApiProvider.tsx';
 
 interface EditAgendaCardProps {
-  updatedAgendaEvent: AgendaEventType;
+  category: EventType;
+  image?: string;
+  metadata: Metadata;
+  name: Language;
+  dates: DateType[];
+  location: string;
   handleFieldChange: (
-    // eslint-disable-next-line no-unused-vars
-    name: keyof AgendaEventType,
-    // eslint-disable-next-line no-unused-vars
-    value: LanguageType | string | OptionType[]
+    name: keyof EventContent,
+    value: Metadata | EventType | Language | string
   ) => void;
+  handleDateChange: (index: number, startDate: boolean, value: string) => void;
+  handleAddDate: () => void;
+  handleRemoveDate: (index: number) => void;
 }
 
 export default function EditAgendaCard({
-  updatedAgendaEvent,
-  handleFieldChange
+  category,
+  image = 'https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/76/52/1b/76521bcd-7c16-6404-b845-be35fc720792/AppIcon-0-0-1x_U007epad-0-85-220.png/1200x600wa.png',
+  metadata,
+  name,
+  dates,
+  location,
+  handleFieldChange,
+  handleDateChange,
+  handleAddDate,
+  handleRemoveDate
 }: EditAgendaCardProps) {
-  const getAllowedTypes = (): OptionsType[] => {
-    switch (updatedAgendaEvent.category) {
-      case 'course':
-        return typesOptions.filter((type) => type.id !== 'education' && type.id !== 'boulder');
-      case 'training':
-        return typesOptions.filter((type) => type.id !== 'education');
-      default:
-        return typesOptions;
-    }
-  };
-
-  const allowedTypes = getAllowedTypes();
-
+  const { text } = useLanguage();
+  const { locations } = useApiState();
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -54,16 +51,18 @@ export default function EditAgendaCard({
   };
 
   return (
-    <div className="w-full rounded-2xl bg-inherit border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] flex flex-col">
+    <div
+      className="w-full rounded-2xl bg-inherit border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] flex flex-col">
       <div>
         <img
-          className="w-full aspect-[4/2] object-cover"
-          src={updatedAgendaEvent.image}
+          className="w-full aspect-4/2 object-cover"
+          src={image}
           alt="Event"
         />
       </div>
       <div className="p-5">
-        <div className="grid space-y-5">
+        <div className="grid gap-5">
+          {/* Image */}
           <Button
             component="label"
             variant="contained"
@@ -73,65 +72,107 @@ export default function EditAgendaCard({
           >
             <PhotoCameraIcon className="mr-2" />
             {text('Upload Image', 'Afbeelding Uploaden')}
-            <input type="file" accept="image/*" hidden onChange={handleImageChange} />
+            <input
+              type="file"
+              accept="image/*"
+              hidden
+              onChange={handleImageChange}
+            />
           </Button>
-
+          {/* Category and Type */}
           <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
             <FormControl fullWidth>
-              <InputLabel id="select-label">{text('Category*', 'Categorie*')}</InputLabel>
+              <InputLabel id="select-label">
+                {text('Category*', 'Categorie*')}
+              </InputLabel>
               <Select
                 labelId="select-label"
-                value={updatedAgendaEvent.category}
+                value={category}
                 label={text('Category*', 'Categorie*')}
                 variant="outlined"
-                onChange={(e) => handleFieldChange('category', e.target.value)}
+                onChange={(e) =>
+                  handleFieldChange('eventType', e.target.value as EventType)
+                }
               >
-                <MenuItem value="activity">{text('Activity', 'Activiteit')}</MenuItem>
-                <MenuItem value="course">{text('Course', 'Cursus')}</MenuItem>
-                <MenuItem value="training">{text('Training', 'Training')}</MenuItem>
-                <MenuItem value="weekend">{text('Weekend', 'Weekend')}</MenuItem>
+                <MenuItem value="activity">
+                  {text('Activity', 'Activiteit')}
+                </MenuItem>
+                <MenuItem value="course">
+                  {text('Course', 'Cursus')}
+                </MenuItem>
+                <MenuItem value="training">
+                  {text('Training', 'Training')}
+                </MenuItem>
+                <MenuItem value="weekend">
+                  {text('Weekend', 'Weekend')}
+                </MenuItem>
               </Select>
             </FormControl>
             <OptionSelector
-              options={allowedTypes}
-              onChange={(selectedTypes) => handleFieldChange('type', selectedTypes)}
+              options={typesOptions}
+              selected={metadata?.type}
+              onChange={(selectedTypes) =>
+                handleFieldChange('metadata', {
+                  ...metadata,
+                  type: selectedTypes
+                } as Metadata)
+              }
               label={'Type'}
-              initialOptions={updatedAgendaEvent.type}
             />
           </div>
+          {/* Title */}
           <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
             <TextField
-              value={updatedAgendaEvent.title.en}
+              value={name.en}
               label={text('Title English*', 'Titel Engels*')}
               onChange={(e) =>
-                handleFieldChange('title', { ...updatedAgendaEvent.title, en: e.target.value })
+                handleFieldChange('name', {
+                  ...name,
+                  en: e.target.value
+                })
               }
             />
             <TextField
-              value={updatedAgendaEvent.title.nl}
+              value={name.nl}
               label={text('Title Dutch*', 'Titel Nederlands*')}
               onChange={(e) =>
-                handleFieldChange('title', { ...updatedAgendaEvent.title, nl: e.target.value })
+                handleFieldChange('name', {
+                  ...name,
+                  nl: e.target.value
+                })
               }
             />
           </div>
-          <TextField
-            value={updatedAgendaEvent.location}
-            label={text('Location*', 'Locatie*')}
-            onChange={(e) => handleFieldChange('location', e.target.value)}
+          {/*Location*/}
+          <FormControl fullWidth>
+            <InputLabel id="select-label">
+              {text('Location*', 'Locatie*')}
+            </InputLabel>
+            <Select
+              labelId="select-label"
+              value={location}
+              label={text('Location*', 'Locatie*')}
+              onChange={(e) =>
+                handleFieldChange('location', e.target.value as string)
+              }
+              variant="outlined"
+            >
+              {locations?.map((l) => (
+                <MenuItem key={l.id} value={l.id}>
+                  {text(l.name)}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <hr />
+          Dates
+          {/*Dates*/}
+          <EditDates
+            dates={dates}
+            handleAddDate={handleAddDate}
+            handleDateChange={handleDateChange}
+            handleRemoveDate={handleRemoveDate}
           />
-          <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
-            <DateTimePicker
-              label={text('Start Date*', 'Startdatum*')}
-              value={moment(updatedAgendaEvent.startDateTime)}
-              onChange={(date) => handleFieldChange('startDateTime', date!.toISOString())}
-            />
-            <DateTimePicker
-              label={text('End Date*', 'Einddatum*')}
-              value={moment(updatedAgendaEvent.endDateTime)}
-              onChange={(date) => handleFieldChange('endDateTime', date!.toISOString())}
-            />
-          </div>
         </div>
       </div>
     </div>

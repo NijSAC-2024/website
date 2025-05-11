@@ -1,23 +1,23 @@
 use crate::{
+    Pagination, ValidatedQuery,
     api::ApiResult,
     auth::{role::Role, session::Session},
     data_source::FileStore,
     error::{AppResult, Error},
     file::{FileId, FileMetadata},
-    Pagination, ValidatedQuery,
 };
 use axum::{
-    extract::{Multipart, Path},
-    http::{header::CONTENT_TYPE, HeaderMap},
-    response::IntoResponse,
     Json,
+    extract::{Multipart, Path},
+    http::{HeaderMap, header::CONTENT_TYPE},
+    response::IntoResponse,
 };
 use bytes::Bytes;
 use image::{
     codecs::{jpeg::JpegEncoder, webp::WebPEncoder},
     load_from_memory,
 };
-use mime::{Mime, IMAGE, IMAGE_JPEG};
+use mime::{IMAGE, IMAGE_JPEG, Mime};
 use std::io::Cursor;
 use tracing::info;
 

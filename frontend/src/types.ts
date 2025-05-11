@@ -1,54 +1,114 @@
-export interface AuthContextType {
-  user: UserType | undefined;
-  isLoggedIn: boolean;
-  checkAuth: () => void;
-  logout: () => void;
-  authOpen: boolean;
-  toggleAuthOpen: () => void;
-}
-
 export interface ValidateProps {
   label: string;
-  // eslint-disable-next-line no-unused-vars
   validator: (value: string) => string | false;
-  // eslint-disable-next-line no-unused-vars
   onChange: (isValid: boolean) => void;
-  // eslint-disable-next-line no-unused-vars
   setValue: (value: string) => void;
 }
 
-export interface LanguageType {
+export type WeekendType = 'sp' | 'mp' | 'boulder' | 'trad' | 'education';
+
+export type ExperienceType = 'sp' | 'mp';
+
+export type EventType = 'activity' | 'course' | 'training' | 'weekend';
+
+export type MembershipStatus =
+  | 'pending'
+  | 'member'
+  | 'extraordinary'
+  | 'nonMember';
+
+export type QuestionType = 'shortText' | 'longText' | 'number' | 'time';
+
+export type LanguageEnum = 'nl' | 'en';
+
+export interface OptionsType {
+  id:
+    | WeekendType
+    | EventType
+    | MembershipStatus
+    | QuestionType
+    | ExperienceType;
+  label: Language;
+}
+
+export interface Language {
   en: string;
   nl: string;
 }
 
-export type OptionType = 'sp' | 'mp' | 'boulder' | 'trad' | 'education';
-
-export interface LanguageType {
-  en: string;
-  nl: string;
+export interface DateType {
+  start: string;
+  end: string;
 }
 
-export type CategoryType = 'activity' | 'course' | 'training' | 'weekend' | '' | 'all';
+export interface Registration extends BasicUser {
+  attended?: boolean;
+  waitingListPosition?: number;
+  answers: Array<Answer>;
+  created: string;
+  updated: string;
+}
 
-export interface AgendaEventType {
-  id: number;
-  image: string;
-  title: LanguageType;
-  category: CategoryType;
-  type: OptionType[];
+export interface Answer {
+  questionId: string;
+  answer: string;
+}
+
+export interface Question {
+  id: string;
+  question: Language;
+  questionType: QuestionType;
+  required: boolean;
+}
+
+export interface Metadata {
+  experience?: ExperienceType[];
+  type?: WeekendType[];
+  gear?: Language;
+}
+
+export interface Event extends Omit<EventContent, 'location'> {
+  id: string;
+  created: string;
+  updated: string;
+  registrationCount: number;
+  waitingListCount: number;
+  location: Location;
+}
+
+export function toEventContent(event: Event): EventContent {
+  const location_id = event.location.id;
+  const eventContent = event as unknown as EventContent;
+  eventContent.location = location_id;
+  return eventContent;
+}
+
+export interface EventContent {
+  name: Language;
+  image?: string;
+  description?: Language;
+  dates: DateType[];
+  registrationPeriod?: DateType;
+  registrationMax?: number;
+  waitingListMax?: number;
+  isPublished: boolean;
+  requiredMembershipStatus: MembershipStatus[];
+  eventType: EventType;
+  questions: Question[];
+  metadata?: Metadata;
   location: string;
-  descriptionMarkdown: LanguageType;
-  gear: LanguageType;
-  experience: OptionType[];
-  allowsRegistrations: boolean;
-  numberOfRegistrations: number;
-  maxRegistrations: number;
-  startDateTime: string;
-  endDateTime: string;
-  registrationOpenTime: string;
-  registrationCloseTime: string;
-  registrationFields: LanguageType[];
+}
+
+export interface Location extends LocationContent {
+  id: string;
+  created: Date;
+  updated: Date;
+}
+
+export interface LocationContent {
+  name: Language;
+  reusable: boolean;
+  description?: Language;
 }
 
 interface registrationType {
@@ -60,21 +120,37 @@ export interface registrationsType {
   registrations: registrationType[];
 }
 
-export interface UserType {
+export interface BasicUser {
+  userId: string;
+  firstName: string;
+  infix?: string;
+  lastName: string;
+}
+
+export interface User {
   id: string;
   created: string;
   updated: string;
   firstName: string;
+  infix: string;
   lastName: string;
-  roles: string[];
-  status: string;
+  phone: string;
+  studentNumber: string;
+  nkbvNumber: number;
+  sportcardNumber: number;
+  iceContactName: string;
+  iceContactEmail: null;
+  iceContactPhone: null;
+  importantInfo: null;
+  roles: [];
+  status: MembershipStatus;
   email: string;
 }
 
 export interface rentOption {
-  name: LanguageType;
+  name: Language;
   price: number;
-  remark?: LanguageType;
+  remark?: Language;
 }
 
 export interface ReservationType {
@@ -86,29 +162,56 @@ export interface ReservationType {
 }
 
 export interface ReservationItemType {
-  name: LanguageType;
+  name: Language;
   price: number;
   amount: number;
 }
 
-export type MenuType = 'association' | 'climbing' | 'alps' | 'language' | undefined;
-
-export interface OptionsType {
-  id: OptionType;
-  label: LanguageType;
+export interface Route {
+  name: string;
+  path: string;
+  params?: RouteParams;
 }
+
+export type RouteParams = Record<string, string>;
+export type Navigate = (name: string, params: RouteParams) => void;
+
+export interface State {
+  version: string;
+  route: Route;
+  user?: User;
+  activities?: Event[];
+  event?: Event;
+}
+
+export type MenuType =
+  | 'association'
+  | 'climbing'
+  | 'alps'
+  | 'language'
+  | undefined;
 
 export const typesOptions: OptionsType[] = [
   { id: 'sp', label: { en: 'Single Pitch', nl: 'Single Pitch' } },
   { id: 'mp', label: { en: 'Multi Pitch', nl: 'Multi Pitch' } },
   { id: 'education', label: { en: 'Education', nl: 'Opleiding' } },
   { id: 'boulder', label: { en: 'Bouldering', nl: 'Boulderen' } },
-  { id: 'trad', label: { en: 'Trad', nl: 'Trad' } }
+  { id: 'trad', label: { en: 'Trad', nl: 'Trad' } },
 ];
 
 export const experienceOptions: OptionsType[] = [
   { id: 'sp', label: { en: 'Single Pitch', nl: 'Single Pitch' } },
-  { id: 'mp', label: { en: 'Multi Pitch', nl: 'Multi Pitch' } }
+  { id: 'mp', label: { en: 'Multi Pitch', nl: 'Multi Pitch' } },
+];
+
+export const memberOptions: OptionsType[] = [
+  { id: 'member', label: { en: 'Member', nl: 'Lid' } },
+  {
+    id: 'extraordinary',
+    label: { en: 'Extraordinary Member', nl: 'Buitengewoon Lid' },
+  },
+  { id: 'nonMember', label: { en: 'Non Member', nl: 'Niet Lid' } },
+  { id: 'pending', label: { en: 'Pending', nl: 'In afwachting' } },
 ];
 
 export const eventOptions = [
@@ -120,14 +223,23 @@ export const eventOptions = [
   { id: 'mp', label: { en: 'Multi Pitch', nl: 'Multi Pitch' } },
   { id: 'education', label: { en: 'Education', nl: 'Opleiding' } },
   { id: 'boulder', label: { en: 'Bouldering', nl: 'Boulderen' } },
-  { id: 'trad', label: { en: 'Trad', nl: 'Trad' } }
+  { id: 'trad', label: { en: 'Trad', nl: 'Trad' } },
 ];
 
 export const rentOptions: rentOption[] = [
-  { name: { en: 'Belay device (ATC or smart)', nl: 'Zekerapparaat (ATC of smart)' }, price: 0.5 },
   {
-    name: { en: 'Carabiner (screw or safebiner)', nl: 'Karabiner (schroefbiner of safebiner)' },
-    price: 0.5
+    name: {
+      en: 'Belay device (ATC or smart)',
+      nl: 'Zekerapparaat (ATC of smart)',
+    },
+    price: 0.5,
+  },
+  {
+    name: {
+      en: 'Carabiner (screw or safebiner)',
+      nl: 'Karabiner (schroefbiner of safebiner)',
+    },
+    price: 0.5,
   },
   { name: { en: 'Sling', nl: 'Schlinge' }, price: 0.5 },
   { name: { en: 'Climbing helmet', nl: 'Klimhelm' }, price: 1.0 },
@@ -137,45 +249,60 @@ export const rentOptions: rentOption[] = [
   {
     name: { en: 'Bivouac sack', nl: 'Bivakzak' },
     price: 1.0,
-    remark: { en: '(per month)', nl: '(per maand)' }
+    remark: { en: '(per month)', nl: '(per maand)' },
   },
   { name: { en: 'Ice axe', nl: 'Pickel' }, price: 0.5 },
   { name: { en: 'Ice drill', nl: 'IJsboor' }, price: 1.0 },
   {
-    name: { en: 'Crampons (incl. crampon cover)', nl: 'Stijgijzers (incl. stijgijzerhoes)' },
-    price: 0.5
+    name: {
+      en: 'Crampons (incl. crampon cover)',
+      nl: 'Stijgijzers (incl. stijgijzerhoes)',
+    },
+    price: 0.5,
   },
   { name: { en: 'Tarp', nl: 'Tarp' }, price: 1.5 },
   {
     name: { en: 'Ice axes (per two)', nl: 'IJsbijl (per twee)' },
     price: 15.0,
-    remark: { en: '(per week)', nl: '(per week)' }
+    remark: { en: '(per week)', nl: '(per week)' },
   },
   {
-    name: { en: 'Nuts (per set incl. nut tool)', nl: 'Nuts (per bos incl. nuttenfrutter)' },
-    price: 0.5
+    name: {
+      en: 'Nuts (per set incl. nut tool)',
+      nl: 'Nuts (per bos incl. nuttenfrutter)',
+    },
+    price: 0.5,
   },
   { name: { en: 'Camalot/Friend', nl: 'Camalot/Friend' }, price: 0.5 },
   { name: { en: 'Other trad gear', nl: 'Overig trad gear' }, price: 1.0 },
-  { name: { en: 'Quickdraws (per 6)', nl: 'Setjes (per 6 stuks)' }, price: 0.5 },
+  {
+    name: { en: 'Quickdraws (per 6)', nl: 'Setjes (per 6 stuks)' },
+    price: 0.5,
+  },
   { name: { en: 'Crash pad', nl: 'Crashpad' }, price: 3.5 },
   { name: { en: 'Single rope', nl: 'Enkeltouw' }, price: 1.5 },
   { name: { en: 'Alpine rope', nl: 'Alpien touw' }, price: 1.5 },
-  { name: { en: 'Double rope (per strand)', nl: 'Dubbeltouw (per streng)' }, price: 1.0 },
+  {
+    name: { en: 'Double rope (per strand)', nl: 'Dubbeltouw (per streng)' },
+    price: 1.0,
+  },
   { name: { en: 'Training rope', nl: 'Oefentouw' }, price: 0.0 },
   { name: { en: 'Stove', nl: 'Brander' }, price: 0.5 },
   { name: { en: 'Cooking gear', nl: 'Kookgerei' }, price: 0.0 },
   {
     name: { en: 'Topo', nl: 'Topo' },
     price: 0.0,
-    remark: { en: '(€5.00 per month after 1 month)', nl: '(€5,00 per maand na 1 maand)' }
+    remark: {
+      en: '(€5.00 per month after 1 month)',
+      nl: '(€5,00 per maand na 1 maand)',
+    },
   },
   {
     name: {
       en: 'Climbing set (harness, safebiner, belay device)',
-      nl: 'Klimset (heupgordel, safebiner, zekerapparaat)'
+      nl: 'Klimset (heupgordel, safebiner, zekerapparaat)',
     },
     price: 5.0,
-    remark: { en: '(for max. 6 months)', nl: '(voor max. 6 maanden)' }
-  }
+    remark: { en: '(for max. 6 months)', nl: '(voor max. 6 maanden)' },
+  },
 ];

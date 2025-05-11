@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO event_registration (event_id, user_id, waiting_list_position, answers, created, updated)\n            VALUES ($1, $2, $3, $4, now(), now())\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Int4",
+        "Jsonb"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "6ae6d3363395372d9e7591e21f4211676918062e6b969e52ad3abcfa4ed7b08a"
+}

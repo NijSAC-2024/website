@@ -1,20 +1,25 @@
 import GenericPage from './GenericPage.tsx';
 import ContentCard from '../components/ContentCard.tsx';
-import SignupForm from '../components/SignupForm.tsx';
-import { text } from '../util.ts';
+import SignupForm from '../components/signup/SignupForm.tsx';
 import { Button, Chip, Collapse } from '@mui/material';
 import { useState } from 'react';
-import SingupOptions from '../components/SingupOptions.tsx';
+import SignupOptions from '../components/signup/SingupOptions.tsx';
+import { useLanguage } from '../providers/LanguageProvider.tsx';
 
 type MembershipTypeEN = 'Member' | 'Extraordinary Member' | 'Donor';
 type MembershipTypeNL = 'Lid' | 'Buitengewoon Lid' | 'Donateur';
+
 interface MembershipType {
   en: MembershipTypeEN;
   nl: MembershipTypeNL;
 }
 
 export default function Signup() {
-  const [membership, setMembership] = useState<MembershipType>({ en: 'Member', nl: 'Lid' });
+  const { text } = useLanguage();
+  const [membership, setMembership] = useState<MembershipType>({
+    en: 'Member',
+    nl: 'Lid'
+  });
   const [selectedMembership, setSelectedMembership] = useState<boolean>(false);
 
   const handleExtraordinaryMember = () => {
@@ -37,22 +42,28 @@ export default function Signup() {
     <GenericPage>
       <ContentCard>
         <div className="px-7 pt-7 pb-5">
-          <h1>{text('Register for the NijSAC', 'Inschrijven bij de NijSAC')}</h1>
+          <h1>
+            {text('Register for the NijSAC', 'Inschrijven bij de NijSAC')}
+          </h1>
           <Collapse in={selectedMembership} timeout="auto" unmountOnExit>
             <div className="pt-3 flex items-center gap-1">
               <Chip
                 label={
-                  text('Selected membership: ', 'Geselecteerd lidmaatschap: ') +
-                  text(membership.en, membership.nl)
+                  text(
+                    'Selected membership: ',
+                    'Geselecteerd lidmaatschap: '
+                  ) + text(membership.en, membership.nl)
                 }
                 color="primary"
               />
               <div className=""></div>
-              <Button onClick={handleChange}>{text('Change', 'Verander')}</Button>
+              <Button onClick={handleChange}>
+                {text('Change', 'Verander')}
+              </Button>
             </div>
           </Collapse>
           <Collapse in={!selectedMembership} timeout="auto" unmountOnExit>
-            <SingupOptions
+            <SignupOptions
               handleMember={handleMember}
               handleExtraordinaryMember={handleExtraordinaryMember}
               handleDonor={handleDonor}
