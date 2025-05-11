@@ -48,20 +48,18 @@ export default function RentalForm({
   };
 
   const handleAmountChange = (name: string, increment: boolean) => {
-    const updatedReservation = reservation.items
-                                          .map((item) => {
-                                            if (item.name.en === name) {
-                                              const newAmount = increment ? item.amount + 1 : item.amount - 1;
-                                              return newAmount > 0
-                                                ? {
-                                                  ...item,
-                                                  amount: newAmount
-                                                }
-                                                : null;
-                                            }
-                                            return item;
-                                          })
-                                          .filter((item) => item !== null);
+    const updatedReservation = reservation.items.map((item) => {
+      if (item.name.en === name) {
+        const newAmount = increment ? item.amount + 1 : item.amount - 1;
+        return newAmount > 0
+          ? {
+            ...item,
+            amount: newAmount
+          }
+          : null;
+      }
+      return item;
+    }).filter((item) => item !== null);
     handleReservationChange(
       'items',
       updatedReservation as ReservationItemType[]
