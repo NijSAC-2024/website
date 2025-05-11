@@ -1,10 +1,10 @@
 use crate::{
+    AppState, Pagination,
     auth::role::MembershipStatus,
     data_source::Count,
     error::{AppResult, Error},
     user::BasicUser,
     wire::user::{User, UserContent, UserId},
-    AppState, Pagination,
 };
 use axum::{extract::FromRequestParts, http::request::Parts};
 use sqlx::PgPool;

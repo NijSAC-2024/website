@@ -1,7 +1,7 @@
 use crate::{
+    AppState, Language,
     error::Error,
     wire::event::{Event, EventContent, EventId},
-    AppState, Language,
 };
 
 use crate::{

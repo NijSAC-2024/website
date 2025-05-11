@@ -1,8 +1,8 @@
 use crate::{
+    AppState, Language, LocationFilter,
     data_source::Count,
     error::{AppResult, Error},
     location::{Location, LocationContent, LocationId, UsedBy},
-    AppState, Language, LocationFilter,
 };
 use axum::{extract::FromRequestParts, http::request::Parts};
 use sqlx::PgPool;

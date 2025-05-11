@@ -3,9 +3,8 @@ use crate::{
     error::Error,
 };
 use argon2::{
-    password_hash,
-    password_hash::{rand_core::OsRng, SaltString},
-    Argon2, PasswordHash, PasswordHasher, PasswordVerifier,
+    Argon2, PasswordHash, PasswordHasher, PasswordVerifier, password_hash,
+    password_hash::{SaltString, rand_core::OsRng},
 };
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;

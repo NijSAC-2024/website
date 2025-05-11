@@ -1,15 +1,15 @@
 use crate::{
+    Pagination, ValidatedJson,
     api::ApiResult,
     auth::{role::Role, session::Session},
     data_source::LocationStore,
     error::{AppResult, Error},
     location::{Location, LocationContent, LocationId, UsedBy},
-    Pagination, ValidatedJson,
 };
 use axum::{
+    Json,
     extract::{Path, Query},
     http::HeaderMap,
-    Json,
 };
 use serde::Deserialize;
 

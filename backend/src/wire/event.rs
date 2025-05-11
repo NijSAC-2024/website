@@ -1,4 +1,4 @@
-use crate::{auth::role::MembershipStatus, error::Error, file::FileId, user::BasicUser, Language};
+use crate::{Language, auth::role::MembershipStatus, error::Error, file::FileId, user::BasicUser};
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 use std::{borrow::Cow, ops::Deref, str::FromStr};
@@ -53,7 +53,7 @@ impl FromStr for ActivityType {
             _ => {
                 return Err(Error::Other(format!(
                     "Invalid event type {s}: Must be one of event, course, weekend, or training"
-                )))
+                )));
             }
         })
     }

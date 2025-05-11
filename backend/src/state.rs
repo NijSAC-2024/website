@@ -1,7 +1,7 @@
 use crate::error::{AppResult, Error};
 use axum::{extract::FromRequestParts, http::request::Parts};
-use object_store::{memory::InMemory, ObjectStore};
-use sqlx::{postgres::PgPoolOptions, PgPool};
+use object_store::{ObjectStore, memory::InMemory};
+use sqlx::{PgPool, postgres::PgPoolOptions};
 use std::{env, ops::Deref, sync::Arc};
 use tracing::error;
 

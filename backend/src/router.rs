@@ -12,11 +12,11 @@ use crate::{
     update_location, upload,
 };
 use axum::{
+    Json, Router,
     extract::{DefaultBodyLimit, State},
     routing::{get, post, put},
-    Json, Router,
 };
-use memory_serve::{load_assets, MemoryServe};
+use memory_serve::{MemoryServe, load_assets};
 use tower_http::{trace, trace::TraceLayer};
 use tracing::Level;
 

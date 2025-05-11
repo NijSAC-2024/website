@@ -8,7 +8,7 @@ use crate::{
     user::UserId,
     wire::event::EventId,
 };
-use axum::{extract::Path, Json};
+use axum::{Json, extract::Path};
 use time::OffsetDateTime;
 
 fn update_all_full_event_access(session: &Session) -> AppResult<()> {
