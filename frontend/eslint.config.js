@@ -3,6 +3,7 @@ import tseslint from 'typescript-eslint';
 import hooksPlugin from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import stylisticTs from '@stylistic/eslint-plugin-ts';
+import react from 'eslint-plugin-react';
 
 export default tseslint.config(
   {
@@ -21,7 +22,8 @@ export default tseslint.config(
       'typescript-eslint': tseslint.plugin,
       'react-hooks': hooksPlugin,
       'react-refresh': reactRefresh,
-      '@stylistic/ts': stylisticTs
+      '@stylistic/ts': stylisticTs,
+      react
     },
     languageOptions: {
       parserOptions: {

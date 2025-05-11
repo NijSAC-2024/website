@@ -11,7 +11,7 @@ axum-extra = { version = "0.10.0", features = ["cookie"] }
 tower-http = { version = "0.6.2", features = ["trace"] }
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
-sqlx = { version = "0.8.3", features = ["postgres", "runtime-tokio", "migrate", "macros", "time", "uuid", "tls-rustls"] }
+sqlx = { version = "0.8.3", default-features = false, features = ["json", "postgres", "runtime-tokio", "migrate", "macros", "time", "uuid", "tls-rustls-aws-lc-rs"] }
 thiserror = "2.0.11"
 validator = { version = "0.20.0", features = ["derive"] }
 uuid = { version = "1.12.1", features = ["v7", "serde"] }
@@ -23,8 +23,8 @@ serde_with = "3.12.0"
 memory-serve = "1.0.0"
 time = { version = "0.3.37", features = ["serde"] }
 rand = "0.9.0"
-strum_macros = "0.26.4"
-object_store = "0.11.2"
+strum_macros = "0.27.1"
+object_store = "0.12.0"
 bytes = "1.9.0"
 mime = "0.3.17"
 image = { version = "0.25.5", features = ["webp"] }
