@@ -9,10 +9,11 @@ import AreYouSure from '../AreYouSure.tsx';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 
 interface SaveButtonProps {
+  id: string | undefined;
   handleSave: (isPublished: boolean) => void;
 }
 
-export default function SaveButton({ handleSave }: SaveButtonProps) {
+export default function SaveButton({ id, handleSave }: SaveButtonProps) {
   const { text } = useLanguage();
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
@@ -32,7 +33,7 @@ export default function SaveButton({ handleSave }: SaveButtonProps) {
         className="fixed bottom-5 right-5 z-10 hover:dark:bg-[#42a5f5] hover:bg-[#1565c0] hover:shadow-2xl shadow-xl duration-300 dark:bg-[#90caf9] bg-[#1976d2] text-white rounded-3xl py-1 px-3 dark:text-black">
         <Button color="inherit" onClick={() => handleSave(true)}>
           <SaveIcon className="mr-2" />
-          {text('Save Event', 'Evenement opslaan')}
+          {id ? text('Update Event', 'Evenement updaten') : text('Publish Event', 'Evenement publiceren')}
         </Button>
         <Tooltip
           title={

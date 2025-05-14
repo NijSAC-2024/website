@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext, useState } from 'react';
+import {createContext, ReactNode, useContext, useEffect, useState} from 'react';
 import { enqueueSnackbar } from 'notistack';
 import { apiFetch, apiFetchVoid } from '../api.ts';
 import { User } from '../types.ts';
@@ -35,6 +35,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
       setUser(data);
       setIsLoggedIn(true);
     } else {
+      setUser(undefined)
       setIsLoggedIn(false);
     }
   };
@@ -79,6 +80,10 @@ export default function AuthProvider({ children }: AuthProviderProps) {
       toggleAuthOpen();
     }
   };
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
 
   return (
     <AuthContext.Provider

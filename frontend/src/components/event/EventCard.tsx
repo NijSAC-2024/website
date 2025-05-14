@@ -20,8 +20,6 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
   const { text, lang } = useLanguage();
   moment.locale(lang);
 
-  console.log('event: ', event);
-
   const formatDate = (date: DateType): string => {
     moment.locale(lang);
 
@@ -104,7 +102,7 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
         )}
         <img
           className="w-full aspect-[4/2] object-cover"
-          src={event.image}
+          src={event.image || '/images/test-header-image.jpg'}
           alt="not available"
         />
         <div className="p-5 grid space-y-1">

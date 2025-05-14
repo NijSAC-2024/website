@@ -120,17 +120,18 @@ export default function EditEvent({ eventContent: init }: EditEventProps) {
   const handleSave = async (bool: boolean) => {
     if (id) {
       await updateEvent(id, { ...event, isPublished: bool });
-      navigate('agenda');
+      navigate(`agenda/${id}`);
     } else {
       await createEvent({ ...event, isPublished: bool });
+      navigate('agenda');
     }
   };
 
   return (
     <GenericPage image={event.image}>
-      <SaveButton handleSave={handleSave} />
+      <SaveButton id={id} handleSave={handleSave} />
 
-      <div className="grid xl:grid-cols-3 gap-5 mt-[-9.3rem]">
+      <div className="grid xl:grid-cols-3 gap-5 mt-[-4.7rem]">
         <div className="xl:col-span-3 mb-[-0.5rem] flex justify-between">
           <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">
             <Button color="inherit" onClick={() => navigate('agenda')}>

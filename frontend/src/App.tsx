@@ -18,10 +18,12 @@ import ErrorPage from './pages/ErrorPage.tsx';
 import AddEvent from './pages/AddEvent.tsx';
 import { useAppState } from './providers/AppStateProvider.tsx';
 import Event from './pages/Event.tsx';
+import Settings from './pages/Settings.tsx';
 
 export default function App(): React.ReactElement {
   const { navigate, route } = useAppState();
-  const { isDarkMode, toggleTheme } = useThemeMode();
+  const { themeMode, checkDarkMode, setTheme } = useThemeMode();
+  const isDarkMode = checkDarkMode();
   const language = useLanguage();
 
   const darkTheme = createTheme({
@@ -85,7 +87,12 @@ export default function App(): React.ReactElement {
   // DEBUG: on "ctrl-,", flip the theme, on "ctrl-.", flip the language
   const eventListener = (e: KeyboardEvent) => {
     if (e.ctrlKey && e.key === ',') {
-      toggleTheme();
+      if (themeMode == 'dark') {
+        setTheme('light');
+      }
+      else if (themeMode == 'light') {
+        setTheme('dark');
+      }
     }
 
     if (e.ctrlKey && e.key === '.') {
@@ -137,6 +144,8 @@ export default function App(): React.ReactElement {
     component = <AddEvent />;
   } else if (route.name == 'event') {
     component = <Event />;
+  } else if (route.name == 'settings') {
+    component = <Settings />;
   } else {
     console.log('not found');
     component = <ErrorPage error={'Page not found'} />;

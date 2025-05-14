@@ -5,6 +5,8 @@ export interface ValidateProps {
   setValue: (value: string) => void;
 }
 
+export type ThemeType = 'dark' | 'light' | 'auto';
+
 export type WeekendType = 'sp' | 'mp' | 'boulder' | 'trad' | 'education';
 
 export type ExperienceType = 'sp' | 'mp';
@@ -188,7 +190,6 @@ export type MenuType =
   | 'association'
   | 'climbing'
   | 'alps'
-  | 'language'
   | undefined;
 
 export const typesOptions: OptionsType[] = [

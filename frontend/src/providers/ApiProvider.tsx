@@ -55,7 +55,7 @@ export default function ApiProvider({ children }: ApiProviderProps) {
     }
     setEvent(updatedEvent);
     setCache(!cache);
-    enqueueSnackbar('saved', {
+    enqueueSnackbar('Saved', {
       variant: 'success',
     });
   };
@@ -73,7 +73,7 @@ export default function ApiProvider({ children }: ApiProviderProps) {
     }
     setEvent(updatedEvent);
     setCache(!cache);
-    enqueueSnackbar('saved', {
+    enqueueSnackbar('Saved', {
       variant: 'success',
     });
   };

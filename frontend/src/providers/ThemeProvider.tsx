@@ -1,9 +1,11 @@
-import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
+import {ThemeType} from '../types.ts';
 
 interface ThemeContextType {
-  isDarkMode: boolean;
-  toggleTheme: () => void;
+  themeMode: ThemeType;
+  checkDarkMode: () => boolean;
+  setTheme: (mode: 'dark' | 'light' | 'auto') => void;
 }
 
 interface ThemeProviderProps {
@@ -14,44 +16,34 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export default function ThemeProvider({ children }: ThemeProviderProps) {
   const [themeCookie, setThemeCookie] = useCookies(['theme']);
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
-    if (themeCookie.theme) {
-      return themeCookie.theme;
-    } else {
-      return false;
-    }
-  });
+  const [themeMode, setThemeMode] = useState<ThemeType>(themeCookie.theme? themeCookie.theme : 'light');
+
+  const checkDarkMode = () => {
+    return themeMode === 'dark' || (themeMode === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  }
+
 
   useEffect(() => {
-    setThemeCookie('theme', isDarkMode.toString(), {
-      secure: true,
-      sameSite: 'strict'
-    });
-
     const rootElement = document.querySelector('#root');
     if (rootElement) {
-      if (isDarkMode) {
+      if (checkDarkMode()) {
         rootElement.classList.add('dark');
       } else {
         rootElement.classList.remove('dark');
       }
     }
-  }, [isDarkMode]);
+  });
 
-  const toggleTheme = () => {
-    setIsDarkMode((prevMode) => !prevMode);
+  const setTheme = (mode: 'dark' | 'light' | 'auto') => {
+    setThemeCookie('theme', mode, {
+      secure: true,
+      sameSite: 'strict'
+    });
+    setThemeMode(mode);
   };
 
-  const value = useMemo(
-    () => ({
-      isDarkMode,
-      toggleTheme
-    }),
-    [isDarkMode]
-  );
-
   return (
-    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
+    <ThemeContext.Provider value={{themeMode, checkDarkMode, setTheme}}>{children}</ThemeContext.Provider>
   );
 }
 

@@ -47,7 +47,7 @@ export default function Event() {
                     <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">
                       <Button
                         color="inherit"
-                        onClick={() => navigate('/agenda')}
+                        onClick={() => navigate('agenda')}
                       >
                         {text('Back to Agenda', 'Terug naar Agenda')}
                       </Button>

@@ -19,6 +19,7 @@ import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import { useAuth } from '../../providers/AuthProvider.tsx';
 import UserMenu from './UserMenu.tsx';
 import { useAppState } from '../../providers/AppStateProvider.tsx';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 interface MobileMenuProps {
   handleLoginOpen: () => void;
@@ -31,7 +32,7 @@ export default function MobileMenu({
   dropdownOpen,
   toggleDropdown
 }: MobileMenuProps) {
-  const { text, setEnglish, setDutch } = useLanguage();
+  const { text } = useLanguage();
   const { navigate } = useAppState();
   const { isLoggedIn } = useAuth();
   const [openMenu, setOpenMenu] = useState<MenuType>(undefined);
@@ -61,7 +62,7 @@ export default function MobileMenu({
             if (dropdownOpen) {
               toggleDropdown();
             }
-            navigate('home');
+            navigate('index');
           }}
         />
         <IconButton size="large" color="inherit" onClick={toggleDropdown}>
@@ -347,44 +348,19 @@ export default function MobileMenu({
 
           <Divider />
 
-          {/* Language */}
-          <ListItem onClick={() => toggleMenu('language')} disablePadding>
-            <ListItemButton>
+          {/* Settings */}
+          <ListItem disablePadding>
+            <ListItemButton onClick={() => {navigate('settings');
+              toggleDropdown();}}>
               <ListItemText
-                primary={text('Language', 'Taal')}
+                primary={text('Settings', 'Instellingen')}
                 className="uppercase px-10"
               />
               <ListItemIcon>
-                {openMenu === 'language' ? <ExpandLess /> : <ExpandMore />}
+                <SettingsIcon />
               </ListItemIcon>
             </ListItemButton>
           </ListItem>
-          <Collapse in={openMenu === 'language'} timeout="auto" unmountOnExit>
-            <List disablePadding>
-              <ListItem disablePadding>
-                <ListItemButton onClick={setEnglish}>
-                  <ListItemText
-                    primary={
-                      <p className="text-[#1976d2] dark:text-[#90caf9] px-14 text-sm">
-                        English
-                      </p>
-                    }
-                  />
-                </ListItemButton>
-              </ListItem>
-              <ListItem disablePadding>
-                <ListItemButton onClick={setDutch}>
-                  <ListItemText
-                    primary={
-                      <p className="text-[#1976d2] dark:text-[#90caf9] px-14 text-sm">
-                        Nederlands
-                      </p>
-                    }
-                  />
-                </ListItemButton>
-              </ListItem>
-            </List>
-          </Collapse>
 
           {/* Login+Become Member / Logout */}
           {!isLoggedIn ? (
