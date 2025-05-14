@@ -17,7 +17,7 @@ export default function DescriptionCard({
   gear,
   experience
 }: DescriptionCardProps) {
-  const { text, lang } = useLanguage();
+  const { text, language } = useLanguage();
   return (
     <ContentCard className="xl:col-span-2 flex flex-col justify-between">
       <div className="p-7">
@@ -33,7 +33,7 @@ export default function DescriptionCard({
               {text('Necessary Gear', 'Benodigde Uitrusting')}
             </b>
             <div className="flex flex-wrap gap-1 mt-1">
-              {lang === 'en'
+              {language === 'en'
                 ? gear.en.split(',').map((item) => item.trim()).map((gear, index) => (
                   <Chip
                     key={index}

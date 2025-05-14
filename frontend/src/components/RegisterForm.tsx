@@ -15,8 +15,8 @@ export default function RegisterForm({
   title,
   registrationCloseTime
 }: RegisterFormProps) {
-  const { text, lang } = useLanguage();
-  moment.locale(lang);
+  const { text, language } = useLanguage();
+  moment.locale(language);
 
   return (
     <div className="grid gap-3">

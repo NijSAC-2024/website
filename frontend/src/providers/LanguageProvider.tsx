@@ -59,7 +59,7 @@ export default function LanguageProvider({ children }: LanguageProviderProps) {
 export const useLanguage = (): LanguageContextType => {
   const context = useContext(LanguageContext);
   if (!context) {
-    throw new Error('useThemeMode must be used within a ThemeProvider');
+    throw new Error('useLanguage must be used within a LanguageProvider');
   }
   return context;
 };

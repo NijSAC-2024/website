@@ -24,8 +24,8 @@ export default function RegisterButton({
   title
 }: RegisterButtonProps) {
   const { isLoggedIn, toggleAuthOpen } = useAuth();
-  const { text, lang } = useLanguage();
-  moment.locale(lang);
+  const { text, language } = useLanguage();
+  moment.locale(language);
   const [registerDialogOpen, setRegisterDialogOpen] = useState<boolean>(false);
 
   const toggleDialog = () => {

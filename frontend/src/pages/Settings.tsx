@@ -11,7 +11,7 @@ export default function Settings() {
   const { language, text, setLang } = useLanguage();
   const themes = [
     {
-      name: {en: 'Automatic', nl: 'Automatisch'},
+      name: {en: 'System default', nl: 'Systeemstandaard'},
       value: 'auto',
     },
     {
@@ -41,7 +41,8 @@ export default function Settings() {
   return (
     <GenericPage>
       <ContentCard className="p-7">
-        <TextCard className="p-6">
+        <h1 className="text-3xl">{text('Settings', 'Instellingen')}</h1>
+        <TextCard className="px-6 py-3 mt-3">
           <DisplayOptions title={text('Language', 'Taal')} value={language} onChange={onLanguageChange} options={languages} />
           <div className="pt-4">
             <DisplayOptions title={text('Display options', 'Weergaveopties')} value={themeMode} onChange={onThemeChange} options={themes} />

@@ -17,11 +17,10 @@ interface AgendaCardProps {
 
 export default function EventCard({ event, agendaPage }: AgendaCardProps) {
   const { navigate } = useAppState();
-  const { text, lang } = useLanguage();
-  moment.locale(lang);
+  const { text, language } = useLanguage();
+  moment.locale(language);
 
   const formatDate = (date: DateType): string => {
-    moment.locale(lang);
 
     const start = new Date(date.start);
     const end = new Date(date.end);
