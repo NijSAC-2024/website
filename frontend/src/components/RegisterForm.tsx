@@ -57,12 +57,25 @@ export default function RegisterForm({
           }}
         />
       ))}
-      <Button variant="contained" fullWidth onClick={() => handleRegistration(answers, existingAnswers && existingAnswers.length > 0)}>
+      <Button
+        variant="contained"
+        fullWidth
+        onClick={() => handleRegistration(answers, existingAnswers && existingAnswers.length > 0)}
+        disabled={
+          registrationQuestions
+            .filter((q) => q.required)
+            .some((q) => {
+              const answer = answers.find((a) => a.questionId === q.id);
+              return !answer?.answer?.trim();
+            })
+        }
+      >
         {text(
           existingAnswers ? 'Update Registration' : 'Register',
           existingAnswers ? 'Inschrijving bijwerken' : 'Inschrijven'
         )}
       </Button>
+
     </div>
   );
 }
