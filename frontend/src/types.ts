@@ -113,15 +113,6 @@ export interface LocationContent {
   description?: Language;
 }
 
-interface registrationType {
-  eid: number;
-  name: string;
-}
-
-export interface registrationsType {
-  registrations: registrationType[];
-}
-
 export interface BasicUser {
   userId: string;
   firstName: string;

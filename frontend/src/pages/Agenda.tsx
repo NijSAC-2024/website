@@ -8,10 +8,12 @@ import Link from '../components/Link.tsx';
 import EventCard from '../components/event/EventCard.tsx';
 import { useApiState } from '../providers/ApiProvider.tsx';
 import { useLanguage } from '../providers/LanguageProvider.tsx';
+import {useAuth} from '../providers/AuthProvider.tsx';
 
 export default function Agenda() {
   const { text } = useLanguage();
   const { events } = useApiState();
+  const { isLoggedIn }= useAuth()
   const [selectedCategory, setSelectedCategory] = useState<EventType | 'all'>(
     'all'
   );
@@ -19,14 +21,16 @@ export default function Agenda() {
 
   return (
     <>
-      <div className="fixed bottom-5 right-5 z-10">
-        <Link routeName={'new_event'}>
-          <Fab variant="extended" color="primary">
-            <AddIcon className="mr-2" />
-            <p>{text('Add event', 'Voeg evenement toe')}</p>
-          </Fab>
-        </Link>
-      </div>
+      {isLoggedIn && (
+        <div className="fixed bottom-5 right-5 z-10">
+          <Link routeName={'new_event'}>
+            <Fab variant="extended" color="primary">
+              <AddIcon className="mr-2" />
+              <p>{text('Add event', 'Voeg evenement toe')}</p>
+            </Fab>
+          </Link>
+        </div>
+      )}
       <GenericPage>
         <div className="Agenda">
           <div className="grid xl:grid-cols-3 lg:grid-cols-2 grid-flow-row gap-5">

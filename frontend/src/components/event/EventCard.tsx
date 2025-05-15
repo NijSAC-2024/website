@@ -166,6 +166,7 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
             questions={event.questions}
             registrationMax={event.registrationMax}
             registrationCount={event.registrationCount}
+            id={event.id}
           />
         </div>
       )}

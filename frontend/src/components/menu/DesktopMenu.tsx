@@ -1,4 +1,4 @@
-import { Button, Menu, MenuItem, Toolbar } from '@mui/material';
+import {Button, Menu, MenuItem, Toolbar, Tooltip} from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import UserMenu from './UserMenu.tsx';
 import { useAuth } from '../../providers/AuthProvider.tsx';
@@ -151,20 +151,22 @@ export default function DesktopMenu({ handleLoginOpen }: DesktopMenuProps) {
         {/* Login+Become Member / Logout */}
         {!isLoggedIn ? (
           <>
+            {/* Settings Dropdown */}
+            <Tooltip title={text('Settings', 'Instellingen')}>
+              <Button
+                color="inherit"
+                className="flex items-center"
+                onClick={() => navigate('settings')}
+              >
+                <SettingsIcon />
+              </Button>
+            </Tooltip>
+
             <Button color="inherit" onClick={handleLoginOpen}>
               {text('Login', 'Inloggen')}
             </Button>
             <Button variant="contained" onClick={() => navigate('register')}>
               {text('Become a member', 'Lid worden')}
-            </Button>
-            
-            {/* Settings Dropdown */}
-            <Button
-              color="inherit"
-              className="flex items-center"
-              onClick={() => navigate('settings')}
-            >
-              <SettingsIcon />
             </Button>
           </>
         ) : (

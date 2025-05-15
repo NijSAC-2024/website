@@ -10,11 +10,13 @@ import { useAppState } from '../providers/AppStateProvider.tsx';
 import { useApiState } from '../providers/ApiProvider.tsx';
 import { useLanguage } from '../providers/LanguageProvider.tsx';
 import { toEventContent } from '../types.ts';
+import {useAuth} from '../providers/AuthProvider.tsx';
 
 export default function Event() {
   const { text } = useLanguage();
   const { navigate } = useAppState();
   const { event } = useApiState();
+  const { isLoggedIn }= useAuth()
 
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const toggleIsEditing = () => {
@@ -35,16 +37,18 @@ export default function Event() {
             <EditEvent eventContent={toEventContent(event)} />
           ) : (
             <>
-              <div className="fixed bottom-5 right-5 z-10">
-                <Fab
-                  variant="extended"
-                  color="primary"
-                  onClick={toggleIsEditing}
-                >
-                  <EditIcon className="mr-2" />
-                  {text('Edit event', 'Evenement bewerken')}
-                </Fab>
-              </div>
+              {isLoggedIn && (
+                <div className="fixed bottom-5 right-5 z-10">
+                  <Fab
+                    variant="extended"
+                    color="primary"
+                    onClick={toggleIsEditing}
+                  >
+                    <EditIcon className="mr-2" />
+                    {text('Edit event', 'Evenement bewerken')}
+                  </Fab>
+                </div>
+              )}
               <GenericPage image={event?.image}>
                 <div className="grid xl:grid-cols-3 gap-5 mt-[-9.3rem]">
                   <div className="xl:col-span-3 mb-[-0.5rem] flex justify-between items-center">
