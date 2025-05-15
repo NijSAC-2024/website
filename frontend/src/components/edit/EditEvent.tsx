@@ -23,12 +23,12 @@ interface EditEventProps {
   eventContent: EventContent;
 }
 
-export default function EditEvent({ eventContent: init }: EditEventProps) {
+export default function EditEvent({ eventContent }: EditEventProps) {
   const { text } = useLanguage();
   const { createEvent, updateEvent } = useApiState();
   const { route } = useAppState();
   const { navigate } = useAppState();
-  const [event, setEvent] = useState<EventContent>(init);
+  const [event, setEvent] = useState<EventContent>(eventContent);
 
   const id = route.params?.id;
 
@@ -68,7 +68,7 @@ export default function EditEvent({ eventContent: init }: EditEventProps) {
         idx === index
           ? {
             ...date,
-            [startDate ? 'startDateTime' : 'endDateTime']: value
+            [startDate ? 'start' : 'end']: value
           }
           : date
       )
@@ -129,7 +129,7 @@ export default function EditEvent({ eventContent: init }: EditEventProps) {
 
   return (
     <GenericPage image={event.image}>
-      <SaveButton id={id} handleSave={handleSave} />
+      <SaveButton id={id} handleSave={handleSave} event={event} />
 
       <div className="grid xl:grid-cols-3 gap-5 mt-[-4.7rem]">
         <div className="xl:col-span-3 mb-[-0.5rem] flex justify-between">

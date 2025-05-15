@@ -11,7 +11,7 @@ export default function Settings() {
   const { language, text, setLang } = useLanguage();
   const themes = [
     {
-      name: {en: 'System default', nl: 'Systeemstandaard'},
+      name: {en: 'Use system settinsgs', nl: 'Gebruik apparaat instellingen'},
       value: 'auto',
     },
     {

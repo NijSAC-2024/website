@@ -28,7 +28,7 @@ export default function EditDates({
           <DateTimePicker
             label={text('Start Date', 'Startdatum')}
             value={moment(dates[0].start)}
-            onChange={(date) => handleDateChange(0, true, date!.toISOString())}
+            onChange={(date) => {handleDateChange(0, true, date!.toISOString()); console.log(date!.toISOString());}}
           />
           <DateTimePicker
             label={text('End Date', 'Einddatum')}

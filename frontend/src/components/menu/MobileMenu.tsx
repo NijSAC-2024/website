@@ -346,25 +346,25 @@ export default function MobileMenu({
             </List>
           </Collapse>
 
-          <Divider />
-
-          {/* Settings */}
-          <ListItem disablePadding>
-            <ListItemButton onClick={() => {navigate('settings');
-              toggleDropdown();}}>
-              <ListItemText
-                primary={text('Settings', 'Instellingen')}
-                className="uppercase px-10"
-              />
-              <ListItemIcon>
-                <SettingsIcon />
-              </ListItemIcon>
-            </ListItemButton>
-          </ListItem>
-
           {/* Login+Become Member / Logout */}
           {!isLoggedIn ? (
             <>
+              {/* Settings */}
+              <ListItem disablePadding>
+                <ListItemButton onClick={() => {navigate('settings');
+                  toggleDropdown();}}>
+                  <ListItemText
+                    primary={text('Settings', 'Instellingen')}
+                    className="uppercase px-10"
+                  />
+                  <ListItemIcon>
+                    <SettingsIcon />
+                  </ListItemIcon>
+                </ListItemButton>
+              </ListItem>
+
+              <Divider/>
+
               <ListItem onClick={handleLoginOpen} disablePadding>
                 <ListItemButton>
                   <ListItemText

@@ -1,6 +1,6 @@
 import { Button, Dialog, DialogActions, DialogContent } from '@mui/material';
 import { useAuth } from '../providers/AuthProvider.tsx';
-import { Language, Question } from '../types.ts';
+import {DateType, Language, MembershipStatus, Question} from '../types.ts';
 import { useState } from 'react';
 import RegisterForm from './RegisterForm.tsx';
 import { useLanguage } from '../providers/LanguageProvider.tsx';
@@ -9,8 +9,8 @@ import moment from 'moment/moment';
 interface RegisterButtonProps {
   registrationCount?: number;
   registrationMax?: number;
-  registrationOpenTime: string;
-  registrationCloseTime: string;
+  registrationPeriod: DateType
+  requiredMembershipStatus: MembershipStatus[];
   questions: Question[];
   title: Language;
 }
@@ -18,12 +18,12 @@ interface RegisterButtonProps {
 export default function RegisterButton({
   registrationCount,
   registrationMax,
-  registrationOpenTime,
-  registrationCloseTime,
+  registrationPeriod,
+  requiredMembershipStatus,
   questions,
   title
 }: RegisterButtonProps) {
-  const { isLoggedIn, toggleAuthOpen } = useAuth();
+  const { isLoggedIn, toggleAuthOpen, user } = useAuth();
   const { text, language } = useLanguage();
   moment.locale(language);
   const [registerDialogOpen, setRegisterDialogOpen] = useState<boolean>(false);
@@ -33,8 +33,8 @@ export default function RegisterButton({
   };
 
   const now = new Date();
-  const openTime = new Date(registrationOpenTime);
-  const closeTime = new Date(registrationCloseTime);
+  const openTime = new Date(registrationPeriod.start);
+  const closeTime = new Date(registrationPeriod.end);
 
   return (
     <>
@@ -47,14 +47,14 @@ export default function RegisterButton({
           <p>
             {text('Registrations open at ', 'Inschrijvingen openen op ')}
           </p>
-          <p>{moment(registrationOpenTime).format('DD MMM HH:mm')}</p>
+          <p>{moment(registrationPeriod.start).format('DD MMM HH:mm')}</p>
         </div>
       ) : closeTime > now ? (
         <Button
           onClick={isLoggedIn ? toggleDialog : toggleAuthOpen}
           variant="contained"
         >
-          {isLoggedIn
+          {isLoggedIn && requiredMembershipStatus.includes(user!.status) || requiredMembershipStatus.includes('nonMember')
             ? text('Register', 'Inschrijven')
             : text('Login to register', 'Login om in te schrijven')}
         </Button>
@@ -66,7 +66,7 @@ export default function RegisterButton({
               'Inschrijvingen zijn gesloten sinds '
             )}
           </p>
-          <p>{moment(registrationCloseTime).format('DD MMM HH:mm')}</p>
+          <p>{moment(registrationPeriod.end).format('DD MMM HH:mm')}</p>
         </div>
       )}
       <Dialog open={registerDialogOpen} onClose={toggleDialog} fullWidth>
@@ -74,7 +74,7 @@ export default function RegisterButton({
           <RegisterForm
             registrationQuestions={questions}
             title={title}
-            registrationCloseTime={registrationCloseTime}
+            registrationCloseTime={registrationPeriod.end}
           />
         </DialogContent>
         <DialogActions>

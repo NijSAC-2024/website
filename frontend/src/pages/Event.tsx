@@ -2,7 +2,7 @@ import { useState } from 'react';
 import GenericPage from './GenericPage.tsx';
 import EventCard from '../components/event/EventCard.tsx';
 import EditIcon from '@mui/icons-material/Edit';
-import { Button, Chip, Fab } from '@mui/material';
+import {Backdrop, Button, CircularProgress, Fab } from '@mui/material';
 import EditEvent from '../components/edit/EditEvent.tsx';
 import RegistrationsCard from '../components/event/RegistrationsCard.tsx';
 import DescriptionCard from '../components/event/DescriptionCard.tsx';
@@ -23,8 +23,12 @@ export default function Event() {
 
   return (
     <>
-      {!event ? (
-        'Loading'
+      {!event?.location? (
+        <Backdrop
+          open={!event?.location}
+        >
+          <CircularProgress/>
+        </Backdrop>
       ) : (
         <>
           {isEditing ? (
@@ -53,11 +57,9 @@ export default function Event() {
                       </Button>
                     </div>
                     {!event?.isPublished && (
-                      <Chip
-                        label={text('Draft', 'Concept')}
-                        className="uppercase font-semibold"
-                        color="primary"
-                      />
+                      <Button variant="contained">
+                        <b>{text('Draft', 'Concept')}</b>
+                      </Button>
                     )}
                   </div>
 

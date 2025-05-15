@@ -157,19 +157,19 @@ export default function DesktopMenu({ handleLoginOpen }: DesktopMenuProps) {
             <Button variant="contained" onClick={() => navigate('register')}>
               {text('Become a member', 'Lid worden')}
             </Button>
+            
+            {/* Settings Dropdown */}
+            <Button
+              color="inherit"
+              className="flex items-center"
+              onClick={() => navigate('settings')}
+            >
+              <SettingsIcon />
+            </Button>
           </>
         ) : (
           <UserMenu />
         )}
-
-        {/* Settings Dropdown */}
-        <Button
-          color="inherit"
-          className="flex items-center"
-          onClick={() => navigate('settings')}
-        >
-          <SettingsIcon />
-        </Button>
       </div>
     </Toolbar>
   );

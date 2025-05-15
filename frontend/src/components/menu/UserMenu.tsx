@@ -35,7 +35,7 @@ export default function UserMenu() {
           aria-haspopup="true"
           aria-expanded={open ? 'true' : undefined}
         >
-          <Avatar className="w-8 h-8">{user?.firstName.charAt(0)}</Avatar>
+          <Avatar className="w-8 h-8">{user?.firstName.charAt(0).toUpperCase()}</Avatar>
         </IconButton>
       </Tooltip>
       <Menu

@@ -148,27 +148,28 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
             )
           )}
         </div>
-        {event.registrationPeriod?.start && event.registrationPeriod?.end && (
-          <div
-            className="p-5 flex justify-between items-center border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
-            <div className="flex items-center">
-              <GroupIcon className="mr-2" />
-              <p>
-                {event.registrationCount}
-                {event.registrationMax && '/' + event.registrationMax}
-              </p>
-            </div>
-            <RegisterButton
-              registrationCloseTime={event.registrationPeriod?.end}
-              registrationOpenTime={event.registrationPeriod?.start}
-              title={event.name}
-              questions={event.questions}
-              registrationMax={event.registrationMax}
-              registrationCount={event.registrationCount}
-            />
-          </div>
-        )}
       </div>
+      {event.registrationPeriod?.start && event.registrationPeriod?.end && (
+        <div
+          className="p-5 flex justify-between items-center border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
+          <div className="flex items-center">
+            <GroupIcon className="mr-2" />
+            <p>
+              {event.registrationCount}
+              {event.registrationMax && '/' + event.registrationMax}
+            </p>
+          </div>
+          <RegisterButton
+            registrationPeriod={event.registrationPeriod}
+            requiredMembershipStatus={event.requiredMembershipStatus}
+            title={event.name}
+            questions={event.questions}
+            registrationMax={event.registrationMax}
+            registrationCount={event.registrationCount}
+          />
+        </div>
+      )}
+
     </div>
   );
 }
