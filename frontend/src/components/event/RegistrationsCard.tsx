@@ -25,7 +25,7 @@ export default function RegistrationsCard() {
                     }
                   }}
                 >
-                  <TableCell>{registration.firstName}</TableCell>
+                  <TableCell>{`${registration?.firstName} ${registration?.infix ?? ''} ${registration?.lastName}`}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

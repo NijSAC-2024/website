@@ -12,7 +12,8 @@ export const routes = [
   ['/about', 'about'],
   ['/material-rental', 'material_rental'],
   ['/not-found', 'not_found'],
-  ['/settings', 'settings']
+  ['/settings', 'settings'],
+  ['/account', 'account']
 ];
 
 function toRouteObject(route: string[]): Route {

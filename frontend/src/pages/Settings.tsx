@@ -44,9 +44,9 @@ export default function Settings() {
         <h1 className="text-3xl">{text('Settings', 'Instellingen')}</h1>
         <TextCard className="px-6 py-3 mt-3">
           <DisplayOptions title={text('Language', 'Taal')} value={language} onChange={onLanguageChange} options={languages} />
-          <div className="pt-4">
-            <DisplayOptions title={text('Display options', 'Weergaveopties')} value={themeMode} onChange={onThemeChange} options={themes} />
-          </div>
+        </TextCard>
+        <TextCard className="px-6 py-3 mt-3">
+          <DisplayOptions title={text('Display options', 'Weergaveopties')} value={themeMode} onChange={onThemeChange} options={themes} />
         </TextCard>
       </ContentCard>
     </GenericPage>

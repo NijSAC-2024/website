@@ -19,6 +19,7 @@ import AddEvent from './pages/AddEvent.tsx';
 import { useAppState } from './providers/AppStateProvider.tsx';
 import Event from './pages/Event.tsx';
 import Settings from './pages/Settings.tsx';
+import Account from './pages/Account.tsx';
 
 export default function App(): React.ReactElement {
   const { navigate, route } = useAppState();
@@ -146,6 +147,8 @@ export default function App(): React.ReactElement {
     component = <Event />;
   } else if (route.name == 'settings') {
     component = <Settings />;
+  } else if (route.name == 'account') {
+    component = <Account />;
   } else {
     console.log('not found');
     component = <ErrorPage error={'Page not found'} />;

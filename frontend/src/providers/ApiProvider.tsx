@@ -10,14 +10,16 @@ import { useAppState } from './AppStateProvider.tsx';
 import { apiFetch } from '../api.ts';
 import { enqueueSnackbar } from 'notistack';
 import { useAuth } from './AuthProvider.tsx';
+import {useLanguage} from './LanguageProvider.tsx';
 
 interface ApiContextType {
   events?: Event[];
   locations?: Location[];
   event?: Event;
   registrations?: Registration[];
-  updateEvent: (id: string, event: EventContent) => Promise<void>;
+  updateEvent: (eventId: string, event: EventContent) => Promise<void>;
   createEvent: (event: EventContent) => Promise<void>;
+  deleteEvent: (eventId: string) => Promise<void>;
   updateRegistration: (eventId: string, answers: Answer[]) => Promise<void>;
   createRegistration: (eventId: string, answers: Answer[]) => Promise<void>;
   deleteRegistration: (eventId: string) => Promise<void>;
@@ -33,6 +35,7 @@ export default function ApiProvider({ children }: ApiProviderProps) {
   const { route } = useAppState();
   const { user } = useAuth()
   const { isLoggedIn } = useAuth();
+  const { text } = useLanguage();
   // We use this boolean to invalidate cached API calls whenever an item gets updated.
   // The `useEffects` depend on the boolean to trigger a reload on any change
   const [cache, setCache] = useState<boolean>(false);
@@ -43,9 +46,9 @@ export default function ApiProvider({ children }: ApiProviderProps) {
   );
   const [registrations, setRegistrations] = useState<Array<Registration>>([]);
 
-  const updateEvent = async (id: string, event: EventContent) => {
+  const updateEvent = async (eventId: string, event: EventContent) => {
     const { error, data: updatedEvent } = await apiFetch<Event>(
-      `/event/${id}`,
+      `/event/${eventId}`,
       {
         method: 'PUT',
         body: JSON.stringify(event),
@@ -59,7 +62,7 @@ export default function ApiProvider({ children }: ApiProviderProps) {
     }
     setEvent(updatedEvent);
     setCache(!cache);
-    enqueueSnackbar('Saved', {
+    enqueueSnackbar(text('Event updated', 'Evenement bijgewerkt'), {
       variant: 'success',
     });
   };
@@ -77,7 +80,24 @@ export default function ApiProvider({ children }: ApiProviderProps) {
     }
     setEvent(updatedEvent);
     setCache(!cache);
-    enqueueSnackbar('Saved', {
+    enqueueSnackbar(text('Event created', 'Evenement aangemaakt'), {
+      variant: 'success',
+    });
+  };
+
+  const deleteEvent = async (eventId: string) => {
+    const { error } = await apiFetch(`/event/${eventId}`, {
+      method: 'DELETE',
+    });
+
+    if (error) {
+      enqueueSnackbar(`${error.message}: ${error.reference}`, {
+        variant: 'error',
+      });
+      return;
+    }
+    setCache(!cache);
+    enqueueSnackbar(text('Event deleted', 'Evenement verwijderd'), {
       variant: 'success',
     });
   };
@@ -95,7 +115,7 @@ export default function ApiProvider({ children }: ApiProviderProps) {
       return;
     }
 
-    enqueueSnackbar('Registration updated', {
+    enqueueSnackbar(text('Registration updated', 'Inschrijving bijgewerkt'), {
       variant: 'success',
     });
   };
@@ -113,7 +133,7 @@ export default function ApiProvider({ children }: ApiProviderProps) {
       return;
     }
     setCache(!cache);
-    enqueueSnackbar('Registered', {
+    enqueueSnackbar(text('Registered', 'Ingeschreven'), {
       variant: 'success',
     });
   }
@@ -130,7 +150,7 @@ export default function ApiProvider({ children }: ApiProviderProps) {
       return;
     }
     setCache(!cache);
-    enqueueSnackbar('Registration deleted', {
+    enqueueSnackbar(text('Registration deleted', 'Inschrijving verwijderd'), {
       variant: 'success',
     });
   };
@@ -208,6 +228,7 @@ export default function ApiProvider({ children }: ApiProviderProps) {
         registrations,
         updateEvent,
         createEvent,
+        deleteEvent,
         updateRegistration,
         createRegistration,
         deleteRegistration

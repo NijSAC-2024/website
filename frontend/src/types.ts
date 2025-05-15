@@ -17,11 +17,14 @@ export type MembershipStatus =
   | 'pending'
   | 'member'
   | 'extraordinary'
-  | 'nonMember';
+  | 'nonMember'
+  | 'donor';
 
 export type QuestionType = 'shortText' | 'longText' | 'number' | 'time';
 
 export type LanguageEnum = 'nl' | 'en';
+
+export type RoleType = 'default' | 'admin';
 
 export interface OptionsType {
   id:
@@ -135,7 +138,7 @@ export interface User {
   iceContactEmail: null;
   iceContactPhone: null;
   importantInfo: null;
-  roles: [];
+  roles: RoleType[];
   status: MembershipStatus;
   email: string;
 }
@@ -206,7 +209,7 @@ export const memberOptions: OptionsType[] = [
   { id: 'pending', label: { en: 'Pending', nl: 'In afwachting' } },
 ];
 
-export const eventOptions = [
+export const labelOptions: OptionsType[] = [
   { id: 'activity', label: { en: 'Activity', nl: 'Activiteit' } },
   { id: 'course', label: { en: 'Course', nl: 'Cursus' } },
   { id: 'training', label: { en: 'Training', nl: 'Training' } },
@@ -216,6 +219,12 @@ export const eventOptions = [
   { id: 'education', label: { en: 'Education', nl: 'Opleiding' } },
   { id: 'boulder', label: { en: 'Bouldering', nl: 'Boulderen' } },
   { id: 'trad', label: { en: 'Trad', nl: 'Trad' } },
+  { id: 'member', label: { en: 'Member', nl: 'Lid' } },
+  {
+    id: 'extraordinary',
+    label: { en: 'Extraordinary Member', nl: 'Buitengewoon Lid' },
+  },
+  { id: 'donor', label: { en: 'Donor', nl: 'Donateur' } }
 ];
 
 export const rentOptions: rentOption[] = [

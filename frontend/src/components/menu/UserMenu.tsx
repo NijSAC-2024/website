@@ -45,7 +45,7 @@ export default function UserMenu() {
         onClick={handleMenuClose}
         className="shadow "
       >
-        <MenuItem onClick={handleMenuClose}>
+        <MenuItem onClick={() => navigateSubmenu('account')}>
           <ListItemIcon>
             <AccountCircleIcon />
           </ListItemIcon>

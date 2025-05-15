@@ -16,7 +16,7 @@ export default function Event() {
   const { text } = useLanguage();
   const { navigate } = useAppState();
   const { event } = useApiState();
-  const { isLoggedIn }= useAuth()
+  const { isLoggedIn, user }= useAuth()
 
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const toggleIsEditing = () => {
@@ -37,7 +37,7 @@ export default function Event() {
             <EditEvent eventContent={toEventContent(event)} />
           ) : (
             <>
-              {isLoggedIn && (
+              {isLoggedIn && user?.roles.includes('admin')  && (
                 <div className="fixed bottom-5 right-5 z-10">
                   <Fab
                     variant="extended"

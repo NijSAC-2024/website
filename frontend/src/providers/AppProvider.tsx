@@ -16,11 +16,12 @@ export default function AppProvider({ children }: AppProviderProps) {
     <CookiesProvider>
       <AuthProvider>
         <AppStateProvider>
-          <ApiProvider>
-            <ThemeProvider>
-              <LanguageProvider>{children}</LanguageProvider>
-            </ThemeProvider>
-          </ApiProvider>
+          <ThemeProvider>
+            <LanguageProvider>
+              <ApiProvider>{children}
+              </ApiProvider>
+            </LanguageProvider>
+          </ThemeProvider>
         </AppStateProvider>
       </AuthProvider>
     </CookiesProvider>

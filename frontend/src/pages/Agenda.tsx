@@ -13,7 +13,7 @@ import {useAuth} from '../providers/AuthProvider.tsx';
 export default function Agenda() {
   const { text } = useLanguage();
   const { events } = useApiState();
-  const { isLoggedIn }= useAuth()
+  const { isLoggedIn, user}= useAuth()
   const [selectedCategory, setSelectedCategory] = useState<EventType | 'all'>(
     'all'
   );
@@ -21,7 +21,7 @@ export default function Agenda() {
 
   return (
     <>
-      {isLoggedIn && (
+      {isLoggedIn && user?.roles.includes('admin') && (
         <div className="fixed bottom-5 right-5 z-10">
           <Link routeName={'new_event'}>
             <Fab variant="extended" color="primary">
