@@ -177,8 +177,8 @@ export default function RegisterButton({
         onCancel={toggleDialog}
         onConfirm={handleDeleteRegistration}
         message={text(
-          'You are about to delete this registration.',
-          'Je staat op het punt deze inschrijving te verwijderen.'
+          'You are about to deregister for this event.',
+          'Je staat op het punt je uit te schrijven voor dit evenement.'
         )}
       />
     </>

@@ -34,7 +34,7 @@ export default function Event() {
       ) : (
         <>
           {isEditing ? (
-            <EditEvent eventContent={toEventContent(event)} />
+            <EditEvent toggleIsEditing={toggleIsEditing} eventContent={toEventContent(event)} />
           ) : (
             <>
               {isLoggedIn && user?.roles.includes('admin')  && (

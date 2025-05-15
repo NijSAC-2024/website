@@ -150,7 +150,7 @@ export default function ApiProvider({ children }: ApiProviderProps) {
       return;
     }
     setCache(!cache);
-    enqueueSnackbar(text('Registration deleted', 'Inschrijving verwijderd'), {
+    enqueueSnackbar(text('Deregistered', 'Uitgeschreven'), {
       variant: 'success',
     });
   };

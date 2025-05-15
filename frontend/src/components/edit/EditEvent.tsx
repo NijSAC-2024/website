@@ -21,9 +21,10 @@ import { useLanguage } from '../../providers/LanguageProvider.tsx';
 
 interface EditEventProps {
   eventContent: EventContent;
+  toggleIsEditing: () => void;
 }
 
-export default function EditEvent({ eventContent }: EditEventProps) {
+export default function EditEvent({ eventContent, toggleIsEditing }: EditEventProps) {
   const { text } = useLanguage();
   const { createEvent, updateEvent } = useApiState();
   const { route } = useAppState();
@@ -121,6 +122,7 @@ export default function EditEvent({ eventContent }: EditEventProps) {
     if (id) {
       await updateEvent(id, { ...event, isPublished: bool });
       navigate(`agenda/${id}`);
+      toggleIsEditing();
     } else {
       await createEvent({ ...event, isPublished: bool });
       navigate('agenda');
@@ -129,7 +131,7 @@ export default function EditEvent({ eventContent }: EditEventProps) {
 
   return (
     <GenericPage image={event.image}>
-      <SaveButton id={id} handleSave={handleSave} event={event} />
+      <SaveButton id={id ?? ''} handleSave={handleSave} event={event} />
 
       <div className="grid xl:grid-cols-3 gap-5 mt-[-4.7rem]">
         <div className="xl:col-span-3 mb-[-0.5rem] flex justify-between">
