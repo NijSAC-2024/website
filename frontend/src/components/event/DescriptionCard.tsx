@@ -25,52 +25,55 @@ export default function DescriptionCard({
           {text(descriptionMarkdown.en, descriptionMarkdown.nl)}
         </Markdown>
       </div>
-      <div
-        className="flex justify-between px-7 py-5 border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
-        {(gear.en.length > 0 || gear.nl.length > 0) && (
-          <div>
-            <b className="text-[#1976d2] dark:text-[#90caf9]">
-              {text('Necessary Gear', 'Benodigde Uitrusting')}
-            </b>
-            <div className="flex flex-wrap gap-1 mt-1">
-              {language === 'en'
-                ? gear.en.split(',').map((item) => item.trim()).map((gear, index) => (
+      {(gear.en.length > 0 || gear.nl.length > 0 || experience.length > 0) && (
+        <div
+          className="flex justify-between px-7 py-5 border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
+          {(gear.en.length > 0 || gear.nl.length > 0) && (
+            <div>
+              <b className="text-[#1976d2] dark:text-[#90caf9]">
+                {text('Necessary Gear', 'Benodigde Uitrusting')}
+              </b>
+              <div className="flex flex-wrap gap-1 mt-1">
+                {language === 'en'
+                  ? gear.en.split(',').map((item) => item.trim()).map((gear, index) => (
+                    <Chip
+                      key={index}
+                      label={gear}
+                      className="uppercase font-semibold"
+                      size="small"
+                    />
+                  ))
+                  : gear.nl.split(',').map((item) => item.trim()).map((gear, index) => (
+                    <Chip
+                      key={index}
+                      label={gear}
+                      className="uppercase font-semibold"
+                      size="small"
+                    />
+                  ))}
+              </div>
+            </div>
+          )}
+          {experience.length > 0 && (
+            <div>
+              <b className="text-[#1976d2] dark:text-[#90caf9]">
+                {text('Necessary Experience', 'Benodigde Ervaring')}
+              </b>
+              <div className="flex flex-wrap gap-1 mt-1">
+                {experience.map((experience, index) => (
                   <Chip
                     key={index}
-                    label={gear}
-                    className="uppercase font-semibold"
-                    size="small"
-                  />
-                ))
-                : gear.nl.split(',').map((item) => item.trim()).map((gear, index) => (
-                  <Chip
-                    key={index}
-                    label={gear}
+                    label={text(getLabel(experience))}
                     className="uppercase font-semibold"
                     size="small"
                   />
                 ))}
+              </div>
             </div>
-          </div>
-        )}
-        {experience.length > 0 && (
-          <div>
-            <b className="text-[#1976d2] dark:text-[#90caf9]">
-              {text('Necessary Experience', 'Benodigde Ervaring')}
-            </b>
-            <div className="flex flex-wrap gap-1 mt-1">
-              {experience.map((experience, index) => (
-                <Chip
-                  key={index}
-                  label={text(getLabel(experience))}
-                  className="uppercase font-semibold"
-                  size="small"
-                />
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
+
     </ContentCard>
   );
 }
