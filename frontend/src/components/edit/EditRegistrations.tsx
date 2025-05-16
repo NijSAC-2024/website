@@ -39,11 +39,15 @@ export default function EditRegistrations({
 }: EditRegistrationProps) {
   const { text } = useLanguage();
   const handleToggleRegistrations = () => {
-    const now = new Date();
-    handleFieldChange('registrationPeriod', {
-      start: now.toISOString(),
-      end: dates[0]?.start || now.toISOString()
-    });
+    if (registrationPeriod) {
+      handleFieldChange('registrationPeriod', null);
+    } else {
+      const now = new Date();
+      handleFieldChange('registrationPeriod', {
+        start: now.toISOString(),
+        end: dates[0]?.start || now.toISOString()
+      });
+    }
   };
 
   return (
@@ -95,7 +99,7 @@ export default function EditRegistrations({
               value={moment(registrationPeriod?.start)}
               onChange={(date) =>
                 handleFieldChange('registrationPeriod', {
-                  start: date!.toISOString(false),
+                  start: date!.toISOString(),
                   end: registrationPeriod!.end
                 })
               }
@@ -108,8 +112,8 @@ export default function EditRegistrations({
               value={moment(registrationPeriod?.end)}
               onChange={(date) =>
                 handleFieldChange('registrationPeriod', {
-                  start: date!.toISOString(false),
-                  end: registrationPeriod!.end
+                  start: registrationPeriod!.start,
+                  end: date!.toISOString()
                 })
               }
             />

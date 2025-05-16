@@ -11,7 +11,9 @@ export const routes = [
   ['/agenda/:id', 'event'],
   ['/about', 'about'],
   ['/material-rental', 'material_rental'],
-  ['/not-found', 'not_found']
+  ['/not-found', 'not_found'],
+  ['/settings', 'settings'],
+  ['/account', 'account']
 ];
 
 function toRouteObject(route: string[]): Route {

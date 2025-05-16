@@ -90,7 +90,7 @@ export default function EditRegistrationQuestions({
           ))}
         </div>
       )}
-      <div className="flex justify-center">
+      <div className="flex justify-center z-0">
         <Tooltip title={text('Add Question', 'Voeg Vraag Toe')}>
           <Fab
             size="small"

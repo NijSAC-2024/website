@@ -164,8 +164,6 @@ export default function EditAgendaCard({
               ))}
             </Select>
           </FormControl>
-          <hr />
-          Dates
           {/*Dates*/}
           <EditDates
             dates={dates}

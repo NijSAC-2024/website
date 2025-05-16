@@ -1,4 +1,4 @@
-import { Button, Menu, MenuItem, Toolbar } from '@mui/material';
+import {Button, Menu, MenuItem, Toolbar, Tooltip} from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import UserMenu from './UserMenu.tsx';
 import { useAuth } from '../../providers/AuthProvider.tsx';
@@ -7,13 +7,14 @@ import { MouseEvent, useState } from 'react';
 import { MenuType } from '../../types.ts';
 import Link from '../Link.tsx';
 import { useAppState } from '../../providers/AppStateProvider.tsx';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 interface DesktopMenuProps {
   handleLoginOpen: () => void;
 }
 
 export default function DesktopMenu({ handleLoginOpen }: DesktopMenuProps) {
-  const { text, setEnglish, setDutch } = useLanguage();
+  const { text } = useLanguage();
   const { navigate } = useAppState();
   const { isLoggedIn } = useAuth();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | undefined>(undefined);
@@ -35,7 +36,7 @@ export default function DesktopMenu({ handleLoginOpen }: DesktopMenuProps) {
   };
 
   return (
-    <Toolbar className="flex justify-between w-[80%] max-w-[1000px] mx-auto">
+    <Toolbar className="flex justify-between w-[80%] max-w-[1050px] mx-auto">
       <div className="flex items-center">
         <Link routeName={'index'}>
           <img
@@ -147,41 +148,20 @@ export default function DesktopMenu({ handleLoginOpen }: DesktopMenuProps) {
         </Menu>
       </div>
       <div className="flex items-center">
-        {/* Language Dropdown */}
-        <Button
-          color="inherit"
-          className="flex items-center"
-          onClick={(e) => handleMenuOpen(e, 'language')}
-        >
-          {text('EN', 'NL')}
-          <ExpandMoreIcon />
-        </Button>
-        <Menu
-          anchorEl={anchorEl}
-          open={openMenu === 'language'}
-          onClose={handleMenuClose}
-        >
-          <MenuItem
-            onClick={() => {
-              setEnglish();
-              handleMenuClose();
-            }}
-          >
-            English
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              setDutch();
-              handleMenuClose();
-            }}
-          >
-            Nederlands
-          </MenuItem>
-        </Menu>
-
         {/* Login+Become Member / Logout */}
         {!isLoggedIn ? (
           <>
+            {/* Settings Dropdown */}
+            <Tooltip title={text('Settings', 'Instellingen')}>
+              <Button
+                color="inherit"
+                className="flex items-center"
+                onClick={() => navigate('settings')}
+              >
+                <SettingsIcon />
+              </Button>
+            </Tooltip>
+
             <Button color="inherit" onClick={handleLoginOpen}>
               {text('Login', 'Inloggen')}
             </Button>
