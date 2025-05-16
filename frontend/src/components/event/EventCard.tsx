@@ -141,8 +141,8 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
                   {text(getLabel(event.eventType)) +
                     text(' dates:', ' datums:')}
                 </b>
-                {event.dates.map((date) => (
-                  <p>{formatDate(date)}</p>
+                {event.dates.map((date, index) => (
+                  <p key={date.start + index}>{formatDate(date)}</p>
                 ))}
               </>
             )

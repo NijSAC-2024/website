@@ -115,6 +115,7 @@ export default function ApiProvider({ children }: ApiProviderProps) {
       return;
     }
 
+    setCache(!cache);
     enqueueSnackbar(text('Registration updated', 'Inschrijving bijgewerkt'), {
       variant: 'success',
     });

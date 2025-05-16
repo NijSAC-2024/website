@@ -25,17 +25,17 @@ export default function DescriptionCard({
           {text(descriptionMarkdown.en, descriptionMarkdown.nl)}
         </Markdown>
       </div>
-      {(gear.en.length > 0 || gear.nl.length > 0 || experience.length > 0) && (
+      {(gear.en?.length > 0 || gear.nl?.length > 0 || experience.length > 0) && (
         <div
           className="flex justify-between px-7 py-5 border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
-          {(gear.en.length > 0 || gear.nl.length > 0) && (
+          {(gear.en?.length > 0 || gear.nl?.length > 0) && (
             <div>
               <b className="text-[#1976d2] dark:text-[#90caf9]">
                 {text('Necessary Gear', 'Benodigde Uitrusting')}
               </b>
               <div className="flex flex-wrap gap-1 mt-1">
                 {language === 'en'
-                  ? gear.en.split(',').map((item) => item.trim()).map((gear, index) => (
+                  ? gear.en?.split(',').map((item) => item.trim()).map((gear, index) => (
                     <Chip
                       key={index}
                       label={gear}
@@ -43,7 +43,7 @@ export default function DescriptionCard({
                       size="small"
                     />
                   ))
-                  : gear.nl.split(',').map((item) => item.trim()).map((gear, index) => (
+                  : gear.nl?.split(',').map((item) => item.trim()).map((gear, index) => (
                     <Chip
                       key={index}
                       label={gear}

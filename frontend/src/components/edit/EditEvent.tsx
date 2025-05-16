@@ -21,10 +21,10 @@ import { useLanguage } from '../../providers/LanguageProvider.tsx';
 
 interface EditEventProps {
   eventContent: EventContent;
-  toggleIsEditing: () => void;
+  stopEditing?: () => void;
 }
 
-export default function EditEvent({ eventContent, toggleIsEditing }: EditEventProps) {
+export default function EditEvent({ eventContent, stopEditing }: EditEventProps) {
   const { text } = useLanguage();
   const { createEvent, updateEvent } = useApiState();
   const { route } = useAppState();
@@ -120,9 +120,11 @@ export default function EditEvent({ eventContent, toggleIsEditing }: EditEventPr
 
   const handleSave = async (bool: boolean) => {
     if (id) {
+      if (stopEditing) {
+        stopEditing();
+      }
       await updateEvent(id, { ...event, isPublished: bool });
       navigate(`agenda/${id}`);
-      toggleIsEditing();
     } else {
       await createEvent({ ...event, isPublished: bool });
       navigate('agenda');

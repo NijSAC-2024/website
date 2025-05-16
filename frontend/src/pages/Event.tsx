@@ -19,9 +19,10 @@ export default function Event() {
   const { isLoggedIn, user }= useAuth()
 
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const toggleIsEditing = () => {
-    setIsEditing((prevState) => !prevState);
-  };
+
+  const stopEditing = () => {
+    setIsEditing(false);
+  }
 
   return (
     <>
@@ -34,7 +35,7 @@ export default function Event() {
       ) : (
         <>
           {isEditing ? (
-            <EditEvent toggleIsEditing={toggleIsEditing} eventContent={toEventContent(event)} />
+            <EditEvent stopEditing={stopEditing} eventContent={toEventContent(event)} />
           ) : (
             <>
               {isLoggedIn && user?.roles.includes('admin')  && (
@@ -42,7 +43,7 @@ export default function Event() {
                   <Fab
                     variant="extended"
                     color="primary"
-                    onClick={toggleIsEditing}
+                    onClick={() => setIsEditing(true)}
                   >
                     <EditIcon className="mr-2" />
                     {text('Edit event', 'Evenement bewerken')}
@@ -78,7 +79,7 @@ export default function Event() {
                       }
                     }
                   />
-                  <RegistrationsCard />
+                  <RegistrationsCard questions={event.questions} />
                 </div>
               </GenericPage>
             </>
