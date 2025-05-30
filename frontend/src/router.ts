@@ -9,6 +9,7 @@ export const routes = [
   ['/agenda', 'agenda'],
   ['/agenda/new', 'new_event'],
   ['/agenda/:id', 'event'],
+  ['/agenda/:id/edit', 'edit_event'],
   ['/about', 'about'],
   ['/material-rental', 'material_rental'],
   ['/not-found', 'not_found'],
@@ -45,7 +46,6 @@ export function matchPath(path: string): Route | undefined {
       `^${route[0].replace(/:([^\s/]+)/g, '(?<$1>[\\w-]+)')}$`
     );
     const matches = path.match(match);
-    console.log('matches: ', matches?.groups);
 
     if (matches !== null) {
       return { name: route[1], path: route[0], params: matches.groups };

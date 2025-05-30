@@ -1,37 +1,59 @@
-import { Checkbox, Fab, TextField } from '@mui/material';
+import { Checkbox, IconButton, TextField } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import { Language, Question } from '../../types.ts';
+import { EventContent, Language, Question } from '../../types.ts';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 
 interface EditRegistrationQuestionProps {
-  registrationQuestions: Question[];
-  handleRegistrationQuestionChange: (
-    id: string,
-    name: keyof Question,
-    value: Language | boolean
-  ) => void;
-  handleAddRegistrationQuestion: () => void;
-  handleRemoveRegistrationQuestion: (id: string) => void;
+  questions: Question[];
+  handleEventChange: (changes: Partial<EventContent>) => void;
 }
 
 export default function EditRegistrationQuestions({
-  registrationQuestions,
-  handleRegistrationQuestionChange,
-  handleAddRegistrationQuestion,
-  handleRemoveRegistrationQuestion
+  questions,
+  handleEventChange
 }: EditRegistrationQuestionProps) {
   const { text } = useLanguage();
+
+  const handleRegistrationQuestionChange = (
+    id: string,
+    name: keyof Question,
+    value: Language | boolean
+  ) => {
+    handleEventChange({
+      questions: questions.map((question) =>
+        question.id === id ? { ...question, [name]: value } : question
+      )
+    });
+  };
+
+  const handleAddRegistrationQuestion = () =>
+    handleEventChange({
+      questions: [
+        ...questions,
+        {
+          id: crypto.randomUUID(),
+          questionType: 'shortText',
+          question: { en: '', nl: '' },
+          required: false
+        }
+      ]
+    });
+
+  const handleRemoveRegistrationQuestion = (id: string) =>
+    handleEventChange({
+      questions: questions.filter((q) => q.id !== id)
+    });
 
   return (
     <>
       <h3>{text('Registration Questions', 'Inschrijfvragen')}</h3>
-      {registrationQuestions.length === 0 ? (
+      {questions.length === 0 ? (
         <p>{text('No questions yet.', 'Nog geen vragen.')}</p>
       ) : (
         <div className="grid gap-2">
-          {registrationQuestions.map((question, index) => (
+          {questions.map((question, index) => (
             <div key={question.id} className="flex items-center z-0">
               <div className="flex w-full gap-2">
                 <TextField
@@ -75,15 +97,15 @@ export default function EditRegistrationQuestions({
                 <Tooltip
                   title={text('Delete Question', 'Verwijder Vraag')}
                 >
-                  <Fab
+                  <IconButton
                     size="small"
                     color="error"
                     onClick={() =>
                       handleRemoveRegistrationQuestion(question.id)
                     }
                   >
-                    <DeleteIcon />
-                  </Fab>
+                    <DeleteIcon fontSize="medium" />
+                  </IconButton>
                 </Tooltip>
               </div>
             </div>
@@ -92,13 +114,13 @@ export default function EditRegistrationQuestions({
       )}
       <div className="flex justify-center z-0">
         <Tooltip title={text('Add Question', 'Voeg Vraag Toe')}>
-          <Fab
+          <IconButton
             size="small"
             color="primary"
             onClick={() => handleAddRegistrationQuestion()}
           >
-            <AddIcon />
-          </Fab>
+            <AddIcon fontSize="large" />
+          </IconButton>
         </Tooltip>
       </div>
     </>

@@ -181,11 +181,12 @@ impl TryFrom<PgRegistration> for Registration {
 impl EventStore {
     pub async fn new_event(
         &self,
-        event: EventContent<LocationId>,
+        mut event: EventContent<LocationId>,
         created_by: &UserId,
     ) -> AppResult<Event<Location>> {
         let event_id = Uuid::now_v7();
 
+        event.dates.sort_by_key(|date| date.start);
         let (start_dates, end_dates) = event.dates.into_iter().fold(
             (Vec::new(), Vec::new()),
             |(mut start_dates, mut end_dates), date| {
@@ -350,8 +351,9 @@ impl EventStore {
     pub async fn update_event(
         &self,
         id: &EventId,
-        updated: EventContent<LocationId>,
+        mut updated: EventContent<LocationId>,
     ) -> AppResult<Event<Location>> {
+        updated.dates.sort_by_key(|date| date.start);
         let (start_dates, end_dates) = updated.dates.into_iter().fold(
             (Vec::new(), Vec::new()),
             |(mut start_dates, mut end_dates), date| {

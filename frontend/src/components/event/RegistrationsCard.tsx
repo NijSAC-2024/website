@@ -1,16 +1,16 @@
 import ContentCard from '../ContentCard.tsx';
 import { Table, TableBody, TableCell, TableRow } from '@mui/material';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
-import { useApiState } from '../../providers/ApiProvider.tsx';
 import { useAuth } from '../../providers/AuthProvider.tsx';
 import {Question} from '../../types.ts';
+import { useEvents } from '../../hooks/useEvents.ts';
 
 interface RegistrationsCardProps {
   questions: Question[];
 }
 
 export default function RegistrationsCard({questions}: RegistrationsCardProps) {
-  const { registrations } = useApiState();
+  const { registrations } = useEvents();
   const { text } = useLanguage();
   const { isLoggedIn, user } = useAuth();
 

@@ -1,5 +1,5 @@
 import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
-import { DateType, EventContent, EventType, Language, Metadata, typesOptions } from '../../types.ts';
+import { DateType, EventContent, EventType, Language, Metadata, typesOptions, WeekendType } from '../../types.ts';
 import OptionSelector from '../OptionSelector.tsx';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import { ChangeEvent } from 'react';
@@ -10,17 +10,11 @@ import { useApiState } from '../../providers/ApiProvider.tsx';
 interface EditAgendaCardProps {
   category: EventType;
   image?: string;
-  metadata: Metadata;
+  metadata?: Metadata;
   name: Language;
   dates: DateType[];
   location: string;
-  handleFieldChange: (
-    name: keyof EventContent,
-    value: Metadata | EventType | Language | string
-  ) => void;
-  handleDateChange: (index: number, startDate: boolean, value: string) => void;
-  handleAddDate: () => void;
-  handleRemoveDate: (index: number) => void;
+  handleEventChange: (changes: Partial<EventContent>) => void;
 }
 
 export default function EditAgendaCard({
@@ -30,10 +24,7 @@ export default function EditAgendaCard({
   name,
   dates,
   location,
-  handleFieldChange,
-  handleDateChange,
-  handleAddDate,
-  handleRemoveDate
+  handleEventChange
 }: EditAgendaCardProps) {
   const { text } = useLanguage();
   const { locations } = useApiState();
@@ -43,7 +34,7 @@ export default function EditAgendaCard({
       const reader = new FileReader();
       reader.onload = () => {
         if (reader.result) {
-          handleFieldChange('image', reader.result.toString());
+          handleEventChange({ image: reader.result.toString() });
         }
       };
       reader.readAsDataURL(file);
@@ -90,9 +81,10 @@ export default function EditAgendaCard({
                 value={category}
                 label={text('Category*', 'Categorie*')}
                 variant="outlined"
-                onChange={(e) =>
-                  handleFieldChange('eventType', e.target.value as EventType)
-                }
+                onChange={(e) => {
+                  console.log(e.target.value);
+                  handleEventChange({ eventType: e.target.value as EventType })
+                }}
               >
                 <MenuItem value="activity">
                   {text('Activity', 'Activiteit')}
@@ -112,10 +104,12 @@ export default function EditAgendaCard({
               options={typesOptions}
               selected={metadata?.type}
               onChange={(selectedTypes) =>
-                handleFieldChange('metadata', {
-                  ...metadata,
-                  type: selectedTypes
-                } as Metadata)
+                handleEventChange({
+                  metadata: {
+                    ...metadata,
+                    type: selectedTypes as WeekendType[]
+                  }
+                })
               }
               label={'Type'}
             />
@@ -126,9 +120,11 @@ export default function EditAgendaCard({
               value={name.en}
               label={text('Title English*', 'Titel Engels*')}
               onChange={(e) =>
-                handleFieldChange('name', {
-                  ...name,
-                  en: e.target.value
+                handleEventChange({
+                  name: {
+                    ...name,
+                    en: e.target.value
+                  }
                 })
               }
             />
@@ -136,9 +132,11 @@ export default function EditAgendaCard({
               value={name.nl}
               label={text('Title Dutch*', 'Titel Nederlands*')}
               onChange={(e) =>
-                handleFieldChange('name', {
-                  ...name,
-                  nl: e.target.value
+                handleEventChange({
+                  name: {
+                    ...name,
+                    nl: e.target.value
+                  }
                 })
               }
             />
@@ -149,11 +147,12 @@ export default function EditAgendaCard({
               {text('Location*', 'Locatie*')}
             </InputLabel>
             <Select
+              required
               labelId="select-label"
               value={location}
               label={text('Location*', 'Locatie*')}
               onChange={(e) =>
-                handleFieldChange('location', e.target.value as string)
+                handleEventChange({ location: e.target.value })
               }
               variant="outlined"
             >
@@ -167,9 +166,7 @@ export default function EditAgendaCard({
           {/*Dates*/}
           <EditDates
             dates={dates}
-            handleAddDate={handleAddDate}
-            handleDateChange={handleDateChange}
-            handleRemoveDate={handleRemoveDate}
+            handleEventChange={handleEventChange}
           />
         </div>
       </div>
