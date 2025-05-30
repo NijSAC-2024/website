@@ -7,7 +7,7 @@ use crate::{
     },
     auth::{login, logout},
     create_location, delete_location, get_file_content, get_file_metadata, get_files, get_location,
-    get_locations, get_user, location_used_by,
+    get_locations, get_user, get_user_registrations, location_used_by,
     state::AppState,
     update_location, upload,
 };
@@ -55,6 +55,10 @@ fn api_router() -> Router<AppState> {
             get(get_user).put(update_user).delete(delete_user),
         )
         .route("/user/{:id}/password", post(update_pwd))
+        .route(
+            "/user/{:id}/event_registrations",
+            post(get_user_registrations),
+        )
         .route("/user/{:id}/material", get(get_material_list))
         .route("/user/{:id}/getMaterial", get(get_user_materials))
         .route("/user/{:id}/material/update", put(update_user_material))

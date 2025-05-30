@@ -64,6 +64,18 @@ pub async fn get_event_registrations(
     Ok(Json(res))
 }
 
+pub async fn get_user_registrations(
+    store: EventStore,
+    Path(id): Path<UserId>,
+    session: Session,
+) -> ApiResult<Vec<EventId>> {
+    if update_single_full_registration_access(&id, &session).is_ok() {
+        Ok(Json(store.get_user_registrations(session.user_id()).await?))
+    } else {
+        Err(Error::Unauthorized)
+    }
+}
+
 /// Partially public endpoint, no login required.
 /// If logged in with sufficient rights, one can see hidden activities.
 pub async fn get_event(

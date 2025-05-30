@@ -557,6 +557,20 @@ impl EventStore {
         .await?)
     }
 
+    pub async fn get_user_registrations(&self, user_id: &UserId) -> AppResult<Vec<EventId>> {
+        Ok(sqlx::query_scalar!(
+            r#"
+            SELECT event_id FROM event_registration WHERE user_id = $1
+            "#,
+            **user_id
+        )
+        .fetch_all(&self.db)
+        .await?
+        .into_iter()
+        .map(Into::into)
+        .collect())
+    }
+
     pub async fn get_registrations_detailed(&self, id: &EventId) -> AppResult<Vec<Registration>> {
         sqlx::query_as!(
             PgRegistration,
