@@ -12,7 +12,7 @@ use crate::{
     user::{BasicUser, UserId},
 };
 use axum::{extract::FromRequestParts, http::request::Parts};
-use sqlx::{Executor, PgConnection, PgPool, Postgres};
+use sqlx::{PgConnection, PgPool};
 use time::OffsetDateTime;
 use uuid::Uuid;
 use validator::Validate;
@@ -50,8 +50,8 @@ struct PgEvent {
     image: Option<Uuid>,
     description_nl: String,
     description_en: String,
-    start: Option<Vec<OffsetDateTime>>,
-    end: Option<Vec<OffsetDateTime>>,
+    start_dates: Vec<OffsetDateTime>,
+    end_dates: Vec<OffsetDateTime>,
     registration_start: Option<OffsetDateTime>,
     registration_end: Option<OffsetDateTime>,
     registration_max: Option<i32>,
@@ -108,17 +108,12 @@ where
     fn try_from(pg: PgEvent) -> Result<Self, Self::Error> {
         let location = TryFrom::try_from(pg.clone())?;
 
-        let dates = if let Some(start) = pg.start {
-            start
-                .into_iter()
-                .zip(pg.end.expect(
-                    "If we retrieve an vec of starts from the DB then there must also be ends",
-                ))
-                .map(|(start, end)| Date { start, end })
-                .collect()
-        } else {
-            vec![]
-        };
+        let dates = pg
+            .start_dates
+            .into_iter()
+            .zip(pg.end_dates)
+            .map(|(start, end)| Date { start, end })
+            .collect();
 
         Ok(Self {
             id: pg.id.into(),
@@ -145,7 +140,7 @@ where
                 dates,
                 questions: serde_json::from_value(pg.questions)?,
                 metadata: pg.metadata,
-                location
+                location,
             },
         })
     }
@@ -191,37 +186,48 @@ impl EventStore {
     ) -> AppResult<Event<Location>> {
         let event_id = Uuid::now_v7();
 
-        let mut tx = self.db.begin().await?;
+        let (start_dates, end_dates) = event.dates.into_iter().fold(
+            (Vec::new(), Vec::new()),
+            |(mut start_dates, mut end_dates), date| {
+                start_dates.push(date.start);
+                end_dates.push(date.end);
+                (start_dates, end_dates)
+            },
+        );
 
         sqlx::query!(
             r#"
             INSERT INTO event (
-                                  id,
-                                  location_id,
-                                  name_nl,
-                                  name_en,
-                                  image,
-                                  description_nl,
-                                  description_en,
-                                  registration_start,
-                                  registration_end,
-                                  registration_max,
-                                  waiting_list_max,
-                                  is_published,
-                                  required_membership_status,
-                                  event_type,
-                                  questions,
-                                  metadata,
-                                  created_by,
-                                  created,
-                                  updated)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13::membership_status[], $14, $15, $16, $17, now(), now())
+                               id,
+                               location_id,
+                               name_nl,
+                               name_en,
+                               image,
+                               start_dates,
+                               end_dates,
+                               description_nl,
+                               description_en,
+                               registration_start,
+                               registration_end,
+                               registration_max,
+                               waiting_list_max,
+                               is_published,
+                               required_membership_status,
+                               event_type,
+                               questions,
+                               metadata,
+                               created_by,
+                               created,
+                               updated)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15::membership_status[], $16, $17, $18, $19, now(), now())
             "#,
             event_id,
             *event.location,
             event.name.nl,
             event.name.en,
             event.image.map(|id|*id),
+            &start_dates,
+            &end_dates,
             event.description.nl,
             event.description.en,
             event.registration_period.as_ref().map(|r| r.start),
@@ -234,39 +240,22 @@ impl EventStore {
             serde_json::to_value(event.questions)?,
             event.metadata,
             **created_by
-        ).execute(&mut *tx).await?;
+        ).execute(&self.db).await?;
 
-        Self::add_dates_to_event(&mut *tx, &event_id.into(), &event.dates).await?;
-
-        let event = Self::get_event(&mut *tx, &event_id.into(), true)
-            .await
-            .map_err(|err| Error::Internal(format!("{err:?}")))?;
-
-        tx.commit().await?;
+        let event = self.get_event(&event_id.into(), true).await?;
 
         Ok(event)
     }
 
-    pub async fn get_event_hydrated(
+    pub async fn get_event(
         &self,
         id: &EventId,
         display_hidden: bool,
     ) -> AppResult<Event<Location>> {
-        Self::get_event(&self.db, id, display_hidden).await
-    }
-
-    async fn get_event<'c, E>(
-        db: E,
-        id: &EventId,
-        display_hidden: bool,
-    ) -> AppResult<Event<Location>>
-    where
-        E: Executor<'c, Database = Postgres>,
-    {
         sqlx::query_as!(
             PgEvent,
             r#"
-            SELECT a.id,
+            SELECT e.id,
                    l.id as location_id,
                    l.name_en as location_name_en,
                    l.name_nl as location_name_nl,
@@ -275,47 +264,46 @@ impl EventStore {
                    l.reusable as location_reusable,
                    l.created as location_created,
                    l.updated as location_updated,
-                   a.name_nl,
-                   a.name_en,
-                   a.image,
-                   a.description_nl,
-                   a.description_en,
-                   array_agg(d.start) as start,
-                   array_agg(d."end") as "end",
-                   a.registration_start,
-                   a.registration_end,
-                   a.registration_max,
-                   a.waiting_list_max,
-                   a.is_published,
-                   a.required_membership_status as "required_membership_status:Vec<MembershipStatus>",
-                   a.event_type,
-                   a.questions,
-                   a.metadata,
+                   e.name_nl,
+                   e.name_en,
+                   e.image,
+                   e.description_nl,
+                   e.description_en,
+                   e.start_dates,
+                   e.end_dates,
+                   e.registration_start,
+                   e.registration_end,
+                   e.registration_max,
+                   e.waiting_list_max,
+                   e.is_published,
+                   e.required_membership_status as "required_membership_status:Vec<MembershipStatus>",
+                   e.event_type,
+                   e.questions,
+                   e.metadata,
                    count(r.user_id) FILTER ( WHERE r.waiting_list_position IS NULL ) as "registration_count!",
                    count(r.user_id) FILTER ( WHERE r.waiting_list_position IS NOT NULL ) as "waiting_list_count!",
-                   a.created,
-                   a.updated
-            FROM event a
-                JOIN location l ON a.location_id = l.id
-                JOIN date d ON a.id = d.event_id 
-                LEFT JOIN event_registration r ON r.event_id = a.id
-            WHERE a.id = $1 AND 
-                  (a.is_published OR $2)
-            GROUP BY a.id, l.id
+                   e.created,
+                   e.updated
+            FROM event e
+                JOIN location l ON e.location_id = l.id
+                LEFT JOIN event_registration r ON r.event_id = e.id
+            WHERE e.id = $1 AND
+                  (e.is_published OR $2)
+            GROUP BY e.id, l.id
             "#,
             **id,
             display_hidden
         )
-            .fetch_one(db)
+            .fetch_one(&self.db)
             .await?
             .try_into()
     }
 
-    pub async fn get_activities(&self, display_hidden: bool) -> AppResult<Vec<Event<Location>>> {
+    pub async fn get_events(&self, display_hidden: bool) -> AppResult<Vec<Event<Location>>> {
         sqlx::query_as!(
             PgEvent,
             r#"
-            SELECT a.id,
+            SELECT e.id,
                    l.id as location_id,
                    l.name_en as location_name_en,
                    l.name_nl as location_name_nl,
@@ -324,32 +312,31 @@ impl EventStore {
                    l.reusable as location_reusable,
                    l.created as location_created,
                    l.updated as location_updated,
-                   a.name_nl,
-                   a.name_en,
-                   a.image,
-                   a.description_nl,
-                   a.description_en,
-                   array_agg(d.start) as start,
-                   array_agg(d."end") as "end",
-                   a.registration_start,
-                   a.registration_end,
-                   a.registration_max,
-                   a.waiting_list_max,
-                   a.is_published,
-                   a.required_membership_status as "required_membership_status:Vec<MembershipStatus>",
-                   a.event_type,
-                   a.questions,
-                   a.metadata,
+                   e.name_nl,
+                   e.name_en,
+                   e.image,
+                   e.description_nl,
+                   e.description_en,
+                   e.start_dates,
+                   e.end_dates,
+                   e.registration_start,
+                   e.registration_end,
+                   e.registration_max,
+                   e.waiting_list_max,
+                   e.is_published,
+                   e.required_membership_status as "required_membership_status:Vec<MembershipStatus>",
+                   e.event_type,
+                   e.questions,
+                   e.metadata,
                    count(r.user_id) FILTER ( WHERE r.waiting_list_position IS NULL ) as "registration_count!",
                    count(r.user_id) FILTER ( WHERE r.waiting_list_position IS NOT NULL ) as "waiting_list_count!",
-                   a.created,
-                   a.updated
-            FROM event a
-                JOIN location l ON a.location_id = l.id
-                JOIN date d ON a.id = d.event_id 
-                LEFT JOIN event_registration r ON r.event_id = a.id
-            WHERE a.is_published OR $1
-            GROUP BY a.id, l.id
+                   e.created,
+                   e.updated
+            FROM event e
+                JOIN location l ON e.location_id = l.id
+                LEFT JOIN event_registration r ON r.event_id = e.id
+            WHERE e.is_published OR $1
+            GROUP BY e.id, l.id
             "#,
             display_hidden
         )
@@ -365,7 +352,14 @@ impl EventStore {
         id: &EventId,
         updated: EventContent<LocationId>,
     ) -> AppResult<Event<Location>> {
-        let mut tx = self.db.begin().await?;
+        let (start_dates, end_dates) = updated.dates.into_iter().fold(
+            (Vec::new(), Vec::new()),
+            |(mut start_dates, mut end_dates), date| {
+                start_dates.push(date.start);
+                end_dates.push(date.end);
+                (start_dates, end_dates)
+            },
+        );
 
         sqlx::query!(
             r#"
@@ -374,17 +368,19 @@ impl EventStore {
                   name_nl = $3,
                   name_en = $4,
                   image = $5,
-                  description_nl = $6,
-                  description_en = $7,
-                  registration_start = $8,
-                  registration_end = $9,
-                  registration_max = $10,
-                  waiting_list_max = $11,
-                  is_published = $12,
-                  required_membership_status = $13::membership_status[],
-                  event_type = $14,
-                  questions = $15,
-                  metadata = $16,
+                  start_dates = $6,
+                  end_dates = $7,
+                  description_nl = $8,
+                  description_en = $9,
+                  registration_start = $10,
+                  registration_end = $11,
+                  registration_max = $12,
+                  waiting_list_max = $13,
+                  is_published = $14,
+                  required_membership_status = $15::membership_status[],
+                  event_type = $16,
+                  questions = $17,
+                  metadata = $18,
                   updated = now()
             WHERE id = $1
             "#,
@@ -393,6 +389,8 @@ impl EventStore {
             updated.name.nl,
             updated.name.en,
             updated.image.map(|id| *id),
+            &start_dates,
+            &end_dates,
             updated.description.nl,
             updated.description.en,
             updated.registration_period.as_ref().map(|r| r.start),
@@ -405,53 +403,12 @@ impl EventStore {
             serde_json::to_value(updated.questions)?,
             updated.metadata,
         )
-        .execute(&mut *tx)
+        .execute(&self.db)
         .await?;
 
-        sqlx::query!(
-            r#"
-            DELETE FROM date WHERE event_id = $1
-            "#,
-            **id
-        )
-        .execute(&mut *tx)
-        .await?;
-
-        Self::add_dates_to_event(&mut *tx, id, &updated.dates).await?;
-
-        let event = Self::get_event(&mut *tx, id, true)
-            .await
-            .map_err(|err| Error::Internal(format!("{err:?}")))?;
-
-        tx.commit().await?;
+        let event = self.get_event(id, true).await?;
 
         Ok(event)
-    }
-
-    async fn add_dates_to_event<'c, E>(db: E, event_id: &EventId, dates: &[Date]) -> AppResult<()>
-    where
-        E: Executor<'c, Database = Postgres>,
-    {
-        let (start, end) =
-            dates
-                .iter()
-                .fold((Vec::new(), Vec::new()), |(mut start, mut end), date| {
-                    start.push(date.start);
-                    end.push(date.end);
-                    (start, end)
-                });
-
-        sqlx::query!(
-            r#"
-            INSERT INTO date (event_id, start, "end") VALUES ($1, unnest($2::timestamptz[]), unnest($3::timestamptz[]))
-            "#,
-            **event_id,
-            &start,
-            &end
-        )
-            .execute(db)
-            .await?;
-        Ok(())
     }
 
     pub async fn delete_event(&self, id: &EventId) -> AppResult<()> {
@@ -598,6 +555,20 @@ impl EventStore {
         )
         .fetch_all(&self.db)
         .await?)
+    }
+
+    pub async fn get_user_registrations(&self, user_id: &UserId) -> AppResult<Vec<EventId>> {
+        Ok(sqlx::query_scalar!(
+            r#"
+            SELECT event_id FROM event_registration WHERE user_id = $1
+            "#,
+            **user_id
+        )
+        .fetch_all(&self.db)
+        .await?
+        .into_iter()
+        .map(Into::into)
+        .collect())
     }
 
     pub async fn get_registrations_detailed(&self, id: &EventId) -> AppResult<Vec<Registration>> {

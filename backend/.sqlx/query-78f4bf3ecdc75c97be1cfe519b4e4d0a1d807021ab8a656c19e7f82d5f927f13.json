@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT a.id,\n                   l.id as location_id,\n                   l.name_en as location_name_en,\n                   l.name_nl as location_name_nl,\n                   l.description_nl as location_description_nl,\n                   l.description_en as location_description_en,\n                   l.reusable as location_reusable,\n                   l.created as location_created,\n                   l.updated as location_updated,\n                   a.name_nl,\n                   a.name_en,\n                   a.image,\n                   a.description_nl,\n                   a.description_en,\n                   array_agg(d.start) as start,\n                   array_agg(d.\"end\") as \"end\",\n                   a.registration_start,\n                   a.registration_end,\n                   a.registration_max,\n                   a.waiting_list_max,\n                   a.is_published,\n                   a.required_membership_status as \"required_membership_status:Vec<MembershipStatus>\",\n                   a.event_type,\n                   a.questions,\n                   a.metadata,\n                   count(r.user_id) FILTER ( WHERE r.waiting_list_position IS NULL ) as \"registration_count!\",\n                   count(r.user_id) FILTER ( WHERE r.waiting_list_position IS NOT NULL ) as \"waiting_list_count!\",\n                   a.created,\n                   a.updated\n            FROM event a\n                JOIN location l ON a.location_id = l.id\n                JOIN date d ON a.id = d.event_id \n                LEFT JOIN event_registration r ON r.event_id = a.id\n            WHERE a.id = $1 AND \n                  (a.is_published OR $2)\n            GROUP BY a.id, l.id\n            ",
+  "query": "\n            SELECT e.id,\n                   l.id as location_id,\n                   l.name_en as location_name_en,\n                   l.name_nl as location_name_nl,\n                   l.description_nl as location_description_nl,\n                   l.description_en as location_description_en,\n                   l.reusable as location_reusable,\n                   l.created as location_created,\n                   l.updated as location_updated,\n                   e.name_nl,\n                   e.name_en,\n                   e.image,\n                   e.description_nl,\n                   e.description_en,\n                   e.start_dates,\n                   e.end_dates,\n                   e.registration_start,\n                   e.registration_end,\n                   e.registration_max,\n                   e.waiting_list_max,\n                   e.is_published,\n                   e.required_membership_status as \"required_membership_status:Vec<MembershipStatus>\",\n                   e.event_type,\n                   e.questions,\n                   e.metadata,\n                   count(r.user_id) FILTER ( WHERE r.waiting_list_position IS NULL ) as \"registration_count!\",\n                   count(r.user_id) FILTER ( WHERE r.waiting_list_position IS NOT NULL ) as \"waiting_list_count!\",\n                   e.created,\n                   e.updated\n            FROM event e\n                JOIN location l ON e.location_id = l.id\n                LEFT JOIN event_registration r ON r.event_id = e.id\n            WHERE e.is_published OR $1\n            GROUP BY e.id, l.id\n            ",
   "describe": {
     "columns": [
       {
@@ -75,12 +75,12 @@
       },
       {
         "ordinal": 14,
-        "name": "start",
+        "name": "start_dates",
         "type_info": "TimestamptzArray"
       },
       {
         "ordinal": 15,
-        "name": "end",
+        "name": "end_dates",
         "type_info": "TimestamptzArray"
       },
       {
@@ -170,7 +170,6 @@
     ],
     "parameters": {
       "Left": [
-        "Uuid",
         "Bool"
       ]
     },
@@ -189,8 +188,8 @@
       true,
       false,
       false,
-      null,
-      null,
+      false,
+      false,
       true,
       true,
       true,
@@ -206,5 +205,5 @@
       false
     ]
   },
-  "hash": "2af2c9d44ebfb918ae4c0ded9675771b431205bf66f320eb99dbdde974ede201"
+  "hash": "78f4bf3ecdc75c97be1cfe519b4e4d0a1d807021ab8a656c19e7f82d5f927f13"
 }
