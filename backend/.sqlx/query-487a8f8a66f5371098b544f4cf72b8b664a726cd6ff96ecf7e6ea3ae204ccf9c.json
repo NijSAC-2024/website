@@ -1,0 +1,50 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE event SET\n                  location_id = $2,\n                  name_nl = $3,\n                  name_en = $4,\n                  image = $5,\n                  start_dates = $6,\n                  end_dates = $7,\n                  description_nl = $8,\n                  description_en = $9,\n                  registration_start = $10,\n                  registration_end = $11,\n                  registration_max = $12,\n                  waiting_list_max = $13,\n                  is_published = $14,\n                  required_membership_status = $15::membership_status[],\n                  event_type = $16,\n                  questions = $17,\n                  metadata = $18,\n                  updated = now()\n            WHERE id = $1\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Text",
+        "Text",
+        "Uuid",
+        "TimestamptzArray",
+        "TimestamptzArray",
+        "Text",
+        "Text",
+        "Timestamptz",
+        "Timestamptz",
+        "Int4",
+        "Int4",
+        "Bool",
+        {
+          "Custom": {
+            "name": "membership_status[]",
+            "kind": {
+              "Array": {
+                "Custom": {
+                  "name": "membership_status",
+                  "kind": {
+                    "Enum": [
+                      "pending",
+                      "member",
+                      "extraordinary",
+                      "non_member"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "Text",
+        "Jsonb",
+        "Jsonb"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "487a8f8a66f5371098b544f4cf72b8b664a726cd6ff96ecf7e6ea3ae204ccf9c"
+}

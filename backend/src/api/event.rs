@@ -73,10 +73,10 @@ pub async fn get_event(
 ) -> ApiResult<Event<Location>> {
     if let Some(session) = session {
         if update_all_full_event_access(&session).is_ok() {
-            return Ok(Json(store.get_event_hydrated(&id, true).await?));
+            return Ok(Json(store.get_event(&id, true).await?));
         }
     }
-    Ok(Json(store.get_event_hydrated(&id, false).await?))
+    Ok(Json(store.get_event(&id, false).await?))
 }
 
 /// Partially public endpoint, no login required.
@@ -87,10 +87,10 @@ pub async fn get_activities(
 ) -> ApiResult<Vec<Event<Location>>> {
     if let Some(session) = session {
         if update_all_full_event_access(&session).is_ok() {
-            return Ok(Json(store.get_activities(true).await?));
+            return Ok(Json(store.get_events(true).await?));
         }
     }
-    Ok(Json(store.get_activities(false).await?))
+    Ok(Json(store.get_events(false).await?))
 }
 
 pub async fn create_event(
@@ -138,7 +138,7 @@ pub async fn create_registration(
 ) -> ApiResult<Registration> {
     update_single_full_registration_access(&user_id, &session)?;
 
-    let event = store.get_event_hydrated(&event_id, true).await?;
+    let event = store.get_event(&event_id, true).await?;
     if update_all_full_event_access(&session).is_err()
         && event.content.registration_period.is_none()
     {
@@ -174,7 +174,7 @@ pub async fn update_registration(
 ) -> ApiResult<Registration> {
     update_single_full_registration_access(&user_id, &session)?;
 
-    let event = store.get_event_hydrated(&event_id, true).await?;
+    let event = store.get_event(&event_id, true).await?;
     let registration = store.get_registration(&event_id, &user_id).await?;
 
     ensure_correct_waiting_list_position(&event, &mut updated, &session, Some(&registration))?;

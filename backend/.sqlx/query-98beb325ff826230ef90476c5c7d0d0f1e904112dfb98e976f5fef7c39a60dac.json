@@ -1,0 +1,51 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO event (\n                               id,\n                               location_id,\n                               name_nl,\n                               name_en,\n                               image,\n                               start_dates,\n                               end_dates,\n                               description_nl,\n                               description_en,\n                               registration_start,\n                               registration_end,\n                               registration_max,\n                               waiting_list_max,\n                               is_published,\n                               required_membership_status,\n                               event_type,\n                               questions,\n                               metadata,\n                               created_by,\n                               created,\n                               updated)\n            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15::membership_status[], $16, $17, $18, $19, now(), now())\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Text",
+        "Text",
+        "Uuid",
+        "TimestamptzArray",
+        "TimestamptzArray",
+        "Text",
+        "Text",
+        "Timestamptz",
+        "Timestamptz",
+        "Int4",
+        "Int4",
+        "Bool",
+        {
+          "Custom": {
+            "name": "membership_status[]",
+            "kind": {
+              "Array": {
+                "Custom": {
+                  "name": "membership_status",
+                  "kind": {
+                    "Enum": [
+                      "pending",
+                      "member",
+                      "extraordinary",
+                      "non_member"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "Text",
+        "Jsonb",
+        "Jsonb",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "98beb325ff826230ef90476c5c7d0d0f1e904112dfb98e976f5fef7c39a60dac"
+}
