@@ -38,6 +38,10 @@ jobs:
           cargo install sqlx-cli --no-default-features --features rustls,postgres && \
           cargo sqlx migrate run --source migrations
 
+      - name: create empty `dist` directory in the frontend
+        working-directory: frontend
+        run: mkdir dist
+
       - name: cargo build
         working-directory: backend
         run: cargo build
@@ -77,6 +81,10 @@ jobs:
         uses: taiki-e/install-action@914ac1e29db2d22aef69891f032778d9adc3990d # v2.49.34
         with:
           tool: cargo-udeps
+
+      - name: create empty `dist` directory in the frontend
+        working-directory: frontend
+        run: mkdir dist
 
       - name: cargo udeps
         working-directory: backend
@@ -156,6 +164,10 @@ jobs:
 
       - name: Rust cache
         uses: Swatinem/rust-cache@9d47c6ad4b02e050fd481d890b2ea34778fd09d6 # v2.7.8
+
+      - name: create empty `dist` directory in the frontend
+        working-directory: frontend
+        run: mkdir dist
 
       - name: Run clippy
         working-directory: backend
