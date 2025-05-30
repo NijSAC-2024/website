@@ -1,25 +1,25 @@
 import MarkdownEditor from '../markdown/MarkdownEditor.tsx';
 import { TextField } from '@mui/material';
 import OptionSelector from '../OptionSelector.tsx';
-import { EventContent, experienceOptions, Language, Metadata } from '../../types.ts';
+import { EventContent, experienceOptions, ExperienceType, Language, Metadata } from '../../types.ts';
 import ContentCard from '../ContentCard.tsx';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 
 interface EditDescriptionProps {
   description?: Language;
   metadata?: Metadata;
-  handleFieldChange: (name: keyof EventContent, value: Metadata | Language) => void;
+  handleEventChange: (change: Partial<EventContent>) => void;
 }
 
 export default function EditDescription({
   description,
   metadata,
-  handleFieldChange
+  handleEventChange
 }: EditDescriptionProps) {
   const { text } = useLanguage();
 
   const handleMarkdown = (markdown: Language) => {
-    handleFieldChange('description', markdown);
+    handleEventChange({ description: markdown });
   };
 
   return (
@@ -48,13 +48,15 @@ export default function EditDescription({
             'Gescheiden door komma\'s'
           )}
           onChange={(e) =>
-            handleFieldChange('metadata', {
-              ...metadata,
-              gear: {
-                ...metadata?.gear,
-                en: e.target.value
+            handleEventChange({
+              metadata: {
+                ...metadata,
+                gear: {
+                  nl: metadata?.gear?.nl || '',
+                  en: e.target.value
+                }
               }
-            } as Metadata)
+            })
           }
         />
         <TextField
@@ -70,13 +72,15 @@ export default function EditDescription({
             'Gescheiden door komma\'s'
           )}
           onChange={(e) =>
-            handleFieldChange('metadata', {
-              ...metadata,
-              gear: {
-                ...metadata?.gear,
-                en: e.target.value
+            handleEventChange({
+              metadata: {
+                ...metadata,
+                gear: {
+                  en: metadata?.gear?.en || '',
+                  nl: e.target.value
+                }
               }
-            } as Metadata)
+            })
           }
         />
         <div className="xl:col-span-2 grid">
@@ -84,10 +88,12 @@ export default function EditDescription({
             options={experienceOptions}
             selected={metadata?.experience}
             onChange={(selected) =>
-              handleFieldChange('metadata', {
-                ...metadata,
-                experience: selected
-              } as Metadata)
+              handleEventChange({
+                metadata: {
+                  ...metadata,
+                  experience: selected as ExperienceType[]
+                }
+              })
             }
             label={text('Necessary Experience', 'Benodigde Ervaring')}
           />

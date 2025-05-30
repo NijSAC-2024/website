@@ -15,11 +15,11 @@ import Home from './pages/Home.tsx';
 import Signup from './pages/Signup.tsx';
 import Agenda from './pages/Agenda.tsx';
 import ErrorPage from './pages/ErrorPage.tsx';
-import AddEvent from './pages/AddEvent.tsx';
 import { useAppState } from './providers/AppStateProvider.tsx';
 import Event from './pages/Event.tsx';
 import Settings from './pages/Settings.tsx';
 import Account from './pages/Account.tsx';
+import EditEvent from './components/edit/EditEvent.tsx';
 
 export default function App(): React.ReactElement {
   const { navigate, route } = useAppState();
@@ -124,7 +124,6 @@ export default function App(): React.ReactElement {
       const newRoute = parseLocation(window.location);
       if (route.name !== newRoute.name || route.params !== newRoute.params) {
         if (newRoute) {
-          console.log('Initial page: ', newRoute.name);
           navigate(newRoute.name, newRoute.params);
         }
       }
@@ -141,10 +140,10 @@ export default function App(): React.ReactElement {
     component = <Signup />;
   } else if (route.name == 'agenda') {
     component = <Agenda />;
-  } else if (route.name == 'new_event') {
-    component = <AddEvent />;
   } else if (route.name == 'event') {
     component = <Event />;
+  } else if (route.name == 'edit_event' || route.name == 'new_event') {
+    component = <EditEvent />;
   } else if (route.name == 'settings') {
     component = <Settings />;
   } else if (route.name == 'account') {

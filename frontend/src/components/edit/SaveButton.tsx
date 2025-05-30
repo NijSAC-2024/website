@@ -9,8 +9,8 @@ import AreYouSure from '../AreYouSure.tsx';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import {EventContent} from '../../types.ts';
 import moment from 'moment';
-import {useApiState} from '../../providers/ApiProvider.tsx';
 import {useAppState} from '../../providers/AppStateProvider.tsx';
+import { useEvents } from '../../hooks/useEvents.ts';
 
 interface SaveButtonProps {
   id: string;
@@ -20,7 +20,7 @@ interface SaveButtonProps {
 
 export default function SaveButton({ id, handleSave, event }: SaveButtonProps) {
   const { text } = useLanguage();
-  const { deleteEvent } = useApiState();
+  const { deleteEvent } = useEvents();
   const { navigate } = useAppState();
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);

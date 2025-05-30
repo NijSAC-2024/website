@@ -8,7 +8,7 @@ import moment from 'moment/moment';
 import {apiFetch} from '../api.ts';
 import {enqueueSnackbar} from 'notistack';
 import AreYouSure from './AreYouSure.tsx';
-import {useApiState} from '../providers/ApiProvider.tsx';
+import { useEvents } from '../hooks/useEvents.ts';
 
 interface RegisterButtonProps {
   registrationCount?: number;
@@ -30,7 +30,7 @@ export default function RegisterButton({
   id
 }: RegisterButtonProps) {
   const { isLoggedIn, toggleAuthOpen, user } = useAuth();
-  const { deleteRegistration, createRegistration, updateRegistration} = useApiState()
+  const { deleteRegistration, createRegistration, updateRegistration} = useEvents()
   const { text, language } = useLanguage();
   moment.locale(language);
   const [registerDialogOpen, setRegisterDialogOpen] = useState<boolean>(false);

@@ -1,11 +1,12 @@
 import { Collapse, Switch, TextField } from '@mui/material';
-import { DateType, EventContent, Language, memberOptions, MembershipStatus, Question } from '../../types.ts';
+import { DateType, EventContent, memberOptions, MembershipStatus, Question } from '../../types.ts';
 import ContentCard from '../ContentCard.tsx';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import moment from 'moment';
 import OptionSelector from '../OptionSelector.tsx';
 import EditRegistrationQuestions from './EditRegistrationQuestions.tsx';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
+import { useState } from 'react';
 
 interface EditRegistrationProps {
   requiredMembershipStatus: MembershipStatus[];
@@ -13,17 +14,7 @@ interface EditRegistrationProps {
   registrationMax?: number;
   registrationPeriod?: DateType;
   questions: Question[];
-  handleFieldChange: (
-    name: keyof EventContent,
-    value: MembershipStatus[] | DateType | number | null
-  ) => void;
-  handleRegistrationQuestionChange: (
-    id: string,
-    name: keyof Question,
-    value: Language | boolean
-  ) => void;
-  handleAddRegistrationQuestion: () => void;
-  handleRemoveRegistrationQuestion: (id: string) => void;
+  handleEventChange: (update: Partial<EventContent>) => void;
 }
 
 export default function EditRegistrations({
@@ -32,20 +23,20 @@ export default function EditRegistrations({
   registrationMax,
   registrationPeriod,
   questions,
-  handleFieldChange,
-  handleRegistrationQuestionChange,
-  handleAddRegistrationQuestion,
-  handleRemoveRegistrationQuestion
+  handleEventChange,
 }: EditRegistrationProps) {
   const { text } = useLanguage();
+  const [hasRegistrationLimit, setHasRegistrationLimit] = useState(!!registrationMax);
   const handleToggleRegistrations = () => {
     if (registrationPeriod) {
-      handleFieldChange('registrationPeriod', null);
+      handleEventChange({ registrationPeriod: undefined });
     } else {
       const now = new Date();
-      handleFieldChange('registrationPeriod', {
-        start: now.toISOString(),
-        end: dates[0]?.start || now.toISOString()
+      handleEventChange({
+        registrationPeriod: {
+          start: now.toISOString(),
+          end: dates[0]?.start || now.toISOString()
+        }
       });
     }
   };
@@ -70,13 +61,14 @@ export default function EditRegistrations({
               {text('Maximum registrations', 'Maximum inschrjvingen')}
             </p>
             <Switch
-              checked={!!registrationMax}
-              onChange={(_, checked) =>
-                handleFieldChange('registrationMax', checked ? 10 : null)
-              }
+              checked={hasRegistrationLimit}
+              onChange={(_, checked) => {
+                setHasRegistrationLimit(checked);
+                handleEventChange({ registrationMax: checked ? 10 : undefined });
+              }}
             />
           </div>
-          <Collapse in={!!registrationMax} timeout="auto" unmountOnExit>
+          <Collapse in={hasRegistrationLimit} timeout="auto" unmountOnExit>
             <TextField
               fullWidth
               type="number"
@@ -84,10 +76,13 @@ export default function EditRegistrations({
                 'Maximum Registrations',
                 'Maximaal Aantal Inschrijvingen'
               )}
-              value={registrationMax || 10}
-              onChange={(e) =>
-                handleFieldChange('registrationMax', parseInt(e.target.value))
-              }
+              value={registrationMax || 0}
+              onChange={(e) => {
+                registrationMax = parseInt(e.target.value);
+                if (!isNaN(registrationMax) && registrationMax > 0) {
+                  handleEventChange({ registrationMax });
+                }
+              }}
             />
           </Collapse>
           <div className="grid grid-cols-2 gap-3">
@@ -98,9 +93,11 @@ export default function EditRegistrations({
               )}
               value={moment(registrationPeriod?.start)}
               onChange={(date) =>
-                handleFieldChange('registrationPeriod', {
-                  start: date!.toISOString(),
-                  end: registrationPeriod!.end
+                handleEventChange({
+                  registrationPeriod: {
+                    start: date!.toISOString(),
+                    end: registrationPeriod!.end
+                  }
                 })
               }
             />
@@ -111,9 +108,11 @@ export default function EditRegistrations({
               )}
               value={moment(registrationPeriod?.end)}
               onChange={(date) =>
-                handleFieldChange('registrationPeriod', {
-                  start: registrationPeriod!.start,
-                  end: date!.toISOString()
+                handleEventChange({
+                  registrationPeriod: {
+                    start: registrationPeriod!.start,
+                    end: date!.toISOString()
+                  }
                 })
               }
             />
@@ -122,10 +121,11 @@ export default function EditRegistrations({
             options={memberOptions}
             selected={requiredMembershipStatus}
             onChange={(selected) =>
-              handleFieldChange(
-                'requiredMembershipStatus',
-                selected as MembershipStatus[]
-              )
+              handleEventChange(
+                {
+                  requiredMembershipStatus:
+                    selected as MembershipStatus[]
+                })
             }
             label={text(
               'Necessary Membership Status',
@@ -135,10 +135,8 @@ export default function EditRegistrations({
 
           {/* Registration Questions */}
           <EditRegistrationQuestions
-            registrationQuestions={questions}
-            handleRegistrationQuestionChange={handleRegistrationQuestionChange}
-            handleAddRegistrationQuestion={handleAddRegistrationQuestion}
-            handleRemoveRegistrationQuestion={handleRemoveRegistrationQuestion}
+            questions={questions}
+            handleEventChange={handleEventChange}
           />
         </div>
       </Collapse>
