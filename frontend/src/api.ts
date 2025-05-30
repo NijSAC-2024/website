@@ -57,14 +57,30 @@ export async function apiFetch<T>(
   options: RequestInit = {},
 ): Promise<ApiResponse<T>> {
   const { data, error } = await apiFetchResponse(url, options);
+
   if (error || !data) {
     if (error?.status === 401 || error?.status === 403) {
       await apiFetchVoid('/logout');
     }
     return { error };
   }
-  const content: T = await data.json();
-  return { data: content };
+
+  if (data.status === 204 || data.headers.get('Content-Length') === '0') {
+    return {};
+  }
+
+  try {
+    const content: T = await data.json();
+    return { data: content };
+  } catch (_parseError) {
+    return {
+      error: {
+        message: 'Failed to parse response',
+        reference: 'PARSE_ERROR',
+        status: data.status,
+      },
+    };
+  }
 }
 
 export async function apiFetchVoid(

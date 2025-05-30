@@ -21,14 +21,15 @@ import { useLanguage } from '../../providers/LanguageProvider.tsx';
 
 interface EditEventProps {
   eventContent: EventContent;
+  stopEditing?: () => void;
 }
 
-export default function EditEvent({ eventContent: init }: EditEventProps) {
+export default function EditEvent({ eventContent, stopEditing }: EditEventProps) {
   const { text } = useLanguage();
   const { createEvent, updateEvent } = useApiState();
   const { route } = useAppState();
   const { navigate } = useAppState();
-  const [event, setEvent] = useState<EventContent>(init);
+  const [event, setEvent] = useState<EventContent>(eventContent);
 
   const id = route.params?.id;
 
@@ -68,7 +69,7 @@ export default function EditEvent({ eventContent: init }: EditEventProps) {
         idx === index
           ? {
             ...date,
-            [startDate ? 'startDateTime' : 'endDateTime']: value
+            [startDate ? 'start' : 'end']: value
           }
           : date
       )
@@ -119,18 +120,22 @@ export default function EditEvent({ eventContent: init }: EditEventProps) {
 
   const handleSave = async (bool: boolean) => {
     if (id) {
+      if (stopEditing) {
+        stopEditing();
+      }
       await updateEvent(id, { ...event, isPublished: bool });
-      navigate('agenda');
+      navigate(`agenda/${id}`);
     } else {
       await createEvent({ ...event, isPublished: bool });
+      navigate('agenda');
     }
   };
 
   return (
     <GenericPage image={event.image}>
-      <SaveButton handleSave={handleSave} />
+      <SaveButton id={id ?? ''} handleSave={handleSave} event={event} />
 
-      <div className="grid xl:grid-cols-3 gap-5 mt-[-9.3rem]">
+      <div className="grid xl:grid-cols-3 gap-5 mt-[-4.7rem]">
         <div className="xl:col-span-3 mb-[-0.5rem] flex justify-between">
           <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">
             <Button color="inherit" onClick={() => navigate('agenda')}>

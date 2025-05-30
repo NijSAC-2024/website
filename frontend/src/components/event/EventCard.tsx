@@ -17,13 +17,10 @@ interface AgendaCardProps {
 
 export default function EventCard({ event, agendaPage }: AgendaCardProps) {
   const { navigate } = useAppState();
-  const { text, lang } = useLanguage();
-  moment.locale(lang);
-
-  console.log('event: ', event);
+  const { text, language } = useLanguage();
+  moment.locale(language);
 
   const formatDate = (date: DateType): string => {
-    moment.locale(lang);
 
     const start = new Date(date.start);
     const end = new Date(date.end);
@@ -104,7 +101,7 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
         )}
         <img
           className="w-full aspect-[4/2] object-cover"
-          src={event.image}
+          src={event.image || '/images/test-header-image.jpg'}
           alt="not available"
         />
         <div className="p-5 grid space-y-1">
@@ -144,34 +141,36 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
                   {text(getLabel(event.eventType)) +
                     text(' dates:', ' datums:')}
                 </b>
-                {event.dates.map((date) => (
-                  <p>{formatDate(date)}</p>
+                {event.dates.map((date, index) => (
+                  <p key={date.start + index}>{formatDate(date)}</p>
                 ))}
               </>
             )
           )}
         </div>
-        {event.registrationPeriod?.start && event.registrationPeriod?.end && (
-          <div
-            className="p-5 flex justify-between items-center border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
-            <div className="flex items-center">
-              <GroupIcon className="mr-2" />
-              <p>
-                {event.registrationCount}
-                {event.registrationMax && '/' + event.registrationMax}
-              </p>
-            </div>
-            <RegisterButton
-              registrationCloseTime={event.registrationPeriod?.end}
-              registrationOpenTime={event.registrationPeriod?.start}
-              title={event.name}
-              questions={event.questions}
-              registrationMax={event.registrationMax}
-              registrationCount={event.registrationCount}
-            />
-          </div>
-        )}
       </div>
+      {event.registrationPeriod?.start && event.registrationPeriod?.end && (
+        <div
+          className="p-5 flex justify-between items-center border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
+          <div className="flex items-center">
+            <GroupIcon className="mr-2" />
+            <p>
+              {event.registrationCount}
+              {event.registrationMax && '/' + event.registrationMax}
+            </p>
+          </div>
+          <RegisterButton
+            registrationPeriod={event.registrationPeriod}
+            requiredMembershipStatus={event.requiredMembershipStatus}
+            title={event.name}
+            questions={event.questions}
+            registrationMax={event.registrationMax}
+            registrationCount={event.registrationCount}
+            id={event.id}
+          />
+        </div>
+      )}
+
     </div>
   );
 }

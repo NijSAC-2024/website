@@ -13,11 +13,11 @@ export default function ItemSelection({
   onItemSelect,
   onAddItem
 }: ItemSelectionProps) {
-  const { text, lang } = useLanguage();
+  const { text, language } = useLanguage();
 
   return (
     <>
-      {lang === 'en' ? (
+      {language === 'en' ? (
         <Autocomplete
           options={rentOptions}
           getOptionLabel={(option) => option.name.en}

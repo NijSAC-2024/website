@@ -5,17 +5,24 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import { MouseEvent, useState } from 'react';
 import { useAuth } from '../../providers/AuthProvider.tsx';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
+import {useAppState} from '../../providers/AppStateProvider.tsx';
 
 export default function UserMenu() {
   const { text } = useLanguage();
   const { user, logout } = useAuth();
+  const { navigate } = useAppState();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
-  const handleClose = () => {
+  const handleMenuClose = () => {
     setAnchorEl(null);
+  };
+
+  const navigateSubmenu = (page: string) => {
+    navigate(page);
+    handleMenuClose();
   };
   return (
     <>
@@ -28,24 +35,24 @@ export default function UserMenu() {
           aria-haspopup="true"
           aria-expanded={open ? 'true' : undefined}
         >
-          <Avatar className="w-8 h-8">{user?.firstName.charAt(0)}</Avatar>
+          <Avatar className="w-8 h-8">{user?.firstName.charAt(0).toUpperCase()}</Avatar>
         </IconButton>
       </Tooltip>
       <Menu
         anchorEl={anchorEl}
         open={open}
-        onClose={handleClose}
-        onClick={handleClose}
+        onClose={handleMenuClose}
+        onClick={handleMenuClose}
         className="shadow "
       >
-        <MenuItem onClick={handleClose}>
+        <MenuItem onClick={() => navigateSubmenu('account')}>
           <ListItemIcon>
             <AccountCircleIcon />
           </ListItemIcon>
           {text('My account', 'Mijn account')}
         </MenuItem>
         <Divider />
-        <MenuItem onClick={handleClose}>
+        <MenuItem onClick={() => navigateSubmenu('settings')}>
           <ListItemIcon>
             <SettingsIcon fontSize="small" />
           </ListItemIcon>
