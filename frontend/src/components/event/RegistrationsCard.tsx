@@ -21,6 +21,7 @@ export default function RegistrationsCard({questions}: RegistrationsCardProps) {
           <h1>{text('Participants', 'Deelnemers')}</h1>
           <Table>
             <TableBody>
+              {/* TODO: proper access management */}
               {questions.length > 0 && user?.roles.includes('admin') && (
                 <TableRow>
                   <TableCell>

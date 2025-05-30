@@ -12,7 +12,6 @@ export default function Home() {
     switch (response.status) {
     case 200: {
       const body = await response.json();
-      console.log(body);
       enqueueSnackbar('Your email is: ' + body.email, {
         variant: 'success'
       });

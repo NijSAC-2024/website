@@ -26,12 +26,15 @@ pub enum MembershipStatus {
     Member,
     Extraordinary,
     NonMember,
+    Donor,
 }
 
 impl MembershipStatus {
     pub fn is_member(&self) -> bool {
         match self {
-            MembershipStatus::Pending | MembershipStatus::NonMember => false,
+            MembershipStatus::Pending | MembershipStatus::NonMember | MembershipStatus::Donor => {
+                false
+            }
             MembershipStatus::Member | MembershipStatus::Extraordinary => true,
         }
     }

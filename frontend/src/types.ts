@@ -24,7 +24,14 @@ export type QuestionType = 'shortText' | 'longText' | 'number' | 'time';
 
 export type LanguageEnum = 'nl' | 'en';
 
-export type RoleType = 'default' | 'admin';
+export type RoleType =
+  | 'admin'
+  | 'treasurer'
+  | 'secretary'
+  | 'chair'
+  | 'viceChair'
+  | 'climbingCommissar'
+  | 'activityCommissionMember';
 
 export interface OptionsType {
   id:
