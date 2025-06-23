@@ -6,7 +6,7 @@ export default function ValidatedTextField({
   label,
   validator,
   onChange,
-  setValue,
+  setValue, value,
 }: ValidateProps) {
   const [error, setError] = useState<string | false>(false);
 
@@ -20,6 +20,7 @@ export default function ValidatedTextField({
 
   return (
     <TextField
+      value={value}
       onChange={handleChange}
       error={!!error}
       helperText={error || ''}

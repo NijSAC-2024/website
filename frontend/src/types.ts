@@ -3,6 +3,7 @@ export interface ValidateProps {
   validator: (value: string) => string | false;
   onChange: (isValid: boolean) => void;
   setValue: (value: string) => void;
+  value: string;
 }
 
 export type ThemeType = 'dark' | 'light' | 'auto';
