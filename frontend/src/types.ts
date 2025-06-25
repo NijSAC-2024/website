@@ -4,6 +4,28 @@ export interface ValidateProps {
   onChange: (isValid: boolean) => void;
   setValue: (value: string) => void;
   value: string;
+  validate: boolean;
+}
+
+export interface ErrorType {
+  email: string | boolean,
+  firstName: string | boolean,
+  infix: string | boolean,
+  lastName: string | boolean,
+  password: string | boolean,
+  address: string | boolean,
+  postalCodeCity: string | boolean,
+  phone: string | boolean,
+  dateOfBirth: string | boolean,
+  university: string | boolean,
+  studentNumber: string | boolean,
+  sportcardNumber: string | boolean,
+  nkbvNumber: string | boolean,
+  iban: string | boolean,
+  bic: string | boolean,
+  iceContactName: string | boolean,
+  iceContactPhone: string | boolean,
+  importantInfo: string | boolean,
 }
 
 export type ThemeType = 'dark' | 'light' | 'auto';

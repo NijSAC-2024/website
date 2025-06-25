@@ -1,8 +1,6 @@
-import { ReactNode, useRef, useState } from 'react';
-import { Button, Checkbox, FormControlLabel } from '@mui/material';
-import ValidatedPassword from '../ValidatedPassword.tsx';
+import React, { useState } from 'react';
+import {Box, Button, Checkbox, FormControl, FormControlLabel, TextField} from '@mui/material';
 import { enqueueSnackbar } from 'notistack';
-import ValidatedTextField from '../ValidatedTextField.tsx';
 import {
   emailValidator,
   nameValidator,
@@ -16,20 +14,23 @@ import {
   optionalValidatorLettersAndNumbers,
   optionalValidatorNumbersOnly,
   addressValidator,
-  emergencyContactNameValidator, validatorLettersAndNumbers,
+  emergencyContactNameValidator,
+  validatorLettersAndNumbers,
 } from '../../validator.ts';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import { apiFetch } from '../../api.ts';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
+import TextCard from '../TextCard.tsx';
+import { ErrorType } from '../../types.ts';
 
 const steps = [
-  'Personal',
-  'Education',
-  'Financial',
-  'Emergency contact',
-  'Overview'
+  {id: 0, label: {en: 'Personal', nl: 'Persoonlijk' }},
+  {id: 1, label: {en: 'Education', nl: 'Educatie'}},
+  {id: 2, label: {en: 'Financial', nl: 'Financieel'}},
+  {id: 3, label: {en: 'Emergency contact', nl: 'Contact voor noodgevallen'}},
+  {id: 4, label: {en: 'Overview', nl: 'Overzicht'}}
 ];
 
 export default function SignupForm() {
@@ -38,21 +39,21 @@ export default function SignupForm() {
 
   // Personal
   const [email, setEmail] = useState<string>('');
-  const [firstName, setfirstName] = useState<string>('');
+  const [firstName, setFirstName] = useState<string>('');
   const [infix, setInfix] = useState<string>(''); // optional
-  const [lastName, setlastName] = useState<string>('');
+  const [lastName, setLastName] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [address, setAddress] = useState<string>('');
   const [postalCodeCity, setPostalCodeCity] = useState<string>('');
-  const [phone, setphone] = useState<string>('');
+  const [phone, setPhone] = useState<string>('');
   const [dateOfBirth, setDateOfBirth] = useState<string>('');
-  const [importantInfo, setimportantInfo] = useState<string>('');
+  const [importantInfo, setImportantInfo] = useState<string>('');
   
   // Education
   const [university, setUniversity] = useState<string>('');
-  const [studentNumber, setstudentNumber] = useState<string>(''); // optional
-  const [sportcardNumber, setsportcardNumber] = useState<string>(''); // optional
-  const [nkbvNumber, setnkbvNumber] = useState<string>(''); // not optional, info field for e.g DAV
+  const [studentNumber, setStudentNumber] = useState<string>(''); // optional
+  const [sportcardNumber, setSportcardNumber] = useState<string>(''); // optional
+  const [nkbvNumber, setNkbvNumber] = useState<string>(''); // not optional, info field for e.g DAV
 
   // Financial
   const [iban, setIban] = useState<string>('');
@@ -65,17 +66,16 @@ export default function SignupForm() {
   // Overview
   const [consentGiven, setConsentGiven] = useState<boolean>(false);
 
-  const formValid = useRef({
-    email: false,
+  const [error, setError] = useState<ErrorType>({
     firstName: false,
     infix: false,
     lastName: false,
-    password: false,
+    dateOfBirth: false,
     address: false,
     postalCodeCity: false,
     phone: false,
-    dateOfBirth: false,
-    importantInfo: false,
+    email: false,
+    password: false,
     university: false,
     studentNumber: false,
     sportcardNumber: false,
@@ -83,11 +83,91 @@ export default function SignupForm() {
     iban: false,
     bic: false,
     iceContactName: false,
-    iceContactPhone: false,
-    consentGiven: false
+    iceContactPhone: false, 
+    importantInfo: false,
   });
 
-  const handleNext = () => {
+  const stepErrorKeys: Record<number, (keyof typeof error)[]> = {
+    0: ['firstName', 'lastName', 'infix', 'dateOfBirth', 'address', 'phone', 'email', 'password'],
+    1: ['university', 'studentNumber', 'sportcardNumber', 'nkbvNumber'],
+    2: ['iban', 'bic'],
+    3: ['iceContactName', 'iceContactPhone', 'importantInfo'],
+  };
+
+  const validateInputs = () => {
+    switch (activeStep) {
+    case 0: {
+      const firstNameError = nameValidator(firstName);
+      const infixError = optionalValidatorLettersOnly(infix);
+      const lastNameError = nameValidator(lastName);
+      const dateOfBirthError = dateValidator(dateOfBirth);
+      const addressError = addressValidator(address);
+      const postalCodeCityError = validatorLettersAndNumbers(postalCodeCity);
+      const phoneError = phoneValidator(phone);
+      const emailError = emailValidator(email);
+      const passwordError = passwordValidator(password);
+      const importantInfoError = optionalValidatorLettersAndNumbers(importantInfo);
+      setError({
+        ...error,
+        firstName: firstNameError,
+        infix: infixError,
+        lastName: lastNameError,
+        dateOfBirth: dateOfBirthError,
+        address: addressError,
+        postalCodeCity: postalCodeCityError,
+        phone: phoneError,
+        email: emailError,
+        password: passwordError,
+        importantInfo: importantInfoError
+      });
+      break;
+    }
+    case 1: {
+      const universityError = educationalInstitutionValidator(university);
+      const studentNumberError = optionalValidatorNumbersOnly(studentNumber);
+      const sportcardNumberError = optionalValidatorNumbersOnly(sportcardNumber);
+      const nkbvNumberError = optionalValidatorNumbersOnly(nkbvNumber);
+      setError({
+        ...error,
+        university: universityError,
+        studentNumber: studentNumberError,
+        sportcardNumber: sportcardNumberError,
+        nkbvNumber: nkbvNumberError
+      });
+      break;
+    }
+    case 2: {
+      const ibanError = ibanValidator(iban);
+      const bicError = bicValidator(bic);
+      setError({
+        ...error,
+        iban: ibanError,
+        bic: bicError
+      });
+      break;
+    }
+    case 3: {
+      const iceContactNameError = emergencyContactNameValidator(iceContactName);
+      const iceContactPhoneError = phoneValidator(iceContactPhone);
+      setError({
+        ...error,
+        iceContactName: iceContactNameError,
+        iceContactPhone: iceContactPhoneError,
+      });
+      break;
+    }
+    default:
+      break;
+    }
+  };
+
+  const handleNext = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const keysToCheck = stepErrorKeys[activeStep] || [];
+    if (keysToCheck.some((key) => error[key])) {
+      console.log('returned');
+      return;
+    }
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
 
@@ -96,13 +176,6 @@ export default function SignupForm() {
   };
 
   const handleSubmit = async () => {
-    if (Object.values(formValid.current).some((isValid) => !isValid)) {
-      enqueueSnackbar('Please fill in all fields correctly.', {
-        variant: 'error'
-      });
-      return;
-    }
-
     const { error } = await apiFetch<void>('/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -149,191 +222,304 @@ export default function SignupForm() {
       variant: 'success'
     });
   };
+  
+  const renderControls = () => {
+    return (
+      <div className="flex justify-between">
+        <Button color="inherit" disabled={activeStep === 0} onClick={handleBack}>
+          Back
+        </Button>
 
+        {activeStep === steps.length - 1 ? (
+          <Button
+            variant="contained"
+            onClick={handleSubmit}
+            disabled={!consentGiven}
+          >
+            Signup
+          </Button>
+        ) : (
+          <Button type="submit" onClick={validateInputs}>Next</Button>
+        )}
+      </div>
+    );
+  }
 
-
-
-  function renderStepContent() {
+  const renderStepContent = () => {
     switch (activeStep) {
     case 0:
       return (
-        <>
-          <ValidatedTextField
-            label={text('First Name', 'Voornaam')}
-            validator={nameValidator}
-            onChange={(isValid) => {
-              formValid.current.firstName = isValid;
-              console.log('firstName valid:', isValid);
-            }}
-            setValue={setfirstName}
-            value={firstName}
-          />
-          <ValidatedTextField
-            label={text('Infix', 'Tussenvoegsel')}
-            validator={optionalValidatorLettersOnly}
-            onChange={(isValid) => (formValid.current.infix = isValid)}
-            setValue={setInfix}
-            value={infix}
-          />
-          <ValidatedTextField
-            label={text('Last Name', 'Achternaam')}
-            validator={nameValidator}
-            onChange={(isValid) => (formValid.current.lastName = isValid)}
-            setValue={setlastName}
-            value={lastName}
-          />
-          <ValidatedTextField
-            label={text('Date of birth', 'Geboortedatum')}
-            validator={dateValidator}
-            onChange={(isValid) => (formValid.current.dateOfBirth = isValid)}
-            setValue={setDateOfBirth}
-            value={dateOfBirth}
-          />
-          <ValidatedTextField
-            label={text('Address', 'Adres')}
-            validator={addressValidator}
-            onChange={(isValid) => (formValid.current.address = isValid)}
-            setValue={setAddress}
-            value={address}
-          />
-          <ValidatedTextField
-            label={text('Postal code', 'Postcode')}
-            validator={validatorLettersAndNumbers}
-            onChange={(isValid) => (formValid.current.postalCodeCity = isValid)}
-            setValue={setPostalCodeCity}
-            value={postalCodeCity}
-          />
-          <ValidatedTextField
-            label={text('Phone', 'Telefoon')}
-            validator={phoneValidator}
-            onChange={(isValid) => (formValid.current.phone = isValid)}
-            setValue={setphone}
-            value={phone}
-          />
-          <ValidatedTextField
-            label={text('Email', 'E-mail')}
-            validator={emailValidator}
-            onChange={(isValid) => (formValid.current.email = isValid)}
-            setValue={setEmail}
-            value={email}
-          />
-          <ValidatedPassword
-            label={text('Password', 'Wachtwoord')}
-            validator={passwordValidator}
-            onChange={(isValid) => (formValid.current.password = isValid)}
-            setValue={setPassword}
-            value={password}
-          />
-        </>
+        <Box className="grid gap-2.5" component="form" onSubmit={handleNext}>
+          <FormControl>
+            <TextField
+              label={text('First Name', 'Voornaam')}
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              variant="outlined"
+              error={!!error.firstName}
+              helperText={error.firstName}
+            />
+          </FormControl>
+
+          <FormControl>
+            <TextField
+              label={text('Infix', 'Tussenvoegsel')}
+              value={infix}
+              onChange={(e) => setInfix(e.target.value)}
+              variant="outlined"
+              error={!!error.infix}
+              helperText={error.infix}
+            />
+          </FormControl>
+
+          <FormControl>
+            <TextField
+              label={text('Last Name', 'Achternaam')}
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              variant="outlined"
+              error={!!error.lastName}
+              helperText={error.lastName}
+            />
+          </FormControl>
+
+          <FormControl>
+            <TextField
+              label={text('Date of birth', 'Geboortedatum')}
+              value={dateOfBirth}
+              onChange={(e) => setDateOfBirth(e.target.value)}
+              variant="outlined"
+              error={!!error.dateOfBirth}
+              helperText={error.dateOfBirth}
+            />
+          </FormControl>
+
+          <FormControl>
+            <TextField
+              label={text('Address', 'Adres')}
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              variant="outlined"
+              error={!!error.address}
+              helperText={error.address}
+            />
+          </FormControl>
+
+          <FormControl>
+            <TextField
+              label={text('Postal code', 'Postcode')}
+              value={postalCodeCity}
+              onChange={(e) => setPostalCodeCity(e.target.value)}
+              variant="outlined"
+              error={!!error.postalCodeCity}
+              helperText={error.postalCodeCity}
+            />
+          </FormControl>
+
+          <FormControl>
+            <TextField
+              label={text('Phone', 'Telefoon')}
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              variant="outlined"
+              error={!!error.phone}
+              helperText={error.phone}
+            />
+          </FormControl>
+
+          <FormControl>
+            <TextField
+              label={text('Email', 'E-mail')}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              variant="outlined"
+              error={!!error.email}
+              helperText={error.email}
+            />
+          </FormControl>
+
+          <FormControl>
+            <TextField
+              type="password"
+              label={text('Password', 'Wachtwoord')}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              variant="outlined"
+              error={!!error.password}
+              helperText={error.password}
+            />
+          </FormControl>
+
+          <FormControl>
+            <TextField
+              label={text('Important Info (allergies etc.)', 'Belangrijke info (allergieën etc.)')}
+              value={importantInfo}
+              onChange={(e) => setImportantInfo(e.target.value)}
+              variant="outlined"
+              error={!!error.importantInfo}
+              helperText={error.importantInfo}
+            />
+          </FormControl>
+
+          {renderControls()}
+        </Box>
       );
     case 1:
       return (
-        <>
-          <ValidatedTextField
-            label={text('Educational Institution', 'Onderwijsinstelling')}
-            validator={educationalInstitutionValidator}
-            onChange={(isValid) => (formValid.current.university = isValid)}
-            setValue={setUniversity}
-            value={university}
-          />
-          <ValidatedTextField
-            label={text('Student Number', 'Studentnummer')}
-            validator={optionalValidatorNumbersOnly}
-            onChange={(isValid) => (formValid.current.studentNumber = isValid)}
-            setValue={setstudentNumber}
-            value={studentNumber}
-          />
-          <ValidatedTextField
-            label={text('Sportcard Number', 'Sportkaartnummer')}
-            validator={optionalValidatorNumbersOnly}
-            onChange={(isValid) => (formValid.current.sportcardNumber = isValid)}
-            setValue={setsportcardNumber}
-            value={sportcardNumber}
-          />
-          <ValidatedTextField
-            label={text('NKBV Number', 'NKBV-nummer')}
-            validator={optionalValidatorNumbersOnly}
-            onChange={(isValid) => (formValid.current.nkbvNumber = isValid)}
-            setValue={setnkbvNumber}
-            value={nkbvNumber}
-          />
-        </>
+        <Box className="grid gap-2.5" component="form" onSubmit={handleNext}>
+          <FormControl>
+            <TextField
+              label={text('Educational Institution', 'Onderwijsinstelling')}
+              value={university}
+              onChange={(e) => setUniversity(e.target.value)}
+              variant="outlined"
+              error={!!error.university}
+              helperText={error.university}
+            />
+          </FormControl>
+
+          <FormControl>
+            <TextField
+              label={text('Student Number', 'Studentnummer')}
+              value={studentNumber}
+              onChange={(e) => setStudentNumber(e.target.value)}
+              variant="outlined"
+              error={!!error.studentNumber}
+              helperText={error.studentNumber}
+            />
+          </FormControl>
+
+          <FormControl>
+            <TextField
+              label={text('Sportcard Number', 'Sportkaartnummer')}
+              value={sportcardNumber}
+              onChange={(e) => setSportcardNumber(e.target.value)}
+              variant="outlined"
+              error={!!error.sportcardNumber}
+              helperText={error.sportcardNumber}
+            />
+          </FormControl>
+
+          <FormControl>
+            <TextField
+              label={text('NKBV Number', 'NKBV-nummer')}
+              value={nkbvNumber}
+              onChange={(e) => setNkbvNumber(e.target.value)}
+              variant="outlined"
+              error={!!error.nkbvNumber}
+              helperText={error.nkbvNumber}
+            />
+          </FormControl>
+
+          {renderControls()}
+        </Box>
+
       );
     case 2:
       return (
-        <>
-          <ValidatedTextField
-            label={text('IBAN', 'IBAN')}
-            validator={ibanValidator}
-            onChange={(isValid) => (formValid.current.iban = isValid)}
-            setValue={setIban}
-            value={iban}
-          />
-          <ValidatedTextField
-            label={text('BIC', 'BIC')}
-            validator={bicValidator}
-            onChange={(isValid) => (formValid.current.bic = isValid)}
-            setValue={setBic}
-            value={bic}
-          />
-        </>
+        <Box className="grid gap-2.5" component="form" onSubmit={handleNext}>
+          <FormControl>
+            <TextField
+              label={text('IBAN', 'IBAN')}
+              value={iban}
+              onChange={(e) => setIban(e.target.value)}
+              variant="outlined"
+              error={!!error.iban}
+              helperText={error.iban}
+            />
+          </FormControl>
+
+          <FormControl>
+            <TextField
+              label={text('BIC', 'BIC')}
+              value={bic}
+              onChange={(e) => setBic(e.target.value)}
+              variant="outlined"
+              error={!!error.bic}
+              helperText={error.bic}
+            />
+          </FormControl>
+
+          {renderControls()}
+        </Box>
       );
     case 3:
       return (
-        <>
-          <ValidatedTextField
-            label={text('Emergency Contact Name', 'Naam noodgevalcontact')}
-            validator={emergencyContactNameValidator}
-            onChange={(isValid) => (formValid.current.iceContactName = isValid)}
-            setValue={seticeContactName}
-            value={iceContactName}
-          />
-          <ValidatedTextField
-            label={text('Emergency Contact Phone', 'Telefoon noodgevalcontact')}
-            validator={phoneValidator}
-            onChange={(isValid) => (formValid.current.iceContactPhone = isValid)}
-            setValue={seticeContactPhone}
-            value={iceContactPhone}
-          />
-          <ValidatedTextField
-            label={text('Important Info (allergies etc.)', 'Belangrijke info (allergieën etc.)')}
-            validator={optionalValidatorLettersAndNumbers}
-            onChange={(isValid) => (formValid.current.importantInfo = isValid)}
-            setValue={setimportantInfo}
-            value={importantInfo}
-          />
-        </>
+        <Box className="grid gap-2.5" component="form" onSubmit={handleNext}>
+          <FormControl>
+            <TextField
+              label={text('Emergency Contact Name', 'Naam noodgevalcontact')}
+              value={iceContactName}
+              onChange={(e) => seticeContactName(e.target.value)}
+              variant="outlined"
+              error={!!error.iceContactName}
+              helperText={error.iceContactName}
+            />
+          </FormControl>
+
+          <FormControl>
+            <TextField
+              label={text('Emergency Contact Phone', 'Telefoon noodgevalcontact')}
+              value={iceContactPhone}
+              onChange={(e) => seticeContactPhone(e.target.value)}
+              variant="outlined"
+              error={!!error.iceContactPhone}
+              helperText={error.iceContactPhone}
+            />
+          </FormControl>
+
+          {renderControls()}
+        </Box>
       );
     case 4:
       return (
         <>
           <p>{text('Please confirm that all entered data is correct.', 'Bevestig dat alle ingevulde gegevens kloppen.')}</p>
-          <div style={{ marginBottom: '1rem' }}>
-            <strong>{text('First Name:', 'Voornaam:')}</strong> {firstName}<br />
-            <strong>{text('Infix:', 'Tussenvoegsel:')}</strong> {infix || '-'}<br />
-            <strong>{text('Last Name:', 'Achternaam:')}</strong> {lastName}<br />
-            <strong>{text('Date of Birth:', 'Geboortedatum:')}</strong> {dateOfBirth}<br />
-            <strong>{text('Address:', 'Adres:')}</strong> {address}<br />
-            <strong>{text('Postal Code:', 'Postcode:')}</strong> {postalCodeCity}<br />
-            <strong>{text('Phone:', 'Telefoon:')}</strong> {phone}<br />
-            <strong>{text('Email:', 'E-mail:')}</strong> {email}<br />
-            <strong>{text('Educational Institution:', 'Onderwijsinstelling:')}</strong> {university}<br />
-            <strong>{text('Student Number:', 'Studentnummer:')}</strong> {studentNumber || '-'}<br />
-            <strong>{text('Sportcard Number:', 'Sportkaartnummer:')}</strong> {sportcardNumber || '-'}<br />
-            <strong>{text('NKBV Number:', 'NKBV-nummer:')}</strong> {nkbvNumber || '-'}<br />
-            <strong>{text('IBAN:', 'IBAN:')}</strong> {iban}<br />
-            <strong>{text('BIC:', 'BIC:')}</strong> {bic}<br />
-            <strong>{text('Emergency Contact Name:', 'Naam noodgevalcontact:')}</strong> {iceContactName}<br />
-            <strong>{text('Emergency Contact Phone:', 'Telefoon noodgevalcontact:')}</strong> {iceContactPhone}<br />
-            <strong>{text('Important Info:', 'Belangrijke info:')}</strong> {importantInfo || '-'}
-          </div>
+          <TextCard className="px-6 py-5 mt-3 grid grid-cols-4 gap-5">
+            <b>{text('First Name:', 'Voornaam:')}</b>
+            <span className="col-span-3">{firstName || '-' }</span>
+            <b>{text('Infix:', 'Tussenvoegsel:')}</b>
+            <span className="col-span-3">{infix || '-' }</span>
+            <b>{text('Last Name:', 'Achternaam:')}</b>
+            <span className="col-span-3">{lastName || '-' }</span>
+            <b>{text('Date of Birth:', 'Geboortedatum:')}</b>
+            <span className="col-span-3">{dateOfBirth || '-' }</span>
+            <b>{text('Address:', 'Adres:')}</b>
+            <span className="col-span-3">{address || '-' }</span>
+            <b>{text('Postal Code:', 'Postcode:')}</b>
+            <span className="col-span-3">{postalCodeCity || '-' }</span>
+            <b>{text('Phone:', 'Telefoon:')}</b>
+            <span className="col-span-3">{phone || '-' }</span>
+            <b>{text('Email:', 'E-mail:')}</b>
+            <span className="col-span-3">{email || '-' }</span>
+
+            <b>{text('Educational Institution:', 'Onderwijsinstelling:')}</b>
+            <span className="col-span-3">{university || '-' }</span>
+            <b>{text('Student Number:', 'Studentnummer:')}</b>
+            <span className="col-span-3">{studentNumber || '-' }</span>
+            <b>{text('Sportcard Number:', 'Sportkaartnummer:')}</b>
+            <span className="col-span-3">{sportcardNumber || '-' }</span>
+            <b>{text('NKBV Number:', 'NKBV-nummer:')}</b>
+            <span className="col-span-3">{nkbvNumber || '-' }</span>
+
+            <b>{text('IBAN:', 'IBAN:')}</b>
+            <span className="col-span-3">{iban || '-' }</span>
+            <b>{text('BIC:', 'BIC:')}</b>
+            <span className="col-span-3">{bic || '-' }</span>
+
+            <b>{text('Emergency Contact Name:', 'Naam noodgevalcontact:')}</b>
+            <span className="col-span-3">{iceContactName || '-' }</span>
+            <b>{text('Emergency Contact Phone:', 'Telefoon noodgevalcontact:')}</b>
+            <span className="col-span-3">{iceContactPhone || '-' }</span>
+            <b>{text('Important Info:', 'Belangrijke info:')}</b>
+            <span className="col-span-3">{importantInfo || '-' }</span>
+          </TextCard>
           <FormControlLabel
             control={
               <Checkbox
                 checked={consentGiven}
                 onChange={(e) => {
                   setConsentGiven(e.target.checked);
-                  formValid.current.consentGiven = e.target.checked;
                 }}
               />
             }
@@ -342,6 +528,7 @@ export default function SignupForm() {
               'Ik geef toestemming aan de NijSAC om alle persoonlijke informatie die ik invoer op de site op te slaan en te verwerken.'
             )}
           />
+          {renderControls()}
         </>
       );
     default:
@@ -356,35 +543,16 @@ export default function SignupForm() {
         <Stepper alternativeLabel activeStep={activeStep}>
           {steps.map((label) => {
             const stepProps: { completed?: boolean } = {};
-            const labelProps: { optional?: ReactNode } = {};
             return (
-              <Step key={label} {...stepProps}>
-                <StepLabel {...labelProps}>{label}</StepLabel>
+              <Step className={activeStep > label.id ? 'cursor-pointer': ''} key={label.id} {...stepProps} onClick={() => activeStep > label.id && setActiveStep(label.id)}>
+                <StepLabel>{text(label.label)}</StepLabel>
               </Step>
             );
           })}
         </Stepper>
 
-        {/* Render fields based on current step */}
+        {/* Render fields based on current[activeStep] step */}
         {renderStepContent()}
-
-        <div className="flex justify-between">
-          <Button color="inherit" disabled={activeStep === 0} onClick={handleBack}>
-            Back
-          </Button>
-
-          {activeStep === steps.length - 1 ? (
-            <Button
-              variant="contained"
-              onClick={handleSubmit}
-              disabled={!formValid.current.consentGiven}
-            >
-              Signup
-            </Button>
-          ) : (
-            <Button onClick={handleNext}>Next</Button>
-          )}
-        </div>
       </div>
     </>
   );
