@@ -1,14 +1,14 @@
 import { Button, Dialog, DialogActions, DialogContent } from '@mui/material';
-import { useAuth } from '../providers/AuthProvider.tsx';
-import {Answer, DateType, Language, MembershipStatus, Question, Registration} from '../types.ts';
+import { useAuth } from '../../providers/AuthProvider.tsx';
+import {Answer, DateType, Language, MembershipStatus, Question, Registration} from '../../types.ts';
 import {useEffect, useState} from 'react';
 import RegisterForm from './RegisterForm.tsx';
-import { useLanguage } from '../providers/LanguageProvider.tsx';
+import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import moment from 'moment/moment';
-import {apiFetch} from '../api.ts';
+import {apiFetch} from '../../api.ts';
 import {enqueueSnackbar} from 'notistack';
-import AreYouSure from './AreYouSure.tsx';
-import {useApiState} from '../providers/ApiProvider.tsx';
+import AreYouSure from '../AreYouSure.tsx';
+import {useApiState} from '../../providers/ApiProvider.tsx';
 
 interface RegisterButtonProps {
   registrationCount?: number;

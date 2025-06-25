@@ -1,7 +1,7 @@
-import {Answer, Language, Question} from '../types.ts';
+import {Answer, Language, Question} from '../../types.ts';
 import {Button, TextField} from '@mui/material';
 import AccessAlarmIcon from '@mui/icons-material/AccessAlarm';
-import { useLanguage } from '../providers/LanguageProvider.tsx';
+import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import moment from 'moment';
 import {useState} from 'react';
 

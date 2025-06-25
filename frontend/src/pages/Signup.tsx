@@ -5,6 +5,7 @@ import { Button, Chip, Collapse } from '@mui/material';
 import { useState } from 'react';
 import SignupOptions from '../components/signup/SingupOptions.tsx';
 import { useLanguage } from '../providers/LanguageProvider.tsx';
+import {FormUser} from '../types.ts';
 
 type MembershipTypeEN = 'Member' | 'Extraordinary Member' | 'Donor';
 type MembershipTypeNL = 'Lid' | 'Buitengewoon Lid' | 'Donateur';
@@ -21,6 +22,32 @@ export default function Signup() {
     nl: 'Lid'
   });
   const [selectedMembership, setSelectedMembership] = useState<boolean>(false);
+  const [formData, setFormData] = useState<FormUser>({
+    email: '',
+    firstName: '',
+    infix: '',
+    lastName: '',
+    password: '',
+    address: '',
+    postalCodeCity: '',
+    phone: '',
+    dateOfBirth: '',
+    importantInfo: '',
+    university: '',
+    studentNumber: '',
+    sportcardNumber: '',
+    nkbvNumber: '',
+    iban: '',
+    bic: '',
+    iceContactName: '',
+    iceContactEmail: '',
+    iceContactPhone: '',
+    consent: false,
+  });
+
+  const handleChange = (field: keyof FormUser, value: string | boolean) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
 
   const handleExtraordinaryMember = () => {
     setMembership({ en: 'Extraordinary Member', nl: 'Buitengewoon Lid' });
@@ -35,7 +62,7 @@ export default function Signup() {
     setSelectedMembership(true);
   };
 
-  const handleChange = () => {
+  const handleChangeMembership = () => {
     setSelectedMembership(false);
   };
   return (
@@ -57,7 +84,7 @@ export default function Signup() {
                 color="primary"
               />
               <div className=""></div>
-              <Button onClick={handleChange}>
+              <Button onClick={handleChangeMembership}>
                 {text('Change', 'Verander')}
               </Button>
             </div>
@@ -72,7 +99,7 @@ export default function Signup() {
         </div>
         <Collapse in={selectedMembership} timeout="auto" unmountOnExit>
           <div className="px-7 pt-5 pb-7 border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
-            <SignupForm />
+            <SignupForm formData={formData} handleChange={handleChange} />
           </div>
         </Collapse>
       </ContentCard>

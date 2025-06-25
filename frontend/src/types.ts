@@ -1,32 +1,4 @@
-export interface ValidateProps {
-  label: string;
-  validator: (value: string) => string | false;
-  onChange: (isValid: boolean) => void;
-  setValue: (value: string) => void;
-  value: string;
-  validate: boolean;
-}
-
-export interface ErrorType {
-  email: string | boolean,
-  firstName: string | boolean,
-  infix: string | boolean,
-  lastName: string | boolean,
-  password: string | boolean,
-  address: string | boolean,
-  postalCodeCity: string | boolean,
-  phone: string | boolean,
-  dateOfBirth: string | boolean,
-  university: string | boolean,
-  studentNumber: string | boolean,
-  sportcardNumber: string | boolean,
-  nkbvNumber: string | boolean,
-  iban: string | boolean,
-  bic: string | boolean,
-  iceContactName: string | boolean,
-  iceContactPhone: string | boolean,
-  importantInfo: string | boolean,
-}
+import React from 'react';
 
 export type ThemeType = 'dark' | 'light' | 'auto';
 
@@ -146,6 +118,61 @@ export interface LocationContent {
   description?: Language;
 }
 
+export type FormUser = {
+  email: string;
+  firstName: string;
+  infix: string;
+  lastName: string;
+  password: string;
+  address: string;
+  postalCodeCity: string;
+  phone: string;
+  dateOfBirth: string;
+  importantInfo: string;
+  university: string;
+  studentNumber: string;
+  sportcardNumber: string;
+  nkbvNumber: string;
+  iban: string;
+  bic: string;
+  iceContactName: string;
+  iceContactEmail: string;
+  iceContactPhone: string;
+  consent: boolean;
+};
+
+export type FormErrors = {
+  firstName: boolean | string;
+  infix: boolean | string;
+  lastName: boolean | string;
+  dateOfBirth: boolean | string;
+  address: boolean | string;
+  postalCodeCity: boolean | string;
+  phone: boolean | string;
+  email: boolean | string;
+  password: boolean | string;
+  university: boolean | string;
+  studentNumber: boolean | string;
+  sportcardNumber: boolean | string;
+  nkbvNumber: boolean | string;
+  iban: boolean | string;
+  bic: boolean | string;
+  iceContactName: boolean | string;
+  iceContactEmail: boolean | string;
+  iceContactPhone: boolean | string;
+  importantInfo: boolean | string;
+};
+
+export type StepProps = {
+  formData: FormUser;
+  errors: FormErrors;
+  handleChange: (field: keyof FormUser, value: string | boolean) => void;
+  handleNext: (e: React.FormEvent) => void;
+  handleBack: () => void;
+  handleSubmit: () => void;
+  validateInputs: () => void;
+};
+
 export interface BasicUser {
   userId: string;
   firstName: string;
@@ -153,24 +180,12 @@ export interface BasicUser {
   lastName: string;
 }
 
-export interface User {
+export interface User extends FormUser{
   id: string;
   created: string;
   updated: string;
-  firstName: string;
-  infix: string;
-  lastName: string;
-  phone: string;
-  studentNumber: string;
-  nkbvNumber: number;
-  sportcardNumber: number;
-  iceContactName: string;
-  iceContactEmail: null;
-  iceContactPhone: null;
-  importantInfo: null;
   roles: RoleType[];
   status: MembershipStatus;
-  email: string;
 }
 
 export interface rentOption {

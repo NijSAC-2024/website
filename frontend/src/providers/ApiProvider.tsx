@@ -5,7 +5,7 @@ import {
   useEffect,
   useState,
 } from 'react';
-import {Event, EventContent, Registration, Location, Answer} from '../types.ts';
+import {Event, EventContent, Registration, Location, Answer, FormUser} from '../types.ts';
 import { useAppState } from './AppStateProvider.tsx';
 import { apiFetch } from '../api.ts';
 import { enqueueSnackbar } from 'notistack';
@@ -23,6 +23,7 @@ interface ApiContextType {
   updateRegistration: (eventId: string, answers: Answer[]) => Promise<void>;
   createRegistration: (eventId: string, answers: Answer[]) => Promise<void>;
   deleteRegistration: (eventId: string) => Promise<void>;
+  createUser: (user: FormUser) => Promise<void>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -156,6 +157,52 @@ export default function ApiProvider({ children }: ApiProviderProps) {
     });
   };
 
+  const createUser = async (user: FormUser) => {
+    const { error } = await apiFetch<void>('/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        firstName: user.firstName,
+        infix: user.infix,
+        lastName: user.lastName,
+        password: user.password,
+        status: 'pending',
+        email: user.email,
+        phone: user.phone,
+        dateOfBirth: user.dateOfBirth,
+        address: user.address,
+        postalCodeCity: user.postalCodeCity,
+        studentNumber: user.studentNumber ? parseInt(user.studentNumber, 10) : null,
+        sportcardNumber: user.sportcardNumber ? parseInt(user.sportcardNumber, 10) : null,
+        nkbvNumber: user.nkbvNumber ? parseInt(user.nkbvNumber, 10) : null,
+        iban: user.iban,
+        bic: user.bic,
+        university: user.university,
+        iceContactName: user.iceContactName,
+        iceContactPhone: user.iceContactPhone,
+        importantInfo: user.importantInfo,
+        consent: user.consent
+      })
+    });
+    
+    if (error) {
+      switch (error.message) {
+      case 'Conflict':
+        enqueueSnackbar('Email is already in use.', {
+          variant: 'error'
+        });
+        break;
+      default:
+        enqueueSnackbar(`${error.message}: ${error.reference}`, {
+          variant: 'error'
+        });
+      }
+      return;
+    }
+    enqueueSnackbar(`Created account: ${user.firstName} ${user.lastName}`, {
+      variant: 'success'
+    });
+  }
 
   useEffect(() => {
     if (route.name === 'agenda') {
@@ -232,7 +279,8 @@ export default function ApiProvider({ children }: ApiProviderProps) {
         deleteEvent,
         updateRegistration,
         createRegistration,
-        deleteRegistration
+        deleteRegistration,
+        createUser
       }}
     >
       {children}
