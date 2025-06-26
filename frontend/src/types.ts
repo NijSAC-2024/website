@@ -1,5 +1,3 @@
-import React from 'react';
-
 export type ThemeType = 'dark' | 'light' | 'auto';
 
 export type WeekendType = 'sp' | 'mp' | 'boulder' | 'trad' | 'education';
@@ -118,61 +116,6 @@ export interface LocationContent {
   description?: Language;
 }
 
-export type FormUser = {
-  email: string;
-  firstName: string;
-  infix: string;
-  lastName: string;
-  password: string;
-  address: string;
-  postalCodeCity: string;
-  phone: string;
-  dateOfBirth: string;
-  importantInfo: string;
-  university: string;
-  studentNumber: string;
-  sportcardNumber: string;
-  nkbvNumber: string;
-  iban: string;
-  bic: string;
-  iceContactName: string;
-  iceContactEmail: string;
-  iceContactPhone: string;
-  consent: boolean;
-};
-
-export type FormErrors = {
-  firstName: boolean | string;
-  infix: boolean | string;
-  lastName: boolean | string;
-  dateOfBirth: boolean | string;
-  address: boolean | string;
-  postalCodeCity: boolean | string;
-  phone: boolean | string;
-  email: boolean | string;
-  password: boolean | string;
-  university: boolean | string;
-  studentNumber: boolean | string;
-  sportcardNumber: boolean | string;
-  nkbvNumber: boolean | string;
-  iban: boolean | string;
-  bic: boolean | string;
-  iceContactName: boolean | string;
-  iceContactEmail: boolean | string;
-  iceContactPhone: boolean | string;
-  importantInfo: boolean | string;
-};
-
-export type StepProps = {
-  formData: FormUser;
-  errors: FormErrors;
-  handleChange: (field: keyof FormUser, value: string | boolean) => void;
-  handleNext: (e: React.FormEvent) => void;
-  handleBack: () => void;
-  handleSubmit: () => void;
-  validateInputs: () => void;
-};
-
 export interface BasicUser {
   userId: string;
   firstName: string;
@@ -180,12 +123,28 @@ export interface BasicUser {
   lastName: string;
 }
 
-export interface User extends FormUser{
+export interface UserContent extends Omit<BasicUser, 'userId'> {
+  firstName: string;
+  infix?: string;
+  lastName: string;
+  phone: string;
+  studentNumber?: number;
+  nkbvNumber?: number;
+  sportcardNumber?: number;
+  iceContactName: string;
+  iceContactEmail: string;
+  iceContactPhone: string;
+  importantInfo?: string;
+  email: string;
+  password?: string;
+  status: MembershipStatus;
+}
+
+export interface User extends UserContent{
   id: string;
   created: string;
   updated: string;
   roles: RoleType[];
-  status: MembershipStatus;
 }
 
 export interface rentOption {

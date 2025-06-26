@@ -5,60 +5,56 @@ import { Button, Chip, Collapse } from '@mui/material';
 import { useState } from 'react';
 import SignupOptions from '../components/signup/SingupOptions.tsx';
 import { useLanguage } from '../providers/LanguageProvider.tsx';
-import {FormUser} from '../types.ts';
-
-type MembershipTypeEN = 'Member' | 'Extraordinary Member' | 'Donor';
-type MembershipTypeNL = 'Lid' | 'Buitengewoon Lid' | 'Donateur';
+import {MembershipStatus, UserContent} from '../types.ts';
+import {useApiState} from '../providers/ApiProvider.tsx';
 
 interface MembershipType {
-  en: MembershipTypeEN;
-  nl: MembershipTypeNL;
+  id: MembershipStatus;
+  label: {en: string, nl: string}
 }
 
 export default function Signup() {
   const { text } = useLanguage();
+  const { createUser } = useApiState()
   const [membership, setMembership] = useState<MembershipType>({
-    en: 'Member',
-    nl: 'Lid'
+    id: 'member', label: {en: 'Member', nl: 'Lid'}
   });
   const [selectedMembership, setSelectedMembership] = useState<boolean>(false);
-  const [formData, setFormData] = useState<FormUser>({
-    email: '',
+  const [newUser, setNewUser] = useState<UserContent>({
     firstName: '',
-    infix: '',
     lastName: '',
-    password: '',
-    address: '',
-    postalCodeCity: '',
     phone: '',
-    dateOfBirth: '',
-    importantInfo: '',
-    university: '',
-    studentNumber: '',
-    sportcardNumber: '',
-    nkbvNumber: '',
-    iban: '',
-    bic: '',
     iceContactName: '',
     iceContactEmail: '',
     iceContactPhone: '',
-    consent: false,
+    email: '',
+    password: '',
+    status: 'pending',
   });
 
-  const handleChange = (field: keyof FormUser, value: string | boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const handleSubmit = () => {
+    createUser(newUser);
+  };
+
+  const handleChange = (field: keyof UserContent, value: string | number) => {
+    setNewUser(prev => ({ ...prev, [field]: value }));
   };
 
   const handleExtraordinaryMember = () => {
-    setMembership({ en: 'Extraordinary Member', nl: 'Buitengewoon Lid' });
+    setMembership({id: 'extraordinary', label: {en: 'Extraordinary Member', nl: 'Buitengewoon Lid'}});
     setSelectedMembership(true);
   };
   const handleMember = () => {
-    setMembership({ en: 'Member', nl: 'Lid' });
+    setMembership({id: 'member', label: {en: 'Member', nl: 'Lid'}});
     setSelectedMembership(true);
   };
   const handleDonor = () => {
-    setMembership({ en: 'Donor', nl: 'Donateur' });
+    setMembership({id: 'donor', label: { en: 'Donor', nl: 'Donateur' }});
+    setSelectedMembership(true);
+  };
+
+  const handleNonMeber = () => {
+    setMembership({id: 'nonMember', label: { en: 'Introduction', nl: 'Introducee' }});
     setSelectedMembership(true);
   };
 
@@ -79,7 +75,7 @@ export default function Signup() {
                   text(
                     'Selected membership: ',
                     'Geselecteerd lidmaatschap: '
-                  ) + text(membership.en, membership.nl)
+                  ) + text(membership.label)
                 }
                 color="primary"
               />
@@ -94,12 +90,13 @@ export default function Signup() {
               handleMember={handleMember}
               handleExtraordinaryMember={handleExtraordinaryMember}
               handleDonor={handleDonor}
+              handleNonMember={handleNonMeber}
             />
           </Collapse>
         </div>
         <Collapse in={selectedMembership} timeout="auto" unmountOnExit>
           <div className="px-7 pt-5 pb-7 border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
-            <SignupForm formData={formData} handleChange={handleChange} />
+            <SignupForm newUser={newUser} handleChange={handleChange} handleSubmit={handleSubmit} />
           </div>
         </Collapse>
       </ContentCard>

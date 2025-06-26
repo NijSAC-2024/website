@@ -1,65 +1,75 @@
-import React, { useState } from 'react';
+import {FormEvent, useState} from 'react';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
-import {FormErrors, FormUser, StepProps} from '../../types.ts';
+import {Language, UserContent} from '../../types.ts';
 import PersonalStep from './PersonalStep.tsx';
 import EducationStep from './EducationStep.tsx';
-import FinancialStep from './FinancialStep.tsx';
 import EmergencyContactStep from './EmergencyContactStep.tsx';
 import OverviewStep from './OverviewStep.tsx';
 import {
-  addressValidator,
-  bicValidator,
-  dateValidator,
-  educationalInstitutionValidator,
   emailValidator, emergencyContactNameValidator,
-  ibanValidator,
   nameValidator,
   optionalValidatorLettersAndNumbers,
   optionalValidatorLettersOnly,
-  optionalValidatorNumbersOnly,
   passwordValidator,
   phoneValidator,
-  validatorLettersAndNumbers
 } from '../../validator.ts';
-import {useApiState} from '../../providers/ApiProvider.tsx';
+
+export interface StepProps {
+  newUser: UserContent;
+  errors: FormErrors;
+  handleChange: (field: keyof UserContent, value: string | number) => void;
+  handleNext: (e: FormEvent) => void;
+  handleBack: () => void;
+  handleSubmit: () => void;
+  validateInputs: () => void;
+}
+
+interface FormErrors {
+  firstName: boolean | Language;
+  infix: boolean | Language;
+  lastName: boolean | Language;
+  phone: boolean | Language;
+  studentNumber: boolean | Language;
+  nkbvNumber: boolean | Language;
+  sportcardNumber: boolean | Language;
+  iceContactName: boolean | Language;
+  iceContactEmail: boolean | Language;
+  iceContactPhone: boolean | Language;
+  importantInfo: boolean | Language;
+  email: boolean | Language;
+  password: boolean | Language;
+}
 
 const steps = [
   {id: 0, label: {en: 'Personal', nl: 'Persoonlijk' }},
-  {id: 1, label: {en: 'Education', nl: 'Educatie'}},
-  {id: 2, label: {en: 'Financial', nl: 'Financieel'}},
-  {id: 3, label: {en: 'Emergency contact', nl: 'Contact voor noodgevallen'}},
-  {id: 4, label: {en: 'Overview', nl: 'Overzicht'}}
+  {id: 1, label: {en: 'Education & Insurance', nl: 'Educatie & Verzekering'}},
+  {id: 2, label: {en: 'Emergency contact', nl: 'Contact noodgevallen'}},
+  {id: 3, label: {en: 'Overview', nl: 'Overzicht'}}
 ];
 
 interface SignupFormProps {
-  formData: FormUser;
-  handleChange: (field: keyof FormUser, value: string | boolean) => void;
+  newUser: UserContent;
+  handleChange: (field: keyof UserContent, value: string | number) => void;
+  handleSubmit: () => void;
 }
 
-export default function SignupForm({formData, handleChange}: SignupFormProps) {
+export default function SignupForm({newUser, handleChange, handleSubmit}: SignupFormProps) {
   const { text } = useLanguage();
-  const { createUser } = useApiState()
   const [activeStep, setActiveStep] = useState<number>(0);
 
   const [errors, setErrors] = useState<FormErrors>({
     firstName: false,
     infix: false,
     lastName: false,
-    dateOfBirth: false,
-    address: false,
-    postalCodeCity: false,
     phone: false,
     email: false,
     password: false,
-    university: false,
     studentNumber: false,
     sportcardNumber: false,
     nkbvNumber: false,
-    iban: false,
-    bic: false,
     iceContactName: false,
     iceContactEmail: false,
     iceContactPhone: false,
@@ -67,13 +77,12 @@ export default function SignupForm({formData, handleChange}: SignupFormProps) {
   });
 
   const stepErrorKeys: Record<number, (keyof typeof errors)[]> = {
-    0: ['firstName', 'lastName', 'infix', 'dateOfBirth', 'address', 'phone', 'email', 'password', 'importantInfo'],
-    1: ['university', 'studentNumber', 'sportcardNumber', 'nkbvNumber'],
-    2: ['iban', 'bic'],
-    3: ['iceContactName', 'iceContactEmail', 'iceContactPhone'],
+    0: ['firstName', 'lastName', 'infix', 'phone', 'email', 'password', 'importantInfo'],
+    1: ['studentNumber', 'sportcardNumber', 'nkbvNumber'],
+    2: ['iceContactName', 'iceContactEmail', 'iceContactPhone'],
   };
 
-  const handleNext = async (event: React.FormEvent) => {
+  const handleNext = async (event: FormEvent) => {
     event.preventDefault();
     const keysToCheck = stepErrorKeys[activeStep] || [];
     if (keysToCheck.some((key) => errors[key])) {
@@ -86,31 +95,21 @@ export default function SignupForm({formData, handleChange}: SignupFormProps) {
     setActiveStep(prev => prev - 1);
   };
 
-  const handleSubmit = () => {
-    createUser(formData);
-  };
-
   const validateInputs = () => {
     switch (activeStep) {
     case 0: {
-      const firstNameError = nameValidator(formData.firstName);
-      const infixError = optionalValidatorLettersOnly(formData.infix);
-      const lastNameError = nameValidator(formData.lastName);
-      const dateOfBirthError = dateValidator(formData.dateOfBirth);
-      const addressError = addressValidator(formData.address);
-      const postalCodeCityError = validatorLettersAndNumbers(formData.postalCodeCity);
-      const phoneError = phoneValidator(formData.phone);
-      const emailError = emailValidator(formData.email);
-      const passwordError = passwordValidator(formData.password);
-      const importantInfoError = optionalValidatorLettersAndNumbers(formData.importantInfo);
+      const firstNameError = nameValidator(newUser.firstName);
+      const infixError = optionalValidatorLettersOnly(newUser.infix);
+      const lastNameError = nameValidator(newUser.lastName);
+      const phoneError = phoneValidator(newUser.phone);
+      const emailError = emailValidator(newUser.email);
+      const passwordError = passwordValidator(newUser.password);
+      const importantInfoError = optionalValidatorLettersAndNumbers(newUser.importantInfo);
       setErrors({
         ...errors,
         firstName: firstNameError,
         infix: infixError,
         lastName: lastNameError,
-        dateOfBirth: dateOfBirthError,
-        address: addressError,
-        postalCodeCity: postalCodeCityError,
         phone: phoneError,
         email: emailError,
         password: passwordError,
@@ -118,34 +117,10 @@ export default function SignupForm({formData, handleChange}: SignupFormProps) {
       });
       break;
     }
-    case 1: {
-      const universityError = educationalInstitutionValidator(formData.university);
-      const studentNumberError = optionalValidatorNumbersOnly(formData.studentNumber);
-      const sportcardNumberError = optionalValidatorNumbersOnly(formData.sportcardNumber);
-      const nkbvNumberError = optionalValidatorNumbersOnly(formData.nkbvNumber);
-      setErrors({
-        ...errors,
-        university: universityError,
-        studentNumber: studentNumberError,
-        sportcardNumber: sportcardNumberError,
-        nkbvNumber: nkbvNumberError
-      });
-      break;
-    }
     case 2: {
-      const ibanError = ibanValidator(formData.iban);
-      const bicError = bicValidator(formData.bic);
-      setErrors({
-        ...errors,
-        iban: ibanError,
-        bic: bicError
-      });
-      break;
-    }
-    case 3: {
-      const iceContactNameError = emergencyContactNameValidator(formData.iceContactName);
-      const iceContactEmailError = emailValidator(formData.iceContactEmail);
-      const iceContactPhoneError = phoneValidator(formData.iceContactPhone);
+      const iceContactNameError = emergencyContactNameValidator(newUser.iceContactName);
+      const iceContactEmailError = emailValidator(newUser.iceContactEmail);
+      const iceContactPhoneError = phoneValidator(newUser.iceContactPhone);
       setErrors({
         ...errors,
         iceContactName: iceContactNameError,
@@ -160,7 +135,7 @@ export default function SignupForm({formData, handleChange}: SignupFormProps) {
   };
 
   const stepProps: StepProps = {
-    formData,
+    newUser,
     errors,
     handleChange,
     handleNext,
@@ -173,9 +148,8 @@ export default function SignupForm({formData, handleChange}: SignupFormProps) {
     switch (activeStep) {
     case 0: return <PersonalStep {...stepProps} />;
     case 1: return <EducationStep {...stepProps} />;
-    case 2: return <FinancialStep {...stepProps} />;
-    case 3: return <EmergencyContactStep {...stepProps} />;
-    case 4: return <OverviewStep {...stepProps} />;
+    case 2: return <EmergencyContactStep {...stepProps} />;
+    case 3: return <OverviewStep {...stepProps} />;
     default: return null;
     }
   };

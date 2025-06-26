@@ -5,7 +5,7 @@ import {
   useEffect,
   useState,
 } from 'react';
-import {Event, EventContent, Registration, Location, Answer, FormUser} from '../types.ts';
+import {Event, EventContent, Registration, Location, Answer, UserContent} from '../types.ts';
 import { useAppState } from './AppStateProvider.tsx';
 import { apiFetch } from '../api.ts';
 import { enqueueSnackbar } from 'notistack';
@@ -23,7 +23,7 @@ interface ApiContextType {
   updateRegistration: (eventId: string, answers: Answer[]) => Promise<void>;
   createRegistration: (eventId: string, answers: Answer[]) => Promise<void>;
   deleteRegistration: (eventId: string) => Promise<void>;
-  createUser: (user: FormUser) => Promise<void>;
+  createUser: (user: UserContent) => Promise<void>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -157,32 +157,11 @@ export default function ApiProvider({ children }: ApiProviderProps) {
     });
   };
 
-  const createUser = async (user: FormUser) => {
+  const createUser = async (user: UserContent) => {
     const { error } = await apiFetch<void>('/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        firstName: user.firstName,
-        infix: user.infix,
-        lastName: user.lastName,
-        password: user.password,
-        status: 'pending',
-        email: user.email,
-        phone: user.phone,
-        dateOfBirth: user.dateOfBirth,
-        address: user.address,
-        postalCodeCity: user.postalCodeCity,
-        studentNumber: user.studentNumber ? parseInt(user.studentNumber, 10) : null,
-        sportcardNumber: user.sportcardNumber ? parseInt(user.sportcardNumber, 10) : null,
-        nkbvNumber: user.nkbvNumber ? parseInt(user.nkbvNumber, 10) : null,
-        iban: user.iban,
-        bic: user.bic,
-        university: user.university,
-        iceContactName: user.iceContactName,
-        iceContactPhone: user.iceContactPhone,
-        importantInfo: user.importantInfo,
-        consent: user.consent
-      })
+      body: JSON.stringify(user)
     });
     
     if (error) {

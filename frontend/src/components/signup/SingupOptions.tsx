@@ -6,12 +6,14 @@ interface SingupOptionsProps {
   handleMember: () => void;
   handleExtraordinaryMember: () => void;
   handleDonor: () => void;
+  handleNonMember: () => void;
 }
 
 export default function SingupOptions({
   handleMember,
   handleExtraordinaryMember,
-  handleDonor
+  handleDonor,
+  handleNonMember
 }: SingupOptionsProps) {
   const { text } = useLanguage();
   return (
@@ -136,7 +138,7 @@ export default function SingupOptions({
             </Button>
           </div>
         </TextCard>
-        <TextCard className="px-7 py-5 xl:col-span-2">
+        <TextCard className="px-7 py-5">
           <h2>{text('Donor', 'Donateur')}</h2>
           <p>
             {text(
@@ -147,6 +149,20 @@ export default function SingupOptions({
           <div className="grid justify-items-end mt-5">
             <Button variant="contained" onClick={handleDonor}>
               {text('Register as donor', 'Inschrijven als donateur')}
+            </Button>
+          </div>
+        </TextCard>
+        <TextCard className="px-7 py-5">
+          <h2>{text('Introduction', 'Introducee')}</h2>
+          <p>
+            {text(
+              'Want to participate in an introduction weekend? Choose this option. When you like it you can easily become a member after.',
+              'Wil je deelnemen aan een introductie weekend? Kies deze optie. Als je het leuk vindt kan je daarna gemakkelijk lid worden.'
+            )}
+          </p>
+          <div className="grid justify-items-end mt-5">
+            <Button variant="contained" onClick={handleNonMember}>
+              {text('Register for introduction', 'Inschrijven als introducee')}
             </Button>
           </div>
         </TextCard>

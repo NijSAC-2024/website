@@ -1,4 +1,4 @@
-create type membership_status as enum ('pending', 'member', 'extraordinary', 'non_member');
+create type membership_status as enum ('pending', 'member', 'extraordinary', 'non_member', 'donor');
 
 create table "user"
 (

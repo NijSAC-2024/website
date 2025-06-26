@@ -60,7 +60,7 @@ pub struct User {
 pub struct UserContent {
     #[validate(length(min = 1, max = 100))]
     pub first_name: String,
-    #[validate(length(min = 0, max = 100))]
+    #[validate(length(min = 1, max = 100))]
     pub infix: Option<String>,
     #[validate(length(min = 1, max = 100))]
     pub last_name: String,
