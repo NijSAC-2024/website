@@ -1,10 +1,3 @@
-export interface ValidateProps {
-  label: string;
-  validator: (value: string) => string | false;
-  onChange: (isValid: boolean) => void;
-  setValue: (value: string) => void;
-}
-
 export type ThemeType = 'dark' | 'light' | 'auto';
 
 export type WeekendType = 'sp' | 'mp' | 'boulder' | 'trad' | 'education';
@@ -130,24 +123,28 @@ export interface BasicUser {
   lastName: string;
 }
 
-export interface User {
+export interface UserContent extends Omit<BasicUser, 'userId'> {
+  firstName: string;
+  infix?: string;
+  lastName: string;
+  phone: string;
+  email: string;
+  password: string;
+  importantInfo?: string;
+  studentNumber?: number;
+  nkbvNumber?: number;
+  sportcardNumber?: number;
+  iceContactName: string;
+  iceContactEmail: string;
+  iceContactPhone: string;
+  status: MembershipStatus;
+}
+
+export interface User extends Omit<UserContent, 'password'> {
   id: string;
   created: string;
   updated: string;
-  firstName: string;
-  infix: string;
-  lastName: string;
-  phone: string;
-  studentNumber: string;
-  nkbvNumber: number;
-  sportcardNumber: number;
-  iceContactName: string;
-  iceContactEmail: null;
-  iceContactPhone: null;
-  importantInfo: null;
   roles: RoleType[];
-  status: MembershipStatus;
-  email: string;
 }
 
 export interface rentOption {

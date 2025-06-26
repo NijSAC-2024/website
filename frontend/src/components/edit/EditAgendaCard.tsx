@@ -60,6 +60,7 @@ export default function EditAgendaCard({
           {/* Image */}
           <form encType="multipart/form-data" action="/file" method="post">
             <Button
+              fullWidth
               component="label"
               variant="contained"
               loading={uploading}

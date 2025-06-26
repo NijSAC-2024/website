@@ -7,7 +7,7 @@ import { getLabel } from '../../util.ts';
 import 'moment/dist/locale/nl';
 import { DateType, Event } from '../../types.ts';
 import Markdown from 'react-markdown';
-import RegisterButton from '../RegisterButton.tsx';
+import RegisterButton from '../register/RegisterButton.tsx';
 import { useAppState } from '../../providers/AppStateProvider.tsx';
 
 interface AgendaCardProps {
