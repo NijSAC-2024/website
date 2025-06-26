@@ -163,7 +163,7 @@ export default function ApiProvider({ children }: ApiProviderProps) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(user)
     });
-    
+
     if (error) {
       switch (error.message) {
       case 'Conflict':
@@ -195,6 +195,8 @@ export default function ApiProvider({ children }: ApiProviderProps) {
           setEvents(events);
         }
       });
+    } else {
+      setEvents([]);
     }
   }, [cache, route.name]);
 
@@ -212,6 +214,8 @@ export default function ApiProvider({ children }: ApiProviderProps) {
           }
         },
       );
+    } else {
+      setLocations([])
     }
   }, [cache, route.name]);
 

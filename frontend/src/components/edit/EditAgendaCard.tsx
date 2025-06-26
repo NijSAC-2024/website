@@ -1,8 +1,8 @@
 import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
-import { DateType, EventContent, EventType, Language, Metadata, typesOptions } from '../../types.ts';
+import { DateType, EventContent, EventType, Language, Metadata, typesOptions, WeekendType } from '../../types.ts';
 import OptionSelector from '../OptionSelector.tsx';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, useState } from 'react';
 import EditDates from './EditDates.tsx';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import { useApiState } from '../../providers/ApiProvider.tsx';
@@ -10,17 +10,11 @@ import { useApiState } from '../../providers/ApiProvider.tsx';
 interface EditAgendaCardProps {
   category: EventType;
   image?: string;
-  metadata: Metadata;
+  metadata?: Metadata;
   name: Language;
   dates: DateType[];
   location: string;
-  handleFieldChange: (
-    name: keyof EventContent,
-    value: Metadata | EventType | Language | string
-  ) => void;
-  handleDateChange: (index: number, startDate: boolean, value: string) => void;
-  handleAddDate: () => void;
-  handleRemoveDate: (index: number) => void;
+  handleEventChange: (changes: Partial<EventContent>) => void;
 }
 
 export default function EditAgendaCard({
@@ -30,23 +24,24 @@ export default function EditAgendaCard({
   name,
   dates,
   location,
-  handleFieldChange,
-  handleDateChange,
-  handleAddDate,
-  handleRemoveDate
+  handleEventChange
 }: EditAgendaCardProps) {
   const { text } = useLanguage();
   const { locations } = useApiState();
+  const [uploading, setUploading] = useState(false);
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (reader.result) {
-          handleFieldChange('image', reader.result.toString());
-        }
-      };
-      reader.readAsDataURL(file);
+      setUploading(true);
+      const formData = new FormData();
+      formData.append(file.name, file);
+      fetch('/api/file', {
+        method: 'POST',
+        body: formData
+      }).then((response) => response.json()).then((uploadInfo) => {
+        handleEventChange({ image: uploadInfo[0].id });
+        setUploading(false);
+      });
     }
   };
 
@@ -56,29 +51,32 @@ export default function EditAgendaCard({
       <div>
         <img
           className="w-full aspect-4/2 object-cover"
-          src={image}
+          src={image?.startsWith('https://') ? image : `/api/file/${image}`}
           alt="Event"
         />
       </div>
       <div className="p-5">
         <div className="grid gap-5">
           {/* Image */}
-          <Button
-            component="label"
-            variant="contained"
-            color="primary"
-            aria-label={text('Change Image', 'Afbeelding Wijzigen')}
-            className="mx-auto"
-          >
-            <PhotoCameraIcon className="mr-2" />
-            {text('Upload Image', 'Afbeelding Uploaden')}
-            <input
-              type="file"
-              accept="image/*"
-              hidden
-              onChange={handleImageChange}
-            />
-          </Button>
+          <form encType="multipart/form-data" action="/file" method="post">
+            <Button
+              component="label"
+              variant="contained"
+              loading={uploading}
+              color="primary"
+              aria-label={text('Change Image', 'Afbeelding Wijzigen')}
+              className="mx-auto"
+              startIcon={<PhotoCameraIcon />}
+            >
+              {text('Upload Image', 'Afbeelding Uploaden')}
+              <input
+                type="file"
+                accept="image/*"
+                hidden
+                onChange={handleImageChange}
+              />
+            </Button>
+          </form>
           {/* Category and Type */}
           <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
             <FormControl fullWidth>
@@ -90,9 +88,9 @@ export default function EditAgendaCard({
                 value={category}
                 label={text('Category*', 'Categorie*')}
                 variant="outlined"
-                onChange={(e) =>
-                  handleFieldChange('eventType', e.target.value as EventType)
-                }
+                onChange={(e) => {
+                  handleEventChange({ eventType: e.target.value as EventType });
+                }}
               >
                 <MenuItem value="activity">
                   {text('Activity', 'Activiteit')}
@@ -112,10 +110,12 @@ export default function EditAgendaCard({
               options={typesOptions}
               selected={metadata?.type}
               onChange={(selectedTypes) =>
-                handleFieldChange('metadata', {
-                  ...metadata,
-                  type: selectedTypes
-                } as Metadata)
+                handleEventChange({
+                  metadata: {
+                    ...metadata,
+                    type: selectedTypes as WeekendType[]
+                  }
+                })
               }
               label={'Type'}
             />
@@ -126,9 +126,11 @@ export default function EditAgendaCard({
               value={name.en}
               label={text('Title English*', 'Titel Engels*')}
               onChange={(e) =>
-                handleFieldChange('name', {
-                  ...name,
-                  en: e.target.value
+                handleEventChange({
+                  name: {
+                    ...name,
+                    en: e.target.value
+                  }
                 })
               }
             />
@@ -136,9 +138,11 @@ export default function EditAgendaCard({
               value={name.nl}
               label={text('Title Dutch*', 'Titel Nederlands*')}
               onChange={(e) =>
-                handleFieldChange('name', {
-                  ...name,
-                  nl: e.target.value
+                handleEventChange({
+                  name: {
+                    ...name,
+                    nl: e.target.value
+                  }
                 })
               }
             />
@@ -149,11 +153,12 @@ export default function EditAgendaCard({
               {text('Location*', 'Locatie*')}
             </InputLabel>
             <Select
+              required
               labelId="select-label"
               value={location}
               label={text('Location*', 'Locatie*')}
               onChange={(e) =>
-                handleFieldChange('location', e.target.value as string)
+                handleEventChange({ location: e.target.value })
               }
               variant="outlined"
             >
@@ -167,9 +172,7 @@ export default function EditAgendaCard({
           {/*Dates*/}
           <EditDates
             dates={dates}
-            handleAddDate={handleAddDate}
-            handleDateChange={handleDateChange}
-            handleRemoveDate={handleRemoveDate}
+            handleEventChange={handleEventChange}
           />
         </div>
       </div>

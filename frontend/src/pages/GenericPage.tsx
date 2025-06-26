@@ -8,7 +8,7 @@ interface GenericPageProps {
 
 export default function GenericPage({
   children,
-  image = '/images/test-header-image.jpg',
+  image = '/images/test-header-image.jpg'
 }: GenericPageProps) {
   const isMobile = useMediaQuery('(max-width: 992px)');
   return (
@@ -18,7 +18,7 @@ export default function GenericPage({
           className={
             'relative w-full min-h-80 bg-cover bg-center brightness-70'
           }
-          style={{ backgroundImage: `url('${image}')` }}
+          style={{ backgroundImage: `url('${image?.startsWith('https://') || image?.startsWith('/') ? image : `/api/file/${image}`}')` }}
         ></div>
       ) : (
         <div

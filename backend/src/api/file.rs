@@ -14,8 +14,8 @@ use axum::{
 };
 use bytes::Bytes;
 use image::{
+    DynamicImage, ImageDecoder, ImageReader,
     codecs::{jpeg::JpegEncoder, webp::WebPEncoder},
-    load_from_memory,
 };
 use mime::{IMAGE, IMAGE_JPEG, Mime};
 use std::io::Cursor;
@@ -84,10 +84,19 @@ pub async fn upload(
 }
 
 fn reduce_image_size(bytes: &[u8]) -> AppResult<(Bytes, Mime)> {
-    let mut image = load_from_memory(bytes)?;
+    let b = Cursor::new(bytes);
+
+    let mut decoder = ImageReader::new(b)
+        .with_guessed_format()
+        .map_err(|_| Error::Internal("Error decoding the image".to_string()))?
+        .into_decoder()?;
+    let orientation = decoder.orientation()?;
+    let mut image = DynamicImage::from_decoder(decoder)?;
+
     if image.width() > 1500 || image.height() > 1500 {
         image = image.thumbnail(1500, 1500);
     }
+    image.apply_orientation(orientation);
 
     let mut buf = Vec::new();
     let writer = Cursor::new(&mut buf);

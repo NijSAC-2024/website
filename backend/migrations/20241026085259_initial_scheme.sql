@@ -64,6 +64,8 @@ create table event --event base
     name_nl                    text                not null,
     name_en                    text                not null,
     image                      uuid references file (id),
+    start_dates                timestamptz[]       not null default '{}',
+    end_dates                  timestamptz[]       not null default '{}',
     description_nl             text                not null default '',
     description_en             text                not null default '', -- location also has its own description
     registration_start         timestamptz,
@@ -92,15 +94,6 @@ create table event --event base
     created_by                 uuid                not null references "user" (id),
     created                    timestamptz         not null,
     updated                    timestamptz         not null
-);
-
-create table date
-(
-    event_id uuid        not null references event (id) on delete cascade,
-    start    timestamptz not null,
-    "end"    timestamptz not null,
-    constraint pk_date
-        primary key (event_id, start)
 );
 
 create table event_registration

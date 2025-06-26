@@ -1,3 +1,10 @@
+export interface ValidateProps {
+  label: string;
+  validator: (value: string) => string | false;
+  onChange: (isValid: boolean) => void;
+  setValue: (value: string) => void;
+}
+
 export type ThemeType = 'dark' | 'light' | 'auto';
 
 export type WeekendType = 'sp' | 'mp' | 'boulder' | 'trad' | 'education';
@@ -83,7 +90,7 @@ export interface Event extends Omit<EventContent, 'location'> {
 
 export function toEventContent(event: Event): EventContent {
   const location_id = event.location.id;
-  const eventContent = event as unknown as EventContent;
+  const eventContent = { ...event } as unknown as EventContent;
   eventContent.location = location_id;
   return eventContent;
 }
@@ -123,28 +130,24 @@ export interface BasicUser {
   lastName: string;
 }
 
-export interface UserContent extends Omit<BasicUser, 'userId'> {
-  firstName: string;
-  infix?: string;
-  lastName: string;
-  phone: string;
-  studentNumber?: number;
-  nkbvNumber?: number;
-  sportcardNumber?: number;
-  iceContactName: string;
-  iceContactEmail: string;
-  iceContactPhone: string;
-  importantInfo?: string;
-  email: string;
-  password?: string;
-  status: MembershipStatus;
-}
-
-export interface User extends UserContent{
+export interface User {
   id: string;
   created: string;
   updated: string;
+  firstName: string;
+  infix: string;
+  lastName: string;
+  phone: string;
+  studentNumber: string;
+  nkbvNumber: number;
+  sportcardNumber: number;
+  iceContactName: string;
+  iceContactEmail: null;
+  iceContactPhone: null;
+  importantInfo: null;
   roles: RoleType[];
+  status: MembershipStatus;
+  email: string;
 }
 
 export interface rentOption {
@@ -195,22 +198,22 @@ export const typesOptions: OptionsType[] = [
   { id: 'mp', label: { en: 'Multi Pitch', nl: 'Multi Pitch' } },
   { id: 'education', label: { en: 'Education', nl: 'Opleiding' } },
   { id: 'boulder', label: { en: 'Bouldering', nl: 'Boulderen' } },
-  { id: 'trad', label: { en: 'Trad', nl: 'Trad' } },
+  { id: 'trad', label: { en: 'Trad', nl: 'Trad' } }
 ];
 
 export const experienceOptions: OptionsType[] = [
   { id: 'sp', label: { en: 'Single Pitch', nl: 'Single Pitch' } },
-  { id: 'mp', label: { en: 'Multi Pitch', nl: 'Multi Pitch' } },
+  { id: 'mp', label: { en: 'Multi Pitch', nl: 'Multi Pitch' } }
 ];
 
 export const memberOptions: OptionsType[] = [
   { id: 'member', label: { en: 'Member', nl: 'Lid' } },
   {
     id: 'extraordinary',
-    label: { en: 'Extraordinary Member', nl: 'Buitengewoon Lid' },
+    label: { en: 'Extraordinary Member', nl: 'Buitengewoon Lid' }
   },
   { id: 'nonMember', label: { en: 'Non Member', nl: 'Niet Lid' } },
-  { id: 'pending', label: { en: 'Pending', nl: 'In afwachting' } },
+  { id: 'pending', label: { en: 'Pending', nl: 'In afwachting' } }
 ];
 
 export const labelOptions: OptionsType[] = [
@@ -226,7 +229,7 @@ export const labelOptions: OptionsType[] = [
   { id: 'member', label: { en: 'Member', nl: 'Lid' } },
   {
     id: 'extraordinary',
-    label: { en: 'Extraordinary Member', nl: 'Buitengewoon Lid' },
+    label: { en: 'Extraordinary Member', nl: 'Buitengewoon Lid' }
   },
   { id: 'donor', label: { en: 'Donor', nl: 'Donateur' } }
 ];
@@ -235,16 +238,16 @@ export const rentOptions: rentOption[] = [
   {
     name: {
       en: 'Belay device (ATC or smart)',
-      nl: 'Zekerapparaat (ATC of smart)',
+      nl: 'Zekerapparaat (ATC of smart)'
     },
-    price: 0.5,
+    price: 0.5
   },
   {
     name: {
       en: 'Carabiner (screw or safebiner)',
-      nl: 'Karabiner (schroefbiner of safebiner)',
+      nl: 'Karabiner (schroefbiner of safebiner)'
     },
-    price: 0.5,
+    price: 0.5
   },
   { name: { en: 'Sling', nl: 'Schlinge' }, price: 0.5 },
   { name: { en: 'Climbing helmet', nl: 'Klimhelm' }, price: 1.0 },
@@ -254,42 +257,42 @@ export const rentOptions: rentOption[] = [
   {
     name: { en: 'Bivouac sack', nl: 'Bivakzak' },
     price: 1.0,
-    remark: { en: '(per month)', nl: '(per maand)' },
+    remark: { en: '(per month)', nl: '(per maand)' }
   },
   { name: { en: 'Ice axe', nl: 'Pickel' }, price: 0.5 },
   { name: { en: 'Ice drill', nl: 'IJsboor' }, price: 1.0 },
   {
     name: {
       en: 'Crampons (incl. crampon cover)',
-      nl: 'Stijgijzers (incl. stijgijzerhoes)',
+      nl: 'Stijgijzers (incl. stijgijzerhoes)'
     },
-    price: 0.5,
+    price: 0.5
   },
   { name: { en: 'Tarp', nl: 'Tarp' }, price: 1.5 },
   {
     name: { en: 'Ice axes (per two)', nl: 'IJsbijl (per twee)' },
     price: 15.0,
-    remark: { en: '(per week)', nl: '(per week)' },
+    remark: { en: '(per week)', nl: '(per week)' }
   },
   {
     name: {
       en: 'Nuts (per set incl. nut tool)',
-      nl: 'Nuts (per bos incl. nuttenfrutter)',
+      nl: 'Nuts (per bos incl. nuttenfrutter)'
     },
-    price: 0.5,
+    price: 0.5
   },
   { name: { en: 'Camalot/Friend', nl: 'Camalot/Friend' }, price: 0.5 },
   { name: { en: 'Other trad gear', nl: 'Overig trad gear' }, price: 1.0 },
   {
     name: { en: 'Quickdraws (per 6)', nl: 'Setjes (per 6 stuks)' },
-    price: 0.5,
+    price: 0.5
   },
   { name: { en: 'Crash pad', nl: 'Crashpad' }, price: 3.5 },
   { name: { en: 'Single rope', nl: 'Enkeltouw' }, price: 1.5 },
   { name: { en: 'Alpine rope', nl: 'Alpien touw' }, price: 1.5 },
   {
     name: { en: 'Double rope (per strand)', nl: 'Dubbeltouw (per streng)' },
-    price: 1.0,
+    price: 1.0
   },
   { name: { en: 'Training rope', nl: 'Oefentouw' }, price: 0.0 },
   { name: { en: 'Stove', nl: 'Brander' }, price: 0.5 },
@@ -299,15 +302,15 @@ export const rentOptions: rentOption[] = [
     price: 0.0,
     remark: {
       en: '(€5.00 per month after 1 month)',
-      nl: '(€5,00 per maand na 1 maand)',
-    },
+      nl: '(€5,00 per maand na 1 maand)'
+    }
   },
   {
     name: {
       en: 'Climbing set (harness, safebiner, belay device)',
-      nl: 'Klimset (heupgordel, safebiner, zekerapparaat)',
+      nl: 'Klimset (heupgordel, safebiner, zekerapparaat)'
     },
     price: 5.0,
-    remark: { en: '(for max. 6 months)', nl: '(voor max. 6 maanden)' },
-  },
+    remark: { en: '(for max. 6 months)', nl: '(voor max. 6 maanden)' }
+  }
 ];

@@ -7,7 +7,7 @@ import { getLabel } from '../../util.ts';
 import 'moment/dist/locale/nl';
 import { DateType, Event } from '../../types.ts';
 import Markdown from 'react-markdown';
-import RegisterButton from '../register/RegisterButton.tsx';
+import RegisterButton from '../RegisterButton.tsx';
 import { useAppState } from '../../providers/AppStateProvider.tsx';
 
 interface AgendaCardProps {
@@ -79,6 +79,11 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
     return truncated.trim() + '…';
   };
 
+  let imageUrl = '/images/test-header-image.jpg'
+  if (event.image) {
+    imageUrl = (event.image?.startsWith('https://') ? event.image : `/api/file/${event.image}`)
+  }
+
   return (
     <div
       className="w-full rounded-2xl bg-inherit border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] flex flex-col relative justify-between">
@@ -101,7 +106,7 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
         )}
         <img
           className="w-full aspect-[4/2] object-cover"
-          src={event.image || '/images/test-header-image.jpg'}
+          src={imageUrl}
           alt="not available"
         />
         <div className="p-5 grid space-y-1">
