@@ -17,7 +17,7 @@ export default function EmergencyContactStep({
     <Box className="grid gap-2.5" component="form" onSubmit={handleNext}>
       <FormControl>
         <TextField
-          label={text('Emergency contact name', 'Naam contact noodgevallen')}
+          label={text('Emergency Contact Name', 'Naam contact noodgevallen')}
           value={newUser.iceContactName}
           onChange={(e) => handleChange('iceContactName', e.target.value)}
           variant="outlined"
@@ -28,7 +28,7 @@ export default function EmergencyContactStep({
 
       <FormControl>
         <TextField
-          label={text('Emergency contact email', 'E-mail contact noodgevallen')}
+          label={text('Emergency Contact Email', 'E-mail contact noodgevallen')}
           value={newUser.iceContactEmail}
           onChange={(e) => handleChange('iceContactEmail', e.target.value)}
           variant="outlined"
@@ -39,7 +39,7 @@ export default function EmergencyContactStep({
 
       <FormControl>
         <TextField
-          label={text('Emergency contact phone', 'Telefoon contact noodgevallen')}
+          label={text('Emergency Contact Phone', 'Telefoon contact noodgevallen')}
           value={newUser.iceContactPhone}
           onChange={(e) => handleChange('iceContactPhone', e.target.value)}
           variant="outlined"

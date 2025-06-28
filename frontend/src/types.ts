@@ -6,6 +6,8 @@ export type ExperienceType = 'sp' | 'mp';
 
 export type EventType = 'activity' | 'course' | 'training' | 'weekend';
 
+export type ErrorType = Language | boolean;
+
 export type MembershipStatus =
   | 'pending'
   | 'member'

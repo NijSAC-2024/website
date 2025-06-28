@@ -7,6 +7,7 @@ import SignupOptions from '../components/signup/SingupOptions.tsx';
 import { useLanguage } from '../providers/LanguageProvider.tsx';
 import {MembershipStatus, UserContent} from '../types.ts';
 import {useApiState} from '../providers/ApiProvider.tsx';
+import {useAppState} from '../providers/AppStateProvider.tsx';
 
 interface MembershipType {
   id: MembershipStatus;
@@ -16,6 +17,7 @@ interface MembershipType {
 export default function Signup() {
   const { text } = useLanguage();
   const { createUser } = useApiState()
+  const { navigate } = useAppState();
   const [membership, setMembership] = useState<MembershipType>({
     id: 'member', label: {en: 'Member', nl: 'Lid'}
   });
@@ -34,6 +36,7 @@ export default function Signup() {
 
   const handleSubmit = () => {
     createUser(newUser);
+    navigate('agenda')
   };
 
   const handleChange = (field: keyof UserContent, value: string | number) => {

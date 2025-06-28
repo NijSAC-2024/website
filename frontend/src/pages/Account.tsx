@@ -11,11 +11,10 @@ export default function Settings() {
 
   return (
     <GenericPage>
-      <ContentCard className="p-7">
+      <ContentCard className="grid gap-1 p-7">
         <h1 className="text-3xl">{text('My account', 'Mijn account')}</h1>
-        <TextCard className="px-6 py-3 mt-3 grid grid-cols-4 gap-5">
-          <h2 className="col-span-4">{text('Personal information', 'Persoonlijke informatie')}</h2>
-
+        <h2>{text('Personal information', 'Persoonlijke informatie')}</h2>
+        <TextCard className="px-6 py-3 grid grid-cols-4 gap-5 mb-3">
           <b>{text('Full name', 'Volledige naam')}</b>
           <span className="col-span-3">
             {`${user?.firstName} ${user?.infix ?? ''} ${user?.lastName}`}
@@ -30,22 +29,24 @@ export default function Settings() {
           <b>{text('Important information', 'Belangrijke informatie')}</b>
           <span className="col-span-3">{user?.importantInfo}</span>
 
-          <b>{text('Student number', 'Studentnummer')}</b>
-          <span className="col-span-3">{user?.studentNumber}</span>
-
-          <b>{text('NKBV number', 'NKBV nummer')}</b>
-          <span className="col-span-3">{user?.nkbvNumber}</span>
-
-          <b>{text('Sportscard number', 'Sportkaartnummer')}</b>
-          <span className="col-span-3">{user?.sportcardNumber}</span>
-
           <b>{text('Membership status', 'Lidmaatschapsstatus')}</b>
           <span className="col-span-3">{text(user ? getLabel(user?.status) : '')}</span>
         </TextCard>
 
-        <TextCard className="px-6 py-3 mt-3 grid grid-cols-4 gap-5">
-          <h2 className="col-span-4">{text('Contact information for emergencies', 'Contactinformatie voor noodgevallen')}</h2>
+        <h2>{text('Education & Insurance', 'Educatie & Verzekering')}</h2>
+        <TextCard className="px-6 py-3 grid grid-cols-4 gap-5 mb-3">
+          <b>{text('Student number', 'Studentnummer')}</b>
+          <span className="col-span-3">{user?.studentNumber}</span>
 
+          <b>{text('Sportscard number', 'Sportkaartnummer')}</b>
+          <span className="col-span-3">{user?.sportcardNumber}</span>
+
+          <b>{text('NKBV number', 'NKBV-nummer')}</b>
+          <span className="col-span-3">{user?.nkbvNumber}</span>
+        </TextCard>
+
+        <h2>{text('Emergency contact', 'Contact noogevallen')}</h2>
+        <TextCard className="px-6 py-3 grid grid-cols-4 gap-5 mb-3">
           <b>{text('ICE contact name', 'ICE contact naam')}</b>
           <span className="col-span-3">{user?.iceContactName}</span>
 

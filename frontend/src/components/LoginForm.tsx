@@ -4,6 +4,7 @@ import { useAuth } from '../providers/AuthProvider.tsx';
 import { useLanguage } from '../providers/LanguageProvider.tsx';
 import PasswordField from './PasswordField.tsx';
 import {emailValidator, passwordValidator} from '../validator.ts';
+import {Language} from '../types.ts';
 
 
 export default function LoginForm() {
@@ -12,8 +13,8 @@ export default function LoginForm() {
 
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [emailError, setEmailError] = useState<string | boolean>(false);
-  const [passwordError, setPasswordError] = useState<string | boolean>(false);
+  const [emailError, setEmailError] = useState<Language | boolean>(false);
+  const [passwordError, setPasswordError] = useState<Language | boolean>(false);
 
   const validateInputs = () => {
     setEmailError(emailValidator(email));
@@ -41,7 +42,7 @@ export default function LoginForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             error={!!emailError}
-            helperText={emailError}
+            helperText={emailError && text(emailError as Language)}
           />
         </FormControl>
         <FormControl error={!!passwordError}>
@@ -50,7 +51,7 @@ export default function LoginForm() {
             onChange={(e) => setPassword(e.target.value)}
             label={text('Password', 'Wachtwoord')}
           />
-          {passwordError && <FormHelperText>{passwordError}</FormHelperText>}
+          {passwordError && <FormHelperText>{text(passwordError as Language)}</FormHelperText>}
         </FormControl>
         <Button variant="contained" type="submit" onClick={validateInputs}>
           {text('Login', 'Inloggen')}

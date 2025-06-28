@@ -18,7 +18,7 @@ export default function PersonalStep({
     <Box className="grid xl:grid-cols-10 gap-y-4 gap-x-2.5" component="form" onSubmit={handleNext}>
       <FormControl className="xl:col-span-4">
         <TextField
-          label={text('First name', 'Voornaam')}
+          label={text('First Name', 'Voornaam')}
           value={newUser.firstName}
           onChange={(e) => handleChange('firstName', e.target.value)}
           variant="outlined"
@@ -40,7 +40,7 @@ export default function PersonalStep({
 
       <FormControl className="xl:col-span-4">
         <TextField
-          label={text('Last name', 'Achternaam')}
+          label={text('Last Name', 'Achternaam')}
           value={newUser.lastName}
           onChange={(e) => handleChange('lastName', e.target.value)}
           variant="outlined"
@@ -83,7 +83,7 @@ export default function PersonalStep({
       <FormControl className="xl:col-span-10">
         <TextField
           multiline
-          label={text('Important info (allergies etc.)', 'Belangrijke info (allergieën etc.)')}
+          label={text('Important Info (allergies etc.)', 'Belangrijke info (allergieën etc.)')}
           value={newUser.importantInfo}
           onChange={(e) => handleChange('importantInfo', e.target.value)}
           variant="outlined"

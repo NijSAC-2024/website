@@ -3,7 +3,7 @@ import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
-import {Language, UserContent} from '../../types.ts';
+import {ErrorType, UserContent} from '../../types.ts';
 import PersonalStep from './PersonalStep.tsx';
 import EducationStep from './EducationStep.tsx';
 import EmergencyContactStep from './EmergencyContactStep.tsx';
@@ -28,19 +28,19 @@ export interface StepProps {
 }
 
 interface FormErrors {
-  firstName: boolean | Language;
-  infix: boolean | Language;
-  lastName: boolean | Language;
-  phone: boolean | Language;
-  studentNumber: boolean | Language;
-  nkbvNumber: boolean | Language;
-  sportcardNumber: boolean | Language;
-  iceContactName: boolean | Language;
-  iceContactEmail: boolean | Language;
-  iceContactPhone: boolean | Language;
-  importantInfo: boolean | Language;
-  email: boolean | Language;
-  password: boolean | Language;
+  firstName: ErrorType
+  infix: ErrorType;
+  lastName: ErrorType;
+  phone: ErrorType;
+  studentNumber: ErrorType;
+  nkbvNumber: ErrorType;
+  sportcardNumber: ErrorType;
+  iceContactName: ErrorType;
+  iceContactEmail: ErrorType;
+  iceContactPhone: ErrorType;
+  importantInfo: ErrorType;
+  email: ErrorType;
+  password: ErrorType;
 }
 
 const steps = [

@@ -164,12 +164,16 @@ export default function RegisterButton({
           />
         </DialogContent>
         <DialogActions>
-          <div className="flex justify-between w-full">
-            {registration && (
-              <Button color="error" onClick={toggleDialog}>{text('Deregister', 'Uitschrijven')}</Button>
-            )}
+
+          {registration ? (
+            <div className="flex justify-between w-full">
+              <Button color="error" variant="outlined" onClick={toggleDialog}>{text('Deregister', 'Uitschrijven')}</Button>
+              <Button onClick={toggleRegisterDialog}>{text('Close', 'Sluit')}</Button>
+            </div>
+          ) : (
             <Button onClick={toggleRegisterDialog}>{text('Close', 'Sluit')}</Button>
-          </div>
+          )}
+
         </DialogActions>
       </Dialog>
       <AreYouSure
