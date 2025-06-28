@@ -14,7 +14,7 @@ export default function EducationStep({
 }: StepProps){
   const { text } = useLanguage()
   return (
-    <Box className="grid lg:grid-cols-2 gap-y-4 gap-x-2.5" component="form" onSubmit={handleNext}>
+    <Box className="grid xl:grid-cols-2 gap-y-4 gap-x-2.5" component="form" onSubmit={handleNext}>
       <FormControl>
         <TextField
           type="number"
@@ -39,7 +39,7 @@ export default function EducationStep({
         />
       </FormControl>
 
-      <FormControl className="lg:col-span-2">
+      <FormControl className="xl:col-span-2">
         <TextField
           type="number"
           label={text('NKBV Number', 'NKBV-nummer')}
@@ -51,7 +51,7 @@ export default function EducationStep({
         />
       </FormControl>
 
-      <div className="lg:col-span-2">
+      <div className="xl:col-span-2">
         <FormControls
           activeStep={1}
           handleBack={handleBack}

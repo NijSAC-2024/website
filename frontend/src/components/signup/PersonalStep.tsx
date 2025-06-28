@@ -15,8 +15,8 @@ export default function PersonalStep({
 }: StepProps) {
   const { text } = useLanguage()
   return (
-    <Box className="grid lg:grid-cols-10 gap-y-4 gap-x-2.5" component="form" onSubmit={handleNext}>
-      <FormControl className="lg:col-span-4">
+    <Box className="grid xl:grid-cols-10 gap-y-4 gap-x-2.5" component="form" onSubmit={handleNext}>
+      <FormControl className="xl:col-span-4">
         <TextField
           label={text('First name', 'Voornaam')}
           value={newUser.firstName}
@@ -27,7 +27,7 @@ export default function PersonalStep({
         />
       </FormControl>
 
-      <FormControl className="lg:col-span-2">
+      <FormControl className="xl:col-span-2">
         <TextField
           label={text('Infix', 'Tussenvoegsel')}
           value={newUser.infix}
@@ -38,7 +38,7 @@ export default function PersonalStep({
         />
       </FormControl>
 
-      <FormControl className="lg:col-span-4">
+      <FormControl className="xl:col-span-4">
         <TextField
           label={text('Last name', 'Achternaam')}
           value={newUser.lastName}
@@ -49,7 +49,7 @@ export default function PersonalStep({
         />
       </FormControl>
 
-      <FormControl className="lg:col-span-10">
+      <FormControl className="xl:col-span-10">
         <TextField
           label={text('Phone', 'Telefoon')}
           value={newUser.phone}
@@ -60,7 +60,7 @@ export default function PersonalStep({
         />
       </FormControl>
 
-      <FormControl className="lg:col-span-5">
+      <FormControl className="xl:col-span-5">
         <TextField
           label={text('Email', 'E-mail')}
           value={newUser.email}
@@ -71,7 +71,7 @@ export default function PersonalStep({
         />
       </FormControl>
 
-      <FormControl className="lg:col-span-5" error={!!errors.password}>
+      <FormControl className="xl:col-span-5" error={!!errors.password}>
         <PasswordField
           value={newUser.password!}
           onChange={(e) => handleChange('password', e.target.value)}
@@ -80,7 +80,7 @@ export default function PersonalStep({
         {errors.password && <FormHelperText>{text(errors.password as Language)}</FormHelperText>}
       </FormControl>
 
-      <FormControl className="lg:col-span-10">
+      <FormControl className="xl:col-span-10">
         <TextField
           multiline
           label={text('Important info (allergies etc.)', 'Belangrijke info (allergieën etc.)')}
@@ -92,7 +92,7 @@ export default function PersonalStep({
         />
       </FormControl>
 
-      <div className="lg:col-span-10">
+      <div className="xl:col-span-10">
         <FormControls
           activeStep={0}
           handleBack={handleBack}

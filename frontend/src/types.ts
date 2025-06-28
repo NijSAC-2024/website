@@ -70,6 +70,7 @@ export interface Metadata {
   experience?: ExperienceType[];
   type?: WeekendType[];
   gear?: Language;
+  worga?: string;
 }
 
 export interface Event extends Omit<EventContent, 'location'> {

@@ -99,6 +99,7 @@ export default function EditEvent() {
           description={event.description}
           metadata={event.metadata}
           handleEventChange={handleEventChange}
+          category={event.eventType}
         />
 
         <EditRegistrations

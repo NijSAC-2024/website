@@ -1,7 +1,6 @@
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import {
-  Checklist as ChecklistIcon,
   Code as CodeIcon,
   FormatBold as BoldIcon,
   FormatItalic as ItalicIcon,
@@ -73,11 +72,6 @@ export default function MarkdownEditorToolbar({
       <Tooltip title={text('Ordered List', 'Geordende lijst')}>
         <IconButton onClick={() => insertMarkdown('1. ')}>
           <EnumerateIcon fontSize="small" />
-        </IconButton>
-      </Tooltip>
-      <Tooltip title={text('Checklist', 'Checklist')}>
-        <IconButton onClick={() => insertMarkdown('- [ ] ')}>
-          <ChecklistIcon fontSize="small" />
         </IconButton>
       </Tooltip>
     </div>

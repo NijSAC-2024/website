@@ -4,18 +4,22 @@ import { getLabel } from '../../util.ts';
 import { Chip } from '@mui/material';
 import ContentCard from '../ContentCard.tsx';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
-import { Language, WeekendType } from '../../types.ts';
+import {EventType, Language, WeekendType} from '../../types.ts';
 
 interface DescriptionCardProps {
   descriptionMarkdown: Language;
   gear: Language;
   experience: WeekendType[];
+  worga: string;
+  category: EventType;
 }
 
 export default function DescriptionCard({
   descriptionMarkdown,
   gear,
-  experience
+  experience,
+  worga,
+  category
 }: DescriptionCardProps) {
   const { text, language } = useLanguage();
   return (
@@ -27,7 +31,7 @@ export default function DescriptionCard({
       </div>
       {(gear.en?.length > 0 || gear.nl?.length > 0 || experience.length > 0) && (
         <div
-          className="flex justify-between px-7 py-5 border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
+          className="xl:flex grid gap-2.5 justify-between px-7 py-5 border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
           {(gear.en?.length > 0 || gear.nl?.length > 0) && (
             <div>
               <b className="text-[#1976d2] dark:text-[#90caf9]">
@@ -68,6 +72,20 @@ export default function DescriptionCard({
                     size="small"
                   />
                 ))}
+              </div>
+            </div>
+          )}
+          {category === 'weekend' && (
+            <div>
+              <b className="text-[#1976d2] dark:text-[#90caf9]">
+                {text('Weekend Organiser', 'Worga')}
+              </b>
+              <div>
+                <Chip
+                  label={worga === 'nobody' ? text('No one assigned', 'Niemand toegewezen') : worga}
+                  className="uppercase font-semibold"
+                  size="small"
+                />
               </div>
             </div>
           )}

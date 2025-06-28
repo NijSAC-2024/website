@@ -46,7 +46,7 @@ export default function EditRegistrations({
       <div className="flex justify-between p-7">
         <h1>{text('Registrations', 'Inschrijvingen')}</h1>
         <div className="flex items-center">
-          <p>{text('Allow registrations', 'Open voor inschrijvingen')}</p>
+          <p className="ml-4">{text('Allow registrations', 'Open voor inschrijvingen')}</p>
           <Switch
             checked={!!registrationPeriod}
             onChange={handleToggleRegistrations}

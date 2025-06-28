@@ -34,7 +34,7 @@ export default function Event() {
           </Fab>
         </div>
       )}
-      <GenericPage image={event?.image}>
+      <GenericPage image={event.image}>
         <div className="grid xl:grid-cols-3 gap-5 mt-[-9.3rem]">
           <div className="xl:col-span-3 mb-[-0.5rem] flex justify-between items-center">
             <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">
@@ -54,14 +54,16 @@ export default function Event() {
 
           <EventCard event={event} agendaPage={false} />
           <DescriptionCard
-            descriptionMarkdown={event?.description || { en: '', nl: '' }}
-            experience={event?.metadata?.experience || []}
+            descriptionMarkdown={event.description || { en: '', nl: '' }}
+            experience={event.metadata?.experience || []}
             gear={
               event?.metadata?.gear || {
                 en: '',
                 nl: ''
               }
             }
+            worga={event.metadata?.worga || ''}
+            category={event.eventType}
           />
           <RegistrationsCard questions={event.questions} />
         </div>

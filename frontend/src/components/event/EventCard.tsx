@@ -30,7 +30,7 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
     const startMonth = start.getMonth();
     const endMonth = end.getMonth();
 
-    if (start === end) {
+    if (date.start === date.end) {
       return moment(start).utc().format('DD MMM HH:mm');
     } else if (startDay === endDay) {
       return (
