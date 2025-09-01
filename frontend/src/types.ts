@@ -15,7 +15,7 @@ export type MembershipStatus =
   | 'nonMember'
   | 'donor';
 
-export type QuestionType = 'shortText' | 'longText' | 'number' | 'time';
+export type QuestionType = 'shortText' | 'longText' |'multipleChoice' | 'number' | 'boolean';
 
 export type LanguageEnum = 'nl' | 'en';
 

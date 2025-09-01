@@ -171,4 +171,5 @@ pub enum QuestionType {
     Number,
     Time,
     MultipleChoice(Vec<String>),
+    Boolean
 }

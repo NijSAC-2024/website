@@ -81,7 +81,6 @@ export default function SaveButton({ id, handleSave, event }: SaveButtonProps) {
           'Je staat op het punt dit evenement te verwijderen.'
         )}
       />
-      ;
     </>
   );
 }

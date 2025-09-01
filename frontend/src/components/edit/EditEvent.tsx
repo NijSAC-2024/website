@@ -71,7 +71,7 @@ export default function EditEvent() {
     <GenericPage image={event.image}>
       <SaveButton id={id ?? ''} handleSave={handleSave} event={event} />
 
-      <div className="grid xl:grid-cols-3 gap-5 mt-[-4.7rem]">
+      <div className="grid xl:grid-cols-3 gap-5 mt-[-9.3rem]">
         <div className="xl:col-span-3 mb-[-0.5rem] flex justify-between">
           <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">
             <Button color="inherit" onClick={() => navigate('agenda')}>
