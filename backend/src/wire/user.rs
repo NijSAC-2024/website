@@ -60,9 +60,9 @@ pub struct User {
 pub struct UserContent {
     #[validate(length(min = 1, max = 100))]
     pub first_name: String,
-    #[validate(length(min = 1, max = 100))]
+    #[validate(length(max = 100))]
     pub infix: Option<String>,
-    #[validate(length(min = 1, max = 100))]
+    #[validate(length(max = 100))]
     pub last_name: String,
     pub phone: String,
     #[validate(range(
@@ -89,7 +89,7 @@ pub struct UserContent {
     pub ice_contact_email: Option<String>,
     #[validate(length(min = 1, max = 100))]
     pub ice_contact_phone: Option<String>,
-    #[validate(length(min = 1, max = 10000))]
+    #[validate(length(max = 1000))]
     pub important_info: Option<String>,
     pub roles: Roles,
     pub status: MembershipStatus,
@@ -148,7 +148,7 @@ impl Debug for UserCredentials {
 pub struct RegisterNewUser {
     #[validate(length(min = 1, max = 100))]
     pub first_name: String,
-    #[validate(length(min = 1, max = 100))]
+    #[validate(length(max = 100))]
     pub infix: Option<String>,
     #[validate(length(min = 1, max = 100))]
     pub last_name: String,
@@ -185,7 +185,7 @@ pub struct RegisterNewUser {
     pub ice_contact_email: Option<String>,
     #[validate(length(min = 1, max = 100))]
     pub ice_contact_phone: Option<String>,
-    #[validate(length(min = 1, max = 10000))]
+    #[validate(length(max = 1000))]
     pub important_info: Option<String>,
     pub status: MembershipStatus,
 }
