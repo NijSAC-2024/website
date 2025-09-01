@@ -10,3 +10,16 @@ VALUES ('24e2256c-4612-4774-a8ce-168c7817fbd4',
         null,
         '2024-11-01 13:14:17.997000 +00:00',
         '2024-11-01 13:14:17.997000 +00:00');
+
+INSERT INTO event_registration (event_id, user_id, answers, attended, created, updated)
+VALUES ('24e2256c-4612-4774-a8ce-168c7817fbd4',
+        '30269618-160d-4a56-83af-7fc0c1996235', -- admin
+        '[
+          {
+            "questionId": "24e2256c-4612-4774-a8ce-168c7817fbd4",
+            "answer": "blue"
+          }
+        ]',
+        null,
+        '2024-11-01 13:14:17.997000 +00:00',
+        '2024-11-01 13:14:17.997000 +00:00');

@@ -1,4 +1,4 @@
-use crate::{Language, auth::role::MembershipStatus, error::Error, file::FileId, user::BasicUser};
+use crate::{auth::role::MembershipStatus, error::Error, file::FileId, user::BasicUser, Language};
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 use std::{borrow::Cow, ops::Deref, str::FromStr};
@@ -164,12 +164,11 @@ pub struct Question {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", tag = "type")]
 pub enum QuestionType {
-    ShortText,
-    LongText,
+    Text,
     Number,
     Time,
-    MultipleChoice(Vec<String>),
-    Boolean
+    MultipleChoice { options: Vec<Language> },
+    Boolean,
 }

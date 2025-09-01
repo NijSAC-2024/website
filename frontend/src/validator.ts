@@ -33,10 +33,10 @@ export const emailValidator = (value: string): Language | false => {
 };
 
 export const passwordValidator = (value?: string): Language | false => {
-  if (!value || value.length < 5) {
+  if (!value || value.length < 10) {
     return {
-      en: 'Password must be at least 5 characters long',
-      nl: 'Wachtwoord moet minimaal 5 karakters lang zijn',
+      en: 'Password must be at least 10 characters long',
+      nl: 'Wachtwoord moet minimaal 10 karakters lang zijn',
     };
   }
   return false;

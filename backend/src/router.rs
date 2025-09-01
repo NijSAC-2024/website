@@ -57,7 +57,7 @@ fn api_router() -> Router<AppState> {
         .route("/user/{:id}/password", post(update_pwd))
         .route(
             "/user/{:id}/event_registrations",
-            post(get_user_registrations),
+            get(get_user_registrations),
         )
         .route("/user/{:id}/material", get(get_material_list))
         .route("/user/{:id}/getMaterial", get(get_user_materials))

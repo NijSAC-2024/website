@@ -22,7 +22,39 @@ VALUES ('24e2256c-4612-4774-a8ce-168c7817fbd4',
               "en": "What is your favorite color?",
               "nl": "Wat is je favoriete kleur?"
             },
-            "questionType": "shortText",
+            "questionType": {
+              "type": "multipleChoice",
+              "options": [
+                {
+                  "en": "Red",
+                  "nl": "Rood"
+                },
+                {
+                  "en": "Green",
+                  "nl": "Groen"
+                },
+                {
+                  "en": "Blue",
+                  "nl": "Blauw"
+                },
+                {
+                  "en": "Yellow",
+                  "nl": "Geel"
+                },
+                {
+                  "en": "Black",
+                  "nl": "Zwart"
+                },
+                {
+                  "en": "White",
+                  "nl": "Wit"
+                },
+                {
+                  "en": "Other",
+                  "nl": "Andere"
+                }
+              ]
+            },
             "required": true
           }
         ]',
