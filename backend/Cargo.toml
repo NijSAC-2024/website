@@ -5,26 +5,26 @@ edition = "2024"
 license = "MIT"
 
 [dependencies]
-tokio = { version = "1.45.1", features = ["full"] }
+tokio = { version = "1.47.1", features = ["full"] }
 axum = { version = "0.8.1", features = ["json", "macros", "multipart"] }
 axum-extra = { version = "0.10.0", features = ["cookie"] }
-tower-http = { version = "0.6.2", features = ["trace"] }
+tower-http = { version = "0.6.6", features = ["trace"] }
 tracing = "0.1.40"
-tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
+tracing-subscriber = { version = "0.3.20", features = ["env-filter"] }
 sqlx = { version = "0.8.6", default-features = false, features = ["json", "postgres", "runtime-tokio", "migrate", "macros", "time", "uuid", "tls-rustls-aws-lc-rs"] }
-thiserror = "2.0.11"
+thiserror = "2.0.16"
 validator = { version = "0.20.0", features = ["derive"] }
-uuid = { version = "1.17.0", features = ["v7", "serde"] }
+uuid = { version = "1.18.0", features = ["v7", "serde"] }
 argon2 = "0.5.3"
 dotenvy = "0.15.7"
 serde = { version = "1.0.217", features = ["derive"] }
-serde_json = "1.0.138"
-serde_with = "3.12.0"
+serde_json = "1.0.143"
+serde_with = "3.14.0"
 memory-serve = "1.0.0"
-time = { version = "0.3.37", features = ["serde"] }
-rand = "0.9.0"
-strum_macros = "0.27.1"
-object_store = "0.12.0"
+time = { version = "0.3.42", features = ["serde"] }
+rand = "0.9.2"
+strum_macros = "0.27.2"
+object_store = "0.12.3"
 bytes = "1.9.0"
 mime = "0.3.17"
-image = { version = "0.25.5", default-features = false, features = ["webp", "jpeg", "png"] }
+image = { version = "0.25.7", default-features = false, features = ["webp", "jpeg", "png"] }
