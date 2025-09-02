@@ -13,9 +13,10 @@ import { useAppState } from '../../providers/AppStateProvider.tsx';
 interface AgendaCardProps {
   event: Event;
   agendaPage: boolean;
+  isRegistered: boolean;
 }
 
-export default function EventCard({ event, agendaPage }: AgendaCardProps) {
+export default function EventCard({ event, agendaPage, isRegistered }: AgendaCardProps) {
   const { navigate } = useAppState();
   const { text, language } = useLanguage();
   moment.locale(language);
@@ -171,7 +172,8 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
             questions={event.questions}
             registrationMax={event.registrationMax}
             registrationCount={event.registrationCount}
-            id={event.id}
+            eventId={event.id}
+            isRegistered={isRegistered}
           />
         </div>
       )}

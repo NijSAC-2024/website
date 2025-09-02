@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import {useEffect, useState} from 'react';
 import GenericPage from './GenericPage.tsx';
 import ContentCard from '../components/ContentCard.tsx';
 import { Event, EventType, WeekendType } from '../types.ts';
@@ -9,6 +9,8 @@ import EventCard from '../components/event/EventCard.tsx';
 import { useApiState } from '../providers/ApiProvider.tsx';
 import { useLanguage } from '../providers/LanguageProvider.tsx';
 import {useAuth} from '../providers/AuthProvider.tsx';
+import {apiFetch} from '../api.ts';
+import {enqueueSnackbar} from 'notistack';
 
 export default function Agenda() {
   const { text } = useLanguage();
@@ -18,6 +20,29 @@ export default function Agenda() {
     'all'
   );
   const [selectedType, setSelectedType] = useState<WeekendType | 'all'>('all');
+  const [registeredEvents, setRegisteredEvents] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchRegistrations = async () => {
+      if (isLoggedIn) {
+        const { error, data: registrations } = await apiFetch<Array<string>>(`/user/${user?.id}/event_registrations`);
+
+        if (error) {
+          enqueueSnackbar(`${error.message}: ${error.reference}`, {
+            variant: 'error',
+          });
+        }
+
+        if (registrations) {
+          setRegisteredEvents(registrations);
+        }
+      } else {
+        setRegisteredEvents([]);
+      }
+    };
+    fetchRegistrations();
+  }, [isLoggedIn, user?.id]);
+
 
   return (
     <>
@@ -128,7 +153,7 @@ export default function Agenda() {
                 (a: Event, b: Event) =>
                   new Date(a.dates[0].start).valueOf() - new Date(b.dates[0].start).valueOf()
               ).map((event: Event) => (
-                <EventCard key={event.id} event={event} agendaPage={true} />
+                <EventCard key={event.id} event={event} agendaPage={true} isRegistered={!!user && registeredEvents.includes(event.id)} />
               ))}
           </div>
         </div>

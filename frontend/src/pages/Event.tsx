@@ -12,7 +12,7 @@ import { useEvents } from '../hooks/useEvents.ts';
 export default function Event() {
   const { text } = useLanguage();
   const { navigate } = useAppState();
-  const { event } = useEvents();
+  const { event, registrations } = useEvents();
   const { isLoggedIn, user } = useAuth();
 
 
@@ -52,7 +52,7 @@ export default function Event() {
             )}
           </div>
 
-          <EventCard event={event} agendaPage={false} />
+          <EventCard event={event} agendaPage={false} isRegistered={registrations.some(reg => reg.userId === user?.id)}/>
           <DescriptionCard
             descriptionMarkdown={event.description || { en: '', nl: '' }}
             experience={event.metadata?.experience || []}

@@ -15,7 +15,12 @@ export type MembershipStatus =
   | 'nonMember'
   | 'donor';
 
-export type QuestionType = 'shortText' | 'longText' |'multipleChoice' | 'number' | 'boolean';
+export type QuestionTypeType = 'text' |'multipleChoice' | 'number' | 'boolean' | 'date';
+
+export interface QuestionType {
+  type: QuestionTypeType;
+  options?: Language[];
+}
 
 export type LanguageEnum = 'nl' | 'en';
 
@@ -34,7 +39,8 @@ export interface OptionsType {
     | EventType
     | MembershipStatus
     | QuestionType
-    | ExperienceType;
+    | ExperienceType
+    | QuestionTypeType;
   label: Language;
 }
 
@@ -227,11 +233,13 @@ export const labelOptions: OptionsType[] = [
   { id: 'boulder', label: { en: 'Bouldering', nl: 'Boulderen' } },
   { id: 'trad', label: { en: 'Trad', nl: 'Trad' } },
   { id: 'member', label: { en: 'Member', nl: 'Lid' } },
-  {
-    id: 'extraordinary',
-    label: { en: 'Extraordinary Member', nl: 'Buitengewoon Lid' }
-  },
-  { id: 'donor', label: { en: 'Donor', nl: 'Donateur' } }
+  { id: 'extraordinary', label: { en: 'Extraordinary Member', nl: 'Buitengewoon Lid' } },
+  { id: 'donor', label: { en: 'Donor', nl: 'Donateur' } },
+  { id: 'text', label: { en: 'Text Question', nl: 'Tekstvraag' } },
+  { id: 'multipleChoice', label: { en: 'Option Question', nl: 'Meerkeuzevraag' } },
+  { id: 'number', label: { en: 'Number Question', nl: 'Getalvraag' } },
+  { id: 'boolean', label: { en: 'Checkbox Question', nl: 'Checkboxvraag' } },
+  { id: 'date', label: { en: 'Date & Time Question', nl: 'Datum- & Tijdvraag' } }
 ];
 
 export const rentOptions: rentOption[] = [

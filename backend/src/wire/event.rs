@@ -168,7 +168,7 @@ pub struct Question {
 pub enum QuestionType {
     Text,
     Number,
-    Time,
     MultipleChoice { options: Vec<Language> },
     Boolean,
+    Date
 }

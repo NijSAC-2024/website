@@ -1,7 +1,7 @@
 import { Button, Dialog, DialogActions, DialogContent } from '@mui/material';
 import { useAuth } from '../../providers/AuthProvider.tsx';
 import {Answer, DateType, Language, MembershipStatus, Question, Registration} from '../../types.ts';
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import RegisterForm from './RegisterForm.tsx';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import moment from 'moment/moment';
@@ -17,7 +17,8 @@ interface RegisterButtonProps {
   requiredMembershipStatus: MembershipStatus[];
   questions: Question[];
   title: Language;
-  id: string;
+  eventId: string;
+  isRegistered: boolean;
 }
 
 export default function RegisterButton({
@@ -27,7 +28,8 @@ export default function RegisterButton({
   requiredMembershipStatus,
   questions,
   title,
-  id
+  eventId,
+  isRegistered
 }: RegisterButtonProps) {
   const { isLoggedIn, toggleAuthOpen, user } = useAuth();
   const { deleteRegistration, createRegistration, updateRegistration} = useEvents()
@@ -36,53 +38,54 @@ export default function RegisterButton({
   const [registerDialogOpen, setRegisterDialogOpen] = useState<boolean>(false);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [registration, setRegistration] = useState<Registration>();
-  const [refreshKey, setRefreshKey] = useState(0);
 
 
   const toggleDialog = () => setDialogOpen((prevState) => !prevState);
 
-  const toggleRegisterDialog = () => {
-    setRegisterDialogOpen((prevState) => !prevState);
+  const toggleRegisterDialog = async () => {
+    if (!registerDialogOpen) {
+      if (isRegistered) {
+        const { error, data: registrations } = await apiFetch<Registration>(`/event/${eventId}/registration/${user?.id}`);
+
+        if (error) {
+          enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
+          return;
+        }
+
+        if (registrations) {
+          setRegistration(registrations);
+        }
+      } else {
+        setRegistration(undefined);
+      }
+
+      setRegisterDialogOpen(true);
+    } else {
+      setRegisterDialogOpen(false);
+    }
   };
+
+
 
   const now = new Date();
   const openTime = new Date(registrationPeriod.start);
   const closeTime = new Date(registrationPeriod.end);
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      apiFetch<Array<Registration>>(`/event/${id}/registration`).then(({ error, data: registrations }) => {
-        if (error) {
-          enqueueSnackbar(`${error.message}: ${error.reference}`, {
-            variant: 'error',
-          });
-        }
-        if (registrations) {
-          setRegistration(registrations.find(reg => reg.userId === user?.id));
-        }
-      });
-    } else {
-      setRegistration(undefined);
-    }
-  }, [id, user?.id, refreshKey, isLoggedIn]);
-
   const handleRegistration = async (answers: Answer[], update?: boolean) => {
     if (update) {
-      await updateRegistration(id, answers);
+      await updateRegistration(eventId, answers);
     } else {
-      await createRegistration(id, answers);
+      await createRegistration(eventId, answers);
     }
     toggleRegisterDialog();
-    setRefreshKey(prev => prev + 1);
   };
 
   const handleRegistrationClick = async () => {
     if (questions.length === 0) {
-      if (registration) {
+      if (isRegistered) {
         toggleDialog();
       } else {
-        await createRegistration(id, []);
-        setRefreshKey(prev => prev + 1);
+        await createRegistration(eventId, []);
       }
     } else {
       toggleRegisterDialog()
@@ -90,8 +93,7 @@ export default function RegisterButton({
   }
 
   const handleDeleteRegistration = async () => {
-    await deleteRegistration(id);
-    setRefreshKey(prevState => prevState + 1);
+    await deleteRegistration(eventId);
     toggleDialog();
     setRegisterDialogOpen(false)
   }
@@ -99,7 +101,7 @@ export default function RegisterButton({
   const canRegister : boolean = isLoggedIn && requiredMembershipStatus.includes(user!.status) || requiredMembershipStatus.includes('nonMember');
 
   const renderRegistrationStatus = () => {
-    if (registration) {
+    if (isRegistered) {
       return closeTime < now ? (
         <Button variant="contained" disabled>
           {text('Registered', 'Ingeschreven')}

@@ -7,9 +7,12 @@ import ListIcon from '@mui/icons-material/List';
 import NumbersIcon from '@mui/icons-material/Numbers';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { EventContent, Language, Question, QuestionType } from '../../types.ts';
+import DateRangeIcon from '@mui/icons-material/DateRange';
+import {EventContent, Language, Question, QuestionTypeType} from '../../types.ts';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import { useState } from 'react';
+import {getLabel} from '../../util.ts';
+
 
 interface EditRegistrationQuestionProps {
   questions: Question[];
@@ -25,11 +28,12 @@ export default function EditRegistrationQuestions({
   const [activeQuestionId, setActiveQuestionId] = useState<string | null>(null);
   const menuOpen = Boolean(anchorEl);
 
-  const questionTypeMenuItems =  [
-    { type: 'shortText', icon: <TextFieldsIcon fontSize="small" />, label: text('Text Question', 'Tekstvraag') },
-    { type: 'multipleChoice', icon: <ListIcon fontSize="small" />, label: text('Option Question', 'Meerkeuzevraag') },
-    { type: 'number', icon: <NumbersIcon fontSize="small" />, label: text('Number Question', 'Getalvraag') },
-    { type: 'boolean', icon: <CheckBoxIcon fontSize="small" />, label: text('Checkbox Question', 'Checkboxvraag') }
+  const questionTypeMenuItems = [
+    { type: 'text', icon: <TextFieldsIcon fontSize="small" />, label: { en: 'Text Question', nl: 'Tekstvraag' } },
+    { type: 'multipleChoice', icon: <ListIcon fontSize="small" />, label: { en: 'Option Question', nl: 'Meerkeuzevraag' } },
+    { type: 'number', icon: <NumbersIcon fontSize="small" />, label: { en: 'Number Question', nl: 'Getalvraag' } },
+    { type: 'boolean', icon: <CheckBoxIcon fontSize="small" />, label: { en: 'Checkbox Question', nl: 'Checkboxvraag' } },
+    { type: 'date', icon: <DateRangeIcon fontSize="small" />, label: { en: 'Date & Time Question', nl: 'Datum- & Tijdvraag' } }
   ];
 
   const activeQuestion = activeQuestionId
@@ -53,11 +57,19 @@ export default function EditRegistrationQuestions({
       questions: questions.filter((q) => q.id !== id)
     });
 
-  const handleSelectQuestionType = (type: QuestionType) => {
+  const handleSelectQuestionType = (type: QuestionTypeType) => {
     if (activeQuestionId) {
       handleEventChange({
         questions: questions.map((q) =>
-          q.id === activeQuestionId ? { ...q, questionType: type } : q
+          q.id === activeQuestionId
+            ? {
+              ...q,
+              questionType: {
+                type,
+                options: type === 'multipleChoice' ? q.questionType.options ?? [] : undefined
+              }
+            }
+            : q
         )
       });
     } else {
@@ -66,7 +78,10 @@ export default function EditRegistrationQuestions({
           ...questions,
           {
             id: crypto.randomUUID(),
-            questionType: type,
+            questionType: {
+              type,
+              options: type === 'multipleChoice' ? [] : undefined
+            },
             question: { en: '', nl: '' },
             required: false
           }
@@ -76,6 +91,62 @@ export default function EditRegistrationQuestions({
     setAnchorEl(null);
     setActiveQuestionId(null);
   };
+
+  const handleOptionChange = (
+    questionId: string,
+    index: number,
+    lang: keyof Language,
+    value: string
+  ) => {
+    handleEventChange({
+      questions: questions.map((q) =>
+        q.id === questionId
+          ? {
+            ...q,
+            questionType: {
+              ...q.questionType,
+              options: q.questionType.options?.map((opt, i) =>
+                i === index ? { ...opt, [lang]: value } : opt
+              ) ?? []
+            }
+          }
+          : q
+      )
+    });
+  };
+
+  const handleAddOption = (questionId: string) => {
+    handleEventChange({
+      questions: questions.map((q) =>
+        q.id === questionId
+          ? {
+            ...q,
+            questionType: {
+              ...q.questionType,
+              options: [...(q.questionType.options ?? []), { en: '', nl: '' }]
+            }
+          }
+          : q
+      )
+    });
+  };
+
+  const handleRemoveOption = (questionId: string, index: number) => {
+    handleEventChange({
+      questions: questions.map((q) =>
+        q.id === questionId
+          ? {
+            ...q,
+            questionType: {
+              ...q.questionType,
+              options: q.questionType.options?.filter((_, i) => i !== index) ?? []
+            }
+          }
+          : q
+      )
+    });
+  };
+
 
   return (
     <>
@@ -90,8 +161,7 @@ export default function EditRegistrationQuestions({
                 <TextField
                   multiline
                   value={question.question.en}
-                  label={`${text('Question', 'Vraag')} ${index + 1} ${text('English', 'Engels')}`}
-                  placeholder={question.questionType === 'multipleChoice' ? text('Options separated by commas', 'Opties gescheiden door komma\'s') : ''}
+                  label={`${text(getLabel(question.questionType.type))} ${index + 1} ${text('English', 'Engels')}`}
                   onChange={(e) =>
                     handleRegistrationQuestionChange(question.id, 'question', {
                       en: e.target.value,
@@ -103,8 +173,7 @@ export default function EditRegistrationQuestions({
                 <TextField
                   multiline
                   value={question.question.nl}
-                  label={`${text('Question', 'Vraag')} ${index + 1} ${text('Dutch', 'Nederlands')}`}
-                  placeholder={question.questionType === 'multipleChoice' ? text('Options separated by commas', 'Opties gescheiden door komma\'s') : ''}
+                  label={`${text(getLabel(question.questionType.type))} ${index + 1} ${text('Dutch', 'Nederlands')}`}
                   onChange={(e) =>
                     handleRegistrationQuestionChange(question.id, 'question', {
                       en: question.question.en,
@@ -113,9 +182,54 @@ export default function EditRegistrationQuestions({
                   }
                   fullWidth
                 />
-
+                {question.questionType.type === 'multipleChoice' && (
+                  <div className="mt-2 space-y-3 xl:col-span-2">
+                    {(question.questionType.options ?? []).map((option, i) => (
+                      <div key={i} className="flex items-center gap-2">
+                        <TextField
+                          size="small"
+                          label={`${text('Option', 'Optie')} ${i + 1} ${text('English', 'Engels')}`}
+                          value={option.en}
+                          onChange={(e) =>
+                            handleOptionChange(question.id, i, 'en', e.target.value)
+                          }
+                          fullWidth
+                        />
+                        <TextField
+                          size="small"
+                          label={`${text('Option', 'Optie')} ${i + 1} ${text('Dutch', 'Nederlands')}`}
+                          value={option.nl}
+                          onChange={(e) =>
+                            handleOptionChange(question.id, i, 'nl', e.target.value)
+                          }
+                          fullWidth
+                        />
+                        <Tooltip title={text('Delete Option', 'Verwijder Optie')}>
+                          <IconButton
+                            size="small"
+                            color="error"
+                            onClick={() => handleRemoveOption(question.id, i)}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </div>
+                    ))}
+                    <div className="flex justify-center">
+                      <Tooltip title={text('Add Option', 'Voeg Optie Toe')}>
+                        <IconButton
+                          size="small"
+                          color="primary"
+                          onClick={() => handleAddOption(question.id)}
+                        >
+                          <AddIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </div>
+                  </div>
+                )}
               </div>
-              <div className="flex items-center gap-2">
+              <Tooltip title={text('Options', 'Opties')}>
                 <IconButton
                   size="small"
                   onClick={(e) => {
@@ -125,7 +239,7 @@ export default function EditRegistrationQuestions({
                 >
                   <MoreVertIcon />
                 </IconButton>
-              </div>
+              </Tooltip>
             </div>
           ))}
         </div>
@@ -154,11 +268,11 @@ export default function EditRegistrationQuestions({
               {questionTypeMenuItems.map((item) => (
                 <MenuItem
                   key={item.type}
-                  selected={activeQuestion.questionType === item.type}
-                  onClick={() => handleSelectQuestionType(item.type as QuestionType)}
+                  selected={activeQuestion.questionType.type === item.type}
+                  onClick={() => handleSelectQuestionType(item.type as QuestionTypeType)}
                 >
                   {item.icon}
-                  <span className="ml-1">{item.label}</span>
+                  <span className="ml-1">{text(item.label)}</span>
                 </MenuItem>
               ))}
               <MenuItem
@@ -196,9 +310,10 @@ export default function EditRegistrationQuestions({
             questionTypeMenuItems.map((item) => (
               <MenuItem
                 key={item.type}
-                onClick={() => handleSelectQuestionType(item.type as QuestionType)}
+                onClick={() => handleSelectQuestionType(item.type as QuestionTypeType)}
               >
-                {item.label}
+                {item.icon}
+                <span className="ml-1">{text(item.label)}</span>
               </MenuItem>
             ))
           )}

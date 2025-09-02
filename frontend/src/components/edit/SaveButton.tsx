@@ -46,7 +46,7 @@ export default function SaveButton({ id, handleSave, event }: SaveButtonProps) {
         <Tooltip
           title={
             menuOpen
-              ? text('Less Options', 'Minder opties')
+              ? text('Fewer Options', 'Minder opties')
               : text('More Options', 'Meer opties')
           }
           placement="top"

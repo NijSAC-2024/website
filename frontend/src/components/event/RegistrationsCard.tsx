@@ -4,6 +4,7 @@ import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import { useAuth } from '../../providers/AuthProvider.tsx';
 import { Question } from '../../types.ts';
 import { useEvents } from '../../hooks/useEvents.ts';
+import moment from 'moment/moment';
 
 interface RegistrationsCardProps {
   questions: Question[];
@@ -29,7 +30,7 @@ export default function RegistrationsCard({ questions }: RegistrationsCardProps)
                   </TableCell>
                   {questions.map((question) => (
                     <TableCell key={question.id}>
-                      <b>{text(question.question)}</b>
+                      <b>{`${text(question.question)} ${question.required ? '*' : ''}`}</b>
                     </TableCell>
                   ))}
                 </TableRow>
@@ -44,11 +45,34 @@ export default function RegistrationsCard({ questions }: RegistrationsCardProps)
                   }}
                 >
                   <TableCell>{`${registration?.firstName} ${registration?.infix ?? ''} ${registration?.lastName}`}</TableCell>
-                  {questions.map((question) => (
-                    <TableCell key={`${registration.userId}-${question.id}`}>
-                      {registration.answers.find((a) => a.questionId === question.id)?.answer || ''}
-                    </TableCell>
-                  ))}
+                  {questions.map((question) => {
+                    const answer = registration.answers?.find(
+                      (a) => a.questionId === question.id)?.answer;
+
+                    if (question.questionType.type === 'boolean') {
+                      return (
+                        <TableCell key={`${registration.userId}-${question.id}`}>
+                          {answer === 'true' ? '✔️' : '❌'}
+                        </TableCell>
+                      );
+                    }
+
+                    if (question.questionType.type === 'date') {
+                      console.log(answer);
+                      return (
+                        <TableCell key={`${registration.userId}-${question.id}`}>
+                          {moment(answer).format('DD MMM HH:mm')}
+                        </TableCell>
+                      );
+                    }
+
+                    return (
+                      <TableCell key={`${registration.userId}-${question.id}`}>
+                        {answer || ''}
+                      </TableCell>
+                    );
+                  })}
+
                 </TableRow>
               ))}
             </TableBody>
