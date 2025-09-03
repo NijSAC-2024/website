@@ -31,12 +31,15 @@ export default function Signup() {
     iceContactPhone: '',
     email: '',
     password: '',
-    status: 'pending',
+    nkbvNumber: 0,
+    sportcardNumber: 0,
+    studentNumber: 0,
+    status: 'pending'
   });
 
   const handleSubmit = () => {
     createUser(newUser);
-    navigate('agenda')
+    navigate('agenda');
   };
 
   const handleChange = (field: keyof UserContent, value: string | number) => {
@@ -44,7 +47,7 @@ export default function Signup() {
   };
 
   const handleExtraordinaryMember = () => {
-    setMembership({id: 'extraordinary', label: {en: 'Extraordinary Member', nl: 'Buitengewoon Lid'}});
+    setMembership({id: 'affiliated', label: {en: 'Affiliated', nl: 'Aangeslotene'}});
     setSelectedMembership(true);
   };
   const handleMember = () => {
@@ -55,12 +58,6 @@ export default function Signup() {
     setMembership({id: 'donor', label: { en: 'Donor', nl: 'Donateur' }});
     setSelectedMembership(true);
   };
-
-  const handleNonMeber = () => {
-    setMembership({id: 'nonMember', label: { en: 'Introduction', nl: 'Introducee' }});
-    setSelectedMembership(true);
-  };
-
   const handleChangeMembership = () => {
     setSelectedMembership(false);
   };
@@ -93,7 +90,6 @@ export default function Signup() {
               handleMember={handleMember}
               handleExtraordinaryMember={handleExtraordinaryMember}
               handleDonor={handleDonor}
-              handleNonMember={handleNonMeber}
             />
           </Collapse>
         </div>

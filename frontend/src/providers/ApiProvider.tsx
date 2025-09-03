@@ -5,7 +5,7 @@ import {
   useEffect,
   useState,
 } from 'react';
-import {Event, EventContent, Registration, Location, Answer, UserContent} from '../types.ts';
+import {Event, EventContent, Registration, Location, Answer, UserContent, toEventContent} from '../types.ts';
 import { useAppState } from './AppStateProvider.tsx';
 import { apiFetch } from '../api.ts';
 import { enqueueSnackbar } from 'notistack';
@@ -16,12 +16,15 @@ interface ApiContextType {
   events?: Event[];
   locations?: Location[];
   event?: Event;
+  eventContent?: EventContent;
   registrations?: Registration[];
-  updateEvent: (eventId: string, event: EventContent) => Promise<void>;
+  registeredEvents: string[];
   createEvent: (event: EventContent) => Promise<void>;
+  updateEvent: (eventId: string, event: EventContent) => Promise<void>;
   deleteEvent: (eventId: string) => Promise<void>;
-  updateRegistration: (eventId: string, answers: Answer[]) => Promise<void>;
+  getRegistration: (eventId: string) => Promise<Registration | undefined>;
   createRegistration: (eventId: string, answers: Answer[]) => Promise<void>;
+  updateRegistration: (eventId: string, answers: Answer[]) => Promise<void>;
   deleteRegistration: (eventId: string) => Promise<void>;
   createUser: (user: UserContent) => Promise<void>;
 }
@@ -46,6 +49,26 @@ export default function ApiProvider({ children }: ApiProviderProps) {
     undefined,
   );
   const [registrations, setRegistrations] = useState<Array<Registration>>([]);
+  const [registeredEvents, setRegisteredEvents] = useState<string[]>([]);
+
+  //EVENTS
+  const createEvent = async (event: EventContent) => {
+    const { error, data: updatedEvent } = await apiFetch<Event>('/event', {
+      method: 'POST',
+      body: JSON.stringify(event),
+    });
+    if (error) {
+      enqueueSnackbar(`${error.message}: ${error.reference}`, {
+        variant: 'error',
+      });
+      return;
+    }
+    setEvent(updatedEvent);
+    setCache(!cache);
+    enqueueSnackbar(text('Event created', 'Evenement aangemaakt'), {
+      variant: 'success',
+    });
+  };
 
   const updateEvent = async (eventId: string, event: EventContent) => {
     const { error, data: updatedEvent } = await apiFetch<Event>(
@@ -68,24 +91,6 @@ export default function ApiProvider({ children }: ApiProviderProps) {
     });
   };
 
-  const createEvent = async (event: EventContent) => {
-    const { error, data: updatedEvent } = await apiFetch<Event>('/event', {
-      method: 'POST',
-      body: JSON.stringify(event),
-    });
-    if (error) {
-      enqueueSnackbar(`${error.message}: ${error.reference}`, {
-        variant: 'error',
-      });
-      return;
-    }
-    setEvent(updatedEvent);
-    setCache(!cache);
-    enqueueSnackbar(text('Event created', 'Evenement aangemaakt'), {
-      variant: 'success',
-    });
-  };
-
   const deleteEvent = async (eventId: string) => {
     const { error } = await apiFetch(`/event/${eventId}`, {
       method: 'DELETE',
@@ -102,6 +107,39 @@ export default function ApiProvider({ children }: ApiProviderProps) {
       variant: 'success',
     });
   };
+
+  // REGISTRATIONS
+  const getRegistration = async (eventId: string) => {
+    const { error, data: registration } = await apiFetch<Registration>(
+      `/event/${eventId}/registration/${user?.id}`,
+    );
+
+    if (error) {
+      enqueueSnackbar(`${error.message}: ${error.reference}`, {
+        variant: 'error',
+      });
+      return undefined;
+    }
+
+    return registration;
+  };
+
+  const createRegistration = async (eventId: string, answers: Answer[]) => {
+    const { error } = await apiFetch<Event>(`/event/${eventId}/registration/${user?.id}`, {
+      method: 'POST',
+      body: JSON.stringify({answers}),
+    });
+    if (error) {
+      enqueueSnackbar(`${error.message}: ${error.reference}`, {
+        variant: 'error',
+      });
+      return;
+    }
+    setCache(!cache);
+    enqueueSnackbar(text('Registered', 'Ingeschreven'), {
+      variant: 'success',
+    });
+  }
 
   const updateRegistration = async (eventId: string, answers: Answer[]) => {
     const { error } = await apiFetch<Event>(`/event/${eventId}/registration/${user?.id}`, {
@@ -122,24 +160,6 @@ export default function ApiProvider({ children }: ApiProviderProps) {
     });
   };
 
-
-  const createRegistration = async (eventId: string, answers: Answer[]) => {
-    const { error } = await apiFetch<Event>(`/event/${eventId}/registration/${user?.id}`, {
-      method: 'POST',
-      body: JSON.stringify({answers}),
-    });
-    if (error) {
-      enqueueSnackbar(`${error.message}: ${error.reference}`, {
-        variant: 'error',
-      });
-      return;
-    }
-    setCache(!cache);
-    enqueueSnackbar(text('Registered', 'Ingeschreven'), {
-      variant: 'success',
-    });
-  }
-
   const deleteRegistration = async (eventId: string) => {
     const { error } = await apiFetch(`/event/${eventId}/registration/${user?.id}`, {
       method: 'DELETE',
@@ -157,6 +177,7 @@ export default function ApiProvider({ children }: ApiProviderProps) {
     });
   };
 
+  //USERS
   const createUser = async (user: UserContent) => {
     const { error } = await apiFetch<void>('/register', {
       method: 'POST',
@@ -183,6 +204,9 @@ export default function ApiProvider({ children }: ApiProviderProps) {
     });
   }
 
+  //USE EFFECTS
+
+  // On the agenda page, fetch the events and the events for which a logged in user is registered.
   useEffect(() => {
     if (route.name === 'agenda') {
       apiFetch<Array<Event>>('/event').then(({ error, data: events }) => {
@@ -195,10 +219,26 @@ export default function ApiProvider({ children }: ApiProviderProps) {
           setEvents(events);
         }
       });
+      if (isLoggedIn) {
+        apiFetch<Array<string>>(`/user/${user?.id}/event_registrations`).then(
+          ({ error, data: registrations }) => {
+            if (error) {
+              enqueueSnackbar(`${error.message}: ${error.reference}`, {
+                variant: 'error',
+              });
+            }
+            if (registrations) {
+              setRegisteredEvents(registrations);
+            }
+          },
+        );
+      } else {
+        setRegisteredEvents([]);
+      }
     } else {
       setEvents([]);
     }
-  }, [cache, route.name]);
+  }, [cache, isLoggedIn, route.name, user?.id]);
 
   useEffect(() => {
     if (route.name === 'event' || route.name == 'new_event') {
@@ -250,18 +290,26 @@ export default function ApiProvider({ children }: ApiProviderProps) {
     }
   }, [cache, route.name, route.params, isLoggedIn]);
 
+  let eventContent = undefined;
+  if (event) {
+    eventContent = toEventContent(event);
+  }
+
   return (
     <ApiContext.Provider
       value={{
         events,
         event,
+        eventContent,
         locations,
         registrations,
-        updateEvent,
+        registeredEvents,
         createEvent,
+        updateEvent,
         deleteEvent,
-        updateRegistration,
+        getRegistration,
         createRegistration,
+        updateRegistration,
         deleteRegistration,
         createUser
       }}

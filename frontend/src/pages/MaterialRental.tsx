@@ -64,8 +64,8 @@ export default function MaterialRental() {
           <h1>{text('Material Rental', 'Materiaalverhuur')}</h1>
           <p>
             {text(
-              'The NijSAC has an extensive material depot that contains both summer and winter material. As a NijSAC member or extraordinary member it is possible to rent material from this. Priority is given in this order. You can fill in a rental request and (unless otherwise stated) pick the material up and return it to the mathok. In addition, the NijSAC also rents topo\'s, guides and maps. See below for all possibilities.',
-              'De NijSAC beschikt over een uitgebreid materiaal voorraad met zowel zomer- als wintermateriaal. Als NijSAC-lid of buitengewoon lid is het mogelijk om hier materiaal van te huren. In deze volgorde wordt prioriteit gegeven. U kunt een huuraanvraag indienen en (tenzij anders vermeld) het materiaal ophalen en terugbrengen bij het mathok. Daarnaast verhuurt de NijSAC ook topo\'s, gidsen en kaarten. Zie onder voor alle mogelijkheden.'
+              'The NijSAC has an extensive material depot that contains both summer and winter material. As a NijSAC member or affiliated it is possible to rent material from this. Priority is given in this order. You can fill in a rental request and (unless otherwise stated) pick the material up and return it to the mathok. In addition, the NijSAC also rents topo\'s, guides and maps. See below for all possibilities.',
+              'De NijSAC beschikt over een uitgebreid materiaal voorraad met zowel zomer- als wintermateriaal. Als NijSAC-lid of aangeslotene is het mogelijk om hier materiaal van te huren. In deze volgorde wordt prioriteit gegeven. U kunt een huuraanvraag indienen en (tenzij anders vermeld) het materiaal ophalen en terugbrengen bij het mathok. Daarnaast verhuurt de NijSAC ook topo\'s, gidsen en kaarten. Zie onder voor alle mogelijkheden.'
             )}
           </p>
 

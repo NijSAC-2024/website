@@ -5,10 +5,8 @@ import {useState} from 'react';
 import RegisterForm from './RegisterForm.tsx';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import moment from 'moment/moment';
-import {apiFetch} from '../../api.ts';
-import {enqueueSnackbar} from 'notistack';
 import AreYouSure from '../AreYouSure.tsx';
-import { useEvents } from '../../hooks/useEvents.ts';
+import {useApiState} from '../../providers/ApiProvider.tsx';
 
 interface RegisterButtonProps {
   registrationCount?: number;
@@ -32,40 +30,28 @@ export default function RegisterButton({
   isRegistered
 }: RegisterButtonProps) {
   const { isLoggedIn, toggleAuthOpen, user } = useAuth();
-  const { deleteRegistration, createRegistration, updateRegistration} = useEvents()
+  const { deleteRegistration, createRegistration, updateRegistration, getRegistration} = useApiState()
   const { text, language } = useLanguage();
   moment.locale(language);
   const [registerDialogOpen, setRegisterDialogOpen] = useState<boolean>(false);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [registration, setRegistration] = useState<Registration>();
 
-
   const toggleDialog = () => setDialogOpen((prevState) => !prevState);
 
   const toggleRegisterDialog = async () => {
     if (!registerDialogOpen) {
       if (isRegistered) {
-        const { error, data: registrations } = await apiFetch<Registration>(`/event/${eventId}/registration/${user?.id}`);
-
-        if (error) {
-          enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
-          return;
-        }
-
-        if (registrations) {
-          setRegistration(registrations);
-        }
+        const registration = await getRegistration(eventId);
+        setRegistration(registration);
       } else {
         setRegistration(undefined);
       }
-
       setRegisterDialogOpen(true);
     } else {
       setRegisterDialogOpen(false);
     }
   };
-
-
 
   const now = new Date();
   const openTime = new Date(registrationPeriod.start);

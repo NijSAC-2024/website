@@ -29,7 +29,7 @@ export default function DescriptionCard({
           {text(descriptionMarkdown.en, descriptionMarkdown.nl)}
         </Markdown>
       </div>
-      {(gear.en?.length > 0 || gear.nl?.length > 0 || experience.length > 0) && (
+      {(gear.en?.length > 0 || gear.nl?.length > 0 || experience.length > 0 || category === 'weekend') && (
         <div
           className="xl:flex grid gap-2.5 justify-between px-7 py-5 border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
           {(gear.en?.length > 0 || gear.nl?.length > 0) && (

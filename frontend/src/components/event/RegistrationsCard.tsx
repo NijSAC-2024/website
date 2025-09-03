@@ -3,21 +3,21 @@ import { Table, TableBody, TableCell, TableRow } from '@mui/material';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import { useAuth } from '../../providers/AuthProvider.tsx';
 import { Question } from '../../types.ts';
-import { useEvents } from '../../hooks/useEvents.ts';
 import moment from 'moment/moment';
+import {useApiState} from '../../providers/ApiProvider.tsx';
 
 interface RegistrationsCardProps {
   questions: Question[];
 }
 
 export default function RegistrationsCard({ questions }: RegistrationsCardProps) {
-  const { registrations } = useEvents();
+  const { registrations } = useApiState();
   const { text } = useLanguage();
   const { isLoggedIn, user } = useAuth();
 
   return (
     <>
-      {isLoggedIn && (
+      {isLoggedIn && registrations && registrations.length > 0 && (
         <ContentCard className="xl:col-span-3 p-7">
           <h1>{text('Participants', 'Deelnemers')}</h1>
           <Table>
@@ -58,7 +58,6 @@ export default function RegistrationsCard({ questions }: RegistrationsCardProps)
                     }
 
                     if (question.questionType.type === 'date') {
-                      console.log(answer);
                       return (
                         <TableCell key={`${registration.userId}-${question.id}`}>
                           {moment(answer).format('DD MMM HH:mm')}

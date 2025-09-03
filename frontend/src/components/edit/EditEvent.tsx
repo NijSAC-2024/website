@@ -8,14 +8,13 @@ import GenericPage from '../../pages/GenericPage.tsx';
 import SaveButton from './SaveButton.tsx';
 import { useAppState } from '../../providers/AppStateProvider.tsx';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
-import { useEvents } from '../../hooks/useEvents.ts';
+import {useApiState} from '../../providers/ApiProvider.tsx';
 
 
 export default function EditEvent() {
   const { text } = useLanguage();
-  const { createEvent, updateEvent, eventContent } = useEvents();
-  const { route } = useAppState();
-  const { navigate } = useAppState();
+  const { route, navigate } = useAppState();
+  const { createEvent, updateEvent, eventContent  } = useApiState()
   const [event, setEvent] = useState<EventContent | null>(null);
 
   useEffect(() => {

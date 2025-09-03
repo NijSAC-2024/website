@@ -1,4 +1,4 @@
-create type membership_status as enum ('pending', 'member', 'extraordinary', 'non_member', 'donor');
+create type membership_status as enum ('pending', 'member', 'affiliated', 'non_member', 'donor');
 
 create table "user"
 (
@@ -73,7 +73,7 @@ create table event --event base
     registration_max           integer,
     waiting_list_max           integer,
     is_published               boolean             not null default true,
-    -- Courses only members, climbing activities only extraordinary, activities only donors, some for all
+    -- Courses only members, climbing activities only affiliated, activities only donors, some for all
     -- Null means that everyone, also externals can participate
     required_membership_status membership_status[] not null default '{"member"}',
     event_type                 text                not null,

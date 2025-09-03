@@ -13,6 +13,7 @@ export default function EducationStep({
   validateInputs,
 }: StepProps){
   const { text } = useLanguage()
+  console.log(newUser.sportcardNumber)
   return (
     <Box className="grid xl:grid-cols-2 gap-y-4 gap-x-2.5" component="form" onSubmit={handleNext}>
       <FormControl>

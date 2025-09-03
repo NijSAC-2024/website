@@ -11,7 +11,7 @@ export type ErrorType = Language | boolean;
 export type MembershipStatus =
   | 'pending'
   | 'member'
-  | 'extraordinary'
+  | 'affiliated'
   | 'nonMember'
   | 'donor';
 
@@ -140,9 +140,9 @@ export interface UserContent extends Omit<BasicUser, 'userId'> {
   email: string;
   password: string;
   importantInfo?: string;
-  studentNumber?: number;
-  nkbvNumber?: number;
-  sportcardNumber?: number;
+  studentNumber: number;
+  nkbvNumber: number;
+  sportcardNumber: number;
   iceContactName: string;
   iceContactEmail: string;
   iceContactPhone: string;
@@ -209,14 +209,15 @@ export const typesOptions: OptionsType[] = [
 
 export const experienceOptions: OptionsType[] = [
   { id: 'sp', label: { en: 'Single Pitch', nl: 'Single Pitch' } },
-  { id: 'mp', label: { en: 'Multi Pitch', nl: 'Multi Pitch' } }
+  { id: 'mp', label: { en: 'Multi Pitch', nl: 'Multi Pitch' } },
+  { id: 'trad', label: { en: 'Trad', nl: 'Trad' } },
 ];
 
 export const memberOptions: OptionsType[] = [
   { id: 'member', label: { en: 'Member', nl: 'Lid' } },
   {
-    id: 'extraordinary',
-    label: { en: 'Extraordinary Member', nl: 'Buitengewoon Lid' }
+    id: 'affiliated',
+    label: { en: 'Affiliated', nl: 'Aangeslotene' }
   },
   { id: 'nonMember', label: { en: 'Non Member', nl: 'Niet Lid' } },
   { id: 'pending', label: { en: 'Pending', nl: 'In afwachting' } }
@@ -233,7 +234,7 @@ export const labelOptions: OptionsType[] = [
   { id: 'boulder', label: { en: 'Bouldering', nl: 'Boulderen' } },
   { id: 'trad', label: { en: 'Trad', nl: 'Trad' } },
   { id: 'member', label: { en: 'Member', nl: 'Lid' } },
-  { id: 'extraordinary', label: { en: 'Extraordinary Member', nl: 'Buitengewoon Lid' } },
+  { id: 'affiliated', label: { en: 'Affiliated', nl: 'Aangeslotene' } },
   { id: 'donor', label: { en: 'Donor', nl: 'Donateur' } },
   { id: 'text', label: { en: 'Text Question', nl: 'Tekstvraag' } },
   { id: 'multipleChoice', label: { en: 'Option Question', nl: 'Meerkeuzevraag' } },

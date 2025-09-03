@@ -10,9 +10,9 @@ import EmergencyContactStep from './EmergencyContactStep.tsx';
 import OverviewStep from './OverviewStep.tsx';
 import {
   emailValidator, emergencyContactNameValidator,
-  nameValidator,
-  optionalValidatorLettersAndNumbers,
-  optionalValidatorLettersOnly,
+  nameValidator, onlyNumbersValidator,
+  optionalOnlyLetterNumberValidator,
+  optionalOnlyLetterValidator,
   passwordValidator,
   phoneValidator,
 } from '../../validator.ts';
@@ -99,12 +99,12 @@ export default function SignupForm({newUser, handleChange, handleSubmit}: Signup
     switch (activeStep) {
     case 0: {
       const firstNameError = nameValidator(newUser.firstName);
-      const infixError = optionalValidatorLettersOnly(newUser.infix);
+      const infixError = optionalOnlyLetterValidator(newUser.infix);
       const lastNameError = nameValidator(newUser.lastName);
       const phoneError = phoneValidator(newUser.phone);
       const emailError = emailValidator(newUser.email);
       const passwordError = passwordValidator(newUser.password);
-      const importantInfoError = optionalValidatorLettersAndNumbers(newUser.importantInfo);
+      const importantInfoError = optionalOnlyLetterNumberValidator(newUser.importantInfo);
       setErrors({
         ...errors,
         firstName: firstNameError,
@@ -114,6 +114,18 @@ export default function SignupForm({newUser, handleChange, handleSubmit}: Signup
         email: emailError,
         password: passwordError,
         importantInfo: importantInfoError
+      });
+      break;
+    }
+    case 1: {
+      const studentNumberError = onlyNumbersValidator(newUser.studentNumber.toString());
+      const sportcardNumberError = onlyNumbersValidator(newUser.sportcardNumber.toString());
+      const nkbvNumberError = onlyNumbersValidator(newUser.nkbvNumber.toString());
+      setErrors({
+        ...errors,
+        studentNumber: studentNumberError,
+        sportcardNumber: sportcardNumberError,
+        nkbvNumber: nkbvNumberError,
       });
       break;
     }

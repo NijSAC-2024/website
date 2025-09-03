@@ -7,12 +7,12 @@ import DescriptionCard from '../components/event/DescriptionCard.tsx';
 import { useAppState } from '../providers/AppStateProvider.tsx';
 import { useLanguage } from '../providers/LanguageProvider.tsx';
 import { useAuth } from '../providers/AuthProvider.tsx';
-import { useEvents } from '../hooks/useEvents.ts';
+import {useApiState} from '../providers/ApiProvider.tsx';
 
 export default function Event() {
   const { text } = useLanguage();
   const { navigate } = useAppState();
-  const { event, registrations } = useEvents();
+  const { event, registrations } = useApiState();
   const { isLoggedIn, user } = useAuth();
 
 
@@ -52,7 +52,7 @@ export default function Event() {
             )}
           </div>
 
-          <EventCard event={event} agendaPage={false} isRegistered={registrations.some(reg => reg.userId === user?.id)}/>
+          <EventCard event={event} agendaPage={false} isRegistered={!!registrations && registrations.some(reg => reg.userId === user?.id)}/>
           <DescriptionCard
             descriptionMarkdown={event.description || { en: '', nl: '' }}
             experience={event.metadata?.experience || []}

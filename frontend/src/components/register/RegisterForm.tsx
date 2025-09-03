@@ -104,7 +104,6 @@ export default function RegisterForm({
                 }}
                 error={!!error}
                 helperText={error && text(error as Language)}
-                multiline
                 fullWidth
               />
             </FormControl>

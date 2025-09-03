@@ -53,7 +53,7 @@ export function phoneValidator(phone: string): Language | false {
   return false;
 }
 
-export function optionalValidatorLettersOnly(value?: string): Language | false {
+export function optionalOnlyLetterValidator(value?: string): Language | false {
   if (!value) {return false;}
   const validPattern = /^[a-zA-Z\s'-]*$/;
   return validPattern.test(value)
@@ -64,7 +64,7 @@ export function optionalValidatorLettersOnly(value?: string): Language | false {
     };
 }
 
-export function optionalValidatorLettersAndNumbers(value?: string): Language | false {
+export function optionalOnlyLetterNumberValidator(value?: string): Language | false {
   if (!value) {return false;}
   const validPattern = /^[a-zA-Z0-9\s'-]*$/;
   return validPattern.test(value)
@@ -75,8 +75,8 @@ export function optionalValidatorLettersAndNumbers(value?: string): Language | f
     };
 }
 
-export function validatorLettersAndNumbers(value: string): Language | false {
-  if (!value.trim()) {
+export function onlyNumbersValidator(value: string): Language | false {
+  if (!value.trim() || value === 'NaN') {
     return {
       en: 'This field is required',
       nl: 'Dit veld is verplicht',
