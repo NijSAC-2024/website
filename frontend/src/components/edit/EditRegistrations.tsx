@@ -43,10 +43,10 @@ export default function EditRegistrations({
 
   return (
     <ContentCard className="xl:col-span-3">
-      <div className="flex justify-between p-7">
+      <div className="grid xl:grid-cols-2 justify-between p-7">
         <h1>{text('Registrations', 'Inschrijvingen')}</h1>
-        <div className="flex items-center">
-          <p className="ml-4">{text('Allow registrations', 'Open voor inschrijvingen')}</p>
+        <div className="flex items-center xl:justify-end">
+          <p>{text('Allow registrations', 'Open voor inschrijvingen')}</p>
           <Switch
             checked={!!registrationPeriod}
             onChange={handleToggleRegistrations}

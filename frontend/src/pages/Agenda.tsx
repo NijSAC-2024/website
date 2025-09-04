@@ -21,7 +21,7 @@ export default function Agenda() {
 
   return (
     <>
-      {isLoggedIn && user?.roles.includes('admin') && (
+      {isLoggedIn && (user?.roles.includes('admin') || user?.roles.includes('activityCommissionMember')) && (
         <div className="fixed bottom-5 right-5 z-10">
           <Link routeName={'new_event'}>
             <Fab variant="extended" color="primary">

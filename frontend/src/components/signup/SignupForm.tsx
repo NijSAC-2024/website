@@ -27,7 +27,7 @@ export interface StepProps {
   validateInputs: () => void;
 }
 
-interface FormErrors {
+export interface FormErrors {
   firstName: ErrorType
   infix: ErrorType;
   lastName: ErrorType;

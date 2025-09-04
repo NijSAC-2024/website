@@ -5,6 +5,7 @@ import { User } from '../types.ts';
 
 interface AuthContextType {
   user: User | undefined;
+  setUser: (user: User | undefined) => void;
   isLoggedIn: boolean;
   checkAuth: () => void;
   login: (email: string, password: string) => void;
@@ -32,8 +33,8 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     const { error, data } = await apiFetch<User>('/whoami');
 
     if (!error) {
-      setUser(data);
       setIsLoggedIn(true);
+      setUser(data);
     } else {
       setUser(undefined)
       setIsLoggedIn(false);
@@ -65,14 +66,10 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     if (error) {
       switch (error.message) {
       case 'Unauthorized':
-        enqueueSnackbar('Incorrect email or password.', {
-          variant: 'error',
-        });
+        enqueueSnackbar('Incorrect email or password.', { variant: 'error' });
         break;
       default:
-        enqueueSnackbar(`${error.message}: ${error.reference}`, {
-          variant: 'error',
-        });
+        enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
       }
     } else {
       await checkAuth();
@@ -89,6 +86,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     <AuthContext.Provider
       value={{
         user,
+        setUser,
         isLoggedIn,
         checkAuth,
         login,

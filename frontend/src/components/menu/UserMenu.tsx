@@ -6,6 +6,7 @@ import { MouseEvent, useState } from 'react';
 import { useAuth } from '../../providers/AuthProvider.tsx';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import {useAppState} from '../../providers/AppStateProvider.tsx';
+import GroupIcon from '@mui/icons-material/Group';
 
 export default function UserMenu() {
   const { text } = useLanguage();
@@ -50,6 +51,12 @@ export default function UserMenu() {
             <AccountCircleIcon />
           </ListItemIcon>
           {text('My account', 'Mijn account')}
+        </MenuItem>
+        <MenuItem onClick={() => navigateSubmenu('members')}>
+          <ListItemIcon>
+            <GroupIcon fontSize="small" />
+          </ListItemIcon>
+          {text('Members', 'Leden')}
         </MenuItem>
         <Divider />
         <MenuItem onClick={() => navigateSubmenu('settings')}>

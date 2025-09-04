@@ -17,65 +17,73 @@ export default function RegistrationsCard({ questions }: RegistrationsCardProps)
 
   return (
     <>
-      {isLoggedIn && registrations && registrations.length > 0 && (
+      {isLoggedIn &&  (
         <ContentCard className="xl:col-span-3 p-7">
           <h1>{text('Participants', 'Deelnemers')}</h1>
-          <Table>
-            <TableBody>
-              {/* TODO: proper access management */}
-              {questions.length > 0 && user?.roles.includes('admin') && (
-                <TableRow>
-                  <TableCell>
-                    <b>{text('Name', 'Naam')}</b>
-                  </TableCell>
-                  {questions.map((question) => (
-                    <TableCell key={question.id}>
-                      <b>{`${text(question.question)} ${question.required ? '*' : ''}`}</b>
-                    </TableCell>
-                  ))}
-                </TableRow>
-              )}
-              {registrations?.map((registration) => (
-                <TableRow
-                  key={registration.userId}
-                  sx={{
-                    '&:last-child td, &:last-child th': {
-                      border: 0
-                    }
-                  }}
-                >
-                  <TableCell>{`${registration?.firstName} ${registration?.infix ?? ''} ${registration?.lastName}`}</TableCell>
-                  {questions.map((question) => {
-                    const answer = registration.answers?.find(
-                      (a) => a.questionId === question.id)?.answer;
-
-                    if (question.questionType.type === 'boolean') {
-                      return (
-                        <TableCell key={`${registration.userId}-${question.id}`}>
-                          {answer === 'true' ? '✔️' : '❌'}
+          {registrations && registrations.length > 0 ? (
+            <div className="overflow-x-auto">
+              <div className="min-w-max">
+                <Table>
+                  <TableBody>
+                    {/* TODO: proper access management */}
+                    {questions.length > 0 && user?.roles.includes('admin') && (
+                      <TableRow>
+                        <TableCell>
+                          <b>{text('Name', 'Naam')}</b>
                         </TableCell>
-                      );
-                    }
+                        {questions.map((question) => (
+                          <TableCell key={question.id}>
+                            <b>{`${text(question.question)} ${question.required ? '*' : ''}`}</b>
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    )}
+                    {registrations?.map((registration) => (
+                      <TableRow
+                        key={registration.userId}
+                        sx={{
+                          '&:last-child td, &:last-child th': {
+                            border: 0
+                          }
+                        }}
+                      >
+                        <TableCell>{`${registration?.firstName} ${registration?.infix ?? ''} ${registration?.lastName}`}</TableCell>
+                        {questions.map((question) => {
+                          const answer = registration.answers?.find(
+                            (a) => a.questionId === question.id)?.answer;
 
-                    if (question.questionType.type === 'date') {
-                      return (
-                        <TableCell key={`${registration.userId}-${question.id}`}>
-                          {moment(answer).format('DD MMM HH:mm')}
-                        </TableCell>
-                      );
-                    }
+                          if (question.questionType.type === 'boolean') {
+                            return (
+                              <TableCell key={`${registration.userId}-${question.id}`}>
+                                {answer === 'true' ? '✔️' : '❌'}
+                              </TableCell>
+                            );
+                          }
 
-                    return (
-                      <TableCell key={`${registration.userId}-${question.id}`}>
-                        {answer || ''}
-                      </TableCell>
-                    );
-                  })}
+                          if (question.questionType.type === 'date') {
+                            return (
+                              <TableCell key={`${registration.userId}-${question.id}`}>
+                                {moment(answer).format('DD MMM HH:mm')}
+                              </TableCell>
+                            );
+                          }
 
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                          return (
+                            <TableCell key={`${registration.userId}-${question.id}`}>
+                              {answer || ''}
+                            </TableCell>
+                          );
+                        })}
+
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
+          ) : (
+            <p className="mt-2">{text('No registrations yet', 'Nog geen deelnemers')}</p>
+          )}
         </ContentCard>
       )}
     </>

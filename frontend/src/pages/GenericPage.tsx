@@ -28,7 +28,7 @@ export default function GenericPage({
           style={{ backgroundImage: `url('${image}')` }}
         ></div>
       )}
-      <div className="relative w-[90%] lg:w-[80%] max-w-[1000px] mx-auto xl:mt-[-6rem] mt-[-14rem] pb-10">
+      <div className="relative w-[95%] xl:w-[80%] max-w-[1000px] mx-auto xl:mt-[-6rem] mt-[-14rem] pb-20">
         {children}
       </div>
     </div>

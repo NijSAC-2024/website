@@ -5,7 +5,7 @@ import {
   useEffect,
   useState,
 } from 'react';
-import {Event, EventContent, Registration, Location, Answer, UserContent, toEventContent} from '../types.ts';
+import {Event, EventContent, Registration, Location, Answer, UserContent, toEventContent, User} from '../types.ts';
 import { useAppState } from './AppStateProvider.tsx';
 import { apiFetch } from '../api.ts';
 import { enqueueSnackbar } from 'notistack';
@@ -19,6 +19,7 @@ interface ApiContextType {
   eventContent?: EventContent;
   registrations?: Registration[];
   registeredEvents: string[];
+  users: User[];
   createEvent: (event: EventContent) => Promise<void>;
   updateEvent: (eventId: string, event: EventContent) => Promise<void>;
   deleteEvent: (eventId: string) => Promise<void>;
@@ -26,6 +27,7 @@ interface ApiContextType {
   createRegistration: (eventId: string, answers: Answer[]) => Promise<void>;
   updateRegistration: (eventId: string, answers: Answer[]) => Promise<void>;
   deleteRegistration: (eventId: string) => Promise<void>;
+  updateUser: (userId: string, updates: Partial<User>) => Promise<void>;
   createUser: (user: UserContent) => Promise<void>;
 }
 
@@ -37,7 +39,7 @@ interface ApiProviderProps {
 
 export default function ApiProvider({ children }: ApiProviderProps) {
   const { route } = useAppState();
-  const { user } = useAuth()
+  const { user, setUser } = useAuth()
   const { isLoggedIn } = useAuth();
   const { text } = useLanguage();
   // We use this boolean to invalidate cached API calls whenever an item gets updated.
@@ -50,78 +52,101 @@ export default function ApiProvider({ children }: ApiProviderProps) {
   );
   const [registrations, setRegistrations] = useState<Array<Registration>>([]);
   const [registeredEvents, setRegisteredEvents] = useState<string[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+
+  //LOCATIONS
+  const getLocations = async (): Promise<Location[] | undefined> => {
+    const { error, data } = await apiFetch<Array<Location>>('/location');
+    if (error) {
+      enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
+    }
+    return data;
+  };
 
   //EVENTS
+  const getEvents = async (): Promise<Event[] | undefined> => {
+    const { error, data } = await apiFetch<Array<Event>>('/event');
+    if (error) {
+      enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
+    }
+    return data;
+  };
+
+  const getEvent = async (id: string): Promise<Event | undefined> => {
+    const { error, data } = await apiFetch<Event>(`/event/${id}`);
+    if (error) {
+      enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
+    }
+    return data;
+  };
   const createEvent = async (event: EventContent) => {
     const { error, data: updatedEvent } = await apiFetch<Event>('/event', {
       method: 'POST',
       body: JSON.stringify(event),
     });
     if (error) {
-      enqueueSnackbar(`${error.message}: ${error.reference}`, {
-        variant: 'error',
-      });
+      enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
       return;
     }
     setEvent(updatedEvent);
     setCache(!cache);
-    enqueueSnackbar(text('Event created', 'Evenement aangemaakt'), {
-      variant: 'success',
-    });
+    enqueueSnackbar(text('Event created', 'Evenement aangemaakt'), { variant: 'success' });
   };
 
-  const updateEvent = async (eventId: string, event: EventContent) => {
-    const { error, data: updatedEvent } = await apiFetch<Event>(
-      `/event/${eventId}`,
+  const updateEvent = async (eventId: string, eventContent: EventContent) => {
+    const { error, data: updatedEvent } = await apiFetch<Event>(`/event/${eventId}`,
       {
         method: 'PUT',
-        body: JSON.stringify(event),
+        body: JSON.stringify(eventContent),
       },
     );
     if (error) {
-      enqueueSnackbar(`${error.message}: ${error.reference}`, {
-        variant: 'error',
-      });
+      enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
       return;
     }
     setEvent(updatedEvent);
     setCache(!cache);
-    enqueueSnackbar(text('Event updated', 'Evenement bijgewerkt'), {
-      variant: 'success',
-    });
+    enqueueSnackbar(text('Event updated', 'Evenement bijgewerkt'), { variant: 'success' });
   };
 
   const deleteEvent = async (eventId: string) => {
     const { error } = await apiFetch(`/event/${eventId}`, {
       method: 'DELETE',
     });
-
     if (error) {
-      enqueueSnackbar(`${error.message}: ${error.reference}`, {
-        variant: 'error',
-      });
+      enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
       return;
     }
     setCache(!cache);
-    enqueueSnackbar(text('Event deleted', 'Evenement verwijderd'), {
-      variant: 'success',
-    });
+    enqueueSnackbar(text('Event deleted', 'Evenement verwijderd'), { variant: 'success' });
   };
 
   // REGISTRATIONS
+  const getRegisteredEvents = async (userId?: string): Promise<string[] | undefined> => {
+    if (!userId) {
+      return [];
+    }
+    const { error, data } = await apiFetch<Array<string>>(`/user/${userId}/event_registrations`);
+    if (error) {enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });}
+    return data;
+  };
+
+  const getRegistrations = async (eventId: string): Promise<Registration[] | undefined> => {
+    const { error, data } = await apiFetch<Array<Registration>>(`/event/${eventId}/registration`);
+    if (error) {
+      enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
+    }
+    return data;
+  };
+
   const getRegistration = async (eventId: string) => {
-    const { error, data: registration } = await apiFetch<Registration>(
+    const { error, data } = await apiFetch<Registration>(
       `/event/${eventId}/registration/${user?.id}`,
     );
-
     if (error) {
-      enqueueSnackbar(`${error.message}: ${error.reference}`, {
-        variant: 'error',
-      });
-      return undefined;
+      enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
     }
-
-    return registration;
+    return data;
   };
 
   const createRegistration = async (eventId: string, answers: Answer[]) => {
@@ -130,15 +155,11 @@ export default function ApiProvider({ children }: ApiProviderProps) {
       body: JSON.stringify({answers}),
     });
     if (error) {
-      enqueueSnackbar(`${error.message}: ${error.reference}`, {
-        variant: 'error',
-      });
+      enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
       return;
     }
     setCache(!cache);
-    enqueueSnackbar(text('Registered', 'Ingeschreven'), {
-      variant: 'success',
-    });
+    enqueueSnackbar(text('Registered', 'Ingeschreven'), { variant: 'success' });
   }
 
   const updateRegistration = async (eventId: string, answers: Answer[]) => {
@@ -146,38 +167,35 @@ export default function ApiProvider({ children }: ApiProviderProps) {
       method: 'PUT',
       body: JSON.stringify({answers}),
     });
-
     if (error) {
-      enqueueSnackbar(`${error.message}: ${error.reference}`, {
-        variant: 'error',
-      });
+      enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
       return;
     }
-
     setCache(!cache);
-    enqueueSnackbar(text('Registration updated', 'Inschrijving bijgewerkt'), {
-      variant: 'success',
-    });
+    enqueueSnackbar(text('Registration updated', 'Inschrijving bijgewerkt'), { variant: 'success' });
   };
 
   const deleteRegistration = async (eventId: string) => {
     const { error } = await apiFetch(`/event/${eventId}/registration/${user?.id}`, {
       method: 'DELETE',
     });
-
     if (error) {
-      enqueueSnackbar(`${error.message}: ${error.reference}`, {
-        variant: 'error',
-      });
+      enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
       return;
     }
     setCache(!cache);
-    enqueueSnackbar(text('Deregistered', 'Uitgeschreven'), {
-      variant: 'success',
-    });
+    enqueueSnackbar(text('Deregistered', 'Uitgeschreven'), { variant: 'success' });
   };
 
   //USERS
+  const getUsers = async () => {
+    const { error, data } = await apiFetch<User[]>('/user');
+    if (error) {
+      enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
+    }
+    return data || [];
+  };
+
   const createUser = async (user: UserContent) => {
     const { error } = await apiFetch<void>('/register', {
       method: 'POST',
@@ -188,50 +206,58 @@ export default function ApiProvider({ children }: ApiProviderProps) {
     if (error) {
       switch (error.message) {
       case 'Conflict':
-        enqueueSnackbar('Email is already in use.', {
-          variant: 'error'
-        });
+        enqueueSnackbar('Email is already in use.', { variant: 'error' });
         break;
       default:
-        enqueueSnackbar(`${error.message}: ${error.reference}`, {
-          variant: 'error'
-        });
+        enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
       }
       return;
     }
-    enqueueSnackbar(`Created account: ${user.firstName} ${user.lastName}`, {
-      variant: 'success'
-    });
+    enqueueSnackbar(`Created account: ${user.firstName} ${user.lastName}`, { variant: 'success' });
   }
+
+  const updateUser = async (userId: string, updatedUser: Partial<User>) => {
+    const { error, data } = await apiFetch<User>(`/user/${userId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedUser),
+    });
+    if (error) {
+      switch (error.message) {
+      case 'Conflict':
+        enqueueSnackbar('Email is already in use.', { variant: 'error' });
+        break;
+      default:
+        enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
+      }
+      return;
+    }
+    if (data) {
+      if (user?.id === data.id) {
+        setUser(data);
+      }
+    }
+    enqueueSnackbar('User updated', { variant: 'success' });
+    setCache(!cache);
+  };
 
   //USE EFFECTS
 
   // On the agenda page, fetch the events and the events for which a logged in user is registered.
   useEffect(() => {
     if (route.name === 'agenda') {
-      apiFetch<Array<Event>>('/event').then(({ error, data: events }) => {
-        if (error) {
-          enqueueSnackbar(`${error.message}: ${error.reference}`, {
-            variant: 'error',
-          });
-        }
+      getEvents().then(events => {
         if (events) {
           setEvents(events);
         }
       });
+
       if (isLoggedIn) {
-        apiFetch<Array<string>>(`/user/${user?.id}/event_registrations`).then(
-          ({ error, data: registrations }) => {
-            if (error) {
-              enqueueSnackbar(`${error.message}: ${error.reference}`, {
-                variant: 'error',
-              });
-            }
-            if (registrations) {
-              setRegisteredEvents(registrations);
-            }
-          },
-        );
+        getRegisteredEvents(user?.id).then(registrations => {
+          if (registrations) {
+            setRegisteredEvents(registrations);
+          }
+        });
       } else {
         setRegisteredEvents([]);
       }
@@ -241,47 +267,27 @@ export default function ApiProvider({ children }: ApiProviderProps) {
   }, [cache, isLoggedIn, route.name, user?.id]);
 
   useEffect(() => {
-    if (route.name === 'event' || route.name == 'new_event') {
-      apiFetch<Array<Location>>('/location').then(
-        ({ error, data: locations }) => {
-          if (error) {
-            enqueueSnackbar(`${error.message}: ${error.reference}`, {
-              variant: 'error',
-            });
-          }
-          if (locations) {
-            setLocations(locations);
-          }
-        },
-      );
+    if (route.name === 'event' || route.name === 'new_event') {
+      getLocations().then(locations => {
+        if (locations) {
+          setLocations(locations);
+        }
+      });
     } else {
-      setLocations([])
+      setLocations([]);
     }
   }, [cache, route.name]);
 
   useEffect(() => {
     if (route.name === 'event') {
-      apiFetch<Event>(`/event/${route.params!.id}`).then(
-        ({ error, data: event }) => {
-          if (error) {
-            enqueueSnackbar(`${error.message}: ${error.reference}`, {
-              variant: 'error',
-            });
-          }
-          if (event) {
-            setEvent(event);
-          }
-        },
-      );
+      getEvent(route.params!.id).then(event => {
+        if (event) {
+          setEvent(event);
+        }
+      });
+
       if (isLoggedIn) {
-        apiFetch<Array<Registration>>(
-          `/event/${route.params!.id}/registration`,
-        ).then(({ error, data: registrations }) => {
-          if (error) {
-            enqueueSnackbar(`${error.message}: ${error.reference}`, {
-              variant: 'error',
-            });
-          }
+        getRegistrations(route.params!.id).then(registrations => {
           if (registrations) {
             setRegistrations(registrations);
           }
@@ -289,6 +295,19 @@ export default function ApiProvider({ children }: ApiProviderProps) {
       }
     }
   }, [cache, route.name, route.params, isLoggedIn]);
+
+  useEffect(() => {
+    if (route.name === 'members' && isLoggedIn) {
+      getUsers().then(users => {
+        if (users) {
+          setUsers(users);
+        }
+      });
+    } else {
+      setUsers([]);
+    }
+  }, [cache, isLoggedIn, route.name]);
+
 
   let eventContent = undefined;
   if (event) {
@@ -304,6 +323,7 @@ export default function ApiProvider({ children }: ApiProviderProps) {
         locations,
         registrations,
         registeredEvents,
+        users,
         createEvent,
         updateEvent,
         deleteEvent,
@@ -311,6 +331,7 @@ export default function ApiProvider({ children }: ApiProviderProps) {
         createRegistration,
         updateRegistration,
         deleteRegistration,
+        updateUser,
         createUser
       }}
     >

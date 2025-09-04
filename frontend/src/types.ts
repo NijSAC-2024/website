@@ -40,7 +40,8 @@ export interface OptionsType {
     | MembershipStatus
     | QuestionType
     | ExperienceType
-    | QuestionTypeType;
+    | QuestionTypeType
+    | RoleType;
   label: Language;
 }
 
@@ -125,6 +126,12 @@ export interface LocationContent {
   description?: Language;
 }
 
+export function toUserContent(user: User | undefined, password: string = ''): UserContent {
+  const userContent = { ...user } as unknown as UserContent;
+  userContent.password = password;
+  return userContent;
+}
+
 export interface BasicUser {
   userId: string;
   firstName: string;
@@ -199,6 +206,16 @@ export type MenuType =
   | 'alps'
   | undefined;
 
+export const roleOptions: OptionsType[] = [
+  { id: 'admin', label: { en: 'Admin', nl: 'Beheerder' } },
+  { id: 'treasurer', label: { en: 'Treasurer', nl: 'Penningmeester' } },
+  { id: 'secretary', label: { en: 'Secretary', nl: 'Secretaris' } },
+  { id: 'chair', label: { en: 'Chair', nl: 'Voorzitter' } },
+  { id: 'viceChair', label: { en: 'Vice Chair', nl: 'Vicevoorzitter' } },
+  { id: 'climbingCommissar', label: { en: 'Climbing Commissar', nl: 'Klimcommissaris' } },
+  { id: 'activityCommissionMember', label: { en: 'Activity Commission Member', nl: 'Activiteitencommissie Lid' } },
+];
+
 export const typesOptions: OptionsType[] = [
   { id: 'sp', label: { en: 'Single Pitch', nl: 'Single Pitch' } },
   { id: 'mp', label: { en: 'Multi Pitch', nl: 'Multi Pitch' } },
@@ -236,11 +253,20 @@ export const labelOptions: OptionsType[] = [
   { id: 'member', label: { en: 'Member', nl: 'Lid' } },
   { id: 'affiliated', label: { en: 'Affiliated', nl: 'Aangeslotene' } },
   { id: 'donor', label: { en: 'Donor', nl: 'Donateur' } },
+  { id: 'nonMember', label: { en: 'Non Member', nl: 'Niet Lid' } },
+  { id: 'pending', label: { en: 'Pending', nl: 'In afwachting' } },
   { id: 'text', label: { en: 'Text Question', nl: 'Tekstvraag' } },
   { id: 'multipleChoice', label: { en: 'Option Question', nl: 'Meerkeuzevraag' } },
   { id: 'number', label: { en: 'Number Question', nl: 'Getalvraag' } },
   { id: 'boolean', label: { en: 'Checkbox Question', nl: 'Checkboxvraag' } },
-  { id: 'date', label: { en: 'Date & Time Question', nl: 'Datum- & Tijdvraag' } }
+  { id: 'date', label: { en: 'Date & Time Question', nl: 'Datum- & Tijdvraag' } },
+  { id: 'admin', label: { en: 'Admin', nl: 'Beheerder' } },
+  { id: 'treasurer', label: { en: 'Treasurer', nl: 'Penningmeester' } },
+  { id: 'secretary', label: { en: 'Secretary', nl: 'Secretaris' } },
+  { id: 'chair', label: { en: 'Chair', nl: 'Voorzitter' } },
+  { id: 'viceChair', label: { en: 'Vice Chair', nl: 'Vicevoorzitter' } },
+  { id: 'climbingCommissar', label: { en: 'Climbing Commissar', nl: 'Klimcommissaris' } },
+  { id: 'activityCommissionMember', label: { en: 'Activity Commission Member', nl: 'Activiteitencommissie Lid' } }
 ];
 
 export const rentOptions: rentOption[] = [

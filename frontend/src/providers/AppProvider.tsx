@@ -18,7 +18,8 @@ export default function AppProvider({ children }: AppProviderProps) {
         <AppStateProvider>
           <ThemeProvider>
             <LanguageProvider>
-              <ApiProvider>{children}
+              <ApiProvider>
+                {children}
               </ApiProvider>
             </LanguageProvider>
           </ThemeProvider>

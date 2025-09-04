@@ -156,7 +156,7 @@ export default function EditRegistrationQuestions({
       ) : (
         <div className="grid gap-4 xl:gap-3">
           {questions.map((question, index) => (
-            <div key={question.id} className="flex items-center z-0">
+            <div key={question.id} className="flex items-start z-0">
               <div className="grid xl:grid-cols-2 w-full gap-2">
                 <TextField
                   multiline
@@ -229,17 +229,19 @@ export default function EditRegistrationQuestions({
                   </div>
                 )}
               </div>
-              <Tooltip title={text('Options', 'Opties')}>
-                <IconButton
-                  size="small"
-                  onClick={(e) => {
-                    setAnchorEl(e.currentTarget);
-                    setActiveQuestionId(question.id);
-                  }}
-                >
-                  <MoreVertIcon />
-                </IconButton>
-              </Tooltip>
+              <div className="pt-2.5">
+                <Tooltip title={text('Options', 'Opties')}>
+                  <IconButton
+                    size="small"
+                    onClick={(e) => {
+                      setAnchorEl(e.currentTarget);
+                      setActiveQuestionId(question.id);
+                    }}
+                  >
+                    <MoreVertIcon />
+                  </IconButton>
+                </Tooltip>
+              </div>
             </div>
           ))}
         </div>

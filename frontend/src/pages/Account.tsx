@@ -1,63 +1,268 @@
+import {FormEvent, useEffect, useState} from 'react';
 import GenericPage from './GenericPage.tsx';
 import ContentCard from '../components/ContentCard.tsx';
 import TextCard from '../components/TextCard.tsx';
+import {TextField, Button, Box, FormControl} from '@mui/material';
 import { useAuth } from '../providers/AuthProvider.tsx';
-import {useLanguage} from '../providers/LanguageProvider.tsx';
-import {getLabel} from '../util.ts';
+import { useLanguage } from '../providers/LanguageProvider.tsx';
+import { getLabel } from '../util.ts';
+import {useApiState} from '../providers/ApiProvider.tsx';
+import {Language, toUserContent, User, UserContent} from '../types.ts';
+import { FormErrors } from '../components/signup/SignupForm.tsx';
+import {
+  emailValidator, emergencyContactNameValidator,
+  nameValidator, onlyNumbersValidator, optionalOnlyLetterNumberValidator,
+  optionalOnlyLetterValidator,
+  phoneValidator
+} from '../validator.ts';
 
-export default function Settings() {
-  const { text } = useLanguage()
-  const { user } = useAuth()
+export default function Account() {
+  const { text } = useLanguage();
+  const { user } = useAuth();
+  const { updateUser } = useApiState();
+
+  const [form, setForm] = useState<UserContent>(toUserContent(user));
+  const [errors, setErrors] = useState<FormErrors>({
+    firstName: false,
+    infix: false,
+    lastName: false,
+    phone: false,
+    email: false,
+    password: false,
+    studentNumber: false,
+    sportcardNumber: false,
+    nkbvNumber: false,
+    iceContactName: false,
+    iceContactEmail: false,
+    iceContactPhone: false,
+    importantInfo: false,
+  });
+
+
+  useEffect(() => {
+    setForm(toUserContent(user));
+  }, [user]);
+
+  const handleChange = (field: keyof User, value: string | number) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSave = async (event: FormEvent) => {
+    if (!user) {return;}
+
+    event.preventDefault();
+    if (Object.values(errors).some((value) => value)) {
+      return;
+    }
+    await updateUser(user.id, { ...user, ...form });
+  };
+
+  const validateInputs = () => {
+    const newErrors = {
+      firstName: nameValidator(form.firstName),
+      infix: optionalOnlyLetterValidator(form.infix),
+      lastName: nameValidator(form.lastName),
+      phone: phoneValidator(form.phone),
+      email: emailValidator(form.email),
+      importantInfo: optionalOnlyLetterNumberValidator(form.importantInfo),
+      studentNumber: onlyNumbersValidator(form.studentNumber.toString()),
+      sportcardNumber: onlyNumbersValidator(form.sportcardNumber.toString()),
+      nkbvNumber: onlyNumbersValidator(form.nkbvNumber.toString()),
+      iceContactName: emergencyContactNameValidator(form.iceContactName),
+      iceContactEmail: emailValidator(form.iceContactEmail),
+      iceContactPhone: phoneValidator(form.iceContactPhone),
+    };
+
+    setErrors({ ...errors, ...newErrors });
+  };
+
 
   return (
     <GenericPage>
       <ContentCard className="grid gap-1 p-7">
         <h1 className="text-3xl">{text('My account', 'Mijn account')}</h1>
-        <h2>{text('Personal information', 'Persoonlijke informatie')}</h2>
-        <TextCard className="px-6 py-3 grid grid-cols-4 gap-5 mb-3">
-          <b>{text('Full name', 'Volledige naam')}</b>
-          <span className="col-span-3">
-            {`${user?.firstName} ${user?.infix ?? ''} ${user?.lastName}`}
-          </span>
 
-          <b>{text('Phone number', 'Telefoonnummer')}</b>
-          <span className="col-span-3">{user?.phone}</span>
+        <Box component="form" onSubmit={handleSave}>
+          {/* Personal information */}
+          <h2>{text('Personal information', 'Persoonlijke informatie')}</h2>
+          <TextCard className="px-3 xl:px-6 py-3 grid xl:grid-cols-4 gap-2 xl:gap-5 mb-3 items-center">
+            <b>{text('First name', 'Voornaam')}</b>
+            <FormControl className="xl:col-span-3">
+              <TextField
+                size="small"
+                value={form.firstName}
+                fullWidth
+                onChange={(e) => handleChange('firstName', e.target.value)}
+                error={!!errors.firstName}
+                helperText={errors.firstName && text(errors.firstName as Language)}
+              />
+            </FormControl>
 
-          <b>{text('Email', 'E-mailadres')}</b>
-          <span className="col-span-3">{user?.email}</span>
+            <b>{text('Infix', 'Tussenvoegsel')}</b>
+            <FormControl className="xl:col-span-3">
+              <TextField
+                size="small"
+                value={form.infix}
+                fullWidth
+                onChange={(e) => handleChange('infix', e.target.value)}
+                error={!!errors.infix}
+                helperText={errors.infix && text(errors.infix as Language)}
+              />
+            </FormControl>
 
-          <b>{text('Important information', 'Belangrijke informatie')}</b>
-          <span className="col-span-3">{user?.importantInfo}</span>
+            <b>{text('Last name', 'Achternaam')}</b>
+            <FormControl className="xl:col-span-3">
+              <TextField
+                size="small"
+                value={form.lastName}
+                fullWidth
+                onChange={(e) => handleChange('lastName', e.target.value)}
+                error={!!errors.lastName}
+                helperText={errors.lastName && text(errors.lastName as Language)}
+              />
+            </FormControl>
 
-          <b>{text('Membership status', 'Lidmaatschapsstatus')}</b>
-          <span className="col-span-3">{text(user ? getLabel(user?.status) : '')}</span>
-        </TextCard>
+            <b>{text('Phone number', 'Telefoonnummer')}</b>
+            <FormControl className="xl:col-span-3">
+              <TextField
+                size="small"
+                value={form.phone}
+                fullWidth
+                onChange={(e) => handleChange('phone', e.target.value)}
+                error={!!errors.phone}
+                helperText={errors.phone && text(errors.phone as Language)}
+              />
+            </FormControl>
 
-        <h2>{text('Education & Insurance', 'Educatie & Verzekering')}</h2>
-        <TextCard className="px-6 py-3 grid grid-cols-4 gap-5 mb-3">
-          <b>{text('Student number', 'Studentnummer')}</b>
-          <span className="col-span-3">{user?.studentNumber}</span>
+            <b>{text('Email', 'E-mailadres')}</b>
+            <FormControl className="xl:col-span-3">
+              <TextField
+                size="small"
+                value={form.email}
+                fullWidth
+                onChange={(e) => handleChange('email', e.target.value)}
+                error={!!errors.email}
+                helperText={errors.email && text(errors.email as Language)}
+              />
+            </FormControl>
 
-          <b>{text('Sportscard number', 'Sportkaartnummer')}</b>
-          <span className="col-span-3">{user?.sportcardNumber}</span>
+            <b>{text('Important information', 'Belangrijke informatie')}</b>
+            <FormControl className="xl:col-span-3">
+              <TextField
+                size="small"
+                value={form.importantInfo}
+                fullWidth
+                onChange={(e) => handleChange('importantInfo', e.target.value)}
+                error={!!errors.importantInfo}
+                helperText={errors.importantInfo && text(errors.importantInfo as Language)}
+              />
+            </FormControl>
 
-          <b>{text('NKBV number', 'NKBV-nummer')}</b>
-          <span className="col-span-3">{user?.nkbvNumber}</span>
-        </TextCard>
+            <b>{text('Membership status', 'Lidmaatschapsstatus')}</b>
+            <span className="xl:col-span-3">{text(user ? getLabel(user.status) : '')}</span>
 
-        <h2>{text('Emergency contact', 'Contact noogevallen')}</h2>
-        <TextCard className="px-6 py-3 grid grid-cols-4 gap-5 mb-3">
-          <b>{text('ICE contact name', 'ICE contact naam')}</b>
-          <span className="col-span-3">{user?.iceContactName}</span>
+            <b>{text('Roles', 'Rollen')}</b>
+            <span className="xl:col-span-3">
+              {user?.roles.map((r) => text(getLabel(r))).join(', ')}
+            </span>
+          </TextCard>
 
-          <b>{text('ICE email', 'ICE e-mailadres')}</b>
-          <span className="col-span-3">{user?.iceContactEmail}</span>
+          {/* Education & Insurance */}
+          <h2>{text('Education & Insurance', 'Educatie & Verzekering')}</h2>
+          <TextCard className="px-3 xl:px-6 py-3 grid xl:grid-cols-4 gap-2 xl:gap-5 mb-3 items-center">
+            <b>{text('Student number', 'Studentnummer')}</b>
+            <FormControl className="xl:col-span-3">
+              <TextField
+                size="small"
+                type="number"
+                value={form.studentNumber}
+                fullWidth
+                onChange={(e) => handleChange('studentNumber', parseInt(e.target.value))}
+                error={!!errors.studentNumber}
+                helperText={errors.studentNumber && text(errors.studentNumber as Language)}
+              />
+            </FormControl>
 
-          <b>{text('ICE phone number', 'ICE telefoonnummer')}</b>
-          <span className="col-span-3">{user?.iceContactPhone}</span>
-        </TextCard>
+            <b>{text('Sportscard number', 'Sportkaartnummer')}</b>
+            <FormControl className="xl:col-span-3">
+              <TextField
+                size="small"
+                type="number"
+                value={form.sportcardNumber}
+                fullWidth
+                onChange={(e) => handleChange('sportcardNumber', parseInt(e.target.value))}
+                error={!!errors.sportcardNumber}
+                helperText={errors.sportcardNumber && text(errors.sportcardNumber as Language)}
+              />
+            </FormControl>
+
+            <b>{text('NKBV number', 'NKBV-nummer')}</b>
+            <FormControl className="xl:col-span-3">
+              <TextField
+                size="small"
+                type="number"
+                value={form.nkbvNumber}
+                fullWidth
+                onChange={(e) => handleChange('nkbvNumber', parseInt(e.target.value))}
+                error={!!errors.nkbvNumber}
+                helperText={errors.nkbvNumber && text(errors.nkbvNumber as Language)}
+              />
+            </FormControl>
+          </TextCard>
+
+          {/* Emergency contact */}
+          <h2>{text('Emergency contact', 'Contact noodgevallen')}</h2>
+          <TextCard className="px-3 xl:px-6 py-3 grid xl:grid-cols-4 gap-2 xl:gap-5 items-center">
+            <b>{text('ICE contact name', 'ICE contact naam')}</b>
+            <FormControl className="xl:col-span-3">
+              <TextField
+                size="small"
+                value={form.iceContactName}
+                fullWidth
+                onChange={(e) => handleChange('iceContactName', e.target.value)}
+                error={!!errors.iceContactName}
+                helperText={errors.iceContactName && text(errors.iceContactName as Language)}
+              />
+            </FormControl>
+
+            <b>{text('ICE email', 'ICE e-mailadres')}</b>
+            <FormControl className="xl:col-span-3">
+              <TextField
+                size="small"
+                value={form.iceContactEmail}
+                fullWidth
+                onChange={(e) => handleChange('iceContactEmail', e.target.value)}
+                error={!!errors.iceContactEmail}
+                helperText={errors.iceContactEmail && text(errors.iceContactEmail as Language)}
+              />
+            </FormControl>
+
+            <b>{text('ICE phone number', 'ICE telefoonnummer')}</b>
+            <FormControl className="xl:col-span-3">
+              <TextField
+                size="small"
+                value={form.iceContactPhone}
+                fullWidth
+                onChange={(e) => handleChange('iceContactPhone', e.target.value)}
+                error={!!errors.iceContactPhone}
+                helperText={errors.iceContactPhone && text(errors.iceContactPhone as Language)}
+              />
+            </FormControl>
+          </TextCard>
+
+          <div className="flex justify-end mt-5">
+            <Button
+              variant="contained"
+              color="primary"
+              type="submit"
+              onClick={validateInputs}
+              className="mt-4"
+            >
+              {text('Save changes', 'Wijzigingen opslaan')}
+            </Button>
+          </div>
+        </Box>
       </ContentCard>
     </GenericPage>
-
   );
 }
