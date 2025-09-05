@@ -24,7 +24,7 @@ pub enum Role {
 pub enum MembershipStatus {
     Pending,
     Member,
-    Extraordinary,
+    Affiliated,
     NonMember,
     Donor,
 }
@@ -35,7 +35,7 @@ impl MembershipStatus {
             MembershipStatus::Pending | MembershipStatus::NonMember | MembershipStatus::Donor => {
                 false
             }
-            MembershipStatus::Member | MembershipStatus::Extraordinary => true,
+            MembershipStatus::Member | MembershipStatus::Affiliated => true,
         }
     }
 }
