@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import { useState } from 'react';
 import GenericPage from './GenericPage.tsx';
 import ContentCard from '../components/ContentCard.tsx';
 import { Event, EventType, WeekendType } from '../types.ts';
@@ -8,12 +8,12 @@ import Link from '../components/Link.tsx';
 import EventCard from '../components/event/EventCard.tsx';
 import { useApiState } from '../providers/ApiProvider.tsx';
 import { useLanguage } from '../providers/LanguageProvider.tsx';
-import {useAuth} from '../providers/AuthProvider.tsx';
+import { useAuth } from '../providers/AuthProvider.tsx';
 
 export default function Agenda() {
   const { text } = useLanguage();
   const { events, registeredEvents } = useApiState();
-  const { isLoggedIn, user}= useAuth()
+  const { isLoggedIn, user } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState<EventType | 'all'>(
     'all'
   );
@@ -128,7 +128,8 @@ export default function Agenda() {
                 (a: Event, b: Event) =>
                   new Date(a.dates[0].start).valueOf() - new Date(b.dates[0].start).valueOf()
               ).map((event: Event) => (
-                <EventCard key={event.id} event={event} agendaPage={true} isRegistered={!!user && registeredEvents.includes(event.id)} />
+                <EventCard key={event.id} event={event} agendaPage={true}
+                  registrationId={!!user && registeredEvents.find((e) => e.eventId === event.id)?.registrationId || null} />
               ))}
           </div>
         </div>

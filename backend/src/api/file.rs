@@ -59,11 +59,11 @@ pub async fn upload(
             .map_err(|_| Error::BadRequest("Could not parse MIME type"))?;
         let mut data = field.bytes().await.unwrap();
 
-        if let Some(c_t) = &content_type {
-            if c_t.type_() == IMAGE {
-                let (d, c) = reduce_image_size(&data)?;
-                (data, content_type) = (d, Some(c));
-            }
+        if let Some(c_t) = &content_type
+            && c_t.type_() == IMAGE
+        {
+            let (d, c) = reduce_image_size(&data)?;
+            (data, content_type) = (d, Some(c));
         }
 
         let len = data.len();

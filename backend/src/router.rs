@@ -67,11 +67,13 @@ fn api_router() -> Router<AppState> {
             "/event/{:id}",
             get(get_event).put(update_event).delete(delete_event),
         )
-        .route("/event/{:id}/registration", get(get_event_registrations))
         .route(
-            "/event/{:event_id}/registration/{:user_id}",
+            "/event/{:event_id}/registration",
+            get(get_event_registrations).post(create_registration),
+        )
+        .route(
+            "/event/{:event_id}/registration/{:registration_id}",
             get(get_registration)
-                .post(create_registration)
                 .put(update_registration)
                 .delete(delete_registration),
         )

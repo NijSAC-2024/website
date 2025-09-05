@@ -16,7 +16,7 @@ interface RegisterButtonProps {
   questions: Question[];
   title: Language;
   eventId: string;
-  isRegistered: boolean;
+  registrationId: string | null;
 }
 
 export default function RegisterButton({
@@ -27,7 +27,7 @@ export default function RegisterButton({
   questions,
   title,
   eventId,
-  isRegistered
+  registrationId
 }: RegisterButtonProps) {
   const { isLoggedIn, toggleAuthOpen, user } = useAuth();
   const { deleteRegistration, createRegistration, updateRegistration, getRegistration} = useApiState()
@@ -41,8 +41,9 @@ export default function RegisterButton({
 
   const toggleRegisterDialog = async () => {
     if (!registerDialogOpen) {
-      if (isRegistered) {
-        const registration = await getRegistration(eventId);
+      console.log(registrationId);
+      if (registrationId) {
+        const registration = await getRegistration(eventId, registrationId);
         setRegistration(registration);
       } else {
         setRegistration(undefined);
@@ -57,9 +58,9 @@ export default function RegisterButton({
   const openTime = new Date(registrationPeriod.start);
   const closeTime = new Date(registrationPeriod.end);
 
-  const handleRegistration = async (answers: Answer[], update?: boolean) => {
-    if (update) {
-      await updateRegistration(eventId, answers);
+  const handleRegistration = async (answers: Answer[], registrationId: string | null) => {
+    if (registrationId) {
+      await updateRegistration(eventId, registrationId, answers);
     } else {
       await createRegistration(eventId, answers);
     }
@@ -68,7 +69,7 @@ export default function RegisterButton({
 
   const handleRegistrationClick = async () => {
     if (questions.length === 0) {
-      if (isRegistered) {
+      if (registrationId) {
         toggleDialog();
       } else {
         await createRegistration(eventId, []);
@@ -78,8 +79,8 @@ export default function RegisterButton({
     }
   }
 
-  const handleDeleteRegistration = async () => {
-    await deleteRegistration(eventId);
+  const handleDeleteRegistration = async (registrationId: string) => {
+    await deleteRegistration(eventId, registrationId);
     toggleDialog();
     setRegisterDialogOpen(false)
   }
@@ -87,7 +88,7 @@ export default function RegisterButton({
   const canRegister : boolean = isLoggedIn && requiredMembershipStatus.includes(user!.status) || requiredMembershipStatus.includes('nonMember');
 
   const renderRegistrationStatus = () => {
-    if (isRegistered) {
+    if (registrationId) {
       return closeTime < now ? (
         <Button variant="contained" disabled>
           {text('Registered', 'Ingeschreven')}
@@ -147,7 +148,7 @@ export default function RegisterButton({
             registrationQuestions={questions}
             title={title}
             registrationCloseTime={registrationPeriod.end}
-            handleRegistration={handleRegistration}
+            handleRegistration={(answers) => handleRegistration(answers, registrationId)}
             existingAnswers={registration?.answers}
           />
         </DialogContent>
@@ -167,7 +168,7 @@ export default function RegisterButton({
       <AreYouSure
         open={dialogOpen}
         onCancel={toggleDialog}
-        onConfirm={handleDeleteRegistration}
+        onConfirm={() => handleDeleteRegistration(registrationId!)}
         message={text(
           'You are about to deregister for this event.',
           'Je staat op het punt je uit te schrijven voor dit evenement.'

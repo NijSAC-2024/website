@@ -15,7 +15,7 @@ export type MembershipStatus =
   | 'nonMember'
   | 'donor';
 
-export type QuestionTypeType = 'text' |'multipleChoice' | 'number' | 'boolean' | 'date';
+export type QuestionTypeType = 'text' | 'multipleChoice' | 'number' | 'boolean' | 'date';
 
 export interface QuestionType {
   type: QuestionTypeType;
@@ -55,7 +55,9 @@ export interface DateType {
   end: string;
 }
 
-export interface Registration extends BasicUser {
+export interface Registration extends Partial<BasicUser> {
+  registrationId: string;
+  eventId: string;
   attended?: boolean;
   waitingListPosition?: number;
   answers: Array<Answer>;
@@ -213,7 +215,7 @@ export const roleOptions: OptionsType[] = [
   { id: 'chair', label: { en: 'Chair', nl: 'Voorzitter' } },
   { id: 'viceChair', label: { en: 'Vice Chair', nl: 'Vicevoorzitter' } },
   { id: 'climbingCommissar', label: { en: 'Climbing Commissar', nl: 'Klimcommissaris' } },
-  { id: 'activityCommissionMember', label: { en: 'Activity Commission Member', nl: 'Activiteitencommissie Lid' } },
+  { id: 'activityCommissionMember', label: { en: 'Activity Commission Member', nl: 'Activiteitencommissie Lid' } }
 ];
 
 export const typesOptions: OptionsType[] = [
@@ -227,7 +229,7 @@ export const typesOptions: OptionsType[] = [
 export const experienceOptions: OptionsType[] = [
   { id: 'sp', label: { en: 'Single Pitch', nl: 'Single Pitch' } },
   { id: 'mp', label: { en: 'Multi Pitch', nl: 'Multi Pitch' } },
-  { id: 'trad', label: { en: 'Trad', nl: 'Trad' } },
+  { id: 'trad', label: { en: 'Trad', nl: 'Trad' } }
 ];
 
 export const memberOptions: OptionsType[] = [

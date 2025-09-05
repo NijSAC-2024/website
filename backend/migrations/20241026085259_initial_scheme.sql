@@ -22,10 +22,6 @@ create table "user"
     updated           timestamptz       not null
 );
 
-insert into "user" (id, first_name, last_name, phone, roles, status, email, created, updated)
-values ('00000000-0000-0000-0000-000000000000', 'Deleted', 'User', '+00000', '[]', 'non_member', 'deleted@user.com',
-        now(), now());
-
 create table session
 (
     cookie_value text primary key,
@@ -79,13 +75,27 @@ create table event --event base
     event_type                 text                not null,
     -- example scheme:
     -- [
-    --   {
-    --     "id": "24e2256c-4612-4774-a8ce-168c7817fbd4",
-    --     "questionEn": "What is your favorite color?",
-    --     "questionNl": "Wat is je favoriete kleur?",
-    --     "type": "shortText",
-    --     "required": false
-    --   }
+    --  {
+    --    "id": "24e2256c-4612-4774-a8ce-168c7817fbd4",
+    --    "question": {
+    --      "en": "What is your favorite color?",
+    --      "nl": "Wat is je favoriete kleur?"
+    --    },
+    --    "questionType": {
+    --      "type": "multipleChoice",
+    --      "options": [
+    --        {
+    --          "en": "Red",
+    --          "nl": "Rood"
+    --        },
+    --        {
+    --          "en": "Green",
+    --          "nl": "Groen"
+    --        },
+    --      ]
+    --    },
+    --    "required": true
+    --  }
     -- ]
     questions                  jsonb               not null,            -- if no questions are asked, use an empty array
     -- example scheme:
@@ -98,8 +108,9 @@ create table event --event base
 
 create table event_registration
 (
+    registration_id       uuid        not null primary key,
     event_id              uuid        not null references event (id) on delete cascade,
-    user_id               uuid        not null references "user" (id), -- On deletion, we want to replace it with a 'deleted' user
+    user_id               uuid        references "user" (id) on delete SET NULL,
 
     -- Answers to the questions. Example scheme:
     -- [
@@ -115,8 +126,8 @@ create table event_registration
     waiting_list_position integer,
     created               timestamptz not null,
     updated               timestamptz not null,
-    constraint event_registration_pk
-        primary key (event_id, user_id),
+    constraint user_can_register_only_once
+        unique (event_id, user_id),
     constraint consistent_waiting_list
         unique (event_id, waiting_list_position)
 );

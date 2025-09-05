@@ -1,15 +1,21 @@
 use crate::{
     api::{ApiResult, ValidatedJson},
-    auth::{role::Role, session::Session},
+    auth::{
+        role::{MembershipStatus, Role},
+        session::Session,
+    },
     data_source::event::EventStore,
     error::{AppResult, Error},
-    event::{Answer, Date, Event, EventContent, NewRegistration, Question, Registration},
+    event::{
+        Answer, Date, Event, EventContent, NewRegistration, Question, Registration, RegistrationId,
+    },
     location::{Location, LocationId},
     user::UserId,
     wire::event::EventId,
 };
 use axum::{Json, extract::Path};
 use time::OffsetDateTime;
+use tracing::{debug, info, trace, warn};
 
 fn update_all_full_event_access(session: &Session) -> AppResult<()> {
     if session.membership_status().is_member()
@@ -68,7 +74,7 @@ pub async fn get_user_registrations(
     store: EventStore,
     Path(id): Path<UserId>,
     session: Session,
-) -> ApiResult<Vec<EventId>> {
+) -> ApiResult<Vec<Registration>> {
     if update_single_full_registration_access(&id, &session).is_ok() {
         Ok(Json(store.get_user_registrations(session.user_id()).await?))
     } else {
@@ -83,11 +89,12 @@ pub async fn get_event(
     Path(id): Path<EventId>,
     session: Option<Session>,
 ) -> ApiResult<Event<Location>> {
-    if let Some(session) = session {
-        if update_all_full_event_access(&session).is_ok() {
-            return Ok(Json(store.get_event(&id, true).await?));
-        }
+    if let Some(session) = session
+        && update_all_full_event_access(&session).is_ok()
+    {
+        return Ok(Json(store.get_event(&id, true).await?));
     }
+
     Ok(Json(store.get_event(&id, false).await?))
 }
 
@@ -97,10 +104,10 @@ pub async fn get_activities(
     store: EventStore,
     session: Option<Session>,
 ) -> ApiResult<Vec<Event<Location>>> {
-    if let Some(session) = session {
-        if update_all_full_event_access(&session).is_ok() {
-            return Ok(Json(store.get_events(true).await?));
-        }
+    if let Some(session) = session
+        && update_all_full_event_access(&session).is_ok()
+    {
+        return Ok(Json(store.get_events(true).await?));
     }
     Ok(Json(store.get_events(false).await?))
 }
@@ -136,80 +143,149 @@ pub async fn delete_event(
 pub async fn get_registration(
     store: EventStore,
     session: Session,
-    Path((event_id, user_id)): Path<(EventId, UserId)>,
+    Path((_event_id, registration_id)): Path<(EventId, RegistrationId)>,
 ) -> ApiResult<Registration> {
-    update_single_full_registration_access(&user_id, &session)?;
-    Ok(Json(store.get_registration(&event_id, &user_id).await?))
+    let registration = store.get_registration(&registration_id).await?;
+
+    if let Some(ref user) = registration.user {
+        update_single_full_registration_access(&user.user_id, &session)?;
+    } else {
+        update_all_full_event_access(&session)?;
+    }
+
+    Ok(Json(registration))
 }
 
 pub async fn create_registration(
     store: EventStore,
-    session: Session,
-    Path((event_id, user_id)): Path<(EventId, UserId)>,
+    session: Option<Session>,
+    Path(event_id): Path<EventId>,
     ValidatedJson(mut new): ValidatedJson<NewRegistration>,
 ) -> ApiResult<Registration> {
-    update_single_full_registration_access(&user_id, &session)?;
-
+    let user_id = new.user_id.clone();
     let event = store.get_event(&event_id, true).await?;
-    if update_all_full_event_access(&session).is_err()
-        && event.content.registration_period.is_none()
+
+    if let Some(ref user_id) = user_id {
+        let Some(ref session) = session else {
+            info!(
+                user_id = user_id.to_string(),
+                "Tried to register with user ID while not logged in"
+            );
+            return Err(Error::Unauthorized);
+        };
+        update_single_full_registration_access(user_id, session).inspect_err(|_| {
+            info!(
+                user_id = user_id.to_string(),
+                logged_in_user = session.user_id().to_string(),
+                event_id = event.id.to_string(),
+                "logged in user does not have permission to update this registration"
+            )
+        })?;
+    } else if !event
+        .content
+        .required_membership_status
+        .contains(&MembershipStatus::NonMember)
     {
-        Err(Error::BadRequest("Registrations are not open"))?
+        info!(
+            event_id = event.id.to_string(),
+            "Cannot sign up for an event that does not accept NonMembers"
+        );
+        return Err(Error::Unauthorized);
     }
 
-    if update_all_full_event_access(&session).is_err() {
-        if let Some(Date { end, .. }) = event.content.registration_period {
-            if end < OffsetDateTime::now_utc() {
-                Err(Error::BadRequest(
-                    "Registration deadline has already passed",
-                ))?
-            }
+    if event.content.registration_period.is_none() {
+        let Some(ref session) = session else {
+            // For anonymous registrations
+            debug!(
+                event_id = event.id.to_string(),
+                "Registrations are not open"
+            );
+            return Err(Error::BadRequest("Registrations are not open"));
+        };
+        if update_all_full_event_access(session).is_err() {
+            // For regular users
+            debug!(
+                event_id = event.id.to_string(),
+                "Registrations are not open"
+            );
+            Err(Error::BadRequest("Registrations are not open"))?
         }
     }
 
-    ensure_correct_waiting_list_position(&event, &mut new, &session, None)?;
+    if let Some(ref session) = session {
+        if update_all_full_event_access(session).is_err() {
+            ensure_signup_has_not_passed(&event)?;
+        }
+    } else {
+        ensure_signup_has_not_passed(&event)?;
+    };
+
+    ensure_correct_waiting_list_position(&event, &mut new, session.as_ref(), None)?;
+    trace!(
+        event_id = event.id.to_string(),
+        "Calculated waiting list position {:?}", new.waiting_list_position
+    );
 
     if !check_required_questions_answered(&event.content.questions, &new.answers) {
         Err(Error::BadRequest("Missing answer for required question"))?
     };
 
-    Ok(Json(
-        store.new_registration(&event_id, &user_id, new).await?,
-    ))
+    Ok(Json(store.new_registration(&event_id, user_id, new).await?))
 }
 
 pub async fn update_registration(
     store: EventStore,
     session: Session,
-    Path((event_id, user_id)): Path<(EventId, UserId)>,
+    Path((_event_id, registration_id)): Path<(EventId, RegistrationId)>,
     ValidatedJson(mut updated): ValidatedJson<NewRegistration>,
 ) -> ApiResult<Registration> {
-    update_single_full_registration_access(&user_id, &session)?;
+    let registration = store.get_registration(&registration_id).await?;
 
-    let event = store.get_event(&event_id, true).await?;
-    let registration = store.get_registration(&event_id, &user_id).await?;
+    if update_all_full_event_access(&session).is_err() {
+        let Some(user_id) = registration.user.as_ref().map(|u| u.user_id.clone()) else {
+            return Err(Error::BadRequest(
+                "Only admins can update anonymous sign-ups",
+            ));
+        };
 
-    ensure_correct_waiting_list_position(&event, &mut updated, &session, Some(&registration))?;
+        update_single_full_registration_access(&user_id, &session)?;
+    }
+
+    let event = store.get_event(&registration.event_id, true).await?;
+
+    ensure_signup_has_not_passed(&event)?;
+    ensure_correct_waiting_list_position(
+        &event,
+        &mut updated,
+        Some(&session),
+        Some(&registration),
+    )?;
     ensure_attendance_update_full_access_only(&registration, &mut updated, &session);
 
     Ok(Json(
-        store
-            .update_registration(&event_id, &user_id, updated)
-            .await?,
+        store.update_registration(&registration_id, updated).await?,
     ))
 }
 
 pub async fn delete_registration(
     store: EventStore,
     session: Session,
-    Path((event_id, user_id)): Path<(EventId, UserId)>,
+    Path((_event_id, registration_id)): Path<(EventId, RegistrationId)>,
 ) -> AppResult<()> {
-    if update_all_full_event_access(&session).is_ok()
-        || update_single_full_registration_access(&user_id, &session).is_ok()
-    {
-        store.delete_registration(&event_id, &user_id).await
+    if update_all_full_event_access(&session).is_ok() {
+        store.delete_registration(&registration_id).await
     } else {
-        Err(Error::Unauthorized)
+        let registration = store.get_registration(&registration_id).await?;
+        if let Some(user) = registration.user {
+            // Normal users can only delete their own registration
+            update_single_full_registration_access(&user.user_id, &session)?
+        } else {
+            // Anonymous registrations can only be modified by admins
+            return Err(Error::Unauthorized);
+        };
+        let event = store.get_event(&registration.event_id, true).await?;
+        ensure_signup_has_not_passed(&event)?;
+        store.delete_registration(&registration_id).await
     }
 }
 
@@ -222,48 +298,85 @@ fn check_required_questions_answered(questions: &[Question], answers: &[Answer])
     true
 }
 
+fn ensure_signup_has_not_passed(event: &Event<Location>) -> Result<(), Error> {
+    if let Some(Date { end, .. }) = event.content.registration_period
+        && end < OffsetDateTime::now_utc()
+    {
+        return Err(Error::BadRequest(
+            "Registration deadline has already passed",
+        ));
+    };
+    Ok(())
+}
+
 /// Depending on access rights, it allows overwriting the waiting list position
 /// Additionally, it ensures that only valid positions are accepted.
 fn ensure_correct_waiting_list_position(
     event: &Event<Location>,
     new_registration: &mut NewRegistration,
-    session: &Session,
+    session: Option<&Session>,
     current_registration: Option<&Registration>,
 ) -> Result<(), Error> {
-    if update_all_full_event_access(session).is_ok() {
+    if let Some(session) = session
+        && update_all_full_event_access(session).is_ok()
+    {
+        trace!("logged in user has admin access to the waiting list");
         if new_registration.waiting_list_position.is_some() {
+            trace!(
+                event_id = event.id.to_string(),
+                new_waiting_list_position = new_registration.waiting_list_position,
+                "explicitly setting the waiting list position requested"
+            );
             let mut valid_pos = false;
             if new_registration.waiting_list_position == Some(event.waiting_list_count as i32) {
                 valid_pos = true
             }
-            if let Some(current_registration) = current_registration {
-                if current_registration.waiting_list_position
+            if let Some(current_registration) = current_registration
+                && current_registration.waiting_list_position
                     == new_registration.waiting_list_position
-                {
-                    valid_pos = true
-                }
+            {
+                valid_pos = true
             }
             if !valid_pos {
+                warn!(
+                    event_id = event.id.to_string(),
+                    new_waiting_list_position = new_registration.waiting_list_position,
+                    "Determined the requested waiting list position is invalid"
+                );
                 Err(Error::BadRequest("Invalid waiting list position"))?
             }
         }
     } else if let Some(registration) = current_registration {
+        trace!(
+            event_id = event.id.to_string(),
+            "No admin access to waiting list, overriding with exising waiting list position"
+        );
         new_registration.waiting_list_position = registration.waiting_list_position
-    } else if let Some(waiting_list_max) = event.content.waiting_list_max {
-        if waiting_list_max <= event.waiting_list_count as i32 {
-            Err(Error::BadRequest(
-                "Registrations and waiting list are already full",
-            ))?
-        } else {
-            new_registration.waiting_list_position = Some(event.waiting_list_count as i32)
-        }
     } else if let Some(registration_max) = event.content.registration_max {
+        trace!(
+            event_id = event.id.to_string(),
+            "New registration without admin access"
+        );
         if registration_max <= event.registration_count as i32 {
+            trace!("Registrations are full, adding to waiting list");
+
+            if let Some(waiting_list_max) = event.content.waiting_list_max
+                && waiting_list_max <= event.waiting_list_count as i32
+            {
+                Err(Error::BadRequest(
+                    "Registrations and waiting list are already full",
+                ))?
+            }
+            trace!("Waiting list position is {}", event.waiting_list_count);
+            new_registration.waiting_list_position = Some(event.waiting_list_count as i32);
+
             new_registration.waiting_list_position = Some(0)
         } else {
+            trace!("Still spots available, setting waiting list position to None");
             new_registration.waiting_list_position = None
         }
     } else {
+        trace!("No limit to the registrations, setting waiting list position to None");
         new_registration.waiting_list_position = None
     };
     Ok(())

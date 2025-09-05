@@ -10,14 +10,14 @@ use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 use sqlx::FromRow;
 use std::{
-    fmt::{Debug, Display, Formatter},
+    fmt::{Debug, Formatter},
     ops::Deref,
 };
 use time::OffsetDateTime;
 use uuid::Uuid;
 use validator::Validate;
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, derive_more::Display)]
 #[serde(transparent)]
 pub struct UserId(Uuid);
 
@@ -32,12 +32,6 @@ impl Deref for UserId {
 
     fn deref(&self) -> &Self::Target {
         &self.0
-    }
-}
-
-impl Display for UserId {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.0)
     }
 }
 

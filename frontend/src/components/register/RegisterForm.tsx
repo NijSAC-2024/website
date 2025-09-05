@@ -18,7 +18,7 @@ interface RegisterFormProps {
   registrationQuestions: Question[];
   title: Language;
   registrationCloseTime: string;
-  handleRegistration: (answers: Answer[], update?: boolean) => void;
+  handleRegistration: (answers: Answer[]) => void;
   existingAnswers?: Answer[];
 }
 
@@ -69,7 +69,7 @@ export default function RegisterForm({
     if (Object.values(errors).some((v)=> v)) {
       return;
     }
-    handleRegistration(answers, existingAnswers && existingAnswers.length > 0);
+    handleRegistration(answers);
   }
 
   return (

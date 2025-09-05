@@ -18,7 +18,7 @@ pub enum Role {
     // TODO extend
 }
 
-#[derive(sqlx::Type, Serialize, Deserialize, Debug, Clone, Copy)]
+#[derive(sqlx::Type, Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
 #[sqlx(type_name = "membership_status", rename_all = "snake_case")]
 #[serde(rename_all = "camelCase")]
 pub enum MembershipStatus {

@@ -7,7 +7,7 @@ import DescriptionCard from '../components/event/DescriptionCard.tsx';
 import { useAppState } from '../providers/AppStateProvider.tsx';
 import { useLanguage } from '../providers/LanguageProvider.tsx';
 import { useAuth } from '../providers/AuthProvider.tsx';
-import {useApiState} from '../providers/ApiProvider.tsx';
+import { useApiState } from '../providers/ApiProvider.tsx';
 
 export default function Event() {
   const { text } = useLanguage();
@@ -52,7 +52,8 @@ export default function Event() {
             )}
           </div>
 
-          <EventCard event={event} agendaPage={false} isRegistered={!!registrations && registrations.some(reg => reg.userId === user?.id)}/>
+          <EventCard event={event} agendaPage={false}
+            registrationId={!!registrations && registrations.find(reg => reg.userId === user?.id)?.registrationId || null} />
           <DescriptionCard
             descriptionMarkdown={event.description || { en: '', nl: '' }}
             experience={event.metadata?.experience || []}
