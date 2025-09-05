@@ -265,7 +265,7 @@ export default function ApiProvider({ children }: ApiProviderProps) {
   }, [cache, isLoggedIn, route.name, user?.id]);
 
   useEffect(() => {
-    if (route.name === 'event' || route.name === 'new_event') {
+    if (route.name === 'event' || route.name === 'new_event' || route.name === 'edit_event') {
       getLocations().then(locations => {
         if (locations) {
           setLocations(locations);

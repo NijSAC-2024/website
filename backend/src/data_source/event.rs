@@ -310,6 +310,7 @@ impl EventStore {
             .try_into()
     }
 
+    // TODO filter for events in the past
     pub async fn get_events(&self, display_hidden: bool) -> AppResult<Vec<Event<Location>>> {
         sqlx::query_as!(
             PgEvent,
@@ -348,6 +349,7 @@ impl EventStore {
                 LEFT JOIN event_registration r ON r.event_id = e.id
             WHERE e.is_published OR $1
             GROUP BY e.id, l.id
+            ORDER BY start_dates[1]
             "#,
             display_hidden
         )
