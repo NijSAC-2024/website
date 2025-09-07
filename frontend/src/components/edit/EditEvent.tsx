@@ -104,6 +104,7 @@ export default function EditEvent() {
         <EditRegistrations
           requiredMembershipStatus={event.requiredMembershipStatus}
           registrationMax={event.registrationMax}
+          waitingListMax={event.waitingListMax}
           registrationPeriod={event.registrationPeriod}
           questions={event.questions}
           handleEventChange={handleEventChange}

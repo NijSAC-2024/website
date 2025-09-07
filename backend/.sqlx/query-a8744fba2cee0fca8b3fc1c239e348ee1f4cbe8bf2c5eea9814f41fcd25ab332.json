@@ -78,8 +78,9 @@
               "Enum": [
                 "pending",
                 "member",
-                "extraordinary",
-                "non_member"
+                "affiliated",
+                "non_member",
+                "donor"
               ]
             }
           }

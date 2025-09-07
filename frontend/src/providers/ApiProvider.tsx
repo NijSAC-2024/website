@@ -249,18 +249,20 @@ export default function ApiProvider({ children }: ApiProviderProps) {
           setEvents(events);
         }
       });
-
-      if (isLoggedIn) {
-        getRegisteredEvents(user?.id).then(registrations => {
-          if (registrations) {
-            setRegisteredEvents(registrations);
-          }
-        });
-      } else {
-        setRegisteredEvents([]);
-      }
     } else {
       setEvents([]);
+    }
+  }, [cache, isLoggedIn, route.name, user?.id]);
+
+  useEffect(() => {
+    if ((route.name === 'agenda' || route.name === 'event') && isLoggedIn && !(user?.status === 'pending')) {
+      getRegisteredEvents(user?.id).then(registrations => {
+        if (registrations) {
+          setRegisteredEvents(registrations);
+        }
+      });
+    } else {
+      setRegisteredEvents([]);
     }
   }, [cache, isLoggedIn, route.name, user?.id]);
 
@@ -284,7 +286,7 @@ export default function ApiProvider({ children }: ApiProviderProps) {
         }
       });
 
-      if (isLoggedIn) {
+      if (isLoggedIn && !(user?.status === 'pending')) {
         getRegistrations(route.params!.id).then(registrations => {
           if (registrations) {
             setRegistrations(registrations);

@@ -52,7 +52,7 @@ export default function UserMenu() {
           </ListItemIcon>
           {text('My account', 'Mijn account')}
         </MenuItem>
-        <MenuItem onClick={() => navigateSubmenu('members')}>
+        <MenuItem disabled={user?.status === 'pending'} onClick={() => navigateSubmenu('members')}>
           <ListItemIcon>
             <GroupIcon fontSize="small" />
           </ListItemIcon>

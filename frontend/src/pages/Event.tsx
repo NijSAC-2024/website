@@ -12,7 +12,7 @@ import { useApiState } from '../providers/ApiProvider.tsx';
 export default function Event() {
   const { text } = useLanguage();
   const { navigate } = useAppState();
-  const { event, registrations } = useApiState();
+  const { event, registeredEvents } = useApiState();
   const { isLoggedIn, user } = useAuth();
 
 
@@ -53,7 +53,7 @@ export default function Event() {
           </div>
 
           <EventCard event={event} agendaPage={false}
-            registrationId={!!registrations && registrations.find(reg => reg.userId === user?.id)?.registrationId || null} />
+            registration={registeredEvents.find((e) => e.eventId === event.id)} />
           <DescriptionCard
             descriptionMarkdown={event.description || { en: '', nl: '' }}
             experience={event.metadata?.experience || []}

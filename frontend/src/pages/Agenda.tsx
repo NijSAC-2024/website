@@ -5,14 +5,12 @@ import { Event, EventType, WeekendType } from '../types.ts';
 import EventCard from '../components/event/EventCard.tsx';
 import { useApiState } from '../providers/ApiProvider.tsx';
 import { useLanguage } from '../providers/LanguageProvider.tsx';
-import { useAuth } from '../providers/AuthProvider.tsx';
 import NewEventButton from '../components/buttons/NewEventButton.tsx';
 import AgendaFilter from '../components/agenda/AgendaFilter.tsx';
 
 export default function Agenda() {
   const { text } = useLanguage();
   const { events, registeredEvents } = useApiState();
-  const { user } = useAuth();
   const [category, setCategory] = useState<EventType | 'all'>(
     'all'
   );
@@ -49,7 +47,7 @@ export default function Agenda() {
             ).map((event: Event) => (
               // TODO filter out events in the past
               <EventCard key={event.id} event={event} agendaPage={true}
-                registrationId={!!user && registeredEvents.find((e) => e.eventId === event.id)?.registrationId || null} />
+                registration={registeredEvents.find((e) => e.eventId === event.id)} />
             ))}
         </div>
       </GenericPage>

@@ -9,23 +9,18 @@ import {
   TextField
 } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import AccessAlarmIcon from '@mui/icons-material/AccessAlarm';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import moment from 'moment';
 import {FormEvent, useState} from 'react';
 
 interface RegisterFormProps {
   registrationQuestions: Question[];
-  title: Language;
-  registrationCloseTime: string;
   handleRegistration: (answers: Answer[]) => void;
   existingAnswers?: Answer[];
 }
 
 export default function RegisterForm({
   registrationQuestions,
-  title,
-  registrationCloseTime,
   handleRegistration,
   existingAnswers
 }: RegisterFormProps) {
@@ -74,17 +69,6 @@ export default function RegisterForm({
 
   return (
     <Box className="grid gap-3" component="form" onSubmit={handleSubmit}>
-      <h1>
-        {text(
-          'Registration for ' + title.en,
-          'Inschrijving voor ' + title.nl
-        )}
-      </h1>
-      <p>
-        <AccessAlarmIcon className=" mr-2" />
-        {text('Registrations close at ', 'Inschrijvingen sluiten op ')}
-        {moment(registrationCloseTime).format('DD MMM HH:mm')}
-      </p>
       {registrationQuestions.map((question, index) => {
         const label = `${text(question.question.en, question.question.nl)}${question.required ? ' *' : ''}`;
         const error = errors[index];
@@ -205,7 +189,6 @@ export default function RegisterForm({
           existingAnswers ? 'Inschrijving bijwerken' : 'Inschrijven'
         )}
       </Button>
-
     </Box>
   );
 }

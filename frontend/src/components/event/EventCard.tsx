@@ -5,7 +5,7 @@ import moment from 'moment';
 import { Chip } from '@mui/material';
 import { getLabel } from '../../util.ts';
 import 'moment/dist/locale/nl';
-import { DateType, Event } from '../../types.ts';
+import {DateType, Event, Registration} from '../../types.ts';
 import Markdown from 'react-markdown';
 import RegisterButton from '../register/RegisterButton.tsx';
 import { useAppState } from '../../providers/AppStateProvider.tsx';
@@ -13,10 +13,10 @@ import { useAppState } from '../../providers/AppStateProvider.tsx';
 interface AgendaCardProps {
   event: Event;
   agendaPage: boolean;
-  registrationId: string | null;
+  registration?: Registration;
 }
 
-export default function EventCard({ event, agendaPage, registrationId }: AgendaCardProps) {
+export default function EventCard({ event, agendaPage, registration }: AgendaCardProps) {
   const { navigate } = useAppState();
   const { text, language } = useLanguage();
   moment.locale(language);
@@ -171,9 +171,11 @@ export default function EventCard({ event, agendaPage, registrationId }: AgendaC
             title={event.name}
             questions={event.questions}
             registrationMax={event.registrationMax}
+            waitingListMax={event.waitingListMax}
             registrationCount={event.registrationCount}
+            waitingListCount={event.waitingListCount}
             eventId={event.id}
-            registrationId={registrationId}
+            registration={registration}
           />
         </div>
       )}

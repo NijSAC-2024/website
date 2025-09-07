@@ -18,14 +18,17 @@ export default function Members() {
 
   return (
     <GenericPage>
-      <ContentCard className="grid gap-4 p-7">
-        {user?.roles.includes('admin') && (
+
+      {user?.roles.includes('admin') && (
+        <ContentCard className="grid gap-4 p-7 mb-5">
           <AcceptingMembers
             expanded={expanded}
             toggleExpand={toggleExpand}
           />
-        )}
+        </ContentCard>
+      )}
 
+      <ContentCard className="grid gap-4 p-7">
         <h1 className="text-3xl">{text('All members', 'Alle leden')}</h1>
         <MembersTable
           expanded={expanded}

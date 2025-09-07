@@ -11,13 +11,13 @@ interface RegistrationsCardProps {
 }
 
 export default function RegistrationsCard({ questions }: RegistrationsCardProps) {
-  const { registrations } = useApiState();
+  const { registrations, event } = useApiState();
   const { text } = useLanguage();
-  const { isLoggedIn, user } = useAuth();
+  const { user } = useAuth();
 
   return (
     <>
-      {isLoggedIn &&  (
+      {!!user && event?.requiredMembershipStatus.includes(user?.status) && (
         <ContentCard className="xl:col-span-3 p-7">
           <h1>{text('Participants', 'Deelnemers')}</h1>
           {registrations && registrations.length > 0 ? (

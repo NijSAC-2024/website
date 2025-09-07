@@ -368,9 +368,7 @@ fn ensure_correct_waiting_list_position(
                 ))?
             }
             trace!("Waiting list position is {}", event.waiting_list_count);
-            new_registration.waiting_list_position = Some(event.waiting_list_count as i32);
-
-            new_registration.waiting_list_position = Some(0)
+            new_registration.waiting_list_position = Some(event.waiting_list_count as i32)
         } else {
             trace!("Still spots available, setting waiting list position to None");
             new_registration.waiting_list_position = None
