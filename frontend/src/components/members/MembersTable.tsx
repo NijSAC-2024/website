@@ -5,12 +5,13 @@ import {
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
+import SwitchAccountIcon from '@mui/icons-material/SwitchAccount';
 import { useLanguage } from '../../providers/LanguageProvider';
 import {User, RoleType, roleOptions} from '../../types';
 import {useApiState} from '../../providers/ApiProvider.tsx';
 import {useAuth} from '../../providers/AuthProvider.tsx';
 import UserDetails from '../UserDetails.tsx';
+import ContentCard from '../ContentCard.tsx';
 
 interface MembersTableProps {
   expanded: Record<string, boolean>;
@@ -70,10 +71,10 @@ export default function MembersTable({
   }, [filteredUsers, page, rowsPerPage]);
 
   return (
-    <div>
+    <ContentCard className="grid gap-4 p-7">
+      <h1 className="text-3xl">{text('Members', 'Leden')}</h1>
       <TextField
         label={text('Search', 'Zoeken')}
-        variant="outlined"
         fullWidth
         value={search}
         onChange={(e) => {
@@ -86,7 +87,7 @@ export default function MembersTable({
         <TableHead>
           <TableRow>
             <TableCell>
-              <b>{text('Full name', 'Volledige naam')}</b>
+              <b>{text('Name', 'Naam')}</b>
             </TableCell>
           </TableRow>
         </TableHead>
@@ -105,7 +106,7 @@ export default function MembersTable({
                       </Tooltip>
                       <Tooltip title={text('Change role', 'Wijzig rol')}>
                         <IconButton onClick={(e) => handleMenuOpen(e, u)}>
-                          <MoreVertIcon />
+                          <SwitchAccountIcon />
                         </IconButton>
                       </Tooltip>
                     </div>
@@ -150,6 +151,6 @@ export default function MembersTable({
           </MenuItem>
         ))}
       </Menu>
-    </div>
+    </ContentCard>
   );
 }

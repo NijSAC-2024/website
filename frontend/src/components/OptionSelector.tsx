@@ -36,6 +36,7 @@ export default function OptionSelector({
     onChange(value);
   };
 
+
   return (
     <FormControl>
       <InputLabel id="checkbox-select-label">{label}</InputLabel>
@@ -67,8 +68,8 @@ export default function OptionSelector({
         )}
       >
         {options.map((option) => (
-          <MenuItem key={option.id} value={option.id}>
-            <Checkbox checked={selectedOptions.includes(option.id)} />
+          <MenuItem key={option.id as string} value={option.id as string}>
+            <Checkbox checked={selectedOptions.includes(option.id as string)} />
             {text(option.label.en, option.label.nl)}
           </MenuItem>
         ))}

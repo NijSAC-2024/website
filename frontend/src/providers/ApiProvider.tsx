@@ -20,7 +20,7 @@ interface ApiContextType {
   updateEvent: (eventId: string, event: EventContent) => Promise<void>;
   deleteEvent: (eventId: string) => Promise<void>;
   getRegistration: (eventId: string, registrationId: string) => Promise<Registration | undefined>;
-  createRegistration: (eventId: string, answers: Answer[]) => Promise<void>;
+  createRegistration: (eventId: string, userId: string | undefined, answers: Answer[]) => Promise<void>;
   updateRegistration: (eventId: string, registrationId: string, answers: Answer[], attended?: boolean) => Promise<void>;
   deleteRegistration: (eventId: string, registrationId: string) => Promise<void>;
   createUser: (user: UserContent) => Promise<void>;
@@ -148,10 +148,10 @@ export default function ApiProvider({ children }: ApiProviderProps) {
     return data;
   };
 
-  const createRegistration = async (eventId: string, answers: Answer[]) => {
+  const createRegistration = async (eventId: string, userId: string | undefined, answers: Answer[]) => {
     const { error } = await apiFetch<Event>(`/event/${eventId}/registration`, {
       method: 'POST',
-      body: JSON.stringify({ userId: user?.id, answers })
+      body: JSON.stringify({ userId: userId, answers })
     });
     if (error) {
       enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
@@ -311,7 +311,7 @@ export default function ApiProvider({ children }: ApiProviderProps) {
   }, [cache, route.name, route.params, isLoggedIn]);
 
   useEffect(() => {
-    if (route.name === 'members' && isLoggedIn) {
+    if ((route.name === 'members' || route.name === 'event') && isLoggedIn) {
       getUsers().then(users => {
         if (users) {
           setUsers(users);

@@ -81,7 +81,6 @@ export default function Agenda() {
                     />
                   ))
               )}
-
         </div>
       </GenericPage>
     </>

@@ -7,6 +7,7 @@ import TextCard from '../../components/TextCard';
 import { useLanguage } from '../../providers/LanguageProvider';
 import { useApiState } from '../../providers/ApiProvider';
 import UserDetails from '../UserDetails.tsx';
+import ContentCard from '../ContentCard.tsx';
 
 interface AcceptingMembersProps {
   expanded: Record<string, boolean>;
@@ -23,7 +24,7 @@ export default function AcceptingMembers({
   const pendingUsers = users.filter((u) => u.status === 'pending');
 
   return (
-    <div>
+    <ContentCard className="grid gap-4 p-7 mb-5">
       <h1 className="text-2xl">{text('Pending members', 'Goed te keuren leden')}</h1>
       {pendingUsers.length === 0 ? (
         <p className="mt-2">{text('No pending members', 'Geen leden om goed te keuren')}</p>
@@ -68,6 +69,6 @@ export default function AcceptingMembers({
         }
         </div>
       )}
-    </div>
+    </ContentCard>
   );
 }

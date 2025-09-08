@@ -43,7 +43,7 @@ export default function RegisterButton({
 
   const toggleDialog = () => setDialogOpen((prevState) => !prevState);
 
-  const toggleRegisterDialog = async () => setRegisterDialogOpen((prevState) => !prevState);
+  const toggleRegisterDialog = () => setRegisterDialogOpen((prevState) => !prevState);
 
   const now = new Date();
   const openTime = new Date(registrationPeriod.start);
@@ -53,9 +53,9 @@ export default function RegisterButton({
     if (registrationId) {
       await updateRegistration(eventId, registrationId, answers);
     } else {
-      await createRegistration(eventId, answers);
+      await createRegistration(eventId, user?.id, answers);
     }
-    await toggleRegisterDialog();
+    toggleRegisterDialog();
   };
 
   const handleRegistrationClick = async () => {
@@ -63,10 +63,10 @@ export default function RegisterButton({
       if (registration) {
         toggleDialog();
       } else {
-        await createRegistration(eventId, []);
+        await createRegistration(eventId, user?.id, []);
       }
     } else {
-      await toggleRegisterDialog()
+      toggleRegisterDialog()
     }
   }
 
@@ -184,7 +184,6 @@ export default function RegisterButton({
           ) : (
             <Button onClick={toggleRegisterDialog}>{text('Close', 'Sluit')}</Button>
           )}
-
         </DialogActions>
       </Dialog>
       <AreYouSure
