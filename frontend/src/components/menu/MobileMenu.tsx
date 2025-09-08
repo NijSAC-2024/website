@@ -21,21 +21,16 @@ import UserMenu from './UserMenu.tsx';
 import { useAppState } from '../../providers/AppStateProvider.tsx';
 import SettingsIcon from '@mui/icons-material/Settings';
 
-interface MobileMenuProps {
-  handleLoginOpen: () => void;
-  dropdownOpen: boolean;
-  toggleDropdown: () => void;
-}
-
-export default function MobileMenu({
-  handleLoginOpen,
-  dropdownOpen,
-  toggleDropdown
-}: MobileMenuProps) {
+export default function MobileMenu() {
   const { text } = useLanguage();
   const { navigate } = useAppState();
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, toggleAuthOpen } = useAuth();
   const [openMenu, setOpenMenu] = useState<MenuType>(undefined);
+  const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
+
+  const toggleDropdown = () => {
+    setDropdownOpen((prevState) => !prevState);
+  };
 
   const toggleMenu = (menu: MenuType) => {
     if (openMenu === menu) {
@@ -365,7 +360,7 @@ export default function MobileMenu({
 
               <Divider/>
 
-              <ListItem onClick={handleLoginOpen} disablePadding>
+              <ListItem onClick={toggleAuthOpen} disablePadding>
                 <ListItemButton>
                   <ListItemText
                     primary={text('Login', 'Login')}
@@ -388,7 +383,7 @@ export default function MobileMenu({
             </>
           ) : (
             <div className="px-12 pb-3">
-              <UserMenu />
+              <UserMenu toggleDropdown={toggleDropdown}/>
             </div>
           )}
         </List>

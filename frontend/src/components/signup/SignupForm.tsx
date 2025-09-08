@@ -98,46 +98,33 @@ export default function SignupForm({newUser, handleChange, handleSubmit}: Signup
   const validateInputs = () => {
     switch (activeStep) {
     case 0: {
-      const firstNameError = nameValidator(newUser.firstName);
-      const infixError = optionalOnlyLetterValidator(newUser.infix);
-      const lastNameError = nameValidator(newUser.lastName);
-      const phoneError = phoneValidator(newUser.phone);
-      const emailError = emailValidator(newUser.email);
-      const passwordError = passwordValidator(newUser.password);
-      const importantInfoError = optionalOnlyLetterNumberValidator(newUser.importantInfo);
       setErrors({
         ...errors,
-        firstName: firstNameError,
-        infix: infixError,
-        lastName: lastNameError,
-        phone: phoneError,
-        email: emailError,
-        password: passwordError,
-        importantInfo: importantInfoError
+        firstName: nameValidator(newUser.firstName),
+        infix: optionalOnlyLetterValidator(newUser.infix),
+        lastName: nameValidator(newUser.lastName),
+        phone: phoneValidator(newUser.phone),
+        email: emailValidator(newUser.email),
+        password: passwordValidator(newUser.password),
+        importantInfo: optionalOnlyLetterNumberValidator(newUser.importantInfo)
       });
       break;
     }
     case 1: {
-      const studentNumberError = onlyNumbersValidator(newUser.studentNumber.toString());
-      const sportcardNumberError = onlyNumbersValidator(newUser.sportcardNumber.toString());
-      const nkbvNumberError = onlyNumbersValidator(newUser.nkbvNumber.toString());
       setErrors({
         ...errors,
-        studentNumber: studentNumberError,
-        sportcardNumber: sportcardNumberError,
-        nkbvNumber: nkbvNumberError,
+        studentNumber: onlyNumbersValidator(newUser.studentNumber.toString()),
+        sportcardNumber: onlyNumbersValidator(newUser.sportcardNumber.toString()),
+        nkbvNumber: onlyNumbersValidator(newUser.nkbvNumber.toString())
       });
       break;
     }
     case 2: {
-      const iceContactNameError = emergencyContactNameValidator(newUser.iceContactName);
-      const iceContactEmailError = emailValidator(newUser.iceContactEmail);
-      const iceContactPhoneError = phoneValidator(newUser.iceContactPhone);
       setErrors({
         ...errors,
-        iceContactName: iceContactNameError,
-        iceContactEmail: iceContactEmailError,
-        iceContactPhone: iceContactPhoneError,
+        iceContactName: emergencyContactNameValidator(newUser.iceContactName),
+        iceContactEmail: emailValidator(newUser.iceContactEmail),
+        iceContactPhone: phoneValidator(newUser.iceContactPhone)
       });
       break;
     }

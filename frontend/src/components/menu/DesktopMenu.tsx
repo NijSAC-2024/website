@@ -9,14 +9,10 @@ import Link from '../Link.tsx';
 import { useAppState } from '../../providers/AppStateProvider.tsx';
 import SettingsIcon from '@mui/icons-material/Settings';
 
-interface DesktopMenuProps {
-  handleLoginOpen: () => void;
-}
-
-export default function DesktopMenu({ handleLoginOpen }: DesktopMenuProps) {
+export default function DesktopMenu() {
   const { text } = useLanguage();
   const { navigate } = useAppState();
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, toggleAuthOpen } = useAuth();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | undefined>(undefined);
   const [openMenu, setOpenMenu] = useState<MenuType>(undefined);
 
@@ -162,7 +158,7 @@ export default function DesktopMenu({ handleLoginOpen }: DesktopMenuProps) {
               </Button>
             </Tooltip>
 
-            <Button color="inherit" onClick={handleLoginOpen}>
+            <Button color="inherit" onClick={toggleAuthOpen}>
               {text('Login', 'Inloggen')}
             </Button>
             <Button variant="contained" onClick={() => navigate('register')}>

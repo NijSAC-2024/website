@@ -7,6 +7,8 @@ import { useApiState } from '../providers/ApiProvider.tsx';
 import { useLanguage } from '../providers/LanguageProvider.tsx';
 import NewEventButton from '../components/buttons/NewEventButton.tsx';
 import AgendaFilter from '../components/agenda/AgendaFilter.tsx';
+import moment from 'moment/moment';
+import {Switch} from '@mui/material';
 
 export default function Agenda() {
   const { text } = useLanguage();
@@ -15,6 +17,9 @@ export default function Agenda() {
     'all'
   );
   const [type, setType] = useState<WeekendType | 'all'>('all');
+  const [filterPastEvents, setFilterPastEvents] = useState<boolean>(false);
+
+  const now = new Date();
 
   return (
     <>
@@ -22,7 +27,16 @@ export default function Agenda() {
       <GenericPage>
         <div className="grid xl:grid-cols-3 lg:grid-cols-2 grid-flow-row gap-5">
           <ContentCard className="lg:col-span-2 p-7">
-            <h1>Agenda</h1>
+            <div className="grid xl:grid-cols-2 justify-between">
+              <h1>Agenda</h1>
+              <div className="flex items-center xl:justify-end">
+                <p>{text('Include past events', 'Plaatsgevonden evenementen meenemen')}</p>
+                <Switch
+                  checked={filterPastEvents}
+                  onChange={(_, checked) => setFilterPastEvents(checked)}
+                />
+              </div>
+            </div>
             <p>
               {text(
                 'To register for events you must first log in.',
@@ -43,9 +57,9 @@ export default function Agenda() {
                 (category === 'all' ||
                   event.eventType === category) &&
                 (type === 'all' ||
-                  event.metadata?.type?.includes(type))
+                  event.metadata?.type?.includes(type)) &&
+                (filterPastEvents || moment(event.dates[0].start).isAfter(moment(now)))
             ).map((event: Event) => (
-              // TODO filter out events in the past
               <EventCard key={event.id} event={event} agendaPage={true}
                 registration={registeredEvents.find((e) => e.eventId === event.id)} />
             ))}

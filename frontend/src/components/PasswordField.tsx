@@ -1,7 +1,6 @@
 import {ChangeEventHandler, MouseEvent, useState} from 'react';
 import { IconButton, InputAdornment, InputLabel, OutlinedInput } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { useLanguage } from '../providers/LanguageProvider.tsx';
 
 interface PasswordFieldProps {
   label: string;
@@ -15,7 +14,6 @@ export default function PasswordField({
   onChange,
 }: PasswordFieldProps) {
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const { text } = useLanguage();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (event: MouseEvent<HTMLButtonElement>) => {
@@ -24,7 +22,7 @@ export default function PasswordField({
 
   return (
     <>
-      <InputLabel>{text('Password', 'Wachtwoord')}</InputLabel>
+      <InputLabel>{label}</InputLabel>
       <OutlinedInput
         value={value}
         type={showPassword ? 'text' : 'password'}

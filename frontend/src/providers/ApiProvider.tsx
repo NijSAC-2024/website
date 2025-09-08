@@ -23,8 +23,9 @@ interface ApiContextType {
   createRegistration: (eventId: string, answers: Answer[]) => Promise<void>;
   updateRegistration: (eventId: string, registrationId: string, answers: Answer[]) => Promise<void>;
   deleteRegistration: (eventId: string, registrationId: string) => Promise<void>;
-  updateUser: (userId: string, updates: Partial<User>) => Promise<void>;
   createUser: (user: UserContent) => Promise<void>;
+  updateUser: (userId: string, updates: Partial<User>) => Promise<void>;
+  updateUserPassword: (userId: string, password: string) => Promise<void>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -204,7 +205,7 @@ export default function ApiProvider({ children }: ApiProviderProps) {
     if (error) {
       switch (error.message) {
       case 'Conflict':
-        enqueueSnackbar('Email is already in use.', { variant: 'error' });
+        enqueueSnackbar(text('Email is already in use.', 'E-mail is al in gebruik.'), { variant: 'error' });
         break;
       default:
         enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
@@ -223,7 +224,7 @@ export default function ApiProvider({ children }: ApiProviderProps) {
     if (error) {
       switch (error.message) {
       case 'Conflict':
-        enqueueSnackbar('Email is already in use.', { variant: 'error' });
+        enqueueSnackbar(text('Email is already in use.', 'E-mail is al in gebruik.'), { variant: 'error' });
         break;
       default:
         enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
@@ -235,15 +236,28 @@ export default function ApiProvider({ children }: ApiProviderProps) {
         setUser(data);
       }
     }
-    enqueueSnackbar('User updated', { variant: 'success' });
+    enqueueSnackbar(text('User updated', 'Gebruiker bijgewerkt'), { variant: 'success' });
     setCache(!cache);
   };
 
+  const updateUserPassword = async (userId: string, password: string) => {
+    const { error } = await apiFetchVoid(`/user/${userId}/password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({password})
+    });
+    if (error) {
+      enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
+      return;
+    }
+    enqueueSnackbar(text('Password changed', 'Wachtwoord aangepast'), { variant: 'success' });
+  }
+
   //USE EFFECTS
 
-  // On the agenda page, fetch the events and the events for which a logged in user is registered.
+  // On the agenda page, fetch the events
   useEffect(() => {
-    if (route.name === 'agenda') {
+    if (route.name === 'agenda' || route.name === 'account') {
       getEvents().then(events => {
         if (events) {
           setEvents(events);
@@ -255,7 +269,7 @@ export default function ApiProvider({ children }: ApiProviderProps) {
   }, [cache, isLoggedIn, route.name, user?.id]);
 
   useEffect(() => {
-    if ((route.name === 'agenda' || route.name === 'event') && isLoggedIn && !(user?.status === 'pending')) {
+    if ((route.name === 'agenda' || route.name === 'event' || route.name === 'account') && isLoggedIn && !(user?.status === 'pending')) {
       getRegisteredEvents(user?.id).then(registrations => {
         if (registrations) {
           setRegisteredEvents(registrations);
@@ -331,8 +345,9 @@ export default function ApiProvider({ children }: ApiProviderProps) {
         createRegistration,
         updateRegistration,
         deleteRegistration,
+        createUser,
         updateUser,
-        createUser
+        updateUserPassword
       }}
     >
       {children}

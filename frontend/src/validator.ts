@@ -42,6 +42,16 @@ export const passwordValidator = (value?: string): Language | false => {
   return false;
 };
 
+export const repeatPasswordValidator = (value?: string, value2?: string): Language | false => {
+  if (value !== value2) {
+    return {
+      en: 'Password should match',
+      nl: 'Wachtwoord moet gelijk zijn ',
+    };
+  }
+  return false;
+};
+
 export function phoneValidator(phone: string): Language | false {
   const phoneRegex = /^\+?[0-9\s-]{7,15}$/;
   if (!phoneRegex.test(phone)) {

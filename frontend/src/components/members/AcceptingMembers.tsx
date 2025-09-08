@@ -28,7 +28,7 @@ export default function AcceptingMembers({
       {pendingUsers.length === 0 ? (
         <p className="mt-2">{text('No pending members', 'Geen leden om goed te keuren')}</p>
       ) : (
-        <div className="mb-10 grid gap-3"> {
+        <div className="mt-2 grid gap-3"> {
           pendingUsers.map((u) => (
             <TextCard key={u.id} className="px-6 py-3">
               <div className="lg:flex items-center justify-between">

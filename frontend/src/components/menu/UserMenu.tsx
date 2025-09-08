@@ -8,7 +8,11 @@ import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import {useAppState} from '../../providers/AppStateProvider.tsx';
 import GroupIcon from '@mui/icons-material/Group';
 
-export default function UserMenu() {
+interface UserMenuProps {
+  toggleDropdown?: () => void;
+}
+
+export default function UserMenu({toggleDropdown}: UserMenuProps) {
   const { text } = useLanguage();
   const { user, logout } = useAuth();
   const { navigate } = useAppState();
@@ -24,18 +28,14 @@ export default function UserMenu() {
   const navigateSubmenu = (page: string) => {
     navigate(page);
     handleMenuClose();
+    if (toggleDropdown) {
+      toggleDropdown();
+    }
   };
   return (
     <>
       <Tooltip title="Account settings">
-        <IconButton
-          onClick={handleClick}
-          size="small"
-          className="ml-2"
-          aria-controls={open ? 'account-menu' : undefined}
-          aria-haspopup="true"
-          aria-expanded={open ? 'true' : undefined}
-        >
+        <IconButton onClick={handleClick}>
           <Avatar className="w-8 h-8">{user?.firstName.charAt(0).toUpperCase()}</Avatar>
         </IconButton>
       </Tooltip>
@@ -65,7 +65,12 @@ export default function UserMenu() {
           </ListItemIcon>
           {text('Settings', 'Instellingen')}
         </MenuItem>
-        <MenuItem onClick={logout}>
+        <MenuItem onClick={() => {
+          if (toggleDropdown) {
+            toggleDropdown();
+          }
+          logout();
+        }}>
           <ListItemIcon>
             <LogoutIcon fontSize="small" />
           </ListItemIcon>

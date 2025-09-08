@@ -10,13 +10,8 @@ import { useLanguage } from '../../providers/LanguageProvider.tsx';
 export default function MainMenu() {
   const { text } = useLanguage();
   const { authOpen, toggleAuthOpen } = useAuth();
-  const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
   const [offset, setOffset] = useState<number>(window.scrollY);
   const isMobile = useMediaQuery('(max-width: 992px)');
-
-  const toggleDropdown = () => {
-    setDropdownOpen((prevState) => !prevState);
-  };
 
   useEffect(() => {
     const onScroll = () => setOffset(window.scrollY);
@@ -28,20 +23,16 @@ export default function MainMenu() {
     <>
       <div
         className={
-          (offset === 0 && !dropdownOpen
+          (offset === 0
             ? 'bg-transparent text-white'
             : 'bg-white dark:bg-[#121212] shadow-lg text-black dark:text-white') +
           ' fixed transition-all duration-200 ease-in-out z-10 w-full'
         }
       >
         {isMobile ? (
-          <MobileMenu
-            handleLoginOpen={toggleAuthOpen}
-            dropdownOpen={dropdownOpen}
-            toggleDropdown={toggleDropdown}
-          />
+          <MobileMenu/>
         ) : (
-          <DesktopMenu handleLoginOpen={toggleAuthOpen} />
+          <DesktopMenu/>
         )}
       </div>
       <Dialog open={authOpen} onClose={toggleAuthOpen} fullWidth>
