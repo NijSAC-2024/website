@@ -21,7 +21,7 @@ interface ApiContextType {
   deleteEvent: (eventId: string) => Promise<void>;
   getRegistration: (eventId: string, registrationId: string) => Promise<Registration | undefined>;
   createRegistration: (eventId: string, answers: Answer[]) => Promise<void>;
-  updateRegistration: (eventId: string, registrationId: string, answers: Answer[]) => Promise<void>;
+  updateRegistration: (eventId: string, registrationId: string, answers: Answer[], attended?: boolean) => Promise<void>;
   deleteRegistration: (eventId: string, registrationId: string) => Promise<void>;
   createUser: (user: UserContent) => Promise<void>;
   updateUser: (userId: string, updates: Partial<User>) => Promise<void>;
@@ -161,10 +161,10 @@ export default function ApiProvider({ children }: ApiProviderProps) {
     enqueueSnackbar(text('Registered', 'Ingeschreven'), { variant: 'success' });
   };
 
-  const updateRegistration = async (eventId: string, registrationId: string, answers: Answer[]) => {
+  const updateRegistration = async (eventId: string, registrationId: string, answers: Answer[], attended?: boolean) => {
     const { error } = await apiFetch<Event>(`/event/${eventId}/registration/${registrationId}`, {
       method: 'PUT',
-      body: JSON.stringify({ answers })
+      body: JSON.stringify({ answers: answers, attended: attended })
     });
     if (error) {
       enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });

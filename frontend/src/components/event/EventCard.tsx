@@ -32,18 +32,18 @@ export default function EventCard({ event, agendaPage, registration }: AgendaCar
     const endMonth = end.getMonth();
 
     if (date.start === date.end) {
-      return moment(start).utc().format('DD MMM HH:mm');
+      return moment(start).format('DD MMM HH:mm');
     } else if (startDay === endDay) {
       return (
-        moment(start).utc().format('DD MMM HH:mm') +
+        moment(start).format('DD MMM HH:mm') +
         ' - ' +
-        moment(end).utc().format('HH:mm')
+        moment(end).format('HH:mm')
       );
     } else if (!agendaPage) {
       return (
-        moment(start).utc().format('DD MMM HH:mm') +
+        moment(start).format('DD MMM HH:mm') +
         ' - ' +
-        moment(end).utc().format('DD MMM HH:mm')
+        moment(end).format('DD MMM HH:mm')
       );
     } else {
       if (startMonth === endMonth) {

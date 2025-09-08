@@ -52,17 +52,36 @@ export default function Agenda() {
           </ContentCard>
           <AgendaFilter category={category} setCategory={setCategory} type={type} setType={setType}/>
           {events &&
-            events.filter(
-              (event: Event) =>
-                (category === 'all' ||
-                  event.eventType === category) &&
-                (type === 'all' ||
-                  event.metadata?.type?.includes(type)) &&
-                (filterPastEvents || moment(event.dates[0].start).isAfter(moment(now)))
-            ).map((event: Event) => (
-              <EventCard key={event.id} event={event} agendaPage={true}
-                registration={registeredEvents.find((e) => e.eventId === event.id)} />
-            ))}
+            events
+              .filter(
+                (event: Event) =>
+                  (category === 'all' || event.eventType === category) &&
+                  (type === 'all' || event.metadata?.type?.includes(type))
+              )
+              .flatMap((event: Event) =>
+                event.dates
+                  .filter(
+                    (date) => filterPastEvents || moment(date.start).isAfter(moment(now))
+                  )
+                  .map((date, index) => (
+                    <EventCard
+                      key={`${event.id}-${index}`}
+                      event={{
+                        ...event,
+                        dates: [date],
+                        ...(event.dates.length > 1 && {
+                          name: {
+                            en: `${event.name.en} ${index + 1}/${event.dates.length}`,
+                            nl: `${event.name.nl} ${index + 1}/${event.dates.length}`,
+                          },
+                        }),
+                      }}
+                      agendaPage={true}
+                      registration={registeredEvents.find((e) => e.eventId === event.id)}
+                    />
+                  ))
+              )}
+
         </div>
       </GenericPage>
     </>

@@ -1,5 +1,5 @@
 import ContentCard from '../ContentCard.tsx';
-import { Table, TableBody, TableCell, TableRow } from '@mui/material';
+import {Checkbox, Table, TableBody, TableCell, TableRow} from '@mui/material';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import { useAuth } from '../../providers/AuthProvider.tsx';
 import { Question } from '../../types.ts';
@@ -11,7 +11,7 @@ interface RegistrationsCardProps {
 }
 
 export default function RegistrationsCard({ questions }: RegistrationsCardProps) {
-  const { registrations, event } = useApiState();
+  const { registrations, event, updateRegistration } = useApiState();
   const { text } = useLanguage();
   const { user } = useAuth();
 
@@ -25,7 +25,6 @@ export default function RegistrationsCard({ questions }: RegistrationsCardProps)
               <div className="min-w-max">
                 <Table>
                   <TableBody>
-                    {/* TODO: proper access management */}
                     {questions.length > 0 && user?.roles.includes('admin') && (
                       <TableRow>
                         <TableCell>
@@ -36,6 +35,9 @@ export default function RegistrationsCard({ questions }: RegistrationsCardProps)
                             <b>{`${text(question.question)} ${question.required ? '*' : ''}`}</b>
                           </TableCell>
                         ))}
+                        <TableCell>
+                          <b>{text('Attended', 'Aanwezig')}</b>
+                        </TableCell>
                       </TableRow>
                     )}
                     {registrations?.map((registration) => (
@@ -48,13 +50,13 @@ export default function RegistrationsCard({ questions }: RegistrationsCardProps)
                         }}
                       >
                         <TableCell>{`${registration?.firstName} ${registration?.infix ?? ''} ${registration?.lastName}`}</TableCell>
-                        {questions.map((question) => {
+                        {user?.roles.includes('admin') && questions.map((question) => {
                           const answer = registration.answers?.find(
                             (a) => a.questionId === question.id)?.answer;
 
                           if (question.questionType.type === 'boolean') {
                             return (
-                              <TableCell key={`${registration.userId}-${question.id}`}>
+                              <TableCell key={`${registration.registrationId}-${question.id}`}>
                                 {answer === 'true' ? '✔️' : '❌'}
                               </TableCell>
                             );
@@ -62,19 +64,23 @@ export default function RegistrationsCard({ questions }: RegistrationsCardProps)
 
                           if (question.questionType.type === 'date') {
                             return (
-                              <TableCell key={`${registration.userId}-${question.id}`}>
+                              <TableCell key={`${registration.registrationId}-${question.id}`}>
                                 {moment(answer).format('DD MMM HH:mm')}
                               </TableCell>
                             );
                           }
 
                           return (
-                            <TableCell key={`${registration.userId}-${question.id}`}>
+                            <TableCell key={`${registration.registrationId}-${question.id}`}>
                               {answer || ''}
                             </TableCell>
                           );
                         })}
-
+                        {user?.roles.includes('admin') && (
+                          <TableCell key={registration.registrationId}>
+                            <Checkbox checked={registration.attended} onChange={(_, checked) => updateRegistration(event?.id, registration.registrationId, registration.answers, checked)}/>
+                          </TableCell>
+                        )}
                       </TableRow>
                     ))}
                   </TableBody>

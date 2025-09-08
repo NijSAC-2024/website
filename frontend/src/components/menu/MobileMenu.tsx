@@ -241,7 +241,7 @@ export default function MobileMenu() {
           <ListItem onClick={() => toggleMenu('alps')} disablePadding>
             <ListItemButton>
               <ListItemText
-                primary={text('Alps', 'Alpen')}
+                primary={text('Alpinism', 'Alpineren')}
                 className="uppercase px-10"
               />
               <ListItemIcon>

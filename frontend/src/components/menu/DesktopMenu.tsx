@@ -105,7 +105,7 @@ export default function DesktopMenu() {
           className="flex items-center"
           onClick={(e) => handleMenuOpen(e, 'alps')}
         >
-          {text('Alps', 'Alpen')} <ExpandMoreIcon />
+          {text('Alpinism', 'Alpineren')} <ExpandMoreIcon />
         </Button>
         <Menu
           anchorEl={anchorEl}
