@@ -80,7 +80,11 @@ export default function RegistrationsCard({ questions }: RegistrationsCardProps)
 
           {registrations && registrations.length > 0 ? (
             <RegistrationTable
-              registrations={registrations}
+              registrations={registrations.sort((a, b) =>
+                `${a.firstName} ${a.infix ?? ''} ${a.lastName}`.localeCompare(
+                  `${b.firstName} ${b.infix ?? ''} ${b.lastName}`,
+                ),
+              )}
               questions={questions}
               user={user}
               eventId={event?.id}

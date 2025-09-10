@@ -46,7 +46,7 @@ export const repeatPasswordValidator = (value?: string, value2?: string): Langua
   if (value !== value2) {
     return {
       en: 'Password should match',
-      nl: 'Wachtwoord moet gelijk zijn ',
+      nl: 'Wachtwoord moet overeenkomen',
     };
   }
   return false;

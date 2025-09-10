@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
-import { useState } from 'react';
+import {useState} from 'react';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import { MenuType } from '../../types.ts';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
@@ -20,13 +20,16 @@ import { useAuth } from '../../providers/AuthProvider.tsx';
 import UserMenu from './UserMenu.tsx';
 import { useAppState } from '../../providers/AppStateProvider.tsx';
 import SettingsIcon from '@mui/icons-material/Settings';
+import {useThemeMode} from '../../providers/ThemeProvider.tsx';
 
 export default function MobileMenu() {
   const { text } = useLanguage();
   const { navigate } = useAppState();
+  const { checkDarkMode } = useThemeMode()
   const { isLoggedIn, toggleAuthOpen } = useAuth();
   const [openMenu, setOpenMenu] = useState<MenuType>(undefined);
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
+  const isDarkMode = checkDarkMode();
 
   const toggleDropdown = () => {
     setDropdownOpen((prevState) => !prevState);
@@ -47,12 +50,12 @@ export default function MobileMenu() {
   };
 
   return (
-    <>
+    <div className="bg-white dark:bg-[#121212] shadow-lg text-black dark:text-white fixed z-10 w-full">
       <Toolbar className="flex justify-between items-center w-full">
         <img
           src={'/images/logo.svg'}
           alt="Logo"
-          className="hover:opacity-50 hover:cursor-pointer h-24"
+          className={`hover:opacity-50 hover:cursor-pointer h-24 ${!isDarkMode && 'invert'}`}
           onClick={() => {
             if (dropdownOpen) {
               toggleDropdown();
@@ -72,26 +75,8 @@ export default function MobileMenu() {
         in={dropdownOpen}
         timeout="auto"
         unmountOnExit
-        className="relative mt-[-6rem] text-black dark:text-white bg-white dark:bg-[#121212] z-10"
+        className="relative text-black dark:text-white bg-white dark:bg-[#121212] z-10"
       >
-        <Toolbar className="flex justify-between items-center w-full">
-          <img
-            src={'/images/logo.svg'}
-            alt="Logo"
-            className="hover:opacity-50 hover:cursor-pointer h-24"
-            onClick={() => {
-              navigate('index');
-              toggleDropdown();
-            }}
-          />
-          <IconButton size="large" color="inherit" onClick={toggleDropdown}>
-            {dropdownOpen ? (
-              <CloseIcon fontSize="large" />
-            ) : (
-              <MenuIcon fontSize="large" />
-            )}
-          </IconButton>
-        </Toolbar>
         <List disablePadding>
           {/* Agenda */}
           <ListItem disablePadding>
@@ -388,6 +373,6 @@ export default function MobileMenu() {
           )}
         </List>
       </Collapse>
-    </>
+    </div>
   );
 }

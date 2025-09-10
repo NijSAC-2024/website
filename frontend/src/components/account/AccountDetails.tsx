@@ -158,7 +158,12 @@ export default function AccountDetails() {
               type="number"
               value={form.studentNumber}
               fullWidth
-              onChange={(e) => handleChange('studentNumber', parseInt(e.target.value))}
+              onChange={(e) => {
+                const studentNumber = parseInt(e.target.value);
+                if (!isNaN(studentNumber) && studentNumber >= 0) {
+                  handleChange('studentNumber', studentNumber);
+                }
+              }}
               error={!!errors.studentNumber}
               helperText={errors.studentNumber && text(errors.studentNumber as Language)}
             />
@@ -170,7 +175,12 @@ export default function AccountDetails() {
               type="number"
               value={form.sportcardNumber}
               fullWidth
-              onChange={(e) => handleChange('sportcardNumber', parseInt(e.target.value))}
+              onChange={(e) => {
+                const sportcardNumber = parseInt(e.target.value);
+                if (!isNaN(sportcardNumber) && sportcardNumber >= 0) {
+                  handleChange('sportcardNumber', sportcardNumber);
+                }
+              }}
               error={!!errors.sportcardNumber}
               helperText={errors.sportcardNumber && text(errors.sportcardNumber as Language)}
             />
@@ -182,7 +192,12 @@ export default function AccountDetails() {
               type="number"
               value={form.nkbvNumber}
               fullWidth
-              onChange={(e) => handleChange('nkbvNumber', parseInt(e.target.value))}
+              onChange={(e) => {
+                const nkbvNumber = parseInt(e.target.value);
+                if (!isNaN(nkbvNumber) && nkbvNumber >= 0) {
+                  handleChange('nkbvNumber', nkbvNumber);
+                }
+              }}
               error={!!errors.nkbvNumber}
               helperText={errors.nkbvNumber && text(errors.nkbvNumber as Language)}
             />

@@ -60,19 +60,20 @@ export default function Agenda() {
               )
               .flatMap((event: Event) =>
                 event.dates
+                  .map((date, originalIndex) => ({ date, originalIndex }))
                   .filter(
-                    (date) => filterPastEvents || moment(date.start).isAfter(moment(now))
+                    ({ date }) => filterPastEvents || moment(date.start).isAfter(moment(now))
                   )
-                  .map((date, index) => (
+                  .map(({ date, originalIndex }) => (
                     <EventCard
-                      key={`${event.id}-${index}`}
+                      key={`${event.id}-${originalIndex}`}
                       event={{
                         ...event,
                         dates: [date],
                         ...(event.dates.length > 1 && {
                           name: {
-                            en: `${event.name.en} ${index + 1}/${event.dates.length}`,
-                            nl: `${event.name.nl} ${index + 1}/${event.dates.length}`,
+                            en: `${event.name.en} ${originalIndex + 1}/${event.dates.length}`,
+                            nl: `${event.name.nl} ${originalIndex + 1}/${event.dates.length}`,
                           },
                         }),
                       }}
@@ -81,6 +82,7 @@ export default function Agenda() {
                     />
                   ))
               )}
+
         </div>
       </GenericPage>
     </>

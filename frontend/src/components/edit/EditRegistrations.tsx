@@ -90,13 +90,13 @@ export default function EditRegistrations({
                   {text('Maximum waiting queue', 'Maximale wachtrij')}
                 </p>
                 <Switch
-                  checked={!!waitingListMax}
+                  checked={waitingListMax !== undefined}
                   onChange={(_, checked) => {
                     handleEventChange({ waitingListMax: checked ? 10 : undefined });
                   }}
                 />
               </div>
-              <Collapse in={!!waitingListMax} timeout="auto" unmountOnExit>
+              <Collapse in={waitingListMax !== undefined} timeout="auto" unmountOnExit>
                 <TextField
                   fullWidth
                   type="number"
@@ -107,7 +107,7 @@ export default function EditRegistrations({
                   value={waitingListMax || 0}
                   onChange={(e) => {
                     waitingListMax = parseInt(e.target.value);
-                    if (!isNaN(waitingListMax) && waitingListMax > 0) {
+                    if (!isNaN(waitingListMax) && waitingListMax >= 0) {
                       handleEventChange({ waitingListMax });
                     }
                   }}

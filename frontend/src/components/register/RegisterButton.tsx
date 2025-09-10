@@ -96,7 +96,7 @@ export default function RegisterButton({
     }
 
     if (registrationCount && registrationMax && registrationCount >= registrationMax && !user?.roles.includes('admin')) {
-      if (waitingListCount && waitingListMax && waitingListCount >= waitingListMax) {
+      if (waitingListCount !== undefined && waitingListMax !== undefined && waitingListCount >= waitingListMax) {
         return <Button variant="contained" disabled>{text('Full', 'Vol')}</Button>;
       }
       if (canRegister) {
@@ -165,7 +165,7 @@ export default function RegisterButton({
             )}
             {registration && registration?.waitingListPosition != undefined && (
               <b>
-                {`${text('You are at position', 'Je staat op positie')} ${registration?.waitingListPosition+1} ${text('in de waiting queue.', 'op de wachtlijst.')}`}
+                {`${text('You are at position', 'Je staat op positie')} ${registration?.waitingListPosition+1} ${text('in the waiting queue.', 'op de wachtlijst.')}`}
               </b>
             )}
             <RegisterForm

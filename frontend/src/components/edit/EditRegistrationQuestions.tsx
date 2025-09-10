@@ -302,10 +302,9 @@ export default function EditRegistrationQuestions({
                   setAnchorEl(null);
                   setActiveQuestionId(null);
                 }}
-                sx={{ color: 'error.main' }}
               >
-                <DeleteIcon fontSize="small" className="mr-2" />
-                {text('Delete Question', 'Verwijder Vraag')}
+                <DeleteIcon color="error" fontSize="small" className="mr-2" />
+                <p className="dark:text-[#f44336] text-[#d32f2f]">{text('Delete Question', 'Verwijder Vraag')}</p>
               </MenuItem>
             </>
           ) : (
