@@ -70,7 +70,7 @@ export default function AccountDetails() {
   };
 
   return (
-    <ContentCard className="grid gap-1 p-7">
+    <ContentCard className="grid gap-1">
       <h1>{text('My account', 'Mijn account')}</h1>
       <Box component="form" onSubmit={handleSave}>
         {/* Personal information */}

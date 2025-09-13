@@ -24,7 +24,7 @@ export default function AcceptingMembers({
   const pendingUsers = users.filter((u) => u.status === 'pending');
 
   return (
-    <ContentCard className="grid gap-4 p-7 mb-5">
+    <ContentCard className="grid mb-5">
       <h1 className="text-2xl">{text('Pending members', 'Goed te keuren leden')}</h1>
       {pendingUsers.length === 0 ? (
         <p className="mt-2">{text('No pending members', 'Geen leden om goed te keuren')}</p>

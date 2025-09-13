@@ -41,7 +41,7 @@ export default function ChangePassword() {
   };
 
   return (
-    <ContentCard className="p-7 grid gap-3 mt-5">
+    <ContentCard className="grid gap-3 mt-5">
       <h1>{text('Change password', 'Verander wachtwoord')}</h1>
       <Box component="form" onSubmit={handleChangePassword}>
         <div className="grid gap-5 xl:grid-cols-2">

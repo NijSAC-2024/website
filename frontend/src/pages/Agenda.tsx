@@ -26,7 +26,7 @@ export default function Agenda() {
       <NewEventButton />
       <GenericPage>
         <div className="grid xl:grid-cols-3 lg:grid-cols-2 grid-flow-row gap-5">
-          <ContentCard className="lg:col-span-2 p-7">
+          <ContentCard className="lg:col-span-2">
             <div className="grid xl:grid-cols-2 justify-between">
               <h1>Agenda</h1>
               <div className="flex items-center xl:justify-end">
@@ -62,7 +62,7 @@ export default function Agenda() {
                 event.dates
                   .map((date, originalIndex) => ({ date, originalIndex }))
                   .filter(
-                    ({ date }) => filterPastEvents || moment(date.start).isAfter(moment(now))
+                    ({ date }) => filterPastEvents || moment(date.end).isAfter(moment(now))
                   )
                   .map(({ date, originalIndex }) => (
                     <EventCard

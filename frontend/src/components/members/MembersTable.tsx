@@ -71,7 +71,7 @@ export default function MembersTable({
   }, [filteredUsers, page, rowsPerPage]);
 
   return (
-    <ContentCard className="grid gap-4 p-7">
+    <ContentCard className="grid gap-4">
       <h1 className="text-3xl">{text('Members', 'Leden')}</h1>
       <TextField
         label={text('Search', 'Zoeken')}

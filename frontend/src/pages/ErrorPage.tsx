@@ -10,7 +10,7 @@ export default function ErrorPage({ error }: ErrorPageProbs) {
 
   return (
     <GenericPage>
-      <ContentCard className="p-7 grid justify-center">
+      <ContentCard className="grid justify-center">
         <h1 className="mx-auto text-9xl">Oops!</h1>
         <p className="mx-auto text-4xl">
           Sorry, an unexpected error has occurred.

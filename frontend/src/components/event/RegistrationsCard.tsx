@@ -60,7 +60,7 @@ export default function RegistrationsCard({ questions }: RegistrationsCardProps)
   return (
     <>
       {!!user && event?.requiredMembershipStatus.includes(user?.status) && (
-        <ContentCard className="xl:col-span-3 p-7">
+        <ContentCard className="xl:col-span-3">
           <h1>{text('Participants', 'Deelnemers')}</h1>
 
           {user?.roles.includes('admin') && (

@@ -43,7 +43,7 @@ export default function EditRegistrations({
 
   return (
     <ContentCard className="xl:col-span-3">
-      <div className="grid xl:grid-cols-2 justify-between p-7">
+      <div className="grid xl:grid-cols-2 justify-between">
         <h1>{text('Registrations', 'Inschrijvingen')}</h1>
         <div className="flex items-center xl:justify-end">
           <p>{text('Allow registrations', 'Open voor inschrijvingen')}</p>
@@ -54,7 +54,7 @@ export default function EditRegistrations({
         </div>
       </div>
       <Collapse in={!!registrationPeriod} timeout="auto" unmountOnExit>
-        <div className="grid p-7 gap-3 border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
+        <div className="grid gap-3 border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
           {/* Max Registrations and Registration Dates */}
           <div className="flex items-center">
             <p>

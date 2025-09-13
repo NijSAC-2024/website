@@ -29,7 +29,7 @@ export default function EditDates({
                 label={`${text('Start Date', 'Startdatum')} ${index + 1}`}
                 value={moment(date.start)}
                 onChange={(date) => {
-                  dates[index] = { start: date!.toISOString(), end: dates[0].end };
+                  dates[index] = { start: date!.toISOString(), end: dates[index].end };
                   handleEventChange({
                     dates
                   });
@@ -39,7 +39,7 @@ export default function EditDates({
                 label={`${text('End Date', 'Einddatum')} ${index + 1}`}
                 value={moment(date.end)}
                 onChange={(date) => {
-                  dates[index] = { end: date!.toISOString(), start: dates[0].start };
+                  dates[index] = { end: date!.toISOString(), start: dates[index].start };
                   handleEventChange({
                     dates
                   });

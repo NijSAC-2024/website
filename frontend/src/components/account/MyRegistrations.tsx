@@ -15,7 +15,7 @@ export default function MyRegistrations() {
 
   return (
     <>
-      <ContentCard className="p-7 mt-5">
+      <ContentCard className="mt-5">
         <div className="grid xl:grid-cols-2 justify-between">
           <h1>{text('My registrations', 'Mijn inschrijvingen')}</h1>
           <div className="flex items-center xl:justify-end">

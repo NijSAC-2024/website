@@ -18,7 +18,7 @@ export default function AgendaFilter({
 }: AgendaFilterProps) {
   const { text } = useLanguage();
   return (
-    <ContentCard className="xl:col-span-1 lg:col-span-2 p-7">
+    <ContentCard className="xl:col-span-1 lg:col-span-2">
       <h2 className="mb-3">{text('Filter', 'Filteren')}</h2>
       <div className="grid gap-3">
         <FormControl fullWidth>
