@@ -253,7 +253,10 @@ pub async fn update_registration(
 
     let event = store.get_event(&registration.event_id, true).await?;
 
-    ensure_signup_has_not_passed(&event)?;
+    if update_all_full_event_access(&session).is_err() {
+        ensure_signup_has_not_passed(&event)?;
+    }
+
     ensure_correct_waiting_list_position(
         &event,
         &mut updated,
