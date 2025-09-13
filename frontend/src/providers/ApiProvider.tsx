@@ -21,7 +21,7 @@ interface ApiContextType {
   deleteEvent: (eventId: string) => Promise<void>;
   getRegistration: (eventId: string, registrationId: string) => Promise<Registration | undefined>;
   createRegistration: (eventId: string, userId: string | undefined, answers: Answer[]) => Promise<void>;
-  updateRegistration: (eventId: string, registrationId: string, answers: Answer[], attended?: boolean) => Promise<void>;
+  updateRegistration: (eventId: string, registrationId: string, answers: Answer[], attended?: boolean, waitingListPosition?: number) => Promise<void>;
   deleteRegistration: (eventId: string, registrationId: string) => Promise<void>;
   createUser: (user: UserContent) => Promise<void>;
   updateUser: (userId: string, updates: Partial<User>) => Promise<void>;
@@ -161,10 +161,10 @@ export default function ApiProvider({ children }: ApiProviderProps) {
     enqueueSnackbar(text('Registered', 'Ingeschreven'), { variant: 'success' });
   };
 
-  const updateRegistration = async (eventId: string, registrationId: string, answers: Answer[], attended?: boolean) => {
+  const updateRegistration = async (eventId: string, registrationId: string, answers: Answer[], attended?: boolean, waitingListPosition?: number) => {
     const { error } = await apiFetch<Event>(`/event/${eventId}/registration/${registrationId}`, {
       method: 'PUT',
-      body: JSON.stringify({ answers: answers, attended: attended })
+      body: JSON.stringify({ answers: answers, attended: attended, waitingListPosition: waitingListPosition })
     });
     if (error) {
       enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
@@ -269,7 +269,7 @@ export default function ApiProvider({ children }: ApiProviderProps) {
   }, [cache, isLoggedIn, route.name, user?.id]);
 
   useEffect(() => {
-    if ((route.name === 'agenda' || route.name === 'event' || route.name === 'account') && isLoggedIn && !(user?.status === 'pending')) {
+    if ((route.name === 'agenda' || route.name === 'event' || route.name === 'account') && isLoggedIn) {
       getRegisteredEvents(user?.id).then(registrations => {
         if (registrations) {
           setRegisteredEvents(registrations);
@@ -290,28 +290,27 @@ export default function ApiProvider({ children }: ApiProviderProps) {
     } else {
       setLocations([]);
     }
-  }, [cache, route.name]);
+  }, [route.name]);
 
   useEffect(() => {
     if (route.name === 'event') {
       getEvent(route.params!.id).then(event => {
         if (event) {
           setEvent(event);
+          if ((user && event.requiredMembershipStatus.includes(user.status)) || event.requiredMembershipStatus.includes('nonMember')) {
+            getRegistrations(route.params!.id).then(registrations => {
+              if (registrations) {
+                setRegistrations(registrations);
+              }
+            });
+          }
         }
       });
-
-      if (isLoggedIn && !(user?.status === 'pending')) {
-        getRegistrations(route.params!.id).then(registrations => {
-          if (registrations) {
-            setRegistrations(registrations);
-          }
-        });
-      }
     }
-  }, [cache, route.name, route.params, isLoggedIn]);
+  }, [cache, route.name, route.params, isLoggedIn, user?.status, user]);
 
   useEffect(() => {
-    if ((route.name === 'members' || route.name === 'event') && isLoggedIn) {
+    if ((route.name === 'members' || route.name === 'event') && isLoggedIn && !(user?.status === 'pending')) {
       getUsers().then(users => {
         if (users) {
           setUsers(users);
@@ -320,7 +319,7 @@ export default function ApiProvider({ children }: ApiProviderProps) {
     } else {
       setUsers([]);
     }
-  }, [cache, isLoggedIn, route.name]);
+  }, [isLoggedIn, route.name, user?.status]);
 
 
   let eventContent = undefined;

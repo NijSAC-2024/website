@@ -32,12 +32,12 @@ export default function RegistrationsCard({ questions }: RegistrationsCardProps)
     setRegisterDialogOpen(true);
   };
 
-  const handleRegistration = async (answers: Answer[], registrationId?: string, userId?: string) => {
+  const handleRegistration = async (answers: Answer[], registrationId?: string, userId?: string, waitinListPosition?: number) => {
     if (!event) {
       return;
     }
     if (registrationId) {
-      await updateRegistration(event?.id, registrationId, answers);
+      await updateRegistration(event?.id, registrationId, answers, undefined, waitinListPosition);
     } else {
       await createRegistration(event?.id, userId, answers);
     }

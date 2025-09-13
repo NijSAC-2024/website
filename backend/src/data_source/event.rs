@@ -557,18 +557,20 @@ impl EventStore {
 
     pub async fn get_registered_users(&self, id: &EventId) -> AppResult<Vec<BasicUser>> {
         Ok(sqlx::query_as!(
-            BasicUser,
-            r#"
-            SELECT u.id as user_id, u.first_name, u.infix, u.last_name
-            FROM event_registration ar
-                JOIN "user" u ON ar.user_id = u.id
-            WHERE ar.event_id = $1
-            "#,
-            **id
-        )
-        .fetch_all(&self.db)
-        .await?)
+        BasicUser,
+        r#"
+        SELECT u.id as user_id, u.first_name, u.infix, u.last_name
+        FROM event_registration ar
+            JOIN "user" u ON ar.user_id = u.id
+        WHERE ar.event_id = $1
+          AND ar.waiting_list_position IS NULL
+        "#,
+        **id
+    )
+            .fetch_all(&self.db)
+            .await?)
     }
+
 
     pub async fn get_user_registrations(&self, user_id: &UserId) -> AppResult<Vec<Registration>> {
         sqlx::query_as!(

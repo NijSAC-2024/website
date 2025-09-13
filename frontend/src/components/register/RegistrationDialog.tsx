@@ -10,7 +10,7 @@ interface RegistrationDialogProps {
   questions: Question[];
   selectedRegistration: Registration | null;
   selectedUser: User | null;
-  handleRegistration: (answers: Answer[], registrationId?: string, userId?: string) => void;
+  handleRegistration: (answers: Answer[], registrationId?: string, userId?: string, waitingListPosition?: number) => void;
   handleDeregisterClick: () => void;
 }
 
@@ -41,7 +41,7 @@ export default function RegistrationDialog({
           <RegisterForm
             registrationQuestions={questions}
             handleRegistration={(answers: Answer[]) =>
-              handleRegistration(answers, selectedRegistration?.registrationId, selectedUser?.id)
+              handleRegistration(answers, selectedRegistration?.registrationId, selectedUser?.id, selectedRegistration?.waitingListPosition)
             }
             existingAnswers={selectedRegistration?.answers}
           />

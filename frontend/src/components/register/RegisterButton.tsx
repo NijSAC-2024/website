@@ -80,7 +80,7 @@ export default function RegisterButton({
 
   const renderRegistrationStatus = () => {
     if (registration) {
-      if (closeTime < now) {
+      if (closeTime < now && !user?.roles.includes('admin')) {
         if (registration?.waitingListPosition !== undefined) {
           return <Button variant="contained" disabled>{text('In Queue', 'Op de wachtlijst')}</Button>;
         } else {

@@ -17,7 +17,9 @@ export default function RegistrationRow({ registration, questions, eventId, onEd
   const { user } = useAuth()
   return (
     <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-      <TableCell>{`${registration.firstName} ${registration.infix ?? ''} ${registration.lastName}`}</TableCell>
+      <TableCell>
+        {user?.roles.includes('admin') && registration.waitingListPosition !== undefined? <span className="text-[#1976d2] dark:text-[#90caf9]">{`${registration.firstName} ${registration.infix ?? ''} ${registration.lastName}`}</span> : `${registration.firstName} ${registration.infix ?? ''} ${registration.lastName}`}
+      </TableCell>
 
       {user?.roles.includes('admin') && questions.map((q) => {
         const answer = registration.answers?.find((a) => a.questionId === q.id)?.answer;
@@ -36,7 +38,7 @@ export default function RegistrationRow({ registration, questions, eventId, onEd
           <TableCell>
             <Checkbox
               checked={registration.attended}
-              onChange={(_, checked) => updateRegistration(eventId, registration.registrationId, registration.answers, checked)}
+              onChange={(_, checked) => updateRegistration(eventId, registration.registrationId, registration.answers, checked, registration.waitingListPosition)}
             />
           </TableCell>
           <TableCell>
