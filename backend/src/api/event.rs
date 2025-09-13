@@ -46,29 +46,46 @@ fn update_single_full_registration_access(id: &UserId, session: &Session) -> App
     }
 }
 
-fn read_all_basic_registrations_access(session: &Session) -> AppResult<()> {
-    if update_all_full_event_access(session).is_ok() || session.membership_status().is_member() {
-        Ok(())
-    } else {
-        Err(Error::Unauthorized)
-    }
-}
-
 pub async fn get_event_registrations(
     store: EventStore,
     Path(id): Path<EventId>,
-    session: Session,
+    session: Option<Session>,
 ) -> ApiResult<serde_json::Value> {
-    let res = if update_all_full_event_access(&session).is_ok() {
-        serde_json::to_value(store.get_registrations_detailed(&id).await?)?
-    } else if read_all_basic_registrations_access(&session).is_ok() {
-        serde_json::to_value(store.get_registered_users(&id).await?)?
-    } else {
-        Err(Error::Unauthorized)?
-    };
+    let event = store.get_event(&id, true).await?;
 
-    Ok(Json(res))
+    // Admins always get full access
+    if let Some(ref session) = session {
+        if update_all_full_event_access(session).is_ok() {
+            let regs = store.get_registrations_detailed(&id).await?;
+            return Ok(Json(serde_json::to_value(regs)?));
+        }
+    }
+
+    // If NonMember is accepted → anyone can view registrations
+    if event
+        .content
+        .required_membership_status
+        .contains(&MembershipStatus::NonMember)
+    {
+        let regs = store.get_registered_users(&id).await?;
+        return Ok(Json(serde_json::to_value(regs)?));
+    }
+
+    // Otherwise, user must be logged in AND have matching membership
+    if let Some(ref session) = session {
+        if event
+            .content
+            .required_membership_status
+            .contains(&session.membership_status())
+        {
+            let regs = store.get_registered_users(&id).await?;
+            return Ok(Json(serde_json::to_value(regs)?));
+        }
+    }
+
+    Err(Error::Unauthorized)
 }
+
 
 pub async fn get_user_registrations(
     store: EventStore,

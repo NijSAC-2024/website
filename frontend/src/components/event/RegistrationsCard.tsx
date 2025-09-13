@@ -59,7 +59,7 @@ export default function RegistrationsCard({ questions }: RegistrationsCardProps)
 
   return (
     <>
-      {!!user && event?.requiredMembershipStatus.includes(user?.status) && (
+      {((!!user && event?.requiredMembershipStatus.includes(user?.status)) || event?.requiredMembershipStatus.includes('nonMember')) && (
         <ContentCard className="xl:col-span-3">
           <h1>{text('Participants', 'Deelnemers')}</h1>
 
@@ -86,7 +86,6 @@ export default function RegistrationsCard({ questions }: RegistrationsCardProps)
                 ),
               )}
               questions={questions}
-              user={user}
               eventId={event?.id}
               onEditClick={handleEditClick}
             />

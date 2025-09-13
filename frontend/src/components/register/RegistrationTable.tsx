@@ -1,18 +1,19 @@
 import { Table, TableBody, TableCell, TableRow } from '@mui/material';
-import { Question, Registration, User } from '../../types.ts';
+import { Question, Registration } from '../../types.ts';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import RegistrationRow from './RegistrationRow.tsx';
+import {useAuth} from '../../providers/AuthProvider.tsx';
 
 interface RegistrationTableProps {
   registrations: Registration[];
   questions: Question[];
-  user: User | null;
   eventId: string;
   onEditClick: (registration: Registration) => void;
 }
 
-export default function RegistrationTable({ registrations, questions, user, eventId, onEditClick }: RegistrationTableProps) {
+export default function RegistrationTable({ registrations, questions, eventId, onEditClick }: RegistrationTableProps) {
   const { text } = useLanguage();
+  const { user } = useAuth()
 
   return (
     <div className="overflow-x-auto">
@@ -34,7 +35,6 @@ export default function RegistrationTable({ registrations, questions, user, even
                 key={r.userId}
                 registration={r}
                 questions={questions}
-                user={user}
                 eventId={eventId}
                 onEditClick={onEditClick}
               />

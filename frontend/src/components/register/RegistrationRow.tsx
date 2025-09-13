@@ -1,19 +1,20 @@
 import { Checkbox, TableCell, TableRow, IconButton } from '@mui/material';
 import { Edit } from '@mui/icons-material';
 import moment from 'moment';
-import { Question, Registration, User } from '../../types.ts';
+import { Question, Registration } from '../../types.ts';
 import {useApiState} from '../../providers/ApiProvider.tsx';
+import {useAuth} from '../../providers/AuthProvider.tsx';
 
 interface RegistrationRowProps {
   registration: Registration;
   questions: Question[];
-  user: User | null;
   eventId: string;
   onEditClick: (registration: Registration) => void;
 }
 
-export default function RegistrationRow({ registration, questions, user, eventId, onEditClick }: RegistrationRowProps) {
+export default function RegistrationRow({ registration, questions, eventId, onEditClick }: RegistrationRowProps) {
   const { updateRegistration } = useApiState()
+  const { user } = useAuth()
   return (
     <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
       <TableCell>{`${registration.firstName} ${registration.infix ?? ''} ${registration.lastName}`}</TableCell>
