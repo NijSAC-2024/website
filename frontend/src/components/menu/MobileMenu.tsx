@@ -14,13 +14,13 @@ import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
 import {useState} from 'react';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
-import { MenuType } from '../../types.ts';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import { useAuth } from '../../providers/AuthProvider.tsx';
 import UserMenu from './UserMenu.tsx';
 import { useAppState } from '../../providers/AppStateProvider.tsx';
 import SettingsIcon from '@mui/icons-material/Settings';
 import {useThemeMode} from '../../providers/ThemeProvider.tsx';
+import { MenuType } from './MainMenu.tsx';
 
 export default function MobileMenu() {
   const { text } = useLanguage();

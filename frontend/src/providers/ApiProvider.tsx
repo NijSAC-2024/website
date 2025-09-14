@@ -266,7 +266,7 @@ export default function ApiProvider({ children }: ApiProviderProps) {
     } else {
       setEvents([]);
     }
-  }, [cache, isLoggedIn, route.name, user?.id]);
+  }, [isLoggedIn, route.name, user?.id]);
 
   useEffect(() => {
     if ((route.name === 'agenda' || route.name === 'event' || route.name === 'account') && isLoggedIn) {
@@ -319,7 +319,7 @@ export default function ApiProvider({ children }: ApiProviderProps) {
     } else {
       setUsers([]);
     }
-  }, [isLoggedIn, route.name, user?.status]);
+  }, [cache, isLoggedIn, route.name, user?.status]);
 
 
   let eventContent = undefined;

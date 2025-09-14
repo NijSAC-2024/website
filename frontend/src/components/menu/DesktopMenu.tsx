@@ -4,11 +4,11 @@ import UserMenu from './UserMenu.tsx';
 import { useAuth } from '../../providers/AuthProvider.tsx';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import {MouseEvent, useEffect, useState} from 'react';
-import { MenuType } from '../../types.ts';
 import Link from '../Link.tsx';
 import { useAppState } from '../../providers/AppStateProvider.tsx';
 import SettingsIcon from '@mui/icons-material/Settings';
 import {useThemeMode} from '../../providers/ThemeProvider.tsx';
+import {MenuType} from './MainMenu.tsx';
 
 export default function DesktopMenu() {
   const { text } = useLanguage();

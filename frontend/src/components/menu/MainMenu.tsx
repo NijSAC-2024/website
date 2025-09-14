@@ -6,6 +6,12 @@ import MobileMenu from './MobileMenu.tsx';
 import { useAuth } from '../../providers/AuthProvider.tsx';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 
+export type MenuType =
+  | 'association'
+  | 'climbing'
+  | 'alps'
+  | undefined;
+
 export default function MainMenu() {
   const { text } = useLanguage();
   const { authOpen, toggleAuthOpen } = useAuth();
