@@ -1,3 +1,4 @@
+use crate::location::{Location, LocationContent};
 use crate::{
     AppState, Language,
     data_source::Count,
@@ -9,7 +10,6 @@ use axum::http::request::Parts;
 use sqlx::PgPool;
 use time::OffsetDateTime;
 use uuid::Uuid;
-use crate::location::{Location, LocationContent};
 
 pub struct PageStore {
     db: PgPool,
@@ -72,11 +72,16 @@ impl PageStore {
             SELECT COUNT(*) AS "count!" FROM pages
             "#
         )
-            .fetch_one(&self.db)
-            .await?)
+        .fetch_one(&self.db)
+        .await?)
     }
 
-    pub async fn create_page(&self, new: PageContent, slug: &str, created_by: Uuid) -> AppResult<Page> {
+    pub async fn create_page(
+        &self,
+        new: PageContent,
+        slug: &str,
+        created_by: Uuid,
+    ) -> AppResult<Page> {
         let page_id = Uuid::now_v7();
 
         Ok(sqlx::query_as!(
@@ -102,11 +107,7 @@ impl PageStore {
             .into())
     }
 
-    pub async fn update_page(
-        &self,
-        updated: PageContent,
-        slug: &str,
-    ) -> AppResult<Page> {
+    pub async fn update_page(&self, updated: PageContent, slug: &str) -> AppResult<Page> {
         Ok(sqlx::query_as!(
             PgPage,
             r#"
@@ -126,30 +127,23 @@ impl PageStore {
             updated.is_public,
             updated.content.en,
             updated.content.nl,
-
         )
-            .fetch_one(&self.db)
-            .await?
-            .into())
+        .fetch_one(&self.db)
+        .await?
+        .into())
     }
 
-
     pub async fn get_page(&self, slug: &str) -> AppResult<Page> {
-        Ok(sqlx::query_as!(
-            PgPage,
-            r#"SELECT * FROM pages WHERE slug = $1"#,
-            slug
+        Ok(
+            sqlx::query_as!(PgPage, r#"SELECT * FROM pages WHERE slug = $1"#, slug)
+                .fetch_one(&self.db)
+                .await?
+                .into(),
         )
-            .fetch_one(&self.db)
-            .await?
-            .into())
     }
 
     pub async fn delete_page(&self, slug: &str) -> AppResult<()> {
-        sqlx::query!(
-            r#"DELETE FROM pages WHERE slug = $1"#,
-            slug
-        )
+        sqlx::query!(r#"DELETE FROM pages WHERE slug = $1"#, slug)
             .execute(&self.db)
             .await?;
         Ok(())

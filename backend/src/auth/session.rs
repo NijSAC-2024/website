@@ -17,10 +17,10 @@ use axum::{
 use axum_extra::extract::{CookieJar, cookie::Cookie};
 use rand::distr::{Alphanumeric, SampleString};
 use sqlx::PgPool;
+use std::ops::Deref;
 use time::OffsetDateTime;
 use tracing::trace;
 use uuid::Uuid;
-use std::ops::Deref;
 
 pub struct Session {
     user_id: UserId,

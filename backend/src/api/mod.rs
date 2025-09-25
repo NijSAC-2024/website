@@ -3,8 +3,8 @@ mod event;
 mod file;
 mod location;
 mod material;
-mod user;
 mod page;
+mod user;
 
 use crate::{
     auth::{role::Role, session::Session},
@@ -23,10 +23,10 @@ pub use event::*;
 pub use file::*;
 pub use location::*;
 pub use material::*;
+pub use page::*;
 use serde::{Deserialize, de::DeserializeOwned};
 use serde_with::{DisplayFromStr, serde_as};
 pub use user::*;
-pub use page::*;
 use validator::Validate;
 
 type ApiResult<T> = Result<Json<T>, Error>;
