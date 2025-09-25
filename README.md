@@ -11,6 +11,7 @@ psql -h localhost -U nijsac -d nijsac < backend/src/data_source/fixtures/locatio
 psql -h localhost -U nijsac -d nijsac < backend/src/data_source/fixtures/committee.sql
 psql -h localhost -U nijsac -d nijsac < backend/src/data_source/fixtures/event.sql
 psql -h localhost -U nijsac -d nijsac < backend/src/data_source/fixtures/event_registration.sql
+psql -h localhost -U nijsac -d nijsac < backend/src/data_source/fixtures/pages.sql
 ```
 Windows
 ```shell

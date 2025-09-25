@@ -20,6 +20,7 @@ use sqlx::PgPool;
 use time::OffsetDateTime;
 use tracing::trace;
 use uuid::Uuid;
+use std::ops::Deref;
 
 pub struct Session {
     user_id: UserId,
@@ -27,6 +28,14 @@ pub struct Session {
     roles: Roles,
     membership_status: MembershipStatus,
     expiration: OffsetDateTime,
+}
+
+impl Deref for Session {
+    type Target = UserId;
+
+    fn deref(&self) -> &Self::Target {
+        &self.user_id
+    }
 }
 
 struct PgSession {
