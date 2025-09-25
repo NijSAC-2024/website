@@ -1,11 +1,10 @@
-use crate::page::PageContent;
 use crate::{
     ValidatedJson,
     api::ApiResult,
     auth::{role::Role, session::Session},
     data_source::PageStore,
     error::{AppResult, Error},
-    page::Page,
+    page::{Page, PageContent},
 };
 use axum::{Json, extract::Path};
 use std::ops::Deref;
