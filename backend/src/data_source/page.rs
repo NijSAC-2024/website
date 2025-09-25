@@ -1,12 +1,11 @@
-use crate::location::{Location, LocationContent};
 use crate::{
     AppState, Language,
     data_source::Count,
     error::{AppResult, Error},
+    location::{Location, LocationContent},
     page::{Page, PageContent},
 };
-use axum::extract::FromRequestParts;
-use axum::http::request::Parts;
+use axum::{extract::FromRequestParts, http::request::Parts};
 use sqlx::PgPool;
 use time::OffsetDateTime;
 use uuid::Uuid;
