@@ -1,16 +1,9 @@
-use crate::{
-    api::{
-        create_event, create_registration, delete_event, delete_registration, delete_user,
-        get_activities, get_all_users, get_event, get_event_registrations, get_material_list,
-        get_registration, get_user_materials, register, update_event, update_pwd,
-        update_registration, update_user, update_user_material, who_am_i,
-    },
-    auth::{login, logout},
-    create_location, delete_location, get_file_content, get_file_metadata, get_files, get_location,
-    get_locations, get_user, get_user_registrations, location_used_by,
-    state::AppState,
-    update_location, upload,
-};
+use crate::{api::{
+    create_event, create_registration, delete_event, delete_registration, delete_user,
+    get_activities, get_all_users, get_event, get_event_registrations, get_material_list,
+    get_registration, get_user_materials, register, update_event, update_pwd,
+    update_registration, update_user, update_user_material, who_am_i, get_page_content,
+}, auth::{login, logout}, create_location, create_page, delete_location, get_file_content, get_file_metadata, get_files, get_location, get_locations, get_user, get_user_registrations, location_used_by, state::AppState, update_location, update_page, upload};
 use axum::{
     Json, Router,
     extract::{DefaultBodyLimit, State},
@@ -57,7 +50,7 @@ fn api_router() -> Router<AppState> {
         .route("/user/{:id}/password", post(update_pwd))
         .route(
             "/user/{:id}/event_registrations",
-            post(get_user_registrations),
+            get(get_user_registrations),
         )
         .route("/user/{:id}/material", get(get_material_list))
         .route("/user/{:id}/getMaterial", get(get_user_materials))
@@ -83,6 +76,10 @@ fn api_router() -> Router<AppState> {
                 .delete(delete_location),
         )
         .route("/location/{:id}/used_by", get(location_used_by))
+        .route("/page/{:slug}",
+               get(get_page_content)
+                   .post(create_page)
+                    .put(update_page))
 }
 
 async fn version(State(state): State<AppState>) -> Json<String> {

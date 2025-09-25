@@ -9,4 +9,7 @@ psql -h localhost -U nijsac -d nijsac < backend/src/data_source/fixtures/user.sq
 psql -h localhost -U nijsac -d nijsac < backend/src/data_source/fixtures/location.sql
 psql -h localhost -U nijsac -d nijsac < backend/src/data_source/fixtures/event.sql
 psql -h localhost -U nijsac -d nijsac < backend/src/data_source/fixtures/event_registration.sql
+psql -h localhost -U nijsac -d nijsac < backend/src/data_source/fixtures/pages.sql
 ```
+
+

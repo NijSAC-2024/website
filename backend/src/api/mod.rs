@@ -3,6 +3,7 @@ mod file;
 mod location;
 mod material;
 mod user;
+mod page;
 
 use crate::error::Error;
 use axum::{
@@ -20,6 +21,7 @@ pub use material::*;
 use serde::{Deserialize, de::DeserializeOwned};
 use serde_with::{DisplayFromStr, serde_as};
 pub use user::*;
+pub use page::*;
 use validator::Validate;
 
 type ApiResult<T> = Result<Json<T>, Error>;

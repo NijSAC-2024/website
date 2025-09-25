@@ -149,3 +149,17 @@ create table "user_material"
     constraint fk_user
         foreign key (user_id) references "user" (id) on delete cascade
 );
+
+create table pages
+(
+    page_id      uuid        not null primary key,
+    page_name_nl text        not null,
+    page_name_en text        not null,
+    slug         text unique not null,
+    content_nl   text        not null default '',
+    content_en   text        not null default '',
+    is_public    boolean     not null default false, -- Probably no need for specific role
+    created_by   uuid        not null references "user" (id),
+    created      timestamptz not null,
+    updated      timestamptz not null
+);
