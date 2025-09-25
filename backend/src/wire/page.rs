@@ -1,9 +1,9 @@
+use crate::Language;
 use serde::{Deserialize, Serialize};
 use std::ops::Deref;
 use time::OffsetDateTime;
 use uuid::Uuid;
 use validator::Validate;
-use crate::Language;
 
 pub struct PageId(Uuid);
 
