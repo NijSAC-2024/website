@@ -255,9 +255,9 @@ export default function ApiProvider({ children }: ApiProviderProps) {
 
   //USE EFFECTS
 
-  // On the agenda page, fetch the events
+  // On the events page, fetch the events
   useEffect(() => {
-    if (route.name === 'agenda' || route.name === 'account') {
+    if (route.name === 'events' || route.name === 'account') {
       getEvents().then(events => {
         if (events) {
           setEvents(events);
@@ -269,7 +269,7 @@ export default function ApiProvider({ children }: ApiProviderProps) {
   }, [isLoggedIn, route.name, user?.id]);
 
   useEffect(() => {
-    if ((route.name === 'agenda' || route.name === 'event' || route.name === 'account') && isLoggedIn) {
+    if ((route.name === 'events' || route.name === 'event' || route.name === 'account') && isLoggedIn) {
       getRegisteredEvents(user?.id).then(registrations => {
         if (registrations) {
           setRegisteredEvents(registrations);

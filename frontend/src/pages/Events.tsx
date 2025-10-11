@@ -10,7 +10,7 @@ import AgendaFilter from '../components/agenda/AgendaFilter.tsx';
 import moment from 'moment/moment';
 import {Switch} from '@mui/material';
 
-export default function Agenda() {
+export default function Events() {
   const { text } = useLanguage();
   const { events, registeredEvents } = useApiState();
   const [category, setCategory] = useState<EventType | 'all'>(

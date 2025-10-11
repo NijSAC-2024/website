@@ -42,7 +42,7 @@ export default function Event() {
                 color="inherit"
                 onClick={() => navigate('agenda')}
               >
-                {text('Back to Agenda', 'Terug naar Agenda')}
+                {text('Back to Events', 'Terug naar Events')}
               </Button>
             </div>
             {!event?.isPublished && (

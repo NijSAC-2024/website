@@ -74,7 +74,7 @@ export default function EditEvent() {
         <div className="xl:col-span-3 mb-[-0.5rem] flex justify-between">
           <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">
             <Button color="inherit" onClick={() => navigate('agenda')}>
-              {text('Back to Agenda', 'Terug naar Agenda')}
+              {text('Back to Events', 'Terug naar Events')}
             </Button>
           </div>
           {!event.isPublished && (

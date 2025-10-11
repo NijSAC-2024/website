@@ -13,7 +13,7 @@ import { useLanguage } from './providers/LanguageProvider.tsx';
 import { parseLocation } from './router.ts';
 import Home from './pages/Home.tsx';
 import Signup from './pages/Signup.tsx';
-import Agenda from './pages/Agenda.tsx';
+import Events from './pages/Events.tsx';
 import ErrorPage from './pages/ErrorPage.tsx';
 import { useAppState } from './providers/AppStateProvider.tsx';
 import Event from './pages/Event.tsx';
@@ -139,8 +139,8 @@ export default function App(): React.ReactElement {
     component = <Home />;
   } else if (route.name.startsWith('register')) {
     component = <Signup />;
-  } else if (route.name == 'agenda') {
-    component = <Agenda />;
+  } else if (route.name == 'events') {
+    component = <Events />;
   } else if (route.name == 'event') {
     component = <Event />;
   } else if (route.name == 'edit_event' || route.name == 'new_event') {

@@ -78,11 +78,11 @@ export default function MobileMenu() {
         className="relative text-black dark:text-white bg-white dark:bg-[#121212] z-10"
       >
         <List disablePadding>
-          {/* Agenda */}
+          {/* Events */}
           <ListItem disablePadding>
             <ListItemButton
               onClick={() => {
-                navigate('agenda');
+                navigate('events');
                 toggleDropdown();
               }}>
               <ListItemText

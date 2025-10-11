@@ -52,7 +52,7 @@ export default function DesktopMenu() {
               className={`hover:opacity-50 hover:cursor-pointer h-24 mr-4 ${offset !== 0 && !isDarkMode && 'invert'} transition-all duration-200 ease-in-out`}
             />
           </Link>
-          <Button color="inherit" onClick={() => navigate('agenda')}>
+          <Button color="inherit" onClick={() => navigate('events')}>
             {text('Agenda', 'Agenda')}
           </Button>
 
