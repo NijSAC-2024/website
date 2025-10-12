@@ -35,7 +35,8 @@ export default function EditEvent() {
           requiredMembershipStatus: ['member'],
           eventType: 'activity',
           questions: [],
-          location: ''
+          location: '',
+          image: 'https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/76/52/1b/76521bcd-7c16-6404-b845-be35fc720792/AppIcon-0-0-1x_U007epad-0-85-220.png/1200x600wa.png'
         };
         setEvent(event);
       }
@@ -73,7 +74,7 @@ export default function EditEvent() {
       <div className="grid xl:grid-cols-3 gap-5 mt-[-9.3rem]">
         <div className="xl:col-span-3 mb-[-0.5rem] flex justify-between">
           <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">
-            <Button color="inherit" onClick={() => navigate('agenda')}>
+            <Button color="inherit" onClick={() => navigate('events')}>
               {text('Back to Events', 'Terug naar Events')}
             </Button>
           </div>

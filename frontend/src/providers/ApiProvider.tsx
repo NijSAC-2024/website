@@ -1,5 +1,15 @@
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import { Answer, Event, EventContent, Location, Registration, toEventContent, User, UserContent } from '../types.ts';
+import {
+  Answer, BasicUser,
+  Committee, CommitteeContent,
+  Event,
+  EventContent,
+  Location,
+  Registration,
+  toEventContent,
+  User, UserCommittee,
+  UserContent
+} from '../types.ts';
 import { useAppState } from './AppStateProvider.tsx';
 import { apiFetch, apiFetchVoid } from '../api.ts';
 import { enqueueSnackbar } from 'notistack';
@@ -15,6 +25,10 @@ interface ApiContextType {
   // TODO find a better name
   // Holds the registrations a logged-in user is registered for
   registeredEvents: Registration[];
+  committee?: Committee;
+  committees: Committee[];
+  committeeMembers: BasicUser[];
+  userCommittees: UserCommittee[];
   users: User[];
   createEvent: (event: EventContent) => Promise<void>;
   updateEvent: (eventId: string, event: EventContent) => Promise<void>;
@@ -26,6 +40,11 @@ interface ApiContextType {
   createUser: (user: UserContent) => Promise<void>;
   updateUser: (userId: string, updates: Partial<User>) => Promise<void>;
   updateUserPassword: (userId: string, password: string) => Promise<void>;
+  createCommittee: (committee: CommitteeContent) => Promise<void>;
+  updateCommittee: (id: string, committee: CommitteeContent) => Promise<void>;
+  deleteCommittee: (id: string) => Promise<void>;
+  addUserToCommittee: (committeeId: string, userId: string) => Promise<void>;
+  removeUserFromCommittee: (committeeId: string, userId: string) => Promise<void>;
 }
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
@@ -47,26 +66,35 @@ export default function ApiProvider({ children }: ApiProviderProps) {
   const [locations, setLocations] = useState<Array<Location> | undefined>(
     undefined
   );
+  const [committee, setCommittee] = useState<Committee | undefined>(undefined);
+  const [committees, setCommittees] = useState<Committee[]>([]);
+  const [committeeMembers, setCommitteeMembers] = useState<BasicUser[]>([]);
+  const [userCommittees, setUserCommittees] = useState<UserCommittee[]>([]);
   const [registrations, setRegistrations] = useState<Array<Registration>>([]);
   const [registeredEvents, setRegisteredEvents] = useState<Registration[]>([]);
   const [users, setUsers] = useState<User[]>([]);
 
   //LOCATIONS
-  const getLocations = async (): Promise<Location[] | undefined> => {
+  const getLocations = async () => {
     const { error, data } = await apiFetch<Array<Location>>('/location');
     if (error) {
       enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
     }
-    return data;
+    if (data) {
+      setLocations(data);
+    }
   };
 
   //EVENTS
-  const getEvents = async (): Promise<Event[] | undefined> => {
+  const getEvents = async () => {
     const { error, data } = await apiFetch<Array<Event>>('/event');
     if (error) {
       enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
     }
-    return data;
+    if (data)
+    {
+      setEvents(data);
+    }
   };
 
   const getEvent = async (id: string): Promise<Event | undefined> => {
@@ -119,15 +147,18 @@ export default function ApiProvider({ children }: ApiProviderProps) {
   };
 
   // REGISTRATIONS
-  const getRegisteredEvents = async (userId?: string): Promise<Registration[] | undefined> => {
+  const getRegisteredEvents = async (userId?: string) => {
     if (!userId) {
-      return [];
+      setRegisteredEvents([]);
+      return;
     }
     const { error, data } = await apiFetch<Array<Registration>>(`/user/${userId}/event_registrations`);
     if (error) {
       enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
     }
-    return data;
+    if (data) {
+      setRegisteredEvents(data);
+    }
   };
 
   const getRegistrations = async (eventId: string): Promise<Registration[] | undefined> => {
@@ -192,7 +223,9 @@ export default function ApiProvider({ children }: ApiProviderProps) {
     if (error) {
       enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
     }
-    return data || [];
+    if (data) {
+      setUsers(data);
+    }
   };
 
   const createUser = async (user: UserContent) => {
@@ -253,44 +286,168 @@ export default function ApiProvider({ children }: ApiProviderProps) {
     enqueueSnackbar(text('Password changed', 'Wachtwoord aangepast'), { variant: 'success' });
   }
 
+  //COMMITTEES
+  const getCommittees = async () => {
+    const { error, data } = await apiFetch<Committee[]>('/committee');
+    if (error) {
+      enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
+      return;
+    }
+    if (data) {
+      setCommittees(data);
+    }
+  };
+
+  const getCommittee = async (id: string) => {
+    const { error, data } = await apiFetch<Committee>(`/committee/${id}`);
+    if (error) {
+      enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
+      return;
+    }
+    if (data) {
+      setCommittee(data);
+    }
+  };
+
+  const createCommittee = async (committee: CommitteeContent) => {
+    const { error } = await apiFetch<Committee>('/committee', {
+      method: 'POST',
+      body: JSON.stringify(committee)
+    });
+    if (error) {
+      enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
+      return;
+    }
+    setCache(!cache);
+    enqueueSnackbar(text('Committee created', 'Commissie aangemaakt'), { variant: 'success' });
+  };
+
+  const updateCommittee = async (id: string, committee: CommitteeContent) => {
+    const { error } = await apiFetch<Committee>(`/committee/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(committee)
+    });
+    if (error) {
+      enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
+      return;
+    }
+    enqueueSnackbar(text('Committee updated', 'Commissie bijgewerkt'), { variant: 'success' });
+    setCache(!cache);
+  };
+
+  const deleteCommittee = async (id: string) => {
+    const { error } = await apiFetchVoid(`/committee/${id}`, { method: 'DELETE' });
+    if (error) {
+      enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
+      return;
+    }
+    setCache(!cache);
+    enqueueSnackbar(text('Committee deleted', 'Commissie verwijderd'), { variant: 'success' });
+  };
+
+  const addUserToCommittee = async (committeeId: string, userId: string) => {
+    const { error } = await apiFetchVoid(`/committee/${committeeId}/user/${userId}`, { method: 'POST' });
+    if (error) {
+      enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
+      return;
+    }
+    enqueueSnackbar(text('User added to committee', 'Gebruiker toegevoegd aan commissie'), { variant: 'success' });
+  };
+
+  const removeUserFromCommittee = async (committeeId: string, userId: string) => {
+    const { error } = await apiFetchVoid(`/committee/${committeeId}/user/${userId}`, { method: 'DELETE' });
+    if (error) {
+      enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
+      return;
+    }
+    enqueueSnackbar(text('User removed from committee', 'Gebruiker verwijderd van commissie'), { variant: 'success' });
+  };
+
+  const getCommitteeMembers = async (id: string) => {
+    const { error, data } = await apiFetch<BasicUser[]>(`/committee/${id}/members`);
+    if (error) {
+      enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
+      return;
+    }
+    if (data) {
+      setCommitteeMembers(data);
+    }
+  };
+
+  const getUserCommittees = async (userId?: string) => {
+    if (!userId) {
+      setUserCommittees([]);
+      return;
+    }
+    const { error, data } = await apiFetch<UserCommittee[]>(`/user/${userId}/committees`);
+    if (error) {
+      enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
+      return;
+    }
+    if (data) {
+      setUserCommittees(data);
+    }
+  };
+
   //USE EFFECTS
 
   // On the events page, fetch the events
   useEffect(() => {
     if (route.name === 'events' || route.name === 'account') {
-      getEvents().then(events => {
-        if (events) {
-          setEvents(events);
-        }
-      });
+      getEvents();
     } else {
       setEvents([]);
     }
-  }, [isLoggedIn, route.name, user?.id]);
+  }, [route.name]);
+
+  useEffect(() => {
+    if (route.name === 'committees' || route.name === 'account') {
+      getCommittees();
+    } else {
+      setCommittees([]);
+    }
+  }, [route.name]);
+
+  useEffect(() => {
+    if (route.name === 'committee') {
+      getCommittee(route.params!.id);
+      if (user) {
+        getCommitteeMembers(route.params!.id);
+      }
+    } else {
+      setEvents([]);
+    }
+  }, [route.name, route.params, user]);
 
   useEffect(() => {
     if ((route.name === 'events' || route.name === 'event' || route.name === 'account') && isLoggedIn) {
-      getRegisteredEvents(user?.id).then(registrations => {
-        if (registrations) {
-          setRegisteredEvents(registrations);
-        }
-      });
+      getRegisteredEvents(user?.id);
     } else {
       setRegisteredEvents([]);
     }
   }, [cache, isLoggedIn, route.name, user?.id]);
 
   useEffect(() => {
+    if ((route.name === 'account' || route.name === 'committee') && isLoggedIn) {
+      getUserCommittees(user?.id);
+    } else {
+      setUserCommittees([]);
+    }
+  }, [cache, isLoggedIn, route.name, user?.id]);
+
+  useEffect(() => {
     if (route.name === 'event' || route.name === 'new_event' || route.name === 'edit_event') {
-      getLocations().then(locations => {
-        if (locations) {
-          setLocations(locations);
-        }
-      });
+      getLocations();
     } else {
       setLocations([]);
     }
   }, [route.name]);
+
+  useEffect(() => {
+    if ((route.name === 'members' || route.name === 'event') && isLoggedIn && !(user?.status === 'pending')) {
+      getUsers();
+    }
+  }, [cache, isLoggedIn, route.name, user?.status]);
 
   useEffect(() => {
     if (route.name === 'event') {
@@ -309,19 +466,6 @@ export default function ApiProvider({ children }: ApiProviderProps) {
     }
   }, [cache, route.name, route.params, isLoggedIn, user?.status, user]);
 
-  useEffect(() => {
-    if ((route.name === 'members' || route.name === 'event') && isLoggedIn && !(user?.status === 'pending')) {
-      getUsers().then(users => {
-        if (users) {
-          setUsers(users);
-        }
-      });
-    } else {
-      setUsers([]);
-    }
-  }, [cache, isLoggedIn, route.name, user?.status]);
-
-
   let eventContent = undefined;
   if (event) {
     eventContent = toEventContent(event);
@@ -336,6 +480,10 @@ export default function ApiProvider({ children }: ApiProviderProps) {
         locations,
         registrations,
         registeredEvents,
+        committee,
+        committees,
+        committeeMembers,
+        userCommittees,
         users,
         createEvent,
         updateEvent,
@@ -346,7 +494,12 @@ export default function ApiProvider({ children }: ApiProviderProps) {
         deleteRegistration,
         createUser,
         updateUser,
-        updateUserPassword
+        updateUserPassword,
+        createCommittee,
+        updateCommittee,
+        deleteCommittee,
+        addUserToCommittee,
+        removeUserFromCommittee
       }}
     >
       {children}

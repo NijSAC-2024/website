@@ -9,7 +9,7 @@ COPY ./frontend ./
 
 RUN npm run build
 
-FROM rust:1.90 AS backend
+FROM rust:latest AS backend
 
 WORKDIR /src
 COPY ./backend/ ./

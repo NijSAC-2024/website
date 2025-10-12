@@ -40,7 +40,7 @@ export default function Event() {
             <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">
               <Button
                 color="inherit"
-                onClick={() => navigate('agenda')}
+                onClick={() => navigate('events')}
               >
                 {text('Back to Events', 'Terug naar Events')}
               </Button>

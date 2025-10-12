@@ -10,12 +10,17 @@ psql -h localhost -U nijsac -d nijsac < backend/src/data_source/fixtures/user.sq
 psql -h localhost -U nijsac -d nijsac < backend/src/data_source/fixtures/location.sql
 psql -h localhost -U nijsac -d nijsac < backend/src/data_source/fixtures/event.sql
 psql -h localhost -U nijsac -d nijsac < backend/src/data_source/fixtures/event_registration.sql
+psql -h localhost -U nijsac -d nijsac < backend/src/data_source/fixtures/committee.sql
 ```
 Windows
+```shell
+docker exec website-db-1 rm -rf /tmp/fixtures
+```
 ```shell
 docker cp backend/src/data_source/fixtures website-db-1:/tmp/fixtures
 ```
 ```shell
+docker exec -i website-db-1 psql -U nijsac -d nijsac -f /tmp/fixtures/committee.sql
 docker exec -i website-db-1 psql -U nijsac -d nijsac -f /tmp/fixtures/event_registration.sql
 docker exec -i website-db-1 psql -U nijsac -d nijsac -f /tmp/fixtures/event.sql
 docker exec -i website-db-1 psql -U nijsac -d nijsac -f /tmp/fixtures/location.sql

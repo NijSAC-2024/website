@@ -15,8 +15,9 @@ export type MembershipStatus =
   | 'nonMember'
   | 'donor';
 
-export type QuestionTypeType = 'text' | 'multipleChoice' | 'number' | 'boolean' | 'date';
+export type CommitteeRoleType = 'chair' | 'member';
 
+export type QuestionTypeType = 'text' | 'multipleChoice' | 'number' | 'boolean' | 'date';
 export interface QuestionType {
   type: QuestionTypeType;
   options?: Language[];
@@ -41,7 +42,8 @@ export interface OptionsType {
     | QuestionType
     | ExperienceType
     | QuestionTypeType
-    | RoleType;
+    | RoleType
+    | CommitteeRoleType;
   label: Language;
 }
 
@@ -126,6 +128,31 @@ export interface LocationContent {
   name: Language;
   reusable: boolean;
   description?: Language;
+}
+
+export interface UserCommittee {
+  id: string;
+  userId: string;
+  committeeId: string;
+  role: CommitteeRoleType;
+  joined: string;
+  left?: string;
+}
+
+export function toCommitteeContent(committee: Committee | undefined): CommitteeContent {
+  return {...committee} as unknown as CommitteeContent;
+}
+
+export interface Committee extends CommitteeContent {
+  id: string;
+  created: string;
+  updated: string;
+}
+
+export interface CommitteeContent {
+  name: Language;
+  description?: Language;
+  image?: string;
 }
 
 export function toUserContent(user: User | undefined, password: string = ''): UserContent {

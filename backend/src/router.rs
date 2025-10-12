@@ -1,32 +1,33 @@
 use crate::{
     api::{
         create_event, create_registration, delete_event, delete_registration, delete_user,
-        get_activities, get_all_users, get_event, get_event_registrations, get_material_list,
+        get_activities, get_all_users, get_event, get_event_registrations, get_user_committees, get_material_list,
         get_registration, get_user_materials, register, update_event, update_pwd,
-        update_registration, update_user, update_user_material, who_am_i,
+        update_registration, update_user, update_user_material, who_am_i, get_committees, 
+        get_committee, create_committee, update_committee, delete_committee, add_user_to_committee, 
+        remove_user_from_committee, get_committee_members, create_location, delete_location, 
+        get_file_content, get_file_metadata, get_files, get_location, update_location, upload,
+        get_locations, get_user, get_user_registrations, location_used_by,
     },
     auth::{login, logout},
-    create_location, delete_location, get_file_content, get_file_metadata, get_files, get_location,
-    get_locations, get_user, get_user_registrations, location_used_by,
     state::AppState,
-    update_location, upload,
 };
 use axum::{
     Json, Router,
     extract::{DefaultBodyLimit, State},
     routing::{get, post, put},
 };
-use memory_serve::{MemoryServe, load_assets};
+// use memory_serve::{MemoryServe, load_assets};
 use tower_http::{trace, trace::TraceLayer};
 use tracing::Level;
 
 pub fn create_router(state: AppState) -> Router {
-    let memory_router = MemoryServe::new(load_assets!("../frontend/dist"))
-        .index_file(Some("/index.html"))
-        .into_router();
+    // let memory_router = MemoryServe::new(load_assets!("../frontend/dist"))
+    //     .index_file(Some("/index.html"))
+    //     .into_router();
 
     Router::new()
-        .merge(memory_router)
+        // .merge(memory_router)
         .nest("/api", api_router())
         .layer(
             TraceLayer::new_for_http()
@@ -59,6 +60,7 @@ fn api_router() -> Router<AppState> {
             "/user/{:id}/event_registrations",
             get(get_user_registrations),
         )
+        .route("/user/{:id}/committees", get(get_user_committees))
         .route("/user/{:id}/material", get(get_material_list))
         .route("/user/{:id}/getMaterial", get(get_user_materials))
         .route("/user/{:id}/material/update", put(update_user_material))
@@ -85,6 +87,19 @@ fn api_router() -> Router<AppState> {
                 .delete(delete_location),
         )
         .route("/location/{:id}/used_by", get(location_used_by))
+        .route("/committee", get(get_committees).post(create_committee))
+        .route(
+            "/committee/{:id}",
+            get(get_committee).put(update_committee).delete(delete_committee),
+        )
+        .route(
+            "/committee/{:id}/user/{:user_id}",
+            post(add_user_to_committee).delete(remove_user_from_committee),
+        )
+        .route(
+            "/committee/{:id}/members",
+            get(get_committee_members),
+        )
 }
 
 async fn version(State(state): State<AppState>) -> Json<String> {

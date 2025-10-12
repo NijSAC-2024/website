@@ -19,7 +19,7 @@ interface EditAgendaCardProps {
 
 export default function EditAgendaCard({
   category,
-  image = 'https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/76/52/1b/76521bcd-7c16-6404-b845-be35fc720792/AppIcon-0-0-1x_U007epad-0-85-220.png/1200x600wa.png',
+  image,
   metadata,
   name,
   dates,

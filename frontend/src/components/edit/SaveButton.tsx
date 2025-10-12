@@ -28,7 +28,7 @@ export default function SaveButton({ id, handleSave, event }: SaveButtonProps) {
   const handleDelete = async () => {
     await deleteEvent(id);
     toggleDialog();
-    navigate('agenda');
+    navigate('events');
   };
 
   const toggleDialog = () => setDialogOpen((prevState) => !prevState);
@@ -41,7 +41,7 @@ export default function SaveButton({ id, handleSave, event }: SaveButtonProps) {
         className="fixed bottom-5 right-5 z-100 hover:dark:bg-[#42a5f5] hover:bg-[#1565c0] hover:shadow-2xl shadow-xl duration-300 dark:bg-[#90caf9] bg-[#1976d2] text-white rounded-3xl py-1 px-3 dark:text-black">
         <Button color="inherit" disabled={!event.location || !event.name.nl || ! event.name.en || !event.eventType || moment(event.dates[0].end).isBefore(moment(event.dates[0].start)) || (!!event.registrationPeriod && moment(event.registrationPeriod.end).isBefore(moment(event.registrationPeriod.start)))} onClick={() => handleSave(true)}>
           <SaveIcon className="mr-2" />
-          {id ? text('Update Event', 'Evenement updaten') : text('Publish Event', 'Evenement publiceren')}
+          {id ? text('Update Event', 'Evenement bijwerken') : text('Publish Event', 'Evenement publiceren')}
         </Button>
         <Tooltip
           title={
@@ -63,12 +63,12 @@ export default function SaveButton({ id, handleSave, event }: SaveButtonProps) {
                 {text('Save As Draft', 'Opslaan als concept')}
               </Button>
             </div>
-            <div className="flex justify-self-start">
+            {id && <div className="flex justify-self-start">
               <Button color="inherit" onClick={toggleDialog}>
                 <DeleteIcon className="mr-2" />
                 {text('Delete Event', 'Evenement verwijderen')}
               </Button>
-            </div>
+            </div>}
           </div>
         </Collapse>
       </div>

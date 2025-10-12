@@ -3,6 +3,7 @@ mod file;
 mod location;
 mod material;
 mod user;
+pub(crate) mod committee;
 
 use axum::http::HeaderMap;
 pub use file::*;

@@ -3,6 +3,7 @@ mod file;
 mod location;
 mod material;
 mod user;
+mod committee;
 
 use crate::error::Error;
 use axum::{
@@ -17,6 +18,7 @@ pub use event::*;
 pub use file::*;
 pub use location::*;
 pub use material::*;
+pub use committee::*;
 use serde::{Deserialize, de::DeserializeOwned};
 use serde_with::{DisplayFromStr, serde_as};
 pub use user::*;

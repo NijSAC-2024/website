@@ -3,7 +3,7 @@ import GroupIcon from '@mui/icons-material/Group';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import moment from 'moment';
 import { Chip } from '@mui/material';
-import { getLabel } from '../../util.ts';
+import {getLabel, truncateMarkdown} from '../../util.ts';
 import 'moment/dist/locale/nl';
 import {DateType, Event, Registration} from '../../types.ts';
 import Markdown from 'react-markdown';
@@ -56,28 +56,6 @@ export default function EventCard({ event, agendaPage, registration }: AgendaCar
         );
       }
     }
-  };
-
-  const truncateMarkdown = (markdown: string, maxLength: number): string => {
-    if (markdown.length <= maxLength) {
-      return markdown;
-    }
-
-    let truncated = markdown.slice(0, maxLength);
-    const lastCut = Math.max(
-      truncated.lastIndexOf(' '),
-      truncated.lastIndexOf('\n')
-    );
-    truncated = lastCut > -1 ? truncated.slice(0, lastCut) : truncated;
-
-    const unmatchedTags = (truncated.match(/(\*\*|\*|_|`)/g) || []).length % 2;
-    if (unmatchedTags) {
-      truncated = truncated.slice(
-        0,
-        truncated.lastIndexOf((truncated.match(/(\*\*|\*|_|`)/g) || []).pop()!)
-      );
-    }
-    return truncated.trim() + '…';
   };
 
   let imageUrl = '/images/test-header-image.jpg'

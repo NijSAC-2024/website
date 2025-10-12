@@ -21,6 +21,9 @@ import Settings from './pages/Settings.tsx';
 import Account from './pages/Account.tsx';
 import EditEvent from './components/edit/EditEvent.tsx';
 import Members from './pages/Members.tsx';
+import Committees from './pages/Committees.tsx';
+import Committee from './pages/Committee.tsx';
+import EditCommittee from "./components/committee/EditCommittee.tsx";
 
 export default function App(): React.ReactElement {
   const { navigate, route } = useAppState();
@@ -151,6 +154,12 @@ export default function App(): React.ReactElement {
     component = <Account />;
   } else if (route.name == 'members') {
     component = <Members />;
+  } else if (route.name == 'committees') {
+    component = <Committees />;
+  } else if (route.name == 'committee') {
+    component = <Committee />;
+  } else if (route.name == 'edit_committee' || route.name == 'new_committee') {
+    component = <EditCommittee />;
   } else {
     console.log('not found');
     component = <ErrorPage error={'Page not found'} />;

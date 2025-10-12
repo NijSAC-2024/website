@@ -6,6 +6,7 @@ pub mod file;
 pub mod location;
 pub mod material;
 pub mod user;
+pub mod committee;
 
 #[derive(Serialize, Deserialize, Debug, Validate, Default)]
 pub struct Language {

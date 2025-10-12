@@ -75,7 +75,7 @@ export default function DesktopMenu() {
             <MenuItem onClick={handleMenuClose}>
               {text('Board', 'Bestuur')}
             </MenuItem>
-            <MenuItem onClick={handleMenuClose}>
+            <MenuItem onClick={() => navigateSubmenu('committees')}>
               {text('Committees', 'Commissies')}
             </MenuItem>
             <MenuItem onClick={handleMenuClose}>

@@ -15,7 +15,11 @@ export const routes = [
   ['/not-found', 'not_found'],
   ['/settings', 'settings'],
   ['/account', 'account'],
-  ['/members', 'members']
+  ['/members', 'members'],
+  ['/committees', 'committees'],
+  ['/committees/new', 'new_committee'],
+  ['/committee/:id', 'committee'],
+  ['/committee/:id/edit', 'edit_committee'],
 ];
 
 function toRouteObject(route: string[]): Route {
