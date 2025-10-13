@@ -63,7 +63,7 @@ export default function EditEvent() {
       navigate('event', { id });
     } else {
       await createEvent({ ...event, isPublished: bool });
-      navigate('agenda');
+      navigate('events');
     }
   };
 
@@ -92,6 +92,7 @@ export default function EditEvent() {
           name={event.name}
           metadata={event.metadata}
           location={event.location}
+          createdBy={event.createdBy}
           handleEventChange={handleEventChange}
         />
 

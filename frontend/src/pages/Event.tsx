@@ -8,11 +8,12 @@ import { useAppState } from '../providers/AppStateProvider.tsx';
 import { useLanguage } from '../providers/LanguageProvider.tsx';
 import { useAuth } from '../providers/AuthProvider.tsx';
 import { useApiState } from '../providers/ApiProvider.tsx';
+import {isAdminOrBoard} from '../util.ts';
 
 export default function Event() {
   const { text } = useLanguage();
   const { navigate } = useAppState();
-  const { event, registeredEvents } = useApiState();
+  const { event, registeredEvents, userCommittees } = useApiState();
   const { isLoggedIn, user } = useAuth();
 
 
@@ -22,7 +23,7 @@ export default function Event() {
 
   return (
     <>
-      {isLoggedIn && (user?.roles.includes('admin') || user?.roles.includes('activityCommissionMember')) && (
+      {isLoggedIn && (isAdminOrBoard(user) || userCommittees.some(uc => uc.left == null && uc.committeeId === event.createdBy)) && (
         <div className="fixed bottom-5 right-5 z-10">
           <Fab
             variant="extended"
@@ -35,7 +36,7 @@ export default function Event() {
         </div>
       )}
       <GenericPage image={event.image}>
-        <div className="grid xl:grid-cols-3 gap-5 mt-[-9.3rem]">
+        <div className="grid xl:grid-cols-3 gap-5">
           <div className="xl:col-span-3 mb-[-0.5rem] flex justify-between items-center">
             <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">
               <Button
@@ -65,6 +66,7 @@ export default function Event() {
             }
             worga={event.metadata?.worga || ''}
             category={event.eventType}
+            createdBy={event.createdBy}
           />
           <RegistrationsCard questions={event.questions} />
         </div>

@@ -1,6 +1,3 @@
-TRUNCATE  TABLE committee;
-TRUNCATE  TABLE user_committee;
-
 -- Committees
 INSERT INTO committee (id, name_nl, name_en, description_nl, description_en, created, updated)
 VALUES

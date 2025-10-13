@@ -42,7 +42,7 @@ export default function DesktopMenu() {
   };
 
   return (
-    <div className={`${offset === 0 ? 'bg-transparent text-white' : 'bg-white dark:bg-[#121212] shadow-lg text-black dark:text-white'} fixed transition-all duration-200 ease-in-out z-10 w-full`}>
+    <div className={`${offset === 0 ? 'bg-transparent text-white' : 'bg-white dark:bg-[#121212] shadow-lg  dark:text-white'} fixed transition-all duration-200 ease-in-out z-10 w-full`}>
       <Toolbar className="flex justify-between w-[80%] max-w-[1050px] mx-auto">
         <div className="flex items-center">
           <Link routeName={'index'}>

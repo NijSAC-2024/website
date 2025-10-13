@@ -248,7 +248,7 @@ impl CommitteeStore {
             u.last_name
         FROM "user" u
         JOIN user_committee uc ON u.id = uc.user_id
-        WHERE uc.committee_id = $1
+        WHERE uc.committee_id = $1 AND uc."left" IS NULL
         "#,
         committee_id
     )

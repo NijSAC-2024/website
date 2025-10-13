@@ -4,6 +4,8 @@ import moment from 'moment';
 import { Question, Registration } from '../../types.ts';
 import {useApiState} from '../../providers/ApiProvider.tsx';
 import {useAuth} from '../../providers/AuthProvider.tsx';
+import {useAppState} from '../../providers/AppStateProvider.tsx';
+import {isAdminOrBoard} from '../../util.ts';
 
 interface RegistrationRowProps {
   registration: Registration;
@@ -15,13 +17,18 @@ interface RegistrationRowProps {
 export default function RegistrationRow({ registration, questions, eventId, onEditClick }: RegistrationRowProps) {
   const { updateRegistration } = useApiState()
   const { user } = useAuth()
+  const { navigate } = useAppState()
   return (
     <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
       <TableCell>
-        {user?.roles.includes('admin') && registration.waitingListPosition !== undefined? <span className="text-[#1976d2] dark:text-[#90caf9]">{`${registration.firstName} ${registration.infix ?? ''} ${registration.lastName}`}</span> : `${registration.firstName} ${registration.infix ?? ''} ${registration.lastName}`}
+        {<p className="hover:cursor-pointer hover:opacity-60 transition-all duration-100" onClick={() => registration.userId && navigate('user', { id: registration.userId})}>
+          {isAdminOrBoard(user) && registration.waitingListPosition !== undefined?
+            <span className="text-[#1976d2] dark:text-[#90caf9]">{`${registration.firstName} ${registration.infix ?? ''} ${registration.lastName}`}</span> 
+            : `${registration.firstName} ${registration.infix ?? ''} ${registration.lastName}`}
+        </p>}
       </TableCell>
 
-      {user?.roles.includes('admin') && questions.map((q) => {
+      {isAdminOrBoard(user) && questions.map((q) => {
         const answer = registration.answers?.find((a) => a.questionId === q.id)?.answer;
 
         if (q.questionType.type === 'boolean') {
@@ -33,7 +40,7 @@ export default function RegistrationRow({ registration, questions, eventId, onEd
         return <TableCell key={`${registration.registrationId}-${q.id}`}>{answer || ''}</TableCell>;
       })}
 
-      {user?.roles.includes('admin') && (
+      {isAdminOrBoard(user) && (
         <>
           <TableCell>
             <Checkbox

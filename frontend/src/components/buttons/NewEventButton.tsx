@@ -3,13 +3,15 @@ import { Fab } from '@mui/material';
 import { useAuth } from '../../providers/AuthProvider.tsx';
 import AddIcon from '@mui/icons-material/Add';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
+import {useApiState} from '../../providers/ApiProvider.tsx';
+import {isAdminOrBoard} from '../../util.ts';
 
 export default function NewEventButton() {
   const { text } = useLanguage();
   const { isLoggedIn, user } = useAuth();
+  const { userCommittees } = useApiState()
 
-
-  if (isLoggedIn && (user?.roles.includes('admin') || user?.roles.includes('activityCommissionMember'))) {
+  if (isLoggedIn && (isAdminOrBoard(user) || userCommittees.some(uc => uc.left == null))) {
     return (
       <div className="fixed bottom-5 right-5 z-10">
         <Link routeName={'new_event'}>

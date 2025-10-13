@@ -4,12 +4,15 @@ import ContentCard from '../ContentCard';
 import { useAppState } from '../../providers/AppStateProvider.tsx';
 import moment from 'moment';
 import {getLabel} from '../../util.ts';
+import {useAuth} from '../../providers/AuthProvider.tsx';
 
-export default function MyCommittees() {
+export default function UserCommittees() {
   const { text } = useLanguage();
-  const { userCommittees, committees } = useApiState();
+  const { committees, userCommittees } = useApiState();
   const { navigate } = useAppState();
-
+  const { route } = useAppState();
+  const { user } = useAuth();
+  
   if (!committees || !userCommittees) {
     return <></>;
   }
@@ -17,13 +20,13 @@ export default function MyCommittees() {
   return (
     <>
       <ContentCard className="mt-5">
-        <h1>{text('My committees', 'Mijn commissies')}</h1>
+        <h1>{route.params!.id === user?.id? text('My committees', 'Mijn commissies') : text('Committees', 'Commissies')}</h1>
       </ContentCard>
 
       <div className="grid xl:grid-cols-3 gap-5 mt-5">
         {userCommittees.filter((uc, index, self) =>
           index === self.findIndex(m => m.committeeId === uc.committeeId)
-        ).map((userCommittee) => {
+        ).map((userCommittee, index) => {
           const committee = committees.find(c => c.id === userCommittee.committeeId);
           if (!committee) {return null;}
 
@@ -36,7 +39,7 @@ export default function MyCommittees() {
 
           return (
             <div
-              key={userCommittee.id}
+              key={index}
               onClick={() => navigate('committee', { id: committee.id })}
               className="hover:cursor-pointer w-full rounded-2xl bg-inherit border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] h-full"
             >
@@ -51,7 +54,7 @@ export default function MyCommittees() {
                 </h1>
 
                 {/* Display history for current user */}
-                <div className="grid gap-1 mt-2">
+                <div className="grid gap-1">
                   {userCommittees
                     .filter(uc => uc.committeeId === committee.id)
                     .map((uc, i) => (

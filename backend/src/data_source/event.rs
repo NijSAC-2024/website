@@ -17,6 +17,7 @@ use time::OffsetDateTime;
 use tracing::error;
 use uuid::Uuid;
 use validator::Validate;
+use crate::auth::session::Session;
 
 pub struct EventStore {
     db: PgPool,
@@ -64,6 +65,7 @@ struct PgEvent {
     metadata: serde_json::Value,
     registration_count: i64,
     waiting_list_count: i64,
+    created_by: Uuid,
     created: OffsetDateTime,
     updated: OffsetDateTime,
 }
@@ -142,6 +144,7 @@ where
                 questions: serde_json::from_value(pg.questions)?,
                 metadata: pg.metadata,
                 location,
+                created_by: pg.created_by,
             },
         })
     }
@@ -189,11 +192,44 @@ impl TryFrom<PgRegistration> for Registration {
 }
 
 impl EventStore {
-    pub async fn new_event(
+    async fn ensure_user_in_committee(
+        &self,
+        session: &Session,
+        committee_id: &Uuid,
+    ) -> AppResult<()> {
+        if crate::api::is_admin_or_board(&session).is_ok() {
+            return Ok(());
+        }
+
+        let in_committee = sqlx::query_scalar!(
+            r#"
+            SELECT EXISTS(
+                SELECT 1
+                FROM user_committee
+                WHERE user_id = $1
+                  AND committee_id = $2
+                  AND "left" IS NULL
+            )
+            "#,
+            **session.user_id(),
+            *committee_id
+        )
+            .fetch_one(&self.db)
+            .await?
+            .unwrap_or(false);
+
+        if !in_committee {
+            return Err(Error::Unauthorized);
+        }
+        Ok(())
+    }
+
+    pub async fn create_event(
         &self,
         mut event: EventContent<LocationId>,
-        created_by: &UserId,
+        session: &Session,
     ) -> AppResult<Event<Location>> {
+        self.ensure_user_in_committee(session, &event.created_by).await?;
         let event_id = Uuid::now_v7();
 
         event.dates.sort_by_key(|date| date.start);
@@ -250,7 +286,7 @@ impl EventStore {
             Into::<&str>::into(event.event_type),
             serde_json::to_value(event.questions)?,
             event.metadata,
-            **created_by
+            event.created_by
         ).execute(&self.db).await?;
 
         let event = self.get_event(&event_id.into(), true).await?;
@@ -293,6 +329,7 @@ impl EventStore {
                    e.metadata,
                    count(r.user_id) FILTER ( WHERE r.waiting_list_position IS NULL ) as "registration_count!",
                    count(r.user_id) FILTER ( WHERE r.waiting_list_position IS NOT NULL ) as "waiting_list_count!",
+                   e.created_by,
                    e.created,
                    e.updated
             FROM event e
@@ -342,6 +379,7 @@ impl EventStore {
                    e.metadata,
                    count(r.user_id) FILTER ( WHERE r.waiting_list_position IS NULL ) as "registration_count!",
                    count(r.user_id) FILTER ( WHERE r.waiting_list_position IS NOT NULL ) as "waiting_list_count!",
+                   e.created_by,
                    e.created,
                    e.updated
             FROM event e
@@ -364,7 +402,10 @@ impl EventStore {
         &self,
         id: &EventId,
         mut updated: EventContent<LocationId>,
+        session: &Session,
     ) -> AppResult<Event<Location>> {
+        self.ensure_user_in_committee(session, &updated.created_by).await?;
+
         updated.dates.sort_by_key(|date| date.start);
         let (start_dates, end_dates) = updated.dates.into_iter().fold(
             (Vec::new(), Vec::new()),
@@ -378,24 +419,25 @@ impl EventStore {
         sqlx::query!(
             r#"
             UPDATE event SET
-                  location_id = $2,
-                  name_nl = $3,
-                  name_en = $4,
-                  image = $5,
-                  start_dates = $6,
-                  end_dates = $7,
-                  description_nl = $8,
-                  description_en = $9,
-                  registration_start = $10,
-                  registration_end = $11,
-                  registration_max = $12,
-                  waiting_list_max = $13,
-                  is_published = $14,
-                  required_membership_status = $15::membership_status[],
-                  event_type = $16,
-                  questions = $17,
-                  metadata = $18,
-                  updated = now()
+                location_id = $2,
+                name_nl = $3,
+                name_en = $4,
+                image = $5,
+                start_dates = $6,
+                end_dates = $7,
+                description_nl = $8,
+                description_en = $9,
+                registration_start = $10,
+                registration_end = $11,
+                registration_max = $12,
+                waiting_list_max = $13,
+                is_published = $14,
+                required_membership_status = $15::membership_status[],
+                event_type = $16,
+                questions = $17,
+                metadata = $18,
+                created_by = $19,
+                updated = now()
             WHERE id = $1
             "#,
             **id,
@@ -416,24 +458,32 @@ impl EventStore {
             Into::<&str>::into(updated.event_type),
             serde_json::to_value(updated.questions)?,
             updated.metadata,
+            updated.created_by,
         )
-        .execute(&self.db)
-        .await?;
+            .execute(&self.db)
+            .await?;
 
-        let event = self.get_event(id, true).await?;
-
-        Ok(event)
+        self.get_event(id, true).await
     }
 
-    pub async fn delete_event(&self, id: &EventId) -> AppResult<()> {
-        sqlx::query!(
-            r#"
-            DELETE FROM event WHERE id = $1
-            "#,
+    pub async fn delete_event(
+        &self,
+        id: &EventId,
+        session: &Session,
+    ) -> AppResult<()> {
+        let committee_id = sqlx::query_scalar!(
+            r#"SELECT created_by FROM event WHERE id = $1"#,
             **id
         )
-        .execute(&self.db)
-        .await?;
+            .fetch_optional(&self.db)
+            .await?
+            .ok_or_else(|| Error::Unauthorized)?;
+
+        self.ensure_user_in_committee(session, &committee_id).await?;
+
+        sqlx::query!(r#"DELETE FROM event WHERE id = $1"#, **id)
+            .execute(&self.db)
+            .await?;
         Ok(())
     }
 
@@ -598,6 +648,62 @@ impl EventStore {
         .into_iter()
         .map(TryInto::try_into)
         .collect::<Result<Vec<Registration>, Error>>()
+    }
+
+    pub async fn get_user_events(
+        &self,
+        user_id: &UserId,
+    ) -> AppResult<Vec<Event<Location>>> {
+        let events = sqlx::query_as!(
+        PgEvent,
+        r#"
+        SELECT e.id,
+               l.id as location_id,
+               l.name_en as location_name_en,
+               l.name_nl as location_name_nl,
+               l.description_nl as location_description_nl,
+               l.description_en as location_description_en,
+               l.reusable as location_reusable,
+               l.created as location_created,
+               l.updated as location_updated,
+               e.name_nl,
+               e.name_en,
+               e.image,
+               e.description_nl,
+               e.description_en,
+               e.start_dates,
+               e.end_dates,
+               e.registration_start,
+               e.registration_end,
+               e.registration_max,
+               e.waiting_list_max,
+               e.is_published,
+               e.required_membership_status as "required_membership_status:Vec<MembershipStatus>",
+               e.event_type,
+               e.questions,
+               e.metadata,
+               count(r2.user_id) FILTER (WHERE r2.waiting_list_position IS NULL) as "registration_count!",
+               count(r2.user_id) FILTER (WHERE r2.waiting_list_position IS NOT NULL) as "waiting_list_count!",
+               e.created_by,
+               e.created,
+               e.updated
+        FROM event e
+            JOIN location l ON e.location_id = l.id
+            JOIN event_registration r ON r.event_id = e.id
+            LEFT JOIN event_registration r2 ON r2.event_id = e.id
+        WHERE r.user_id = $1
+          AND e.is_published
+        GROUP BY e.id, l.id
+        "#,
+        **user_id
+    )
+            .fetch_all(&self.db)
+            .await?;
+
+        Ok(events
+            .into_iter()
+            .map(|e| e.try_into())
+            .collect::<Result<Vec<_>, _>>()?)
     }
 
     pub async fn get_registrations_detailed(&self, id: &EventId) -> AppResult<Vec<Registration>> {

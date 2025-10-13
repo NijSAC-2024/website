@@ -18,7 +18,7 @@ import ErrorPage from './pages/ErrorPage.tsx';
 import { useAppState } from './providers/AppStateProvider.tsx';
 import Event from './pages/Event.tsx';
 import Settings from './pages/Settings.tsx';
-import Account from './pages/Account.tsx';
+import User from './pages/User.tsx';
 import EditEvent from './components/edit/EditEvent.tsx';
 import Members from './pages/Members.tsx';
 import Committees from './pages/Committees.tsx';
@@ -150,8 +150,8 @@ export default function App(): React.ReactElement {
     component = <EditEvent />;
   } else if (route.name == 'settings') {
     component = <Settings />;
-  } else if (route.name == 'account') {
-    component = <Account />;
+  } else if (route.name == 'user') {
+    component = <User />;
   } else if (route.name == 'members') {
     component = <Members />;
   } else if (route.name == 'committees') {

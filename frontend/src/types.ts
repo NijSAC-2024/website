@@ -32,7 +32,6 @@ export type RoleType =
   | 'chair'
   | 'viceChair'
   | 'climbingCommissar'
-  | 'activityCommissionMember';
 
 export interface OptionsType {
   id:
@@ -116,6 +115,7 @@ export interface EventContent {
   questions: Question[];
   metadata?: Metadata;
   location: string;
+  createdBy?: string;
 }
 
 export interface Location extends LocationContent {
@@ -241,8 +241,7 @@ export const roleOptions: OptionsType[] = [
   { id: 'secretary', label: { en: 'Secretary', nl: 'Secretaris' } },
   { id: 'chair', label: { en: 'Chair', nl: 'Voorzitter' } },
   { id: 'viceChair', label: { en: 'Vice Chair', nl: 'Vicevoorzitter' } },
-  { id: 'climbingCommissar', label: { en: 'Climbing Commissar', nl: 'Klimcommissaris' } },
-  { id: 'activityCommissionMember', label: { en: 'Activity Commission Member', nl: 'Activiteitencommissie Lid' } }
+  { id: 'climbingCommissar', label: { en: 'Climbing Commissar', nl: 'Klimcommissaris' } }
 ];
 
 export const typesOptions: OptionsType[] = [
@@ -294,8 +293,7 @@ export const labelOptions: OptionsType[] = [
   { id: 'secretary', label: { en: 'Secretary', nl: 'Secretaris' } },
   { id: 'chair', label: { en: 'Chair', nl: 'Voorzitter' } },
   { id: 'viceChair', label: { en: 'Vice Chair', nl: 'Vicevoorzitter' } },
-  { id: 'climbingCommissar', label: { en: 'Climbing Commissar', nl: 'Klimcommissaris' } },
-  { id: 'activityCommissionMember', label: { en: 'Activity Commission Member', nl: 'Activiteitencommissie Lid' } }
+  { id: 'climbingCommissar', label: { en: 'Climbing Commissar', nl: 'Klimcommissaris' } }
 ];
 
 export const rentOptions: rentOption[] = [

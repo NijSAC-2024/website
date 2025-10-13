@@ -14,7 +14,7 @@ export const routes = [
   ['/material-rental', 'material_rental'],
   ['/not-found', 'not_found'],
   ['/settings', 'settings'],
-  ['/account', 'account'],
+  ['/user/:id', 'user'],
   ['/members', 'members'],
   ['/committees', 'committees'],
   ['/committees/new', 'new_committee'],

@@ -1,7 +1,7 @@
 use crate::{
     Pagination, ValidatedQuery,
     api::ApiResult,
-    auth::{role::Role, session::Session},
+    auth::{session::Session},
     data_source::FileStore,
     error::{AppResult, Error},
     file::{FileId, FileMetadata},
@@ -21,34 +21,11 @@ use mime::{IMAGE, IMAGE_JPEG, Mime};
 use std::io::Cursor;
 use tracing::info;
 
-fn upload_access(session: &Session) -> AppResult<()> {
-    if session.membership_status().is_member()
-        && session.roles().iter().any(|role| {
-            matches!(
-                role,
-                Role::Admin
-                    | Role::Treasurer
-                    | Role::Secretary
-                    | Role::Chair
-                    | Role::ViceChair
-                    | Role::ClimbingCommissar
-                    | Role::ActivityCommissionMember
-            )
-        })
-    {
-        Ok(())
-    } else {
-        Err(Error::Unauthorized)
-    }
-}
-
 pub async fn upload(
     store: FileStore,
     session: Session,
     mut multipart: Multipart,
 ) -> ApiResult<Vec<FileMetadata>> {
-    upload_access(&session)?;
-
     let mut result = vec![];
     while let Some(field) = multipart.next_field().await.unwrap() {
         let name = field.name().unwrap().to_string();
@@ -70,7 +47,7 @@ pub async fn upload(
 
         result.push(
             store
-                .create(&name, content_type, session.user_id(), data)
+                .create(&name, content_type, data, &session)
                 .await?,
         );
         info!(
@@ -141,11 +118,10 @@ pub async fn get_files(
     session: Session,
     ValidatedQuery(pagination): ValidatedQuery<Pagination>,
 ) -> AppResult<(HeaderMap, Json<Vec<FileMetadata>>)> {
-    upload_access(&session)?;
     let total = store.count().await?;
 
     Ok((
         total.as_header(),
-        Json(store.get_all_metadata(pagination).await?),
+        Json(store.get_all_metadata(pagination, &session).await?),
     ))
 }

@@ -7,7 +7,7 @@ use crate::{
         get_committee, create_committee, update_committee, delete_committee, add_user_to_committee, 
         remove_user_from_committee, get_committee_members, create_location, delete_location, 
         get_file_content, get_file_metadata, get_files, get_location, update_location, upload,
-        get_locations, get_user, get_user_registrations, location_used_by,
+        get_locations, get_user, get_user_registrations, location_used_by, get_user_events
     },
     auth::{login, logout},
     state::AppState,
@@ -60,6 +60,7 @@ fn api_router() -> Router<AppState> {
             "/user/{:id}/event_registrations",
             get(get_user_registrations),
         )
+        .route("/user/{:id}/events", get(get_user_events))
         .route("/user/{:id}/committees", get(get_user_committees))
         .route("/user/{:id}/material", get(get_material_list))
         .route("/user/{:id}/getMaterial", get(get_user_materials))

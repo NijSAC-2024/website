@@ -8,7 +8,6 @@ import {
   Language,
   Metadata,
 } from '../../types.ts';
-import ContentCard from '../ContentCard.tsx';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import {useApiState} from '../../providers/ApiProvider.tsx';
 
@@ -34,7 +33,7 @@ export default function EditDescription({
   };
 
   return (
-    <ContentCard className="xl:col-span-2 flex flex-col justify-between">
+    <div className="xl:col-span-2 flex flex-col justify-between w-full rounded-2xl bg-[rgba(255,255,255,0.9)] dark:bg-[rgba(18,18,18,0.7)] border border-solid border-b-2 border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)] border-b-[#1976d2] dark:border-b-[#90caf9]">
       {/* Description */}
       <div>
         <MarkdownEditor
@@ -145,6 +144,6 @@ export default function EditDescription({
           </div>
         )}
       </div>
-    </ContentCard>
+    </div>
   );
 }

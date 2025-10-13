@@ -5,7 +5,7 @@ import { useLanguage } from '../providers/LanguageProvider.tsx';
 import {useAppState} from '../providers/AppStateProvider.tsx';
 import {useAuth} from '../providers/AuthProvider.tsx';
 import {Fab} from '@mui/material';
-import {truncateMarkdown} from '../util.ts';
+import {isAdminOrBoard, truncateMarkdown} from '../util.ts';
 import Markdown from 'react-markdown';
 import AddIcon from '@mui/icons-material/Add';
 
@@ -13,11 +13,11 @@ export default function Committees() {
   const { text } = useLanguage();
   const { committees } = useApiState();
   const { navigate } = useAppState()
-  const { isLoggedIn, user } = useAuth();
+  const { user } = useAuth();
 
   return (
     <>
-      {isLoggedIn && user?.roles.includes('admin') && (
+      {isAdminOrBoard(user) && (
         <div className="fixed bottom-5 right-5 z-10">
           <Fab
             variant="extended"
@@ -49,7 +49,7 @@ export default function Committees() {
                   onClick={() => navigate('committee', { id: committee.id })}
                   className="hover:cursor-pointer h-full"
                 >
-                  <div className="w-full h-full rounded-2xl bg-inherit border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)]">
+                  <div className="w-full h-full rounded-2xl bg-[rgba(255,255,255,0.9)] dark:bg-[rgba(18,18,18,0.7)] border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)]">
                     <img
                       className="w-full aspect-[4/2] object-cover"
                       src={

@@ -24,7 +24,6 @@ export default function LoginForm() {
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     if (emailError || passwordError) {
-      console.log('returned');
       return;
     }
     login(email, password);

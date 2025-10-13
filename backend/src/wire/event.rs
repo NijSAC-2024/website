@@ -110,6 +110,7 @@ pub struct EventContent<T> {
     #[serde(default)]
     pub metadata: serde_json::Value,
     pub location: T,
+    pub created_by: Uuid,
 }
 
 #[derive(Serialize, Deserialize, Debug, Validate)]

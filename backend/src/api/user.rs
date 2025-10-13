@@ -2,12 +2,12 @@ use crate::{
     Pagination,
     api::{ApiResult, ValidatedJson, ValidatedQuery},
     auth::{
-        role::{MembershipStatus, Role},
+        role::{MembershipStatus},
         session::Session,
     },
     data_source::UserStore,
     error::{AppResult, Error},
-    user::{Password, RegisterNewUser, User, UserContent, UserId},
+    user::{Password, RegisterNewUser, User, UserContent, UserId, BasicUser},
 };
 use axum::{
     Json,
@@ -15,32 +15,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-
-fn read_access(id: &UserId, session: &Session) -> AppResult<()> {
-    if update_all_access(session).is_ok() || id == session.user_id() {
-        Ok(())
-    } else {
-        Err(Error::NotFound)
-    }
-}
-
-fn update_all_access(session: &Session) -> AppResult<()> {
-    if session.membership_status().is_member()
-        && session.roles().iter().any(|role| match role {
-            Role::Admin
-            | Role::Treasurer
-            | Role::Secretary
-            | Role::Chair
-            | Role::ViceChair
-            | Role::ClimbingCommissar => true,
-            Role::ActivityCommissionMember => false,
-        })
-    {
-        Ok(())
-    } else {
-        Err(Error::Unauthorized)
-    }
-}
+use crate::api::is_admin_or_board;
 
 enum UpdateAccess {
     Anything,
@@ -48,7 +23,7 @@ enum UpdateAccess {
 }
 
 fn update_access(id: &UserId, session: &Session) -> AppResult<UpdateAccess> {
-    if update_all_access(session).is_ok() {
+    if is_admin_or_board(session).is_ok() {
         Ok(UpdateAccess::Anything)
     } else if id == session.user_id() {
         Ok(UpdateAccess::SelfUpdate)
@@ -65,7 +40,7 @@ enum ReadAccess {
 }
 
 fn read_all_access(session: &Session) -> AppResult<ReadAccess> {
-    if update_all_access(session).is_ok() {
+    if is_admin_or_board(session).is_ok() {
         Ok(ReadAccess::Full)
     } else if session.membership_status().is_member() {
         Ok(ReadAccess::Limited)
@@ -102,38 +77,35 @@ pub async fn register(
     Ok((StatusCode::CREATED, Json(user)))
 }
 
-pub async fn who_am_i(store: UserStore, session: Session) -> ApiResult<User> {
-    Ok(Json(store.get(session.user_id()).await?))
+pub async fn who_am_i(store: UserStore, session: Option<Session>) -> ApiResult<User> {
+    if let Some(session) = session {
+        Ok(Json(store.get(session.user_id()).await?))
+    }
+    else {
+        Err(Error::Unauthorized)
+    }
 }
 
 pub async fn get_user(
     store: UserStore,
     Path(id): Path<UserId>,
     session: Session,
-) -> ApiResult<User> {
-    read_access(&id, &session)?;
-
-    Ok(Json(store.get(&id).await?))
+) -> AppResult<Response> {
+    match read_all_access(&session)? {
+        ReadAccess::Full => Ok(Json(store.get(&id).await?).into_response()),
+        ReadAccess::Limited => Ok(Json(store.get_basic_info(&id).await?).into_response()),
+    }
 }
 
 pub async fn get_all_users(
     store: UserStore,
     session: Session,
     ValidatedQuery(pagination): ValidatedQuery<Pagination>,
-) -> AppResult<Response> {
-    let total = store.count().await?;
-
-    match read_all_access(&session)? {
-        ReadAccess::Full => Ok((
-            total.as_header(),
-            Json(store.get_all_detailed(&pagination).await?),
-        )
-            .into_response()),
-        ReadAccess::Limited => Ok((
-            total.as_header(),
-            Json(store.get_all_basic_info(&pagination).await?),
-        )
-            .into_response()),
+) -> AppResult<Json<Vec<BasicUser>>> {
+    if session.membership_status().is_member() {
+        Ok(Json(store.get_all_basic_info(&pagination).await?))
+    } else {
+        Err(Error::Unauthorized)
     }
 }
 
@@ -166,6 +138,6 @@ pub async fn delete_user(
     session: Session,
     Path(id): Path<UserId>,
 ) -> AppResult<()> {
-    update_all_access(&session)?;
+    update_access(&id, &session)?;
     store.delete(&id).await
 }

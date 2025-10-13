@@ -201,43 +201,60 @@ impl UserStore {
         .try_into()
     }
 
-    pub async fn get_all_detailed(&self, pagination: &Pagination) -> AppResult<Vec<User>> {
-        sqlx::query_as!(
-            PgUser,
+    pub async fn get_basic_info(&self, id: &UserId) -> AppResult<BasicUser> {
+        Ok(sqlx::query_as!(
+            BasicUser,
             r#"
-            SELECT 
-                id,
+            SELECT
+                id AS "user_id!",
                 first_name,
                 infix,
-                last_name,
-                phone,
-                student_number,
-                nkbv_number,
-                sportcard_number,
-                ice_contact_name,
-                ice_contact_email,
-                ice_contact_phone,
-                important_info,
-                roles,
-                status AS "status: MembershipStatus",
-                email,
-                created,
-                updated
-            FROM "user"
-            WHERE id != '00000000-0000-0000-0000-000000000000'
-            ORDER BY last_name
-            LIMIT $1
-            OFFSET $2
+                last_name
+            FROM "user" WHERE id = $1
             "#,
-            pagination.limit,
-            pagination.offset
+            id.deref()
         )
-        .fetch_all(&self.db)
-        .await?
-        .into_iter()
-        .map(TryInto::try_into)
-        .collect()
+            .fetch_one(&self.db)
+            .await?)
     }
+
+    // pub async fn get_all_detailed(&self, pagination: &Pagination) -> AppResult<Vec<User>> {
+    //     sqlx::query_as!(
+    //         PgUser,
+    //         r#"
+    //         SELECT
+    //             id,
+    //             first_name,
+    //             infix,
+    //             last_name,
+    //             phone,
+    //             student_number,
+    //             nkbv_number,
+    //             sportcard_number,
+    //             ice_contact_name,
+    //             ice_contact_email,
+    //             ice_contact_phone,
+    //             important_info,
+    //             roles,
+    //             status AS "status: MembershipStatus",
+    //             email,
+    //             created,
+    //             updated
+    //         FROM "user"
+    //         WHERE id != '00000000-0000-0000-0000-000000000000'
+    //         ORDER BY last_name
+    //         LIMIT $1
+    //         OFFSET $2
+    //         "#,
+    //         pagination.limit,
+    //         pagination.offset
+    //     )
+    //     .fetch_all(&self.db)
+    //     .await?
+    //     .into_iter()
+    //     .map(TryInto::try_into)
+    //     .collect()
+    // }
 
     pub async fn get_all_basic_info(&self, pagination: &Pagination) -> AppResult<Vec<BasicUser>> {
         Ok(sqlx::query_as!(

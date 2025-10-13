@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogActions, Button } from '@mui/material';
-import {Answer, Language, Question, Registration, User} from '../../types.ts';
+import {Answer, BasicUser, Language, Question, Registration} from '../../types.ts';
 import RegisterForm from './RegisterForm.tsx';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 
@@ -9,7 +9,7 @@ interface RegistrationDialogProps {
   name: Language;
   questions: Question[];
   selectedRegistration: Registration | null;
-  selectedUser: User | null;
+  selectedUser: BasicUser | null;
   handleRegistration: (answers: Answer[], registrationId?: string, userId?: string, waitingListPosition?: number) => void;
   handleDeregisterClick: () => void;
 }
@@ -41,7 +41,7 @@ export default function RegistrationDialog({
           <RegisterForm
             registrationQuestions={questions}
             handleRegistration={(answers: Answer[]) =>
-              handleRegistration(answers, selectedRegistration?.registrationId, selectedUser?.id, selectedRegistration?.waitingListPosition)
+              handleRegistration(answers, selectedRegistration?.registrationId, selectedUser?.userId, selectedRegistration?.waitingListPosition)
             }
             existingAnswers={selectedRegistration?.answers}
           />

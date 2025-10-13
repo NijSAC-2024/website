@@ -6,6 +6,8 @@ import { ChangeEvent, useState } from 'react';
 import EditDates from './EditDates.tsx';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import { useApiState } from '../../providers/ApiProvider.tsx';
+import {isAdminOrBoard} from '../../util.ts';
+import {useAuth} from '../../providers/AuthProvider.tsx';
 
 interface EditAgendaCardProps {
   category: EventType;
@@ -14,6 +16,7 @@ interface EditAgendaCardProps {
   name: Language;
   dates: DateType[];
   location: string;
+  createdBy?: string;
   handleEventChange: (changes: Partial<EventContent>) => void;
 }
 
@@ -24,10 +27,12 @@ export default function EditAgendaCard({
   name,
   dates,
   location,
+  createdBy,
   handleEventChange
 }: EditAgendaCardProps) {
   const { text } = useLanguage();
-  const { locations } = useApiState();
+  const { user } = useAuth()
+  const { locations, committees, userCommittees } = useApiState();
   const [uploading, setUploading] = useState(false);
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -48,13 +53,11 @@ export default function EditAgendaCard({
   return (
     <div
       className="w-full rounded-2xl bg-inherit border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] flex flex-col">
-      <div>
-        <img
-          className="w-full aspect-4/2 object-cover"
-          src={image?.startsWith('https://') ? image : `/api/file/${image}`}
-          alt="Event"
-        />
-      </div>
+      <img
+        className="w-full aspect-4/2 object-cover"
+        src={image?.startsWith('https://') ? image : `/api/file/${image}`}
+        alt="Event"
+      />
       <div className="p-5">
         <div className="grid gap-5">
           {/* Image */}
@@ -105,6 +108,24 @@ export default function EditAgendaCard({
                 <MenuItem value="weekend">
                   {text('Weekend', 'Weekend')}
                 </MenuItem>
+              </Select>
+            </FormControl>
+            <FormControl fullWidth>
+              <InputLabel id="committee-select-label">
+                {text('Committee*', 'Commissie*')}
+              </InputLabel>
+              <Select
+                labelId="committee-select-label"
+                value={createdBy}
+                label={text('Committee*', 'Commissie*')}
+                variant="outlined"
+                onChange={(e) => handleEventChange({ createdBy: e.target.value })}
+              >
+                {committees.filter(c => (userCommittees.some(uc => uc.committeeId == c.id && uc.left == null) || isAdminOrBoard(user))).map((committee) => (
+                  <MenuItem key={committee.id} value={committee.id}>
+                    {text(committee.name)}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
             <OptionSelector

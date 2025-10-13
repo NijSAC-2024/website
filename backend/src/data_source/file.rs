@@ -13,6 +13,7 @@ use sqlx::PgPool;
 use std::sync::Arc;
 use time::OffsetDateTime;
 use uuid::Uuid;
+use crate::auth::session::Session;
 
 pub struct FileStore {
     db: PgPool,
@@ -62,6 +63,35 @@ impl TryFrom<PgFileMetadata> for FileMetadata {
 }
 
 impl FileStore {
+    async fn upload_access(&self, session: &Session) -> AppResult<()> {
+        // Admins always allowed
+        if crate::api::is_admin_or_board(&session).is_ok() {
+            return Ok(());
+        }
+
+        // Check if user is active in any committee
+        let in_any_committee = sqlx::query_scalar!(
+        r#"
+        SELECT EXISTS(
+            SELECT 1
+            FROM user_committee
+            WHERE user_id = $1
+              AND "left" IS NULL
+        )
+        "#,
+        **session.user_id()
+    )
+            .fetch_one(&self.db)
+            .await?
+            .unwrap_or(false);
+
+        if !in_any_committee {
+            return Err(Error::Unauthorized);
+        }
+
+        Ok(())
+    }
+
     pub async fn count(&self) -> AppResult<Count> {
         Ok(sqlx::query_as!(
             Count,
@@ -77,9 +107,10 @@ impl FileStore {
         &self,
         original_filename: &str,
         mime_type: Option<Mime>,
-        created_by: &UserId,
         payload: Bytes,
+        session: &Session,
     ) -> AppResult<FileMetadata> {
+        self.upload_access(session).await?;
         let file_id: FileId = Uuid::now_v7().into();
 
         let size = payload.len();
@@ -98,7 +129,7 @@ impl FileStore {
             original_filename,
             mime_type.map(|mime| mime.to_string()),
             size as i32,
-            **created_by
+            **session.user_id(),
         )
         .fetch_one(&self.db)
         .await?
@@ -122,7 +153,8 @@ impl FileStore {
         Ok(self.object_store.get(&id.into()).await?.bytes().await?)
     }
 
-    pub async fn get_all_metadata(&self, pagination: Pagination) -> AppResult<Vec<FileMetadata>> {
+    pub async fn get_all_metadata(&self, pagination: Pagination, session: &Session) -> AppResult<Vec<FileMetadata>> {
+        self.upload_access(session).await?;
         sqlx::query_as!(
             PgFileMetadata,
             r#"

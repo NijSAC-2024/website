@@ -26,7 +26,11 @@ export default function UserMenu({toggleDropdown}: UserMenuProps) {
   };
 
   const navigateSubmenu = (page: string) => {
-    navigate(page);
+    if (page === 'user' && user) {
+      navigate('user', { id: user?.id });
+    } else {
+      navigate(page);
+    }
     handleMenuClose();
     if (toggleDropdown) {
       toggleDropdown();
@@ -34,7 +38,7 @@ export default function UserMenu({toggleDropdown}: UserMenuProps) {
   };
   return (
     <>
-      <Tooltip title="Account settings">
+      <Tooltip title="User settings">
         <IconButton onClick={handleClick}>
           <Avatar className="w-8 h-8">{user?.firstName.charAt(0).toUpperCase()}</Avatar>
         </IconButton>
@@ -46,7 +50,7 @@ export default function UserMenu({toggleDropdown}: UserMenuProps) {
         onClick={handleMenuClose}
         className="shadow "
       >
-        <MenuItem onClick={() => navigateSubmenu('account')}>
+        <MenuItem onClick={() => navigateSubmenu('user')}>
           <ListItemIcon>
             <AccountCircleIcon />
           </ListItemIcon>

@@ -3,6 +3,7 @@ import { Question, Registration } from '../../types.ts';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import RegistrationRow from './RegistrationRow.tsx';
 import {useAuth} from '../../providers/AuthProvider.tsx';
+import {isAdminOrBoard} from "../../util.ts";
 
 interface RegistrationTableProps {
   registrations: Registration[];
@@ -20,7 +21,7 @@ export default function RegistrationTable({ registrations, questions, eventId, o
       <div className="min-w-max">
         <Table>
           <TableBody>
-            {questions.length > 0 && user?.roles.includes('admin') && (
+            {isAdminOrBoard(user) && (
               <TableRow>
                 <TableCell><b>{text('Name', 'Naam')}</b></TableCell>
                 {questions.map((q) => (

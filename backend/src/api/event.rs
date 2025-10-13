@@ -1,7 +1,7 @@
 use crate::{
     api::{ApiResult, ValidatedJson},
     auth::{
-        role::{MembershipStatus, Role},
+        role::{MembershipStatus},
         session::Session,
     },
     data_source::event::EventStore,
@@ -16,35 +16,7 @@ use crate::{
 use axum::{Json, extract::Path};
 use time::OffsetDateTime;
 use tracing::{debug, info, trace, warn};
-
-fn update_all_full_event_access(session: &Session) -> AppResult<()> {
-    if session.membership_status().is_member()
-        && session.roles().iter().any(|role| {
-            matches!(
-                role,
-                Role::Admin
-                    | Role::Treasurer
-                    | Role::Secretary
-                    | Role::Chair
-                    | Role::ViceChair
-                    | Role::ClimbingCommissar
-                    | Role::ActivityCommissionMember
-            )
-        })
-    {
-        Ok(())
-    } else {
-        Err(Error::Unauthorized)
-    }
-}
-
-fn update_single_full_registration_access(id: &UserId, session: &Session) -> AppResult<()> {
-    if update_all_full_event_access(session).is_ok() || id == session.user_id() {
-        Ok(())
-    } else {
-        Err(Error::Unauthorized)
-    }
-}
+use crate::api::{has_registration_access, is_admin_or_board};
 
 pub async fn get_event_registrations(
     store: EventStore,
@@ -55,7 +27,7 @@ pub async fn get_event_registrations(
 
     // Admins always get full access
     if let Some(ref session) = session {
-        if update_all_full_event_access(session).is_ok() {
+        if is_admin_or_board(session).is_ok() {
             let regs = store.get_registrations_detailed(&id).await?;
             return Ok(Json(serde_json::to_value(regs)?));
         }
@@ -92,8 +64,20 @@ pub async fn get_user_registrations(
     Path(id): Path<UserId>,
     session: Session,
 ) -> ApiResult<Vec<Registration>> {
-    if update_single_full_registration_access(&id, &session).is_ok() {
+    if has_registration_access(&id, &session).is_ok() {
         Ok(Json(store.get_user_registrations(session.user_id()).await?))
+    } else {
+        Err(Error::Unauthorized)
+    }
+}
+
+pub async fn get_user_events(
+    store: EventStore,
+    Path(id): Path<UserId>,
+    session: Session,
+) -> ApiResult<Vec<Event<Location>>> {
+    if session.membership_status().is_member() {
+        Ok(Json(store.get_user_events(&id).await?))
     } else {
         Err(Error::Unauthorized)
     }
@@ -107,12 +91,12 @@ pub async fn get_event(
     session: Option<Session>,
 ) -> ApiResult<Event<Location>> {
     if let Some(session) = session
-        && update_all_full_event_access(&session).is_ok()
+        && is_admin_or_board(&session).is_ok()
     {
-        return Ok(Json(store.get_event(&id, true).await?));
+        Ok(Json(store.get_event(&id, true).await?))
+    } else {
+        Ok(Json(store.get_event(&id, false).await?))
     }
-
-    Ok(Json(store.get_event(&id, false).await?))
 }
 
 /// Partially public endpoint, no login required.
@@ -122,11 +106,12 @@ pub async fn get_activities(
     session: Option<Session>,
 ) -> ApiResult<Vec<Event<Location>>> {
     if let Some(session) = session
-        && update_all_full_event_access(&session).is_ok()
+        && is_admin_or_board(&session).is_ok()
     {
-        return Ok(Json(store.get_events(true).await?));
+        Ok(Json(store.get_events(true).await?))
+    } else {
+        Ok(Json(store.get_events(false).await?))
     }
-    Ok(Json(store.get_events(false).await?))
 }
 
 pub async fn create_event(
@@ -134,8 +119,7 @@ pub async fn create_event(
     session: Session,
     ValidatedJson(new): ValidatedJson<EventContent<LocationId>>,
 ) -> ApiResult<Event<Location>> {
-    update_all_full_event_access(&session)?;
-    Ok(Json(store.new_event(new, session.user_id()).await?))
+    Ok(Json(store.create_event(new, &session).await?))
 }
 
 pub async fn update_event(
@@ -144,8 +128,7 @@ pub async fn update_event(
     Path(id): Path<EventId>,
     ValidatedJson(updated): ValidatedJson<EventContent<LocationId>>,
 ) -> ApiResult<Event<Location>> {
-    update_all_full_event_access(&session)?;
-    Ok(Json(store.update_event(&id, updated).await?))
+    Ok(Json(store.update_event(&id, updated, &session).await?))
 }
 
 pub async fn delete_event(
@@ -153,8 +136,7 @@ pub async fn delete_event(
     session: Session,
     Path(id): Path<EventId>,
 ) -> AppResult<()> {
-    update_all_full_event_access(&session)?;
-    store.delete_event(&id).await
+    store.delete_event(&id, &session).await
 }
 
 pub async fn get_registration(
@@ -165,11 +147,8 @@ pub async fn get_registration(
     let registration = store.get_registration(&registration_id).await?;
 
     if let Some(ref user) = registration.user {
-        update_single_full_registration_access(&user.user_id, &session)?;
-    } else {
-        update_all_full_event_access(&session)?;
+        has_registration_access(&user.user_id, &session)?;
     }
-
     Ok(Json(registration))
 }
 
@@ -190,7 +169,7 @@ pub async fn create_registration(
             );
             return Err(Error::Unauthorized);
         };
-        update_single_full_registration_access(user_id, session).inspect_err(|_| {
+        has_registration_access(user_id, session).inspect_err(|_| {
             info!(
                 user_id = user_id.to_string(),
                 logged_in_user = session.user_id().to_string(),
@@ -219,7 +198,7 @@ pub async fn create_registration(
             );
             return Err(Error::BadRequest("Registrations are not open"));
         };
-        if update_all_full_event_access(session).is_err() {
+        if is_admin_or_board(session).is_err() {
             // For regular users
             debug!(
                 event_id = event.id.to_string(),
@@ -230,7 +209,7 @@ pub async fn create_registration(
     }
 
     if let Some(ref session) = session {
-        if update_all_full_event_access(session).is_err() {
+        if is_admin_or_board(session).is_err() {
             ensure_signup_has_not_passed(&event)?;
         }
     } else {
@@ -258,19 +237,19 @@ pub async fn update_registration(
 ) -> ApiResult<Registration> {
     let registration = store.get_registration(&registration_id).await?;
 
-    if update_all_full_event_access(&session).is_err() {
+    if is_admin_or_board(&session).is_err() {
         let Some(user_id) = registration.user.as_ref().map(|u| u.user_id.clone()) else {
             return Err(Error::BadRequest(
                 "Only admins can update anonymous sign-ups",
             ));
         };
 
-        update_single_full_registration_access(&user_id, &session)?;
+        has_registration_access(&user_id, &session)?;
     }
 
     let event = store.get_event(&registration.event_id, true).await?;
 
-    if update_all_full_event_access(&session).is_err() {
+    if is_admin_or_board(&session).is_err() {
         ensure_signup_has_not_passed(&event)?;
     }
 
@@ -292,13 +271,13 @@ pub async fn delete_registration(
     session: Session,
     Path((_event_id, registration_id)): Path<(EventId, RegistrationId)>,
 ) -> AppResult<()> {
-    if update_all_full_event_access(&session).is_ok() {
+    if is_admin_or_board(&session).is_ok() {
         store.delete_registration(&registration_id).await
     } else {
         let registration = store.get_registration(&registration_id).await?;
         if let Some(user) = registration.user {
             // Normal users can only delete their own registration
-            update_single_full_registration_access(&user.user_id, &session)?
+            has_registration_access(&user.user_id, &session)?
         } else {
             // Anonymous registrations can only be modified by admins
             return Err(Error::Unauthorized);
@@ -338,7 +317,7 @@ fn ensure_correct_waiting_list_position(
     current_registration: Option<&Registration>,
 ) -> Result<(), Error> {
     if let Some(session) = session
-        && update_all_full_event_access(session).is_ok()
+        && is_admin_or_board(session).is_ok()
     {
         trace!("logged in user has admin access to the waiting list");
         if new_registration.waiting_list_position.is_some() {
@@ -405,7 +384,7 @@ fn ensure_attendance_update_full_access_only(
     new_registration: &mut NewRegistration,
     session: &Session,
 ) {
-    if update_all_full_event_access(session).is_err() {
+    if is_admin_or_board(session).is_err() {
         new_registration.attended = current_registration.attended
     }
 }

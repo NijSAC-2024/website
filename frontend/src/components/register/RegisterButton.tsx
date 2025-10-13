@@ -8,6 +8,7 @@ import moment from 'moment/moment';
 import AreYouSure from '../AreYouSure.tsx';
 import {useApiState} from '../../providers/ApiProvider.tsx';
 import AccessAlarmIcon from '@mui/icons-material/AccessAlarm';
+import {isAdminOrBoard} from '../../util.ts';
 
 interface RegisterButtonProps {
   registrationCount?: number;
@@ -80,7 +81,7 @@ export default function RegisterButton({
 
   const renderRegistrationStatus = () => {
     if (registration) {
-      if (closeTime < now && !user?.roles.includes('admin')) {
+      if (closeTime < now && !isAdminOrBoard(user)) {
         if (registration?.waitingListPosition !== undefined) {
           return <Button variant="contained" disabled>{text('In Queue', 'Op de wachtlijst')}</Button>;
         } else {
@@ -95,7 +96,7 @@ export default function RegisterButton({
       }
     }
 
-    if (registrationCount && registrationMax && registrationCount >= registrationMax && !user?.roles.includes('admin')) {
+    if (registrationCount && registrationMax && registrationCount >= registrationMax && !isAdminOrBoard(user)) {
       if (waitingListCount !== undefined && waitingListMax !== undefined && waitingListCount >= waitingListMax) {
         return <Button variant="contained" disabled>{text('Full', 'Vol')}</Button>;
       }
@@ -115,7 +116,7 @@ export default function RegisterButton({
 
     if (closeTime > now) {
       if (canRegister) {
-        if (registrationCount && registrationMax && registrationCount >= registrationMax && !user?.roles.includes('admin')) {
+        if (registrationCount && registrationMax && registrationCount >= registrationMax && !isAdminOrBoard(user)) {
           return <Button variant="contained" onClick={handleRegistrationClick}>{text('Join Queue', 'Inschrijven wachtlijst')}</Button>;
         }
         return <Button variant="contained" onClick={handleRegistrationClick}>{text('Register', 'Inschrijven')}</Button>
@@ -124,6 +125,8 @@ export default function RegisterButton({
         return <Button variant="contained" disabled>{text('Register', 'Inschrijven')}</Button>
       }
       return <Button variant="contained" onClick={toggleAuthOpen}>{text('Login to register', 'Login om in te schrijven')}</Button>
+    } else if (isAdminOrBoard(user)) {
+      return <Button variant="contained">{text('Register', 'Inschrijven')}</Button>
     }
 
     return (
@@ -156,7 +159,7 @@ export default function RegisterButton({
               {text('Registrations close at ', 'Inschrijvingen sluiten op ')}
               {moment(registrationPeriod.end).format('DD MMM HH:mm')}
             </p>
-            {!registration && registrationMax && !!registrationCount && registrationCount >= registrationMax && !user?.roles.includes('admin') && (
+            {!registration && registrationMax && !!registrationCount && registrationCount >= registrationMax && !isAdminOrBoard(user) && (
               <b>
                 {text('The event is currently full. By registering, you will be put in the waiting queue. If a spot becomes available, you will automatically be registered and notified.',
                   'Het evenement zit momenteel vol. Door je aan te melden kom je op de wachtlijst. Zodra er een plek vrijkomt, word je automatisch ingeschreven en ontvang je bericht.')}

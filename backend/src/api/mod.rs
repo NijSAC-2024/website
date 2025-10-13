@@ -5,7 +5,7 @@ mod material;
 mod user;
 mod committee;
 
-use crate::error::Error;
+use crate::error::{AppResult, Error};
 use axum::{
     Json,
     extract::{
@@ -23,6 +23,9 @@ use serde::{Deserialize, de::DeserializeOwned};
 use serde_with::{DisplayFromStr, serde_as};
 pub use user::*;
 use validator::Validate;
+use crate::auth::role::Role;
+use crate::auth::session::Session;
+use crate::user::UserId;
 
 type ApiResult<T> = Result<Json<T>, Error>;
 
@@ -76,5 +79,32 @@ where
         let Query(value) = Query::<T>::from_request_parts(parts, state).await?;
         value.validate()?;
         Ok(ValidatedQuery(value))
+    }
+}
+
+pub(crate) fn is_admin_or_board(session: &Session) -> AppResult<()> {
+    if session.roles().iter().any(|role| {
+        matches!(
+                role,
+                Role::Admin
+                    | Role::Treasurer
+                    | Role::Secretary
+                    | Role::Chair
+                    | Role::ViceChair
+                    | Role::ClimbingCommissar
+            )
+    })
+    {
+        Ok(())
+    } else {
+        Err(Error::Unauthorized)
+    }
+}
+
+fn has_registration_access(id: &UserId, session: &Session) -> AppResult<()> {
+    if is_admin_or_board(session).is_ok() || id == session.user_id() {
+        Ok(())
+    } else {
+        Err(Error::Unauthorized)
     }
 }

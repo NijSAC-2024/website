@@ -53,6 +53,30 @@ create table location
     updated        timestamptz not null
 );
 
+create type committee_role as enum ('chair', 'member');
+
+create table committee
+(
+    id             uuid        primary key,
+    name_nl        text        not null,
+    name_en        text        not null,
+    description_nl text        not null default '',
+    description_en text        not null default '',
+    image                      uuid references file (id),
+    created        timestamptz not null,
+    updated        timestamptz not null
+);
+
+create table user_committee
+(
+    id           uuid           primary key,
+    user_id      uuid           not null references "user" (id) on delete cascade,
+    committee_id uuid           not null references committee (id) on delete cascade,
+    role         committee_role not null default 'member',
+    joined       timestamptz    not null default now(),
+    "left"       timestamptz
+);
+
 create table event --event base
 (
     id                         uuid primary key,
@@ -101,7 +125,7 @@ create table event --event base
     -- example scheme:
     -- { "weekendType": "singlePitch" }
     metadata                   jsonb               not null,            -- if no metadata is given, use an empty object
-    created_by                 uuid                not null references "user" (id),
+    created_by                 uuid                not null references committee (id),
     created                    timestamptz         not null,
     updated                    timestamptz         not null
 );
@@ -159,28 +183,4 @@ create table "user_material"
         foreign key (material_id) references "material" (material_id) on delete cascade,
     constraint fk_user
         foreign key (user_id) references "user" (id) on delete cascade
-);
-
-create type committee_role as enum ('chair', 'member');
-
-create table committee
-(
-    id             uuid        primary key,
-    name_nl        text        not null,
-    name_en        text        not null,
-    description_nl text        not null default '',
-    description_en text        not null default '',
-    image                      uuid references file (id),
-    created        timestamptz not null,
-    updated        timestamptz not null
-);
-
-create table user_committee
-(
-    id           uuid           primary key,
-    user_id      uuid           not null references "user" (id) on delete cascade,
-    committee_id uuid           not null references committee (id) on delete cascade,
-    role         committee_role not null default 'member',
-    joined       timestamptz    not null default now(),
-    "left"       timestamptz
 );

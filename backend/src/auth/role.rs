@@ -7,15 +7,11 @@ pub type Roles = Vec<Role>;
 #[non_exhaustive]
 pub enum Role {
     Admin,
-
     Treasurer,
     Secretary,
     Chair,
     ViceChair,
     ClimbingCommissar,
-
-    ActivityCommissionMember,
-    // TODO extend
 }
 
 #[derive(sqlx::Type, Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]

@@ -9,6 +9,7 @@ import ContentCard from '../components/ContentCard.tsx';
 import remarkGfm from 'remark-gfm';
 import Markdown from 'react-markdown';
 import {BasicUser} from '../types.ts';
+import {isAdminOrBoard} from '../util.ts';
 
 export default function Committee() {
   const { text } = useLanguage();
@@ -27,7 +28,7 @@ export default function Committee() {
 
   return (
     <>
-      {isLoggedIn && (userCommittees?.some(uc => uc.committeeId === committee.id && uc.role === 'chair' && uc.left == null) || user?.roles.includes('admin')) && (
+      {isLoggedIn && ((userCommittees?.some(uc => uc.committeeId === committee.id && uc.role === 'chair' && uc.left == null)) || isAdminOrBoard(user)) && (
         <div className="fixed bottom-5 right-5 z-10">
           <Fab
             variant="extended"
@@ -51,7 +52,7 @@ export default function Committee() {
           </div>
 
           {/* Committee Info */}
-          <div className="w-full rounded-2xl bg-inherit xl:col-span-2 xl:row-span-2 border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] h-full">
+          <div className="w-full rounded-2xl bg-[rgba(255,255,255,0.9)] dark:bg-[rgba(18,18,18,0.7)] xl:col-span-2 xl:row-span-2 border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] h-full">
             <img
               className="w-full aspect-[4/2] object-cover"
               src={imageUrl}
@@ -73,20 +74,16 @@ export default function Committee() {
               <h2>{text('Members', 'Leden')}</h2>
               <Table>
                 <TableBody>
-                  {committeeMembers
-                    ?.filter((member, index, self) =>
-                      index === self.findIndex(m => m.userId === member.userId)
-                    )
-                    .map((member: BasicUser) => (
-                      <TableRow
-                        key={member.userId}
-                        sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                      >
-                        <TableCell component="th" scope="row">
-                          <p>{`${member.firstName} ${member.infix ?? ''} ${member.lastName}`}</p>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                  {committeeMembers.map((member: BasicUser) => (
+                    <TableRow
+                      key={member.userId}
+                      sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                    >
+                      <TableCell component="th" scope="row">
+                        <p className="hover:cursor-pointer hover:opacity-60 transition-all duration-100" onClick={() => navigate('user', { id: member.userId})}>{`${member.firstName} ${member.infix ?? ''} ${member.lastName}`}</p>
+                      </TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </ContentCard>
