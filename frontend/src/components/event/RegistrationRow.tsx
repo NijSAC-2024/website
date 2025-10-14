@@ -1,7 +1,7 @@
 import { Checkbox, TableCell, TableRow, IconButton } from '@mui/material';
 import { Edit } from '@mui/icons-material';
 import moment from 'moment';
-import { Question, Registration } from '../../types.ts';
+import { Registration } from '../../types.ts';
 import {useApiState} from '../../providers/ApiProvider.tsx';
 import {useAuth} from '../../providers/AuthProvider.tsx';
 import {useAppState} from '../../providers/AppStateProvider.tsx';
@@ -9,13 +9,11 @@ import {isAdminOrBoard} from '../../util.ts';
 
 interface RegistrationRowProps {
   registration: Registration;
-  questions: Question[];
-  eventId: string;
   onEditClick: (registration: Registration) => void;
 }
 
-export default function RegistrationRow({ registration, questions, eventId, onEditClick }: RegistrationRowProps) {
-  const { updateRegistration } = useApiState()
+export default function RegistrationRow({ registration, onEditClick }: RegistrationRowProps) {
+  const { updateRegistration, event } = useApiState()
   const { user } = useAuth()
   const { navigate } = useAppState()
   return (
@@ -28,7 +26,7 @@ export default function RegistrationRow({ registration, questions, eventId, onEd
         </p>}
       </TableCell>
 
-      {isAdminOrBoard(user) && questions.map((q) => {
+      {isAdminOrBoard(user) && event?.questions.map((q) => {
         const answer = registration.answers?.find((a) => a.questionId === q.id)?.answer;
 
         if (q.questionType.type === 'boolean') {
@@ -40,12 +38,12 @@ export default function RegistrationRow({ registration, questions, eventId, onEd
         return <TableCell key={`${registration.registrationId}-${q.id}`}>{answer || ''}</TableCell>;
       })}
 
-      {isAdminOrBoard(user) && (
+      {event && isAdminOrBoard(user) && (
         <>
           <TableCell>
             <Checkbox
               checked={registration.attended}
-              onChange={(_, checked) => updateRegistration(eventId, registration.registrationId, registration.answers, checked, registration.waitingListPosition)}
+              onChange={(_, checked) => updateRegistration(event?.id, registration.registrationId, registration.answers, checked, registration.waitingListPosition)}
             />
           </TableCell>
           <TableCell>

@@ -15,6 +15,7 @@ import { apiFetch, apiFetchVoid } from '../api.ts';
 import { enqueueSnackbar } from 'notistack';
 import { useAuth } from './AuthProvider.tsx';
 import { useLanguage } from './LanguageProvider.tsx';
+import {isAdminOrBoard} from '../util.ts';
 
 interface ApiContextType {
   events?: Event[];
@@ -462,10 +463,13 @@ export default function ApiProvider({ children }: ApiProviderProps) {
   }, [route.name]);
 
   useEffect(() => {
-    if ((route.name === 'members' || route.name === 'event') && isLoggedIn && !(user?.status === 'pending')) {
+    if ((route.name === 'members') && isLoggedIn && !(user?.status === 'pending')) {
       getUsers();
     }
-  }, [cache, isLoggedIn, route.name, user?.status]);
+    if ((route.name === 'event') && isAdminOrBoard(user)) {
+      getUsers();
+    }
+  }, [cache, isLoggedIn, route.name, user]);
 
   useEffect(() => {
     if (route.name === 'event') {

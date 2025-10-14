@@ -50,7 +50,7 @@ export default function MobileMenu() {
   };
 
   return (
-    <div className="bg-white dark:bg-[#121212] shadow-lg text-black dark:text-white fixed z-10 w-full">
+    <div className="bg-[rgba(255,255,255,0.95)] dark:bg-[rgba(18,18,18,0.9)] shadow-lg fixed z-10 w-full">
       <Toolbar className="flex justify-between items-center w-full">
         <img
           src={'/images/logo.svg'}
@@ -75,7 +75,7 @@ export default function MobileMenu() {
         in={dropdownOpen}
         timeout="auto"
         unmountOnExit
-        className="relative text-black dark:text-white bg-white dark:bg-[#121212] z-10"
+        className="z-10"
       >
         <List disablePadding>
           {/* Events */}

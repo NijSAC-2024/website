@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogActions, Button } from '@mui/material';
 import {Answer, BasicUser, Language, Question, Registration} from '../../types.ts';
-import RegisterForm from './RegisterForm.tsx';
+import RegisterForm from '../register/RegisterForm.tsx';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 
 interface RegistrationDialogProps {

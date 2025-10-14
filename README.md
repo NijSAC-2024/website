@@ -8,9 +8,9 @@ To spin up a simple development environment, run `docker compose up` and visit h
 ```shell
 psql -h localhost -U nijsac -d nijsac < backend/src/data_source/fixtures/user.sql
 psql -h localhost -U nijsac -d nijsac < backend/src/data_source/fixtures/location.sql
+psql -h localhost -U nijsac -d nijsac < backend/src/data_source/fixtures/committee.sql
 psql -h localhost -U nijsac -d nijsac < backend/src/data_source/fixtures/event.sql
 psql -h localhost -U nijsac -d nijsac < backend/src/data_source/fixtures/event_registration.sql
-psql -h localhost -U nijsac -d nijsac < backend/src/data_source/fixtures/committee.sql
 ```
 Windows
 ```shell

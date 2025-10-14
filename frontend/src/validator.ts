@@ -92,12 +92,20 @@ export function onlyNumbersValidator(value: string): Language | false {
       nl: 'Dit veld is verplicht',
     };
   }
-  const validPattern = /^[a-zA-Z0-9\s'-]+$/;
+
+  if (/^-/.test(value.trim())) {
+    return {
+      en: 'Negative numbers are not allowed',
+      nl: 'Negatieve getallen zijn niet toegestaan',
+    };
+  }
+
+  const validPattern = /^[0-9\s'-]+$/;
   return validPattern.test(value)
     ? false
     : {
-      en: 'Only letters and numbers are allowed',
-      nl: 'Alleen letters en cijfers zijn toegestaan',
+      en: 'Only numbers are allowed',
+      nl: 'Alleen cijfers zijn toegestaan',
     };
 }
 

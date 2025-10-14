@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogContent } from '@mui/material';
+import {Button, Dialog, DialogActions, DialogContent, Tooltip} from '@mui/material';
 import { useAuth } from '../../providers/AuthProvider.tsx';
 import {Answer, DateType, Language, MembershipStatus, Question, Registration} from '../../types.ts';
 import {useState} from 'react';
@@ -79,6 +79,31 @@ export default function RegisterButton({
 
   const canRegister : boolean = isLoggedIn && requiredMembershipStatus.includes(user!.status) || requiredMembershipStatus.includes('nonMember');
 
+  const renderClock = () => {
+    const now = moment();
+    const close = moment(closeTime);
+    const diffHours = close.diff(now, 'hours');
+    const diffDays = close.diff(now, 'days');
+
+    let message = '';
+    let color = 'inherit';
+
+    if (diffHours <= 24) {
+      message = `Registration closes in ${diffHours === 1 ? '1 hour' : `${diffHours} hours!`}`;
+      color = 'text-red-500';
+    } else if (diffDays <= 7) {
+      message = `Registration closes in ${diffDays === 1 ? '1 day' : `${diffDays} days!`}`;
+    }
+
+    return (
+      <Tooltip title={message || ''}>
+        <p>
+          <AccessAlarmIcon className={`mr-2 ${color}`} />
+        </p>
+      </Tooltip>
+    );
+  };
+
   const renderRegistrationStatus = () => {
     if (registration) {
       if (closeTime < now && !isAdminOrBoard(user)) {
@@ -101,7 +126,7 @@ export default function RegisterButton({
         return <Button variant="contained" disabled>{text('Full', 'Vol')}</Button>;
       }
       if (canRegister) {
-        return <Button variant="contained" onClick={handleRegistrationClick}>{text('Join Queue', 'Inschrijven wachtlijst')}</Button>;
+        return <Button variant="contained" onClick={handleRegistrationClick}>{renderClock()}{text('Join Queue', 'Inschrijven wachtlijst')}</Button>;
       }
     }
 
@@ -117,12 +142,12 @@ export default function RegisterButton({
     if (closeTime > now) {
       if (canRegister) {
         if (registrationCount && registrationMax && registrationCount >= registrationMax && !isAdminOrBoard(user)) {
-          return <Button variant="contained" onClick={handleRegistrationClick}>{text('Join Queue', 'Inschrijven wachtlijst')}</Button>;
+          return <Button variant="contained" onClick={handleRegistrationClick}>{renderClock()}{text('Join Queue', 'Inschrijven wachtlijst')}</Button>;
         }
-        return <Button variant="contained" onClick={handleRegistrationClick}>{text('Register', 'Inschrijven')}</Button>
+        return <Button variant="contained" onClick={handleRegistrationClick}>{renderClock()}{text('Register', 'Inschrijven')}</Button>
       }
       if (isLoggedIn && !requiredMembershipStatus.includes(user!.status)) {
-        return <Button variant="contained" disabled>{text('Register', 'Inschrijven')}</Button>
+        return <Button variant="contained" disabled>{renderClock()}{text('Register', 'Inschrijven')}</Button>
       }
       return <Button variant="contained" onClick={toggleAuthOpen}>{text('Login to register', 'Login om in te schrijven')}</Button>
     } else if (isAdminOrBoard(user)) {
@@ -154,11 +179,6 @@ export default function RegisterButton({
                 'Inschrijving voor ' + title.nl
               )}
             </h1>
-            <p>
-              <AccessAlarmIcon className=" mr-2" />
-              {text('Registrations close at ', 'Inschrijvingen sluiten op ')}
-              {moment(registrationPeriod.end).format('DD MMM HH:mm')}
-            </p>
             {!registration && registrationMax && !!registrationCount && registrationCount >= registrationMax && !isAdminOrBoard(user) && (
               <b>
                 {text('The event is currently full. By registering, you will be put in the waiting queue. If a spot becomes available, you will automatically be registered and notified.',

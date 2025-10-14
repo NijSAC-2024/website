@@ -2,7 +2,7 @@ import { EventContent } from '../../types.ts';
 import { Button } from '@mui/material';
 import { useEffect, useState } from 'react';
 import EditRegistrations from './EditRegistrations.tsx';
-import EditAgendaCard from './EditAgendaCard.tsx';
+import EditEventCard from './EditEventCard.tsx';
 import EditDescription from './EditDescription.tsx';
 import GenericPage from '../../pages/GenericPage.tsx';
 import SaveButton from './SaveButton.tsx';
@@ -85,7 +85,7 @@ export default function EditEvent() {
           )}
         </div>
 
-        <EditAgendaCard
+        <EditEventCard
           dates={event.dates}
           image={event.image}
           category={event.eventType}

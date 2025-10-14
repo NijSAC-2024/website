@@ -10,7 +10,7 @@ interface AgendaFilterProps {
   setType: (type: WeekendType | 'all') => void;
 }
 
-export default function AgendaFilter({
+export default function EventsFilter({
   category,
   setCategory,
   type,

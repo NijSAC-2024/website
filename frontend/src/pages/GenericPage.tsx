@@ -23,7 +23,7 @@ export default function GenericPage({
           }')`
         }}
       ></div>
-      <div className="relative w-[95%] xl:w-[80%] max-w-[1000px] mx-auto xl:mt-[-28rem] mt-[-21rem] pb-20">
+      <div className="relative w-[95%] xl:w-[80%] max-w-[1000px] mx-auto xl:mt-[-35vh] mt-[-37.5vh] pb-20">
         {children}
       </div>
     </div>

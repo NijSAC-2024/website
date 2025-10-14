@@ -20,7 +20,7 @@ interface EditAgendaCardProps {
   handleEventChange: (changes: Partial<EventContent>) => void;
 }
 
-export default function EditAgendaCard({
+export default function EditEventCard({
   category,
   image,
   metadata,
@@ -81,8 +81,8 @@ export default function EditAgendaCard({
               />
             </Button>
           </form>
-          {/* Category and Type */}
-          <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
+          {/* Category, Committee and Type */}
+          <div className="grid gap-3">
             <FormControl fullWidth>
               <InputLabel id="select-label">
                 {text('Category*', 'Categorie*')}

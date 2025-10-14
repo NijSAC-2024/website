@@ -1,20 +1,19 @@
 import { Table, TableBody, TableCell, TableRow } from '@mui/material';
-import { Question, Registration } from '../../types.ts';
+import { Registration } from '../../types.ts';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import RegistrationRow from './RegistrationRow.tsx';
 import {useAuth} from '../../providers/AuthProvider.tsx';
-import {isAdminOrBoard} from "../../util.ts";
+import {isAdminOrBoard} from '../../util.ts';
+import {useApiState} from '../../providers/ApiProvider.tsx';
 
 interface RegistrationTableProps {
-  registrations: Registration[];
-  questions: Question[];
-  eventId: string;
   onEditClick: (registration: Registration) => void;
 }
 
-export default function RegistrationTable({ registrations, questions, eventId, onEditClick }: RegistrationTableProps) {
+export default function RegistrationTable({ onEditClick }: RegistrationTableProps) {
   const { text } = useLanguage();
   const { user } = useAuth()
+  const { event, registrations } = useApiState()
 
   return (
     <div className="overflow-x-auto">
@@ -24,19 +23,17 @@ export default function RegistrationTable({ registrations, questions, eventId, o
             {isAdminOrBoard(user) && (
               <TableRow>
                 <TableCell><b>{text('Name', 'Naam')}</b></TableCell>
-                {questions.map((q) => (
+                {event?.questions.map((q) => (
                   <TableCell key={q.id}><b>{`${text(q.question)} ${q.required ? '*' : ''}`}</b></TableCell>
                 ))}
                 <TableCell><b>{text('Attended', 'Aanwezig')}</b></TableCell>
                 <TableCell><b>{text('Actions', 'Acties')}</b></TableCell>
               </TableRow>
             )}
-            {registrations.map((r) => (
+            {registrations?.map((r) => (
               <RegistrationRow
                 key={r.userId}
                 registration={r}
-                questions={questions}
-                eventId={eventId}
                 onEditClick={onEditClick}
               />
             ))}

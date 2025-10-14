@@ -1,6 +1,6 @@
 import {useState, useMemo} from 'react';
 import {
-  Table, TableBody, TableCell, TableHead, TableRow,
+  Table, TableBody, TableCell, TableRow,
   TablePagination, TextField
 } from '@mui/material';
 import { useLanguage } from '../../providers/LanguageProvider';
@@ -47,13 +47,6 @@ export default function MembersTable() {
       />
 
       <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>
-              <b>{text('Name', 'Naam')}</b>
-            </TableCell>
-          </TableRow>
-        </TableHead>
         <TableBody>
           {paginatedUsers.map((u) => (
             <TableRow key={u.userId}>

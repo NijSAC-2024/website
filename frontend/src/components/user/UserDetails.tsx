@@ -179,7 +179,7 @@ export default function UserDetails() {
 
             <b>{text('Roles', 'Rollen')}</b>
             <span className="xl:col-span-3">
-              {viewUser.roles.map((r) => text(getLabel(r))).join(', ')}
+              {viewUser.roles && viewUser.roles.map((r) => text(getLabel(r))).join(', ')}
             </span>
           </TextCard>
 

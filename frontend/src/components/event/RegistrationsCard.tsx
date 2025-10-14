@@ -6,10 +6,12 @@ import {Answer, BasicUser, Question, Registration} from '../../types.ts';
 import { useApiState } from '../../providers/ApiProvider.tsx';
 import { useState } from 'react';
 import AreYouSure from '../AreYouSure.tsx';
-import RegistrationTable from '../register/RegistrationTable.tsx';
-import RegistrationDialog from '../register/RegistrationDialog.tsx';
-import RegisterUserAutocomplete from '../register/RegisterUserAutocomplete.tsx';
+import RegistrationTable from './RegistrationTable.tsx';
+import RegistrationDialog from './RegistrationDialog.tsx';
+import RegisterUserAutocomplete from './RegisterUserAutocomplete.tsx';
 import {isAdminOrBoard} from '../../util.ts';
+import AccessAlarmIcon from '@mui/icons-material/AccessAlarm';
+import moment from 'moment';
 
 interface RegistrationsCardProps {
   questions: Question[];
@@ -62,7 +64,12 @@ export default function RegistrationsCard({ questions }: RegistrationsCardProps)
     <>
       {((!!user && event?.requiredMembershipStatus.includes(user?.status)) || event?.requiredMembershipStatus.includes('nonMember')) && event?.registrationPeriod && (
         <ContentCard className="xl:col-span-3">
-          <h1>{text('Participants', 'Deelnemers')}</h1>
+          <h1>{text('Registrations', 'Inschrijvingen')}</h1>
+          <p>
+            <AccessAlarmIcon className=" mr-2" />
+            {text('Registrations close at ', 'Inschrijvingen sluiten op ')}
+            {moment(event?.registrationPeriod.end).format('DD MMM HH:mm')}
+          </p>
 
           {isAdminOrBoard(user) && (
             <Box className="mt-2 grid" component="form" onSubmit={(e) => { e.preventDefault(); toggleRegisterDialog(); }}>

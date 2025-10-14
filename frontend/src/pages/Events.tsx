@@ -5,8 +5,8 @@ import { Event, EventType, WeekendType } from '../types.ts';
 import EventCard from '../components/event/EventCard.tsx';
 import { useApiState } from '../providers/ApiProvider.tsx';
 import { useLanguage } from '../providers/LanguageProvider.tsx';
-import NewEventButton from '../components/buttons/NewEventButton.tsx';
-import AgendaFilter from '../components/agenda/AgendaFilter.tsx';
+import NewEventButton from '../components/events/NewEventButton.tsx';
+import EventsFilter from '../components/events/EventsFilter.tsx';
 import moment from 'moment/moment';
 import {Switch} from '@mui/material';
 
@@ -50,7 +50,7 @@ export default function Events() {
               )}
             </p>
           </ContentCard>
-          <AgendaFilter category={category} setCategory={setCategory} type={type} setType={setType}/>
+          <EventsFilter category={category} setCategory={setCategory} type={type} setType={setType}/>
           {events &&
             events
               .filter(
