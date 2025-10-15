@@ -131,7 +131,6 @@ export interface LocationContent {
 }
 
 export interface UserCommittee {
-  id: string;
   userId: string;
   committeeId: string;
   role: CommitteeRoleType;

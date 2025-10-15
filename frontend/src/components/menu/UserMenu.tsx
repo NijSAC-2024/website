@@ -38,7 +38,7 @@ export default function UserMenu({toggleDropdown}: UserMenuProps) {
   };
   return (
     <>
-      <Tooltip title="User settings">
+      <Tooltip title={text('Account settings', 'Account instellingen')}>
         <IconButton onClick={handleClick}>
           <Avatar className="w-8 h-8">{user?.firstName.charAt(0).toUpperCase()}</Avatar>
         </IconButton>

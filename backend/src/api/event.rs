@@ -1,5 +1,5 @@
 use crate::{
-    api::{ApiResult, ValidatedJson},
+    api::{ApiResult, ValidatedJson, is_admin_or_board},
     auth::{
         role::{MembershipStatus},
         session::Session,
@@ -16,7 +16,14 @@ use crate::{
 use axum::{Json, extract::Path};
 use time::OffsetDateTime;
 use tracing::{debug, info, trace, warn};
-use crate::api::{has_registration_access, is_admin_or_board};
+
+fn has_registration_access(id: &UserId, session: &Session) -> AppResult<()> {
+    if is_admin_or_board(session).is_ok() || id == session.user_id() {
+        Ok(())
+    } else {
+        Err(Error::Unauthorized)
+    }
+}
 
 pub async fn get_event_registrations(
     store: EventStore,

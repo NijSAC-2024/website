@@ -25,7 +25,6 @@ pub use user::*;
 use validator::Validate;
 use crate::auth::role::Role;
 use crate::auth::session::Session;
-use crate::user::UserId;
 
 type ApiResult<T> = Result<Json<T>, Error>;
 
@@ -95,14 +94,6 @@ pub(crate) fn is_admin_or_board(session: &Session) -> AppResult<()> {
             )
     })
     {
-        Ok(())
-    } else {
-        Err(Error::Unauthorized)
-    }
-}
-
-fn has_registration_access(id: &UserId, session: &Session) -> AppResult<()> {
-    if is_admin_or_board(session).is_ok() || id == session.user_id() {
         Ok(())
     } else {
         Err(Error::Unauthorized)

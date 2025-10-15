@@ -138,6 +138,6 @@ pub async fn delete_user(
     session: Session,
     Path(id): Path<UserId>,
 ) -> AppResult<()> {
-    update_access(&id, &session)?;
+    is_admin_or_board(&session)?;
     store.delete(&id).await
 }

@@ -36,6 +36,19 @@ export default function DescriptionCard({
       </div>
       <div
         className="xl:flex grid grid-cols-2 gap-2.5 justify-between p-3.5 border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
+        <div>
+          <b className="text-[#1976d2] dark:text-[#90caf9]">
+            {text('Organised by', 'Geörganiseerd door')}
+          </b>
+          <div>
+            <Chip
+              label={text(committees.find(c => c.id === createdBy)?.name || {en: '', nl: ''})}
+              className="uppercase font-semibold"
+              size="small"
+              onClick={() => navigate('committee', {id: createdBy!})}
+            />
+          </div>
+        </div>
         {(gear.en?.length > 0 || gear.nl?.length > 0) && (
           <div>
             <b className="text-[#1976d2] dark:text-[#90caf9]">
@@ -93,19 +106,6 @@ export default function DescriptionCard({
             </div>
           </div>
         )}
-        <div>
-          <b className="text-[#1976d2] dark:text-[#90caf9]">
-            {text('Organised by', 'Geörganiseerd door')}
-          </b>
-          <div>
-            <Chip
-              label={text(committees.find(c => c.id === createdBy)?.name || {en: '', nl: ''})}
-              className="uppercase font-semibold"
-              size="small"
-              onClick={() => navigate('committee', {id: createdBy!})}
-            />
-          </div>
-        </div>
       </div>
     </div>
   );

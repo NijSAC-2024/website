@@ -151,7 +151,7 @@ export default function RegisterButton({
       }
       return <Button variant="contained" onClick={toggleAuthOpen}>{text('Login to register', 'Login om in te schrijven')}</Button>
     } else if (isAdminOrBoard(user)) {
-      return <Button variant="contained">{text('Register', 'Inschrijven')}</Button>
+      return <Button variant="contained" onClick={handleRegistrationClick}>{text('Register', 'Inschrijven')}</Button>
     }
 
     return (
