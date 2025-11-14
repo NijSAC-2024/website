@@ -1,0 +1,64 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT\n                id,\n                name_nl,\n                name_en,\n                description_nl,\n                description_en,\n                created,\n                updated,\n                image\n            FROM committee\n            WHERE id = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "name_nl",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "name_en",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "description_nl",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "description_en",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 6,
+        "name": "updated",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "image",
+        "type_info": "Uuid"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "232bb7795726d3df9bfe75c6620a19e395ec8821acd76e75ad005b8a1d667297"
+}

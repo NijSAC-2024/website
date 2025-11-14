@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT count(r.user_id) FILTER ( WHERE r.waiting_list_position IS NOT NULL ) as \"count!\"\n            FROM event e\n                LEFT JOIN event_registration r ON r.event_id = e.id\n            WHERE e.id = (SELECT event_id FROM event_registration WHERE registration_id = $1)\n            GROUP BY e.id\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count!",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "64d413a2062634664e39a7fdfff86bc7bf97d07e524b3f3464dbc664015a2dbd"
+}

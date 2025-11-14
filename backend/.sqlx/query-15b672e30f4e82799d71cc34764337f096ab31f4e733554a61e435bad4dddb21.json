@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                UPDATE event_registration\n                SET waiting_list_position = null\n                WHERE registration_id = $1\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "15b672e30f4e82799d71cc34764337f096ab31f4e733554a61e435bad4dddb21"
+}

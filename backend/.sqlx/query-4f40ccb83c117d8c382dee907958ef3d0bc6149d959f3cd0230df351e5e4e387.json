@@ -1,0 +1,40 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT\n                u.id AS \"user_id!\",\n                u.first_name,\n                u.infix,\n                u.last_name\n            FROM \"user\" u\n            JOIN user_committee uc ON u.id = uc.user_id\n            WHERE uc.committee_id = $1 AND uc.\"left\" IS NULL\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "user_id!",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "first_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "infix",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "last_name",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "4f40ccb83c117d8c382dee907958ef3d0bc6149d959f3cd0230df351e5e4e387"
+}

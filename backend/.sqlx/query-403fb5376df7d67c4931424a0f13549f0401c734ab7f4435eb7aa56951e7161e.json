@@ -1,0 +1,69 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO committee (\n                id,\n                name_nl,\n                name_en,\n                description_nl,\n                description_en,\n                image,\n                created,\n                updated\n            )\n            VALUES ($1, $2, $3, $4, $5, $6, now(), now())\n            RETURNING\n                id,\n                name_nl,\n                name_en,\n                description_nl,\n                description_en,\n                created,\n                updated,\n                image\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "name_nl",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "name_en",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "description_nl",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "description_en",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 6,
+        "name": "updated",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "image",
+        "type_info": "Uuid"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "403fb5376df7d67c4931424a0f13549f0401c734ab7f4435eb7aa56951e7161e"
+}
