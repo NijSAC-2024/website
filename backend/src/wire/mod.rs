@@ -1,12 +1,12 @@
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
+pub mod committee;
 pub mod event;
 pub mod file;
 pub mod location;
 pub mod material;
 pub mod user;
-pub mod committee;
 
 #[derive(Serialize, Deserialize, Debug, Validate, Default)]
 pub struct Language {

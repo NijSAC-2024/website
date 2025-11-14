@@ -1,3 +1,4 @@
+use crate::auth::session::Session;
 use crate::{
     AppState, Pagination,
     data_source::Count,
@@ -13,7 +14,6 @@ use sqlx::PgPool;
 use std::sync::Arc;
 use time::OffsetDateTime;
 use uuid::Uuid;
-use crate::auth::session::Session;
 
 pub struct FileStore {
     db: PgPool,
@@ -65,13 +65,13 @@ impl TryFrom<PgFileMetadata> for FileMetadata {
 impl FileStore {
     async fn upload_access(&self, session: &Session) -> AppResult<()> {
         // Admins always allowed
-        if crate::api::is_admin_or_board(&session).is_ok() {
+        if crate::api::is_admin_or_board(session).is_ok() {
             return Ok(());
         }
 
         // Check if user is active in any committee
         let in_any_committee = sqlx::query_scalar!(
-        r#"
+            r#"
         SELECT EXISTS(
             SELECT 1
             FROM user_committee
@@ -79,11 +79,11 @@ impl FileStore {
               AND "left" IS NULL
         )
         "#,
-        **session.user_id()
-    )
-            .fetch_one(&self.db)
-            .await?
-            .unwrap_or(false);
+            **session.user_id()
+        )
+        .fetch_one(&self.db)
+        .await?
+        .unwrap_or(false);
 
         if !in_any_committee {
             return Err(Error::Unauthorized);
@@ -153,7 +153,11 @@ impl FileStore {
         Ok(self.object_store.get(&id.into()).await?.bytes().await?)
     }
 
-    pub async fn get_all_metadata(&self, pagination: Pagination, session: &Session) -> AppResult<Vec<FileMetadata>> {
+    pub async fn get_all_metadata(
+        &self,
+        pagination: Pagination,
+        session: &Session,
+    ) -> AppResult<Vec<FileMetadata>> {
         self.upload_access(session).await?;
         sqlx::query_as!(
             PgFileMetadata,

@@ -4,6 +4,7 @@ use crate::{
     wire::event::{Event, EventContent, EventId},
 };
 
+use crate::auth::session::Session;
 use crate::{
     auth::role::MembershipStatus,
     error::AppResult,
@@ -17,7 +18,6 @@ use time::OffsetDateTime;
 use tracing::error;
 use uuid::Uuid;
 use validator::Validate;
-use crate::auth::session::Session;
 
 pub struct EventStore {
     db: PgPool,
@@ -197,7 +197,7 @@ impl EventStore {
         session: &Session,
         committee_id: &Uuid,
     ) -> AppResult<()> {
-        if crate::api::is_admin_or_board(&session).is_ok() {
+        if crate::api::is_admin_or_board(session).is_ok() {
             return Ok(());
         }
 
@@ -214,9 +214,9 @@ impl EventStore {
             **session.user_id(),
             *committee_id
         )
-            .fetch_one(&self.db)
-            .await?
-            .unwrap_or(false);
+        .fetch_one(&self.db)
+        .await?
+        .unwrap_or(false);
 
         if !in_committee {
             return Err(Error::Unauthorized);
@@ -229,7 +229,8 @@ impl EventStore {
         mut event: EventContent<LocationId>,
         session: &Session,
     ) -> AppResult<Event<Location>> {
-        self.ensure_user_in_committee(session, &event.created_by).await?;
+        self.ensure_user_in_committee(session, &event.created_by)
+            .await?;
         let event_id = Uuid::now_v7();
 
         event.dates.sort_by_key(|date| date.start);
@@ -404,7 +405,8 @@ impl EventStore {
         mut updated: EventContent<LocationId>,
         session: &Session,
     ) -> AppResult<Event<Location>> {
-        self.ensure_user_in_committee(session, &updated.created_by).await?;
+        self.ensure_user_in_committee(session, &updated.created_by)
+            .await?;
 
         updated.dates.sort_by_key(|date| date.start);
         let (start_dates, end_dates) = updated.dates.into_iter().fold(
@@ -460,26 +462,21 @@ impl EventStore {
             updated.metadata,
             updated.created_by,
         )
-            .execute(&self.db)
-            .await?;
+        .execute(&self.db)
+        .await?;
 
         self.get_event(id, true).await
     }
 
-    pub async fn delete_event(
-        &self,
-        id: &EventId,
-        session: &Session,
-    ) -> AppResult<()> {
-        let committee_id = sqlx::query_scalar!(
-            r#"SELECT created_by FROM event WHERE id = $1"#,
-            **id
-        )
-            .fetch_optional(&self.db)
-            .await?
-            .ok_or_else(|| Error::Unauthorized)?;
+    pub async fn delete_event(&self, id: &EventId, session: &Session) -> AppResult<()> {
+        let committee_id =
+            sqlx::query_scalar!(r#"SELECT created_by FROM event WHERE id = $1"#, **id)
+                .fetch_optional(&self.db)
+                .await?
+                .ok_or_else(|| Error::Unauthorized)?;
 
-        self.ensure_user_in_committee(session, &committee_id).await?;
+        self.ensure_user_in_committee(session, &committee_id)
+            .await?;
 
         sqlx::query!(r#"DELETE FROM event WHERE id = $1"#, **id)
             .execute(&self.db)
@@ -607,20 +604,19 @@ impl EventStore {
 
     pub async fn get_registered_users(&self, id: &EventId) -> AppResult<Vec<BasicUser>> {
         Ok(sqlx::query_as!(
-        BasicUser,
-        r#"
+            BasicUser,
+            r#"
         SELECT u.id as user_id, u.first_name, u.infix, u.last_name
         FROM event_registration ar
             JOIN "user" u ON ar.user_id = u.id
         WHERE ar.event_id = $1
           AND ar.waiting_list_position IS NULL
         "#,
-        **id
-    )
-            .fetch_all(&self.db)
-            .await?)
+            **id
+        )
+        .fetch_all(&self.db)
+        .await?)
     }
-
 
     pub async fn get_user_registrations(&self, user_id: &UserId) -> AppResult<Vec<Registration>> {
         sqlx::query_as!(
@@ -650,10 +646,7 @@ impl EventStore {
         .collect::<Result<Vec<Registration>, Error>>()
     }
 
-    pub async fn get_user_events(
-        &self,
-        user_id: &UserId,
-    ) -> AppResult<Vec<Event<Location>>> {
+    pub async fn get_user_events(&self, user_id: &UserId) -> AppResult<Vec<Event<Location>>> {
         let events = sqlx::query_as!(
         PgEvent,
         r#"
@@ -700,10 +693,10 @@ impl EventStore {
             .fetch_all(&self.db)
             .await?;
 
-        Ok(events
+        events
             .into_iter()
             .map(|e| e.try_into())
-            .collect::<Result<Vec<_>, _>>()?)
+            .collect::<Result<Vec<_>, _>>()
     }
 
     pub async fn get_registrations_detailed(&self, id: &EventId) -> AppResult<Vec<Registration>> {

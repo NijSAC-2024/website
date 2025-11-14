@@ -1,9 +1,6 @@
 use crate::{
     api::{ApiResult, ValidatedJson, is_admin_or_board},
-    auth::{
-        role::{MembershipStatus},
-        session::Session,
-    },
+    auth::{role::MembershipStatus, session::Session},
     data_source::event::EventStore,
     error::{AppResult, Error},
     event::{
@@ -33,11 +30,11 @@ pub async fn get_event_registrations(
     let event = store.get_event(&id, true).await?;
 
     // Admins always get full access
-    if let Some(ref session) = session {
-        if is_admin_or_board(session).is_ok() {
-            let regs = store.get_registrations_detailed(&id).await?;
-            return Ok(Json(serde_json::to_value(regs)?));
-        }
+    if let Some(ref session) = session
+        && is_admin_or_board(session).is_ok()
+    {
+        let regs = store.get_registrations_detailed(&id).await?;
+        return Ok(Json(serde_json::to_value(regs)?));
     }
 
     // If NonMember is accepted → anyone can view registrations
@@ -51,20 +48,18 @@ pub async fn get_event_registrations(
     }
 
     // Otherwise, user must be logged in AND have matching membership
-    if let Some(ref session) = session {
-        if event
+    if let Some(ref session) = session
+        && event
             .content
             .required_membership_status
             .contains(&session.membership_status())
-        {
-            let regs = store.get_registered_users(&id).await?;
-            return Ok(Json(serde_json::to_value(regs)?));
-        }
+    {
+        let regs = store.get_registered_users(&id).await?;
+        return Ok(Json(serde_json::to_value(regs)?));
     }
 
     Err(Error::Unauthorized)
 }
-
 
 pub async fn get_user_registrations(
     store: EventStore,

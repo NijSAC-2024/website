@@ -1,7 +1,7 @@
 use crate::{
     Pagination, ValidatedQuery,
     api::ApiResult,
-    auth::{session::Session},
+    auth::session::Session,
     data_source::FileStore,
     error::{AppResult, Error},
     file::{FileId, FileMetadata},
@@ -45,11 +45,7 @@ pub async fn upload(
 
         let len = data.len();
 
-        result.push(
-            store
-                .create(&name, content_type, data, &session)
-                .await?,
-        );
+        result.push(store.create(&name, content_type, data, &session).await?);
         info!(
             "User {} Uploaded file '{}' with {} bytes",
             &session.user_id(),

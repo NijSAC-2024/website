@@ -1,10 +1,12 @@
+mod committee;
 mod event;
 mod file;
 mod location;
 mod material;
 mod user;
-mod committee;
 
+use crate::auth::role::Role;
+use crate::auth::session::Session;
 use crate::error::{AppResult, Error};
 use axum::{
     Json,
@@ -14,17 +16,15 @@ use axum::{
     },
     http::request::Parts,
 };
+pub use committee::*;
 pub use event::*;
 pub use file::*;
 pub use location::*;
 pub use material::*;
-pub use committee::*;
 use serde::{Deserialize, de::DeserializeOwned};
 use serde_with::{DisplayFromStr, serde_as};
 pub use user::*;
 use validator::Validate;
-use crate::auth::role::Role;
-use crate::auth::session::Session;
 
 type ApiResult<T> = Result<Json<T>, Error>;
 
@@ -84,16 +84,15 @@ where
 pub(crate) fn is_admin_or_board(session: &Session) -> AppResult<()> {
     if session.roles().iter().any(|role| {
         matches!(
-                role,
-                Role::Admin
-                    | Role::Treasurer
-                    | Role::Secretary
-                    | Role::Chair
-                    | Role::ViceChair
-                    | Role::ClimbingCommissar
-            )
-    })
-    {
+            role,
+            Role::Admin
+                | Role::Treasurer
+                | Role::Secretary
+                | Role::Chair
+                | Role::ViceChair
+                | Role::ClimbingCommissar
+        )
+    }) {
         Ok(())
     } else {
         Err(Error::Unauthorized)

@@ -1,18 +1,15 @@
+use crate::api::is_admin_or_board;
+use crate::committee::CommitteeRole;
 use crate::{
     ValidatedJson,
     api::ApiResult,
-    auth::{session::Session},
+    auth::session::Session,
+    committee::{Committee, CommitteeContent, CommitteeId, UserCommittee},
     data_source::committee::CommitteeStore,
     error::{AppResult, Error},
-    committee::{Committee, CommitteeContent, UserCommittee, CommitteeId},
-    user::{UserId, BasicUser},
+    user::{BasicUser, UserId},
 };
-use axum::{
-    Json,
-    extract::Path,
-};
-use crate::api::is_admin_or_board;
-use crate::committee::CommitteeRole;
+use axum::{Json, extract::Path};
 
 pub async fn committee_access(
     session: &Session,
@@ -29,9 +26,7 @@ pub async fn committee_access(
 
     // Must be chair and currently active (left IS NONE)
     let is_chair = user_committees.iter().any(|c| {
-        c.committee_id == *committee_id
-            && c.role == CommitteeRole::Chair
-            && c.left.is_none()
+        c.committee_id == *committee_id && c.role == CommitteeRole::Chair && c.left.is_none()
     });
 
     if is_chair {
@@ -41,7 +36,10 @@ pub async fn committee_access(
     }
 }
 
-pub async fn get_committee(store: CommitteeStore, Path(id): Path<CommitteeId>) -> ApiResult<Committee> {
+pub async fn get_committee(
+    store: CommitteeStore,
+    Path(id): Path<CommitteeId>,
+) -> ApiResult<Committee> {
     store.get_one(&id).await.map(Into::into)
 }
 
@@ -99,7 +97,7 @@ pub async fn remove_user_from_committee(
 pub async fn get_committee_members(
     store: CommitteeStore,
     Path(id): Path<CommitteeId>,
-    session: Session
+    session: Session,
 ) -> ApiResult<Vec<BasicUser>> {
     if session.membership_status().is_member() {
         Ok(Json(store.get_committee_members(&id).await?))
@@ -111,7 +109,7 @@ pub async fn get_committee_members(
 pub async fn get_user_committees(
     store: CommitteeStore,
     Path(id): Path<UserId>,
-    session: Session
+    session: Session,
 ) -> ApiResult<Vec<UserCommittee>> {
     if session.membership_status().is_member() {
         Ok(Json(store.get_committees_for_user(&id).await?))
@@ -119,4 +117,3 @@ pub async fn get_user_committees(
         Err(Error::Unauthorized)
     }
 }
-

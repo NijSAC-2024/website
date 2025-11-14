@@ -14,7 +14,7 @@ use axum::{Json, extract::Path, http::HeaderMap};
 fn read_all_access(session: &Session) -> AppResult<()> {
     if session.membership_status().is_member()
         && session.roles().iter().any(|role| {
-        matches!(
+            matches!(
                 role,
                 Role::Admin
                     | Role::Treasurer
@@ -23,7 +23,7 @@ fn read_all_access(session: &Session) -> AppResult<()> {
                     | Role::ViceChair
                     | Role::ClimbingCommissar
             )
-    })
+        })
     {
         Ok(())
     } else {

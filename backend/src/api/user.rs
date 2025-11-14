@@ -1,13 +1,11 @@
+use crate::api::is_admin_or_board;
 use crate::{
     Pagination,
     api::{ApiResult, ValidatedJson, ValidatedQuery},
-    auth::{
-        role::{MembershipStatus},
-        session::Session,
-    },
+    auth::{role::MembershipStatus, session::Session},
     data_source::UserStore,
     error::{AppResult, Error},
-    user::{Password, RegisterNewUser, User, UserContent, UserId, BasicUser},
+    user::{BasicUser, Password, RegisterNewUser, User, UserContent, UserId},
 };
 use axum::{
     Json,
@@ -15,7 +13,6 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use crate::api::is_admin_or_board;
 
 enum UpdateAccess {
     Anything,
@@ -80,8 +77,7 @@ pub async fn register(
 pub async fn who_am_i(store: UserStore, session: Option<Session>) -> ApiResult<User> {
     if let Some(session) = session {
         Ok(Json(store.get(session.user_id()).await?))
-    }
-    else {
+    } else {
         Err(Error::Unauthorized)
     }
 }

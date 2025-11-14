@@ -1,13 +1,11 @@
+use crate::Language;
+use crate::file::FileId;
+use crate::user::UserId;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::ops::Deref;
 use time::OffsetDateTime;
 use uuid::Uuid;
 use validator::Validate;
-use crate::{
-    file::FileId,
-};
-use crate::Language;
-use crate::user::UserId;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
 #[serde(transparent)]
@@ -59,10 +57,7 @@ pub struct CommitteeContent {
     pub image: Option<FileId>,
 }
 
-fn serialize_option<S>(
-    date: &Option<OffsetDateTime>,
-    serializer: S,
-) -> Result<S::Ok, S::Error>
+fn serialize_option<S>(date: &Option<OffsetDateTime>, serializer: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
 {
@@ -88,6 +83,9 @@ pub struct UserCommittee {
     #[serde(with = "time::serde::rfc3339")]
     pub joined: OffsetDateTime,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(serialize_with = "serialize_option", deserialize_with = "deserialize_option")]
+    #[serde(
+        serialize_with = "serialize_option",
+        deserialize_with = "deserialize_option"
+    )]
     pub left: Option<OffsetDateTime>,
 }

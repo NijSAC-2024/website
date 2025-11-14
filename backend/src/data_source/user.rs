@@ -214,8 +214,8 @@ impl UserStore {
             "#,
             id.deref()
         )
-            .fetch_one(&self.db)
-            .await?)
+        .fetch_one(&self.db)
+        .await?)
     }
 
     // pub async fn get_all_detailed(&self, pagination: &Pagination) -> AppResult<Vec<User>> {
