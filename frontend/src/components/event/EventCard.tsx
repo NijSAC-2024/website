@@ -8,7 +8,7 @@ import 'moment/dist/locale/nl';
 import {DateType, Event, Registration} from '../../types.ts';
 import Markdown from 'react-markdown';
 import RegisterButton from '../register/RegisterButton.tsx';
-import { useAppState } from '../../providers/AppStateProvider.tsx';
+import {useWebsite} from '../../hooks/useState.ts';
 
 interface AgendaCardProps {
   event: Event;
@@ -17,7 +17,7 @@ interface AgendaCardProps {
 }
 
 export default function EventCard({ event, agendaPage, registration }: AgendaCardProps) {
-  const { navigate } = useAppState();
+  const {navigate} = useWebsite()
   const { text, language } = useLanguage();
   moment.locale(language);
 
@@ -67,7 +67,7 @@ export default function EventCard({ event, agendaPage, registration }: AgendaCar
     <div
       className="w-full rounded-2xl bg-[rgba(255,255,255,0.9)] dark:bg-[rgba(18,18,18,0.7)] border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] flex flex-col relative justify-between">
       <div
-        onClick={() => navigate('event', { id: event.id })}
+        onClick={() => navigate('events.event', { event_id: event.id })}
         className={agendaPage ? 'hover:cursor-pointer' : ''}
       >
         <Chip

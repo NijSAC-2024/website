@@ -2,9 +2,7 @@ import { FormEvent, useEffect, useState } from 'react';
 import { TextField, Button, Box, FormControl } from '@mui/material';
 import {Language, toUserContent, UserContent} from '../../types';
 import { FormErrors } from '../signup/SignupForm';
-import { useApiState } from '../../providers/ApiProvider';
 import { useLanguage } from '../../providers/LanguageProvider';
-import { useAuth } from '../../providers/AuthProvider';
 import {
   emailValidator, emergencyContactNameValidator, nameValidator,
   onlyNumbersValidator, optionalOnlyLetterNumberValidator, optionalOnlyLetterValidator, phoneValidator
@@ -12,14 +10,14 @@ import {
 import ContentCard from '../ContentCard.tsx';
 import TextCard from '../TextCard.tsx';
 import {getLabel, isAdminOrBoard} from '../../util.ts';
-import {useAppState} from '../../providers/AppStateProvider.tsx';
 import UserActions from './UserActions.tsx';
+import {useWebsite} from '../../hooks/useState.ts';
+import {useUsers} from '../../hooks/useUsers.ts';
 
 export default function UserDetails() {
   const { text } = useLanguage();
-  const { user } = useAuth();
-  const { updateUser, getUser } = useApiState();
-  const { route } = useAppState()
+  const { user } = useUsers();
+  const {state: {routerState: {params}}} = useWebsite();
   const [viewUser, setViewUser] = useState(user);
   const [form, setForm] = useState<UserContent>(toUserContent(user));
   const [errors, setErrors] = useState<FormErrors>({
@@ -38,13 +36,13 @@ export default function UserDetails() {
     importantInfo: false,
   });
 
-  const isMe = route.params!.id === user?.id
+  const isMe = params.user_id === user?.id
   const canEdit = isAdminOrBoard(user) || isMe
 
 
   useEffect(() => {
     if (!isMe && !!user) {
-      getUser(route.params!.id).then((u) => {
+      getUser(params.user_id).then((u) => {
         if (u) {
           setViewUser(u);
           setForm(toUserContent(u));
@@ -54,7 +52,11 @@ export default function UserDetails() {
       setViewUser(user);
       setForm(toUserContent(user));
     }
-  }, [getUser, isMe, route.params, user]);
+  }, [isMe, params, user]);
+
+  if (!user) {
+    return null
+  }
 
   const handleChange = (field: keyof UserContent, value: string | number) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -82,7 +84,7 @@ export default function UserDetails() {
     event.preventDefault();
     if (!canEdit || !viewUser) {return;}
     if (Object.values(errors).some((v) => v)) {return;}
-    await updateUser(viewUser.id, { ...viewUser, ...form });
+    await updateUser(viewUser.userId, { ...viewUser, ...form });
   };
 
   if (!viewUser) {return null;}

@@ -16,8 +16,10 @@ use std::{
 use time::OffsetDateTime;
 use uuid::Uuid;
 use validator::Validate;
+use crate::auth::role::Role;
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, derive_more::Display)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, derive_more::Display, sqlx::Type)]
+#[sqlx(transparent)]
 #[serde(transparent)]
 pub struct UserId(Uuid);
 
@@ -207,7 +209,7 @@ impl Debug for RegisterNewUser {
 #[derive(Serialize, Debug, FromRow)]
 #[serde(rename_all = "camelCase")]
 pub struct BasicUser {
-    pub user_id: UserId,
+    pub id: UserId,
     pub first_name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub infix: Option<String>,

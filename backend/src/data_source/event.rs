@@ -170,7 +170,7 @@ impl TryFrom<PgRegistration> for Registration {
     fn try_from(pg: PgRegistration) -> AppResult<Self> {
         let user = if let Some(user_id) = pg.user_id {
             Some(BasicUser {
-                user_id: user_id.into(),
+                id: user_id.into(),
                 first_name: pg.first_name.unwrap_or_default(),
                 infix: pg.infix,
                 last_name: pg.last_name.unwrap_or_default(),
@@ -606,12 +606,12 @@ impl EventStore {
         Ok(sqlx::query_as!(
             BasicUser,
             r#"
-        SELECT u.id as user_id, u.first_name, u.infix, u.last_name
-        FROM event_registration ar
-            JOIN "user" u ON ar.user_id = u.id
-        WHERE ar.event_id = $1
-          AND ar.waiting_list_position IS NULL
-        "#,
+            SELECT u.id, u.first_name, u.infix, u.last_name
+            FROM event_registration ar
+                JOIN "user" u ON ar.user_id = u.id
+            WHERE ar.event_id = $1
+              AND ar.waiting_list_position IS NULL
+            "#,
             **id
         )
         .fetch_all(&self.db)

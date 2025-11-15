@@ -8,33 +8,27 @@ import {
 } from '@mui/material';
 import SwitchAccountIcon from '@mui/icons-material/SwitchAccount';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
-import { useAuth } from '../../providers/AuthProvider.tsx';
-import { useApiState } from '../../providers/ApiProvider.tsx';
 import {User, RoleType, roleOptions} from '../../types.ts';
 import GroupIcon from '@mui/icons-material/Group';
-import {useAppState} from '../../providers/AppStateProvider.tsx';
 import {isAdminOrBoard} from '../../util.ts';
+import {useWebsite} from '../../hooks/useState.ts';
+import {useUsers} from '../../hooks/useUsers.ts';
+import {useCommittees} from '../../hooks/useCommittees.ts';
 
 
 export default function UserActions() {
   const { text } = useLanguage();
-  const { user } = useAuth();
-  const {
-    addUserToCommittee,
-    removeUserFromCommittee,
-    updateUser,
-    committees,
-    userCommittees,
-    getUser,
-  } = useApiState();
-  const { route } = useAppState()
+  const { user } = useUsers();
+  const {myCommittees, committees} = useCommittees();
+  const {state: {routerState: {params}}} = useWebsite();
+
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [committeeAnchor, setCommitteeAnchor] = useState<null | HTMLElement>(null);
   const [viewUser, setViewUser] = useState<User | null>(null);
 
   useEffect(() => {
-    if (!!user && !(route.params!.id === user?.id)) {
-      getUser(route.params!.id).then((u) => {
+    if (!!user && !(params.user_id === user?.id)) {
+      getUser(params.user_id).then((u) => {
         if (u) {
           setViewUser(u);
         }
@@ -42,9 +36,9 @@ export default function UserActions() {
     } else if (user) {
       setViewUser(user);
     }
-  }, [getUser, route.params, user]);
+  }, [params, user]);
 
-  if (!isAdminOrBoard(user)) {return null;}
+  if (!user || !isAdminOrBoard(user)) {return null;}
 
   const handleRoleMenuOpen = (event: MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -72,7 +66,7 @@ export default function UserActions() {
 
   const toggleCommittee = async (committeeId: string) => {
     if (!viewUser) {return;}
-    const inCommittee = userCommittees.some((c) => c.committeeId === committeeId && c.left == null);
+    const inCommittee = myCommittees.some((c) => c.committeeId === committeeId && c.left == null);
 
     if (inCommittee) {
       await removeUserFromCommittee(committeeId, viewUser.id,);
@@ -105,7 +99,7 @@ export default function UserActions() {
         onClose={handleClose}
       >
         {committees.map((committee) => {
-          const inCommittee = userCommittees.some((c) => c.committeeId === committee.id && c.left == null);
+          const inCommittee = myCommittees.some((c) => c.committeeId === committee.id && c.left == null);
           return (
             <MenuItem
               key={committee.id}

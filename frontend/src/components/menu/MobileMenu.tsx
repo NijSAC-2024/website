@@ -15,18 +15,19 @@ import MenuIcon from '@mui/icons-material/Menu';
 import {useState} from 'react';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
-import { useAuth } from '../../providers/AuthProvider.tsx';
 import UserMenu from './UserMenu.tsx';
-import { useAppState } from '../../providers/AppStateProvider.tsx';
 import SettingsIcon from '@mui/icons-material/Settings';
 import {useThemeMode} from '../../providers/ThemeProvider.tsx';
 import { MenuType } from './MainMenu.tsx';
+import {useWebsite} from '../../hooks/useState.ts';
+import {RouteName} from '../../routes.ts';
+import {useUsers} from '../../hooks/useUsers.ts';
 
 export default function MobileMenu() {
   const { text } = useLanguage();
-  const { navigate } = useAppState();
+  const {navigate} = useWebsite()
   const { checkDarkMode } = useThemeMode()
-  const { isLoggedIn, toggleAuthOpen } = useAuth();
+  const { isLoggedIn, toggleAuthOpen } = useUsers();
   const [openMenu, setOpenMenu] = useState<MenuType>(undefined);
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
   const isDarkMode = checkDarkMode();
@@ -43,7 +44,7 @@ export default function MobileMenu() {
     }
   };
 
-  const navigateSubmenu = (page: string) => {
+  const navigateSubmenu = (page: RouteName) => {
     toggleDropdown();
     setOpenMenu(undefined);
     navigate(page);
@@ -208,7 +209,7 @@ export default function MobileMenu() {
               </ListItem>
               <ListItem disablePadding>
                 <ListItemButton
-                  onClick={() => navigateSubmenu('/material-rental')}
+                  onClick={() => navigateSubmenu('material_rental')}
                 >
                   <ListItemText
                     primary={

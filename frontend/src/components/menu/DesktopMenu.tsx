@@ -1,20 +1,20 @@
 import {Button, Menu, MenuItem, Toolbar, Tooltip} from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import UserMenu from './UserMenu.tsx';
-import { useAuth } from '../../providers/AuthProvider.tsx';
-import { useLanguage } from '../../providers/LanguageProvider.tsx';
+import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import {MouseEvent, useEffect, useState} from 'react';
-import Link from '../Link.tsx';
-import { useAppState } from '../../providers/AppStateProvider.tsx';
 import SettingsIcon from '@mui/icons-material/Settings';
 import {useThemeMode} from '../../providers/ThemeProvider.tsx';
 import {MenuType} from './MainMenu.tsx';
+import {useWebsite} from '../../hooks/useState.ts';
+import {RouteName} from '../../routes.ts';
+import {useUsers} from '../../hooks/useUsers.ts';
 
-export default function DesktopMenu() {
-  const { text } = useLanguage();
-  const { navigate } = useAppState();
-  const { checkDarkMode } = useThemeMode()
-  const { isLoggedIn, toggleAuthOpen } = useAuth();
+export default function DesktopMenu({setShowLogin}: { setShowLogin: (show: boolean) => void }) {
+  const {text} = useLanguage();
+  const {navigate} = useWebsite();
+  const {user} = useUsers();
+  const {checkDarkMode} = useThemeMode();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | undefined>(undefined);
   const [openMenu, setOpenMenu] = useState<MenuType>(undefined);
   const [offset, setOffset] = useState<number>(window.scrollY);
@@ -22,7 +22,7 @@ export default function DesktopMenu() {
 
   useEffect(() => {
     const onScroll = () => setOffset(window.scrollY);
-    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('scroll', onScroll, {passive: true});
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
@@ -36,22 +36,22 @@ export default function DesktopMenu() {
     setOpenMenu(undefined);
   };
 
-  const navigateSubmenu = (page: string) => {
+  const navigateSubmenu = (page: RouteName) => {
     navigate(page);
     handleMenuClose();
   };
 
   return (
-    <div className={`${offset === 0 ? 'bg-transparent text-white' : 'bg-[rgba(255,255,255,0.95)] dark:bg-[rgba(18,18,18,0.9)] shadow-lg  dark:text-white'} fixed transition-all duration-200 ease-in-out z-10 w-full`}>
+    <div
+      className={`${offset === 0 ? 'bg-transparent text-white' : 'bg-[rgba(255,255,255,0.95)] dark:bg-[rgba(18,18,18,0.9)] shadow-lg  dark:text-white'} fixed transition-all duration-200 ease-in-out z-10 w-full`}>
       <Toolbar className="flex justify-between w-[80%] max-w-[1050px] mx-auto">
         <div className="flex items-center">
-          <Link routeName={'index'}>
-            <img
-              src={'/images/logo.svg'}
-              alt="Logo"
-              className={`hover:opacity-50 hover:cursor-pointer h-24 mr-4 ${offset !== 0 && !isDarkMode && 'invert'} transition-all duration-200 ease-in-out`}
-            />
-          </Link>
+          <img
+            src={'/images/logo.svg'}
+            alt="Logo"
+            className={`hover:opacity-50 hover:cursor-pointer h-24 mr-4 ${offset !== 0 && !isDarkMode && 'invert'} transition-all duration-200 ease-in-out`}
+            onClick={() => navigate('index')}
+          />
           <Button color="inherit" onClick={() => navigate('events')}>
             {text('Agenda', 'Agenda')}
           </Button>
@@ -62,7 +62,7 @@ export default function DesktopMenu() {
             className="flex items-center"
             onClick={(e) => handleMenuOpen(e, 'association')}
           >
-            {text('Association', 'Vereniging')} <ExpandMoreIcon />
+            {text('Association', 'Vereniging')} <ExpandMoreIcon/>
           </Button>
           <Menu
             anchorEl={anchorEl}
@@ -89,7 +89,7 @@ export default function DesktopMenu() {
             className="flex items-center"
             onClick={(e) => handleMenuOpen(e, 'climbing')}
           >
-            {text('Climbing', 'Klimmen')} <ExpandMoreIcon />
+            {text('Climbing', 'Klimmen')} <ExpandMoreIcon/>
           </Button>
           <Menu
             anchorEl={anchorEl}
@@ -105,7 +105,7 @@ export default function DesktopMenu() {
             <MenuItem onClick={handleMenuClose}>
               {text('Climbing Areas', 'Klimgebieden')}
             </MenuItem>
-            <MenuItem onClick={() => navigateSubmenu('/material-rental')}>
+            <MenuItem onClick={() => navigateSubmenu('material_rental')}>
               {text('Material Rental', 'Materiaalverhuur')}
             </MenuItem>
           </Menu>
@@ -116,7 +116,7 @@ export default function DesktopMenu() {
             className="flex items-center"
             onClick={(e) => handleMenuOpen(e, 'alps')}
           >
-            {text('Alpinism', 'Alpineren')} <ExpandMoreIcon />
+            {text('Alpinism', 'Alpineren')} <ExpandMoreIcon/>
           </Button>
           <Menu
             anchorEl={anchorEl}
@@ -156,7 +156,7 @@ export default function DesktopMenu() {
         </div>
         <div className="flex items-center">
           {/* Login+Become Member / Logout */}
-          {!isLoggedIn ? (
+          {!user ? (
             <>
               {/* Settings Dropdown */}
               <Tooltip title={text('Settings', 'Instellingen')}>
@@ -165,11 +165,11 @@ export default function DesktopMenu() {
                   className="flex items-center"
                   onClick={() => navigate('settings')}
                 >
-                  <SettingsIcon />
+                  <SettingsIcon/>
                 </Button>
               </Tooltip>
 
-              <Button color="inherit" onClick={toggleAuthOpen}>
+              <Button color="inherit" onClick={() => setShowLogin(true)}>
                 {text('Login', 'Inloggen')}
               </Button>
               <Button variant="contained" onClick={() => navigate('register')}>
@@ -177,7 +177,7 @@ export default function DesktopMenu() {
               </Button>
             </>
           ) : (
-            <UserMenu />
+            <UserMenu/>
           )}
         </div>
       </Toolbar>

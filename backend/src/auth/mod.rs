@@ -1,6 +1,7 @@
 use crate::{
     api::ValidatedJson, auth::session::Session, error::Error, wire::user::UserCredentials,
 };
+use axum::Json;
 use axum::response::IntoResponse;
 use axum_extra::extract::{CookieJar, cookie::Cookie};
 use sqlx::PgPool;
@@ -17,8 +18,8 @@ pub async fn login(
     ValidatedJson(credentials): ValidatedJson<UserCredentials>,
 ) -> Result<impl IntoResponse, Error> {
     trace!("Login attempt for user {}", credentials.email);
-    let session = Session::new(credentials, &db).await?;
-    Ok(jar.add(session.into_cookie()))
+    let (session, user) = Session::new(credentials, &db).await?;
+    Ok((jar.add(session.into_cookie()), Json(user)))
 }
 
 pub async fn logout(

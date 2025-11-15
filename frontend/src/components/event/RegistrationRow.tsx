@@ -2,10 +2,10 @@ import { Checkbox, TableCell, TableRow, IconButton } from '@mui/material';
 import { Edit } from '@mui/icons-material';
 import moment from 'moment';
 import { Registration } from '../../types.ts';
-import {useApiState} from '../../providers/ApiProvider.tsx';
-import {useAuth} from '../../providers/AuthProvider.tsx';
-import {useAppState} from '../../providers/AppStateProvider.tsx';
 import {isAdminOrBoard} from '../../util.ts';
+import {useWebsite} from '../../hooks/useState.ts';
+import {useEvents} from '../../hooks/useEvents.ts';
+import {useUsers} from '../../hooks/useUsers.ts';
 
 interface RegistrationRowProps {
   registration: Registration;
@@ -13,20 +13,21 @@ interface RegistrationRowProps {
 }
 
 export default function RegistrationRow({ registration, onEditClick }: RegistrationRowProps) {
-  const { updateRegistration, event } = useApiState()
-  const { user } = useAuth()
-  const { navigate } = useAppState()
+  const {currentEvent} = useEvents();
+  const { user } = useUsers()
+  const {navigate} = useWebsite()
+
   return (
     <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
       <TableCell>
-        {<p className="hover:cursor-pointer hover:opacity-60 transition-all duration-100" onClick={() => registration.userId && navigate('user', { id: registration.userId})}>
+        {<p className="hover:cursor-pointer hover:opacity-60 transition-all duration-100" onClick={() => registration.id && navigate('user', { user_id: registration.id})}>
           {isAdminOrBoard(user) && registration.waitingListPosition !== undefined?
             <span className="text-[#1976d2] dark:text-[#90caf9]">{`${registration.firstName} ${registration.infix ?? ''} ${registration.lastName}`}</span> 
             : `${registration.firstName} ${registration.infix ?? ''} ${registration.lastName}`}
         </p>}
       </TableCell>
 
-      {isAdminOrBoard(user) && event?.questions.map((q) => {
+      {isAdminOrBoard(user) && currentEvent?.questions.map((q) => {
         const answer = registration.answers?.find((a) => a.questionId === q.id)?.answer;
 
         if (q.questionType.type === 'boolean') {
@@ -38,7 +39,7 @@ export default function RegistrationRow({ registration, onEditClick }: Registrat
         return <TableCell key={`${registration.registrationId}-${q.id}`}>{answer || ''}</TableCell>;
       })}
 
-      {event && isAdminOrBoard(user) && (
+      {currentEvent && isAdminOrBoard(user) && (
         <>
           <TableCell>
             <Checkbox

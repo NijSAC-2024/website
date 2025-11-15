@@ -6,8 +6,7 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AreYouSure from '../AreYouSure.tsx';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
-import {useAppState} from '../../providers/AppStateProvider.tsx';
-import {useApiState} from '../../providers/ApiProvider.tsx';
+import {useWebsite} from "../../hooks/useState.ts";
 
 interface SaveButtonProps {
   id: string;
@@ -16,10 +15,9 @@ interface SaveButtonProps {
 
 export default function SaveButton({ id, handleSave }: SaveButtonProps) {
   const { text } = useLanguage();
-  const { deleteCommittee } = useApiState();
-  const { navigate } = useAppState();
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+  const {navigate} = useWebsite()
 
   const handleDelete = async () => {
     await deleteCommittee(id);

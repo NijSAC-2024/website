@@ -1,9 +1,7 @@
 import ContentCard from '../ContentCard.tsx';
 import { Box, FormControl } from '@mui/material';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
-import { useAuth } from '../../providers/AuthProvider.tsx';
 import {Answer, BasicUser, Question, Registration} from '../../types.ts';
-import { useApiState } from '../../providers/ApiProvider.tsx';
 import { useState } from 'react';
 import AreYouSure from '../AreYouSure.tsx';
 import RegistrationTable from './RegistrationTable.tsx';
@@ -12,20 +10,28 @@ import RegisterUserAutocomplete from './RegisterUserAutocomplete.tsx';
 import {isAdminOrBoard} from '../../util.ts';
 import AccessAlarmIcon from '@mui/icons-material/AccessAlarm';
 import moment from 'moment';
+import {useUsers} from '../../hooks/useUsers.ts';
+import {useEvents} from '../../hooks/useEvents.ts';
+import {useEventRegistrations} from '../../hooks/useEventRegistrations.ts';
 
 interface RegistrationsCardProps {
   questions: Question[];
 }
 
 export default function RegistrationsCard({ questions }: RegistrationsCardProps) {
-  const { registrations, event, updateRegistration, deleteRegistration, createRegistration } = useApiState();
   const { text } = useLanguage();
-  const { user } = useAuth();
+  const {currentEvent} = useEvents();
+  const {eventRegistrations} = useEventRegistrations();
+  const { user } = useUsers();
 
   const [registerDialogOpen, setRegisterDialogOpen] = useState(false);
   const [selectedRegistration, setSelectedRegistration] = useState<Registration | null>(null);
   const [selectedUser, setSelectedUser] = useState<BasicUser | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
+
+  if (!currentEvent) {
+    return null
+  }
 
   const toggleRegisterDialog = () => setRegisterDialogOpen((prev) => !prev);
 
@@ -36,13 +42,10 @@ export default function RegistrationsCard({ questions }: RegistrationsCardProps)
   };
 
   const handleRegistration = async (answers: Answer[], registrationId?: string, userId?: string, waitinListPosition?: number) => {
-    if (!event) {
-      return;
-    }
     if (registrationId) {
-      await updateRegistration(event?.id, registrationId, answers, undefined, waitinListPosition);
+      await updateRegistration(currentEvent.id, registrationId, answers, undefined, waitinListPosition);
     } else {
-      await createRegistration(event?.id, userId, answers);
+      await createRegistration(currentEvent.id, userId, answers);
     }
     setRegisterDialogOpen(false);
     setSelectedRegistration(null);
@@ -52,8 +55,8 @@ export default function RegistrationsCard({ questions }: RegistrationsCardProps)
   const handleDeregisterClick = () => setConfirmOpen(true);
 
   const handleConfirmDeregister = async () => {
-    if (selectedRegistration && event) {
-      await deleteRegistration(event?.id, selectedRegistration.registrationId);
+    if (selectedRegistration) {
+      await deleteRegistration(currentEvent.id, selectedRegistration.registrationId);
     }
     setConfirmOpen(false);
     setRegisterDialogOpen(false);
@@ -62,20 +65,20 @@ export default function RegistrationsCard({ questions }: RegistrationsCardProps)
 
   return (
     <>
-      {((!!user && event?.requiredMembershipStatus.includes(user?.status)) || event?.requiredMembershipStatus.includes('nonMember')) && event?.registrationPeriod && (
+      {((!!user && currentEvent.requiredMembershipStatus.includes(user.status)) || currentEvent.requiredMembershipStatus.includes('nonMember')) && currentEvent.registrationPeriod && (
         <ContentCard className="xl:col-span-3">
           <h1>{text('Registrations', 'Inschrijvingen')}</h1>
           <p>
             <AccessAlarmIcon className=" mr-2" />
             {text('Registrations close at ', 'Inschrijvingen sluiten op ')}
-            {moment(event?.registrationPeriod.end).format('DD MMM HH:mm')}
+            {moment(currentEvent.registrationPeriod.end).format('DD MMM HH:mm')}
           </p>
 
-          {isAdminOrBoard(user) && (
+          {user && isAdminOrBoard(user) && (
             <Box className="mt-2 grid" component="form" onSubmit={(e) => { e.preventDefault(); toggleRegisterDialog(); }}>
               <FormControl>
                 <RegisterUserAutocomplete
-                  registrations={registrations}
+                  registrations={eventRegistrations}
                   selectedUser={selectedUser}
                   setSelectedUser={setSelectedUser}
                   setSelectedRegistration={setSelectedRegistration}
@@ -85,15 +88,15 @@ export default function RegistrationsCard({ questions }: RegistrationsCardProps)
             </Box>
           )}
 
-          {registrations && registrations.length > 0 ? (
+          {eventRegistrations && eventRegistrations.length > 0 ? (
             <RegistrationTable
-              registrations={registrations.sort((a, b) =>
+              registrations={eventRegistrations.sort((a, b) =>
                 `${a.firstName} ${a.infix ?? ''} ${a.lastName}`.localeCompare(
                   `${b.firstName} ${b.infix ?? ''} ${b.lastName}`,
                 ),
               )}
               questions={questions}
-              eventId={event?.id}
+              eventId={currentEvent.id}
               onEditClick={handleEditClick}
             />
           ) : (
@@ -102,11 +105,11 @@ export default function RegistrationsCard({ questions }: RegistrationsCardProps)
         </ContentCard>
       )}
 
-      {event && (
+      {currentEvent && (
         <RegistrationDialog
           open={registerDialogOpen}
           toggleDialog={toggleRegisterDialog}
-          name={event?.name}
+          name={currentEvent.name}
           questions={questions}
           selectedRegistration={selectedRegistration}
           selectedUser={selectedUser}

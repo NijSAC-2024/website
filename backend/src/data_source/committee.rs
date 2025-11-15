@@ -246,7 +246,7 @@ impl CommitteeStore {
             BasicUser,
             r#"
             SELECT
-                u.id AS "user_id!",
+                u.id,
                 u.first_name,
                 u.infix,
                 u.last_name

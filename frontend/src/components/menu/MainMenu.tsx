@@ -1,10 +1,10 @@
-import { Button, Dialog, DialogActions, DialogContent, useMediaQuery } from '@mui/material';
+import {Button, Dialog, DialogActions, DialogContent, useMediaQuery} from '@mui/material';
 import LoginForm from '../LoginForm.tsx';
 
 import DesktopMenu from './DesktopMenu.tsx';
 import MobileMenu from './MobileMenu.tsx';
-import { useAuth } from '../../providers/AuthProvider.tsx';
-import { useLanguage } from '../../providers/LanguageProvider.tsx';
+import {useLanguage} from '../../providers/LanguageProvider.tsx';
+import {useState} from 'react';
 
 export type MenuType =
   | 'association'
@@ -13,23 +13,25 @@ export type MenuType =
   | undefined;
 
 export default function MainMenu() {
-  const { text } = useLanguage();
-  const { authOpen, toggleAuthOpen } = useAuth();
+  const {text} = useLanguage();
   const isMobile = useMediaQuery('(max-width: 992px)');
+  const [showLogin, setShowLogin] = useState(false);
 
   return (
     <>
       {isMobile ? (
         <MobileMenu/>
       ) : (
-        <DesktopMenu/>
+        <DesktopMenu setShowLogin={setShowLogin}/>
       )}
-      <Dialog open={authOpen} onClose={toggleAuthOpen} fullWidth>
+      <Dialog open={showLogin} onClose={() => setShowLogin(false)} fullWidth>
         <DialogContent>
-          <LoginForm />
+          <LoginForm close={() => {
+            setShowLogin(false)
+          }}/>
         </DialogContent>
         <DialogActions>
-          <Button onClick={toggleAuthOpen}>
+          <Button onClick={() => setShowLogin(false)}>
             {text('Close', 'Sluit')}
           </Button>
         </DialogActions>

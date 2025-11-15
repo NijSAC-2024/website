@@ -1,28 +1,31 @@
-import Link from '../Link.tsx';
-import { Fab } from '@mui/material';
-import { useAuth } from '../../providers/AuthProvider.tsx';
+import {Fab} from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import { useLanguage } from '../../providers/LanguageProvider.tsx';
-import {useApiState} from '../../providers/ApiProvider.tsx';
+import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import {isAdminOrBoard} from '../../util.ts';
+import {useWebsite} from '../../hooks/useState.ts';
+import {useUsers} from '../../hooks/useUsers.ts';
+import {useCommittees} from '../../hooks/useCommittees.ts';
 
 export default function NewEventButton() {
-  const { text } = useLanguage();
-  const { isLoggedIn, user } = useAuth();
-  const { userCommittees } = useApiState()
+  const {text} = useLanguage();
+  const {user} = useUsers();
+  const {myCommittees} = useCommittees();
+  const {navigate} = useWebsite();
 
-  if (isLoggedIn && (isAdminOrBoard(user) || userCommittees.some(uc => uc.left == null))) {
-    return (
-      <div className="fixed bottom-5 right-5 z-10">
-        <Link routeName={'new_event'}>
-          <Fab variant="extended" color="primary">
-            <AddIcon className="mr-2" />
-            <p>{text('Add event', 'Voeg evenement toe')}</p>
-          </Fab>
-        </Link>
-      </div>
-    );
+  if (!user) {
+    return null;
   }
 
-  return <></>;
+  if (isAdminOrBoard(user) || myCommittees.some(uc => uc.left == null)) {
+    return (
+      <div className="fixed bottom-5 right-5 z-10">
+        <Fab variant="extended" color="primary" onClick={() => navigate('events.new')}>
+          <AddIcon className="mr-2"/>
+          <p>{text('Add event', 'Voeg evenement toe')}</p>
+        </Fab>
+      </div>
+    );
+  } else {
+    return null;
+  }
 }

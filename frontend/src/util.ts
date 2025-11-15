@@ -1,8 +1,8 @@
-import {Language, labelOptions, User} from './types.ts';
+import {Language, labelOptions, BasicUser, User} from './types.ts';
 
 export function getLabel(id: string): Language {
   const categoryOption = labelOptions.find((option) => option.id === id);
-  return categoryOption ? categoryOption.label : { en: id, nl: id };
+  return categoryOption ? categoryOption.label : {en: id, nl: id};
 }
 
 export function truncateMarkdown(markdown: string, maxLength: number): string {
@@ -27,9 +27,7 @@ export function truncateMarkdown(markdown: string, maxLength: number): string {
   return truncated.trim() + '…';
 }
 
-export function isAdminOrBoard(user?: User): boolean {
-  if (!user?.roles) {return false;}
-
+export function isAdminOrBoard(user: User): boolean {
   const allowedRoles = [
     'admin',
     'chair',

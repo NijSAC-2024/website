@@ -149,7 +149,7 @@ pub async fn get_registration(
     let registration = store.get_registration(&registration_id).await?;
 
     if let Some(ref user) = registration.user {
-        has_registration_access(&user.user_id, &session)?;
+        has_registration_access(&user.id, &session)?;
     }
     Ok(Json(registration))
 }
@@ -240,7 +240,7 @@ pub async fn update_registration(
     let registration = store.get_registration(&registration_id).await?;
 
     if is_admin_or_board(&session).is_err() {
-        let Some(user_id) = registration.user.as_ref().map(|u| u.user_id.clone()) else {
+        let Some(user_id) = registration.user.as_ref().map(|u| u.id.clone()) else {
             return Err(Error::BadRequest(
                 "Only admins can update anonymous sign-ups",
             ));
@@ -279,7 +279,7 @@ pub async fn delete_registration(
         let registration = store.get_registration(&registration_id).await?;
         if let Some(user) = registration.user {
             // Normal users can only delete their own registration
-            has_registration_access(&user.user_id, &session)?
+            has_registration_access(&user.id, &session)?
         } else {
             // Anonymous registrations can only be modified by admins
             return Err(Error::Unauthorized);

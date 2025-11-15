@@ -4,37 +4,24 @@ import {
   Committee, CommitteeContent,
   Event,
   EventContent,
-  Location,
   Registration,
   toEventContent,
   User, UserCommittee,
   UserContent
 } from '../types.ts';
-import { useAppState } from './AppStateProvider.tsx';
 import { apiFetch, apiFetchVoid } from '../api.ts';
 import { enqueueSnackbar } from 'notistack';
-import { useAuth } from './AuthProvider.tsx';
 import { useLanguage } from './LanguageProvider.tsx';
 import {isAdminOrBoard} from '../util.ts';
 
 interface ApiContextType {
-  events?: Event[];
-  locations?: Location[];
-  event?: Event;
-  eventContent?: EventContent;
-  registrations?: Registration[];
-  // TODO find a better name
-  // Holds the registrations a logged-in user is registered for
-  registeredEvents: Registration[];
   committee?: Committee;
   committees: Committee[];
   committeeMembers: BasicUser[];
-  userCommittees: UserCommittee[];
   users: BasicUser[];
   createEvent: (event: EventContent) => Promise<void>;
   updateEvent: (eventId: string, event: EventContent) => Promise<void>;
   deleteEvent: (eventId: string) => Promise<void>;
-  getRegistration: (eventId: string, registrationId: string) => Promise<Registration | undefined>;
   createRegistration: (eventId: string, userId: string | undefined, answers: Answer[]) => Promise<void>;
   updateRegistration: (eventId: string, registrationId: string, answers: Answer[], attended?: boolean, waitingListPosition?: number) => Promise<void>;
   deleteRegistration: (eventId: string, registrationId: string) => Promise<void>;
@@ -66,27 +53,13 @@ export default function ApiProvider({ children }: ApiProviderProps) {
   const [cache, setCache] = useState<boolean>(false);
   const [events, setEvents] = useState<Array<Event>>([]);
   const [event, setEvent] = useState<Event | undefined>(undefined);
-  const [locations, setLocations] = useState<Array<Location> | undefined>(
-    undefined
-  );
   const [committee, setCommittee] = useState<Committee | undefined>(undefined);
   const [committees, setCommittees] = useState<Committee[]>([]);
   const [committeeMembers, setCommitteeMembers] = useState<BasicUser[]>([]);
   const [userCommittees, setUserCommittees] = useState<UserCommittee[]>([]);
   const [registrations, setRegistrations] = useState<Array<Registration>>([]);
-  const [registeredEvents, setRegisteredEvents] = useState<Registration[]>([]);
   const [users, setUsers] = useState<BasicUser[]>([]);
 
-  //LOCATIONS
-  const getLocations = async () => {
-    const { error, data } = await apiFetch<Array<Location>>('/location');
-    if (error) {
-      enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
-    }
-    if (data) {
-      setLocations(data);
-    }
-  };
 
   //EVENTS
   const getEvents = async () => {
@@ -158,32 +131,6 @@ export default function ApiProvider({ children }: ApiProviderProps) {
   };
 
   // REGISTRATIONS
-  const getRegisteredEvents = async (userId: string) => {
-    const { error, data } = await apiFetch<Array<Registration>>(`/user/${userId}/event_registrations`);
-    if (error) {
-      enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
-    }
-    return data;
-  };
-
-  const getRegistrations = async (eventId: string): Promise<Registration[] | undefined> => {
-    const { error, data } = await apiFetch<Array<Registration>>(`/event/${eventId}/registration`);
-    if (error) {
-      enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
-    }
-    return data;
-  };
-
-  const getRegistration = async (eventId: string, registrationId: string): Promise<Registration | undefined> => {
-    const { error, data } = await apiFetch<Registration>(
-      `/event/${eventId}/registration/${registrationId}`
-    );
-    if (error) {
-      enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
-    }
-    return data;
-  };
-
   const createRegistration = async (eventId: string, userId: string | undefined, answers: Answer[]) => {
     const { error } = await apiFetch<Event>(`/event/${eventId}/registration`, {
       method: 'POST',
@@ -389,15 +336,6 @@ export default function ApiProvider({ children }: ApiProviderProps) {
     }
   };
 
-  const getUserCommittees = async (userId: string) => {
-    const { error, data } = await apiFetch<UserCommittee[]>(`/user/${userId}/committees`);
-    if (error) {
-      enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
-      return;
-    }
-    return data;
-  };
-
   //USE EFFECTS
 
   // On the events page, fetch the events
@@ -407,23 +345,7 @@ export default function ApiProvider({ children }: ApiProviderProps) {
     }
   }, [route.name]);
 
-  useEffect(() => {
-    if (route.name === 'user' || route.name === 'event' || route.name === 'events' || route.name === 'committee') {
-      if(!!user && route.name === 'user' && route.params!.id !== user?.id ) {
-        getUserCommittees(route.params!.id).then(uc => {
-          if (uc) {
-            setUserCommittees(uc)
-          }
-        })
-      } else if (user){
-        getUserCommittees(user.id).then(uc => {
-          if (uc) {
-            setUserCommittees(uc)
-          }
-        })
-      }
-    }
-  }, [cache, route.name, route.params, user]);
+
 
   useEffect(() => {
     if (route.name === 'committees' || route.name === 'user' || route.name === 'edit_event' || route.name === 'new_event' || route.name === 'event') {
@@ -441,26 +363,6 @@ export default function ApiProvider({ children }: ApiProviderProps) {
       setCommitteeMembers([]);
     }
   }, [route.name, route.params, user]);
-
-  useEffect(() => {
-    if ((route.name === 'events' || route.name === 'event' || route.name === 'user') && isLoggedIn) {
-      getRegisteredEvents(user!.id).then(data => {
-        if (data) {
-          setRegisteredEvents(data)
-        }
-      });
-    } else {
-      setRegisteredEvents([]);
-    }
-  }, [cache, isLoggedIn, route.name, user]);
-
-  useEffect(() => {
-    if (route.name === 'event' || route.name === 'new_event' || route.name === 'edit_event') {
-      getLocations();
-    } else {
-      setLocations([]);
-    }
-  }, [route.name]);
 
   useEffect(() => {
     if ((route.name === 'members') && isLoggedIn && !(user?.status === 'pending')) {
@@ -499,9 +401,7 @@ export default function ApiProvider({ children }: ApiProviderProps) {
         events,
         event,
         eventContent,
-        locations,
         registrations,
-        registeredEvents,
         committee,
         committees,
         committeeMembers,
@@ -510,7 +410,6 @@ export default function ApiProvider({ children }: ApiProviderProps) {
         createEvent,
         updateEvent,
         deleteEvent,
-        getRegistration,
         getUser,
         getUserEvents,
         createRegistration,

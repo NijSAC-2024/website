@@ -2,20 +2,20 @@ import { useEffect, useState, ChangeEvent } from 'react';
 import { Button, TextField } from '@mui/material';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import GenericPage from '../../pages/GenericPage.tsx';
-import { useAppState } from '../../providers/AppStateProvider.tsx';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
-import { useApiState } from '../../providers/ApiProvider.tsx';
 import {CommitteeContent, toCommitteeContent} from '../../types.ts';
 import SaveButton from './SaveButton.tsx';
 import MarkdownEditor from '../markdown/MarkdownEditor.tsx';
+import {useWebsite} from "../../hooks/useState.ts";
 
 export default function EditCommittee() {
   const { text } = useLanguage();
-  const { route, navigate } = useAppState();
-  const { committee, createCommittee, updateCommittee } = useApiState();
   const [committeeContent, setCommitteeContent] = useState<CommitteeContent>(toCommitteeContent(committee));
   const [uploading, setUploading] = useState(false);
-  const id = route.params?.id;
+  const {navigate} = useWebsite()
+  const {state: {routerState: {params}}} = useWebsite();
+
+  const committee_id = params.committee_id;
 
   useEffect(() => {
     if (route.name === 'new_committee') {
@@ -50,9 +50,9 @@ export default function EditCommittee() {
   };
 
   const handleSave = async () => {
-    if (id) {
-      await updateCommittee(id, committeeContent);
-      navigate('committee', { id });
+    if (committee_id) {
+      await updateCommittee(committee_id, committeeContent);
+      navigate('committees.committee', { committee_id });
     } else {
       await createCommittee(committeeContent);
       navigate('committees');
@@ -67,7 +67,7 @@ export default function EditCommittee() {
 
   return (
     <GenericPage image={imageUrl}>
-      <SaveButton id={id ?? ''} handleSave={handleSave}/>
+      <SaveButton id={committee_id ?? ''} handleSave={handleSave}/>
       <div className="grid xl:grid-cols-3 gap-5 mt-[-9.3rem]">
         <div className="xl:col-span-3 mb-[-0.5rem] flex justify-between">
           <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">

@@ -9,7 +9,7 @@ import {
   Metadata,
 } from '../../types.ts';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
-import {useApiState} from '../../providers/ApiProvider.tsx';
+import {useEventRegistrations} from '../../hooks/useEventRegistrations.ts';
 
 interface EditDescriptionProps {
   description?: Language;
@@ -25,7 +25,7 @@ export default function EditDescription({
   category
 }: EditDescriptionProps) {
   const { text } = useLanguage();
-  const { registrations } = useApiState();
+  const { eventRegistrations } = useEventRegistrations();
 
 
   const handleMarkdown = (markdown: Language) => {
@@ -133,7 +133,7 @@ export default function EditDescription({
                 <MenuItem value={'nobody'}>
                   {text('No one assigned', 'Niemand toegewezen')}
                 </MenuItem>
-                {registrations?.map((registration, index) => (
+                {eventRegistrations?.map((registration, index) => (
                   <MenuItem key={index} value={`${registration.firstName} ${registration.infix ?? ''} ${registration.lastName}`}>
                     {`${registration.firstName} ${registration.infix ?? ''} ${registration.lastName}`}
                   </MenuItem>

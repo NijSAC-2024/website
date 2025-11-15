@@ -1,14 +1,13 @@
 import {Button, Dialog, DialogActions, DialogContent, Tooltip} from '@mui/material';
-import { useAuth } from '../../providers/AuthProvider.tsx';
 import {Answer, DateType, Language, MembershipStatus, Question, Registration} from '../../types.ts';
 import {useState} from 'react';
 import RegisterForm from './RegisterForm.tsx';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import moment from 'moment/moment';
 import AreYouSure from '../AreYouSure.tsx';
-import {useApiState} from '../../providers/ApiProvider.tsx';
 import AccessAlarmIcon from '@mui/icons-material/AccessAlarm';
 import {isAdminOrBoard} from '../../util.ts';
+import {useUsers} from '../../hooks/useUsers.ts';
 
 interface RegisterButtonProps {
   registrationCount?: number;
@@ -35,8 +34,7 @@ export default function RegisterButton({
   eventId,
   registration
 }: RegisterButtonProps) {
-  const { isLoggedIn, toggleAuthOpen, user } = useAuth();
-  const { deleteRegistration, createRegistration, updateRegistration} = useApiState()
+  const { user } = useUsers();
   const { text, language } = useLanguage();
   moment.locale(language);
   const [registerDialogOpen, setRegisterDialogOpen] = useState<boolean>(false);
@@ -54,7 +52,7 @@ export default function RegisterButton({
     if (registrationId) {
       await updateRegistration(eventId, registrationId, answers);
     } else {
-      await createRegistration(eventId, user?.id, answers);
+      await createRegistration(eventId, user.id, answers);
     }
     toggleRegisterDialog();
   };
@@ -64,7 +62,7 @@ export default function RegisterButton({
       if (registration) {
         toggleDialog();
       } else {
-        await createRegistration(eventId, user?.id, []);
+        await createRegistration(eventId, user.userId, []);
       }
     } else {
       toggleRegisterDialog()
@@ -77,7 +75,7 @@ export default function RegisterButton({
     setRegisterDialogOpen(false)
   }
 
-  const canRegister : boolean = isLoggedIn && requiredMembershipStatus.includes(user!.status) || requiredMembershipStatus.includes('nonMember');
+  const canRegister : boolean = user && requiredMembershipStatus.includes(user.status) || requiredMembershipStatus.includes('nonMember');
 
   const renderClock = () => {
     const now = moment();
@@ -106,7 +104,7 @@ export default function RegisterButton({
 
   const renderRegistrationStatus = () => {
     if (registration) {
-      if (closeTime < now && !isAdminOrBoard(user)) {
+      if (closeTime < now && user && !isAdminOrBoard(user)) {
         if (registration?.waitingListPosition !== undefined) {
           return <Button variant="contained" disabled>{text('In Queue', 'Op de wachtlijst')}</Button>;
         } else {
@@ -146,11 +144,11 @@ export default function RegisterButton({
         }
         return <Button variant="contained" onClick={handleRegistrationClick}>{renderClock()}{text('Register', 'Inschrijven')}</Button>
       }
-      if (isLoggedIn && !requiredMembershipStatus.includes(user!.status)) {
+      if (user && !requiredMembershipStatus.includes(user.status)) {
         return <Button variant="contained" disabled>{renderClock()}{text('Register', 'Inschrijven')}</Button>
       }
       return <Button variant="contained" onClick={toggleAuthOpen}>{text('Login to register', 'Login om in te schrijven')}</Button>
-    } else if (isAdminOrBoard(user)) {
+    } else if (user && isAdminOrBoard(user)) {
       return <Button variant="contained" onClick={handleRegistrationClick}>{text('Register', 'Inschrijven')}</Button>
     }
 

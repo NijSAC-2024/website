@@ -41,7 +41,7 @@ export default function RegistrationDialog({
           <RegisterForm
             registrationQuestions={questions}
             handleRegistration={(answers: Answer[]) =>
-              handleRegistration(answers, selectedRegistration?.registrationId, selectedUser?.userId, selectedRegistration?.waitingListPosition)
+              handleRegistration(answers, selectedRegistration?.registrationId, selectedUser?.id, selectedRegistration?.waitingListPosition)
             }
             existingAnswers={selectedRegistration?.answers}
           />

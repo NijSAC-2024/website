@@ -1,41 +1,45 @@
 import GenericPage from './GenericPage.tsx';
 import EventCard from '../components/event/EventCard.tsx';
 import EditIcon from '@mui/icons-material/Edit';
-import { Button, Fab } from '@mui/material';
+import {Button, Fab} from '@mui/material';
 import RegistrationsCard from '../components/event/RegistrationsCard.tsx';
 import DescriptionCard from '../components/event/DescriptionCard.tsx';
-import { useAppState } from '../providers/AppStateProvider.tsx';
-import { useLanguage } from '../providers/LanguageProvider.tsx';
-import { useAuth } from '../providers/AuthProvider.tsx';
-import { useApiState } from '../providers/ApiProvider.tsx';
+import {useLanguage} from '../providers/LanguageProvider.tsx';
 import {isAdminOrBoard} from '../util.ts';
+import {useWebsite} from '../hooks/useState.ts';
+import {useUsers} from '../hooks/useUsers.ts';
+import {useEvents} from '../hooks/useEvents.ts';
+import {useEventRegistrations} from '../hooks/useEventRegistrations.ts';
+import {useCommittees} from '../hooks/useCommittees.ts';
 
 export default function Event() {
-  const { text } = useLanguage();
-  const { navigate } = useAppState();
-  const { event, registeredEvents, userCommittees } = useApiState();
-  const { isLoggedIn, user } = useAuth();
+  const {text} = useLanguage();
+  const {navigate} = useWebsite();
+  const {currentEvent} = useEvents();
+  const {userEventRegistrations} = useEventRegistrations();
+  const {myCommittees} = useCommittees();
+  const { user} = useUsers();
 
 
-  if (!event) {
+  if (!currentEvent) {
     return <></>;
   }
 
   return (
     <>
-      {isLoggedIn && (isAdminOrBoard(user) || userCommittees.some(uc => uc.left == null && uc.committeeId === event.createdBy)) && (
+      {user && (isAdminOrBoard(user) || myCommittees.some(uc => uc.left == null && uc.committeeId === currentEvent.createdBy)) && (
         <div className="fixed bottom-5 right-5 z-10">
           <Fab
             variant="extended"
             color="primary"
-            onClick={() => navigate('edit_event', { id: event.id })}
+            onClick={() => navigate('events.event.edit', {event_id: currentEvent.id})}
           >
-            <EditIcon className="mr-2" />
-            {text('Edit event', 'Evenement bewerken')}
+            <EditIcon className="mr-2"/>
+            {text('Edit currentEvent', 'Evenement bewerken')}
           </Fab>
         </div>
       )}
-      <GenericPage image={event.image}>
+      <GenericPage image={currentEvent.image}>
         <div className="grid xl:grid-cols-3 gap-5">
           <div className="xl:col-span-3 mb-[-0.5rem] flex justify-between items-center">
             <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">
@@ -46,29 +50,29 @@ export default function Event() {
                 {text('Back to Events', 'Terug naar Events')}
               </Button>
             </div>
-            {!event?.isPublished && (
+            {!currentEvent?.isPublished && (
               <Button variant="contained">
                 <b>{text('Draft', 'Concept')}</b>
               </Button>
             )}
           </div>
 
-          <EventCard event={event} agendaPage={false}
-            registration={registeredEvents.find((e) => e.eventId === event.id)} />
+          <EventCard event={currentEvent} agendaPage={false}
+            registration={userEventRegistrations.find((e) => e.eventId === currentEvent.id)}/>
           <DescriptionCard
-            descriptionMarkdown={event.description || { en: '', nl: '' }}
-            experience={event.metadata?.experience || []}
+            descriptionMarkdown={currentEvent.description || {en: '', nl: ''}}
+            experience={currentEvent.metadata?.experience || []}
             gear={
-              event?.metadata?.gear || {
+              currentEvent?.metadata?.gear || {
                 en: '',
                 nl: ''
               }
             }
-            worga={event.metadata?.worga || ''}
-            category={event.eventType}
-            createdBy={event.createdBy}
+            worga={currentEvent.metadata?.worga || ''}
+            category={currentEvent.eventType}
+            createdBy={currentEvent.createdBy}
           />
-          <RegistrationsCard questions={event.questions} />
+          <RegistrationsCard questions={currentEvent.questions}/>
         </div>
       </GenericPage>
     </>

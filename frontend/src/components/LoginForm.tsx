@@ -1,15 +1,17 @@
 import {FormEvent, useState} from 'react';
 import {Box, Button, FormControl, FormHelperText, TextField} from '@mui/material';
-import { useAuth } from '../providers/AuthProvider.tsx';
-import { useLanguage } from '../providers/LanguageProvider.tsx';
+import {useLanguage} from '../providers/LanguageProvider.tsx';
 import PasswordField from './PasswordField.tsx';
 import {emailValidator, passwordValidator} from '../validator.ts';
-import {Language} from '../types.ts';
+import {Language, User} from '../types.ts';
+import {enqueueSnackbar} from 'notistack';
+import {apiFetch,} from '../api.ts';
+import {useWebsite} from '../hooks/useState.ts';
 
 
-export default function LoginForm() {
-  const { login } = useAuth();
-  const { text } = useLanguage();
+export default function LoginForm({close}: { close: () => void }) {
+  const {text} = useLanguage();
+  const {dispatch} = useWebsite();
 
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -18,7 +20,29 @@ export default function LoginForm() {
 
   const validateInputs = () => {
     setEmailError(emailValidator(email));
-    setPasswordError(passwordValidator(password))
+    setPasswordError(passwordValidator(password));
+  };
+
+  const login = (email: string, password: string) => {
+    apiFetch<User>('/login', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({email, password}),
+    }).then(({data: user, error}) => {
+      if (error) {
+        switch (error.message) {
+        case 'Unauthorized':
+          enqueueSnackbar('Incorrect email or password.', {variant: 'error'});
+          break;
+        default:
+          enqueueSnackbar(`${error.message}: ${error.reference}`, {variant: 'error'});
+        }
+      } else {
+        dispatch({type: 'set_user', user});
+        enqueueSnackbar('You logged in', {variant: 'success'});
+        close();
+      }
+    });
   };
 
   const handleSubmit = async (event: FormEvent) => {
@@ -28,6 +52,7 @@ export default function LoginForm() {
     }
     login(email, password);
   };
+
 
   return (
     <>

@@ -1,13 +1,14 @@
-import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
-import { DateType, EventContent, EventType, Language, Metadata, typesOptions, WeekendType } from '../../types.ts';
+import {Button, FormControl, InputLabel, MenuItem, Select, TextField} from '@mui/material';
+import {DateType, EventContent, EventType, Language, Metadata, typesOptions, WeekendType} from '../../types.ts';
 import OptionSelector from '../OptionSelector.tsx';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
-import { ChangeEvent, useState } from 'react';
+import {ChangeEvent, useState} from 'react';
 import EditDates from './EditDates.tsx';
-import { useLanguage } from '../../providers/LanguageProvider.tsx';
-import { useApiState } from '../../providers/ApiProvider.tsx';
+import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import {isAdminOrBoard} from '../../util.ts';
-import {useAuth} from '../../providers/AuthProvider.tsx';
+import {useUsers} from '../../hooks/useUsers.ts';
+import {useLocations} from '../../hooks/useLocations.ts';
+import {useCommittees} from '../../hooks/useCommittees.ts';
 
 interface EditAgendaCardProps {
   category: EventType;
@@ -30,9 +31,10 @@ export default function EditEventCard({
   createdBy,
   handleEventChange
 }: EditAgendaCardProps) {
-  const { text } = useLanguage();
-  const { user } = useAuth()
-  const { locations, committees, userCommittees } = useApiState();
+  const {text} = useLanguage();
+  const {user} = useUsers();
+  const {locations} = useLocations();
+  const {committees, myCommittees} = useCommittees();
   const [uploading, setUploading] = useState(false);
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -44,7 +46,7 @@ export default function EditEventCard({
         method: 'POST',
         body: formData
       }).then((response) => response.json()).then((uploadInfo) => {
-        handleEventChange({ image: uploadInfo[0].id });
+        handleEventChange({image: uploadInfo[0].id});
         setUploading(false);
       });
     }
@@ -70,7 +72,7 @@ export default function EditEventCard({
               color="primary"
               aria-label={text('Change Image', 'Afbeelding Wijzigen')}
               className="mx-auto"
-              startIcon={<PhotoCameraIcon />}
+              startIcon={<PhotoCameraIcon/>}
             >
               {text('Upload Image', 'Afbeelding Uploaden')}
               <input
@@ -93,7 +95,7 @@ export default function EditEventCard({
                 label={text('Category*', 'Categorie*')}
                 variant="outlined"
                 onChange={(e) => {
-                  handleEventChange({ eventType: e.target.value as EventType });
+                  handleEventChange({eventType: e.target.value as EventType});
                 }}
               >
                 <MenuItem value="activity">
@@ -119,9 +121,9 @@ export default function EditEventCard({
                 value={createdBy}
                 label={text('Committee*', 'Commissie*')}
                 variant="outlined"
-                onChange={(e) => handleEventChange({ createdBy: e.target.value })}
+                onChange={(e) => handleEventChange({createdBy: e.target.value})}
               >
-                {committees.filter(c => (userCommittees.some(uc => uc.committeeId == c.id && uc.left == null) || isAdminOrBoard(user))).map((committee) => (
+                {committees.filter(c => (myCommittees.some(uc => uc.committeeId == c.id && uc.left == null) || isAdminOrBoard(user))).map((committee) => (
                   <MenuItem key={committee.id} value={committee.id}>
                     {text(committee.name)}
                   </MenuItem>
@@ -180,7 +182,7 @@ export default function EditEventCard({
               value={location}
               label={text('Location*', 'Locatie*')}
               onChange={(e) =>
-                handleEventChange({ location: e.target.value })
+                handleEventChange({location: e.target.value})
               }
               variant="outlined"
             >

@@ -16,6 +16,12 @@ pub struct UserStore {
     db: PgPool,
 }
 
+impl UserStore {
+    pub fn new(db: PgPool) -> Self {
+        Self { db }
+    }
+}
+
 impl FromRequestParts<AppState> for UserStore {
     type Rejection = Error;
 
@@ -30,7 +36,7 @@ impl FromRequestParts<AppState> for UserStore {
 }
 
 #[derive(Debug)]
-struct PgUser {
+pub struct PgUser {
     id: Uuid,
     first_name: String,
     infix: Option<String>,
@@ -206,7 +212,7 @@ impl UserStore {
             BasicUser,
             r#"
             SELECT
-                id AS "user_id!",
+                id,
                 first_name,
                 infix,
                 last_name
@@ -261,7 +267,7 @@ impl UserStore {
             BasicUser,
             r#"
             SELECT 
-                id as user_id,
+                id,
                 first_name,
                 infix,
                 last_name

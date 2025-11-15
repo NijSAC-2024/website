@@ -1,32 +1,31 @@
-import { useLanguage } from '../../providers/LanguageProvider';
-import { useApiState } from '../../providers/ApiProvider';
+import {useLanguage} from '../../providers/LanguageProvider';
 import ContentCard from '../ContentCard';
-import { useAppState } from '../../providers/AppStateProvider.tsx';
 import moment from 'moment';
 import {getLabel} from '../../util.ts';
-import {useAuth} from '../../providers/AuthProvider.tsx';
 import {useState} from 'react';
 import {Switch} from '@mui/material';
+import {useWebsite} from '../../hooks/useState.ts';
+import {useUsers} from '../../hooks/useUsers.ts';
+import {useCommittees} from '../../hooks/useCommittees.ts';
 
 export default function UserCommittees() {
-  const { text } = useLanguage();
-  const { committees, userCommittees } = useApiState();
-  const { navigate } = useAppState();
-  const { route } = useAppState();
-  const { user } = useAuth();
+  const {text} = useLanguage();
+  const {user} = useUsers();
   const [filterLeftCommittees, setFilterLeftCommittees] = useState<boolean>(false);
-  
-  if (!committees || !userCommittees) {
-    return <></>;
+  const {navigate, state: {routerState: {params}}} = useWebsite();
+  const {committees, myCommittees} = useCommittees();
+
+  if (!committees || !myCommittees || !user) {
+    return null;
   }
 
-  const filteredCommittees = userCommittees.filter((uc) => uc.left == null || filterLeftCommittees)
+  const filteredCommittees = myCommittees.filter((uc) => uc.left == null || filterLeftCommittees);
 
   return (
     <>
       <ContentCard className="mt-5">
         <div className="grid xl:grid-cols-2 justify-between">
-          <h1>{route.params!.id === user?.id? text('My committees', 'Mijn commissies') : text('Committees', 'Commissies')}</h1>
+          <h1>{params.user_id === user.id ? text('My committees', 'Mijn commissies') : text('Committees', 'Commissies')}</h1>
           <div className="flex items-center xl:justify-end">
             <p>{text('Include left committees', 'Uitgetreden commissies meenemen')}</p>
             <Switch
@@ -42,12 +41,14 @@ export default function UserCommittees() {
           index === self.findIndex(m => m.committeeId === uc.committeeId)
         ).map((userCommittee, index) => {
           const committee = committees.find(c => c.id === userCommittee.committeeId);
-          if (!committee) {return null;}
+          if (!committee) {
+            return null;
+          }
 
           return (
             <div
               key={index}
-              onClick={() => navigate('committee', { id: committee.id })}
+              onClick={() => navigate('committees', {committee_id: committee.id})}
               className="hover:cursor-pointer w-full rounded-2xl bg-inherit border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] h-full"
             >
               <div className="p-5 grid gap-1">
@@ -57,7 +58,7 @@ export default function UserCommittees() {
 
                 {/* Display history for current user */}
                 <div className="grid gap-1">
-                  {userCommittees
+                  {myCommittees
                     .filter(uc => uc.committeeId === committee.id)
                     .map((uc, i) => (
                       <p className="italic" key={i}>

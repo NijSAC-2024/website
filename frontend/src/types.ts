@@ -1,3 +1,6 @@
+import {WebsiteError} from './error/error.ts';
+import {RouterState} from './router.ts';
+
 export type ThemeType = 'dark' | 'light' | 'auto';
 
 export type WeekendType = 'sp' | 'mp' | 'boulder' | 'trad' | 'education';
@@ -18,6 +21,7 @@ export type MembershipStatus =
 export type CommitteeRoleType = 'chair' | 'member';
 
 export type QuestionTypeType = 'text' | 'multipleChoice' | 'number' | 'boolean' | 'date';
+
 export interface QuestionType {
   type: QuestionTypeType;
   options?: Language[];
@@ -96,7 +100,7 @@ export interface Event extends Omit<EventContent, 'location'> {
 
 export function toEventContent(event: Event): EventContent {
   const location_id = event.location.id;
-  const eventContent = { ...event } as unknown as EventContent;
+  const eventContent = {...event} as unknown as EventContent;
   eventContent.location = location_id;
   return eventContent;
 }
@@ -155,19 +159,21 @@ export interface CommitteeContent {
 }
 
 export function toUserContent(user: User | undefined, password: string = ''): UserContent {
-  const userContent = { ...user } as unknown as UserContent;
+  const userContent = {...user} as unknown as UserContent;
   userContent.password = password;
   return userContent;
 }
 
 export interface BasicUser {
-  userId: string;
+  id: string;
   firstName: string;
   infix?: string;
   lastName: string;
+  roles: RoleType[];
+  status: MembershipStatus;
 }
 
-export interface UserContent extends Omit<BasicUser, 'userId'> {
+export interface UserContent extends Omit<BasicUser, 'id'> {
   firstName: string;
   infix?: string;
   lastName: string;
@@ -181,14 +187,12 @@ export interface UserContent extends Omit<BasicUser, 'userId'> {
   iceContactName: string;
   iceContactEmail: string;
   iceContactPhone: string;
-  status: MembershipStatus;
 }
 
 export interface User extends Omit<UserContent, 'password'> {
   id: string;
   created: string;
   updated: string;
-  roles: RoleType[];
 }
 
 export interface rentOption {
@@ -211,22 +215,62 @@ export interface ReservationItemType {
   amount: number;
 }
 
-export interface Route {
-  name: string;
-  path: string;
-  params?: RouteParams;
-}
-
-export type RouteParams = Record<string, string>;
-export type Navigate = (name: string, params: RouteParams) => void;
-
 export interface State {
   version: string;
-  route: Route;
-  user?: User;
-  activities?: Event[];
-  event?: Event;
+  events: Event[] | null;
+  registrations: Registration[] | null;
+  // Holds the registrations a logged-in user is registered for
+  userEventRegistrations: Registration[] | null;
+  myCommittees: UserCommittee[] | null;
+  committees: Committee[] | null;
+  committeeMembers: BasicUser[] | null;
+  locations: Location[] | null;
+  user: User | null;
+  users: User[] | null;
+  routerState: RouterState;
+  nextRouterState: RouterState | null;
+  error: WebsiteError | null;
 }
+
+export type Action =
+  | {
+    type: 'set_user';
+    user: User | null;
+  } | {
+    type: 'set_users';
+    users: User[];
+  } | {
+    type: 'set_events';
+    events: Event[];
+  } | {
+    type: 'set_locations';
+    locations: Location[];
+  } | {
+    type: 'set_event_registrations';
+    registrations: Registration[];
+  } | {
+    type: 'set_user_event_registrations';
+    registrations: Registration[];
+  } | {
+    type: 'set_my_committees';
+    committees: UserCommittee[];
+  } | {
+    type: 'set_committees';
+    committees: Committee[];
+  } | {
+    type: 'set_committee_members';
+    members: BasicUser[];
+  } | {
+    type: 'set_error';
+    error: WebsiteError;
+  } | {
+    type: 'set_next_router_state';
+    nextRouterState: RouterState | null;
+  }
+  | {
+    type: 'set_route';
+    routerState: RouterState;
+  };
 
 export type MenuType =
   | 'association'
@@ -235,64 +279,64 @@ export type MenuType =
   | undefined;
 
 export const roleOptions: OptionsType[] = [
-  { id: 'admin', label: { en: 'Admin', nl: 'Beheerder' } },
-  { id: 'treasurer', label: { en: 'Treasurer', nl: 'Penningmeester' } },
-  { id: 'secretary', label: { en: 'Secretary', nl: 'Secretaris' } },
-  { id: 'chair', label: { en: 'Chair', nl: 'Voorzitter' } },
-  { id: 'viceChair', label: { en: 'Vice Chair', nl: 'Vicevoorzitter' } },
-  { id: 'climbingCommissar', label: { en: 'Climbing Commissar', nl: 'Klimcommissaris' } }
+  {id: 'admin', label: {en: 'Admin', nl: 'Beheerder'}},
+  {id: 'treasurer', label: {en: 'Treasurer', nl: 'Penningmeester'}},
+  {id: 'secretary', label: {en: 'Secretary', nl: 'Secretaris'}},
+  {id: 'chair', label: {en: 'Chair', nl: 'Voorzitter'}},
+  {id: 'viceChair', label: {en: 'Vice Chair', nl: 'Vicevoorzitter'}},
+  {id: 'climbingCommissar', label: {en: 'Climbing Commissar', nl: 'Klimcommissaris'}}
 ];
 
 export const typesOptions: OptionsType[] = [
-  { id: 'sp', label: { en: 'Single Pitch', nl: 'Single Pitch' } },
-  { id: 'mp', label: { en: 'Multi Pitch', nl: 'Multi Pitch' } },
-  { id: 'education', label: { en: 'Education', nl: 'Opleiding' } },
-  { id: 'boulder', label: { en: 'Bouldering', nl: 'Boulderen' } },
-  { id: 'trad', label: { en: 'Trad', nl: 'Trad' } }
+  {id: 'sp', label: {en: 'Single Pitch', nl: 'Single Pitch'}},
+  {id: 'mp', label: {en: 'Multi Pitch', nl: 'Multi Pitch'}},
+  {id: 'education', label: {en: 'Education', nl: 'Opleiding'}},
+  {id: 'boulder', label: {en: 'Bouldering', nl: 'Boulderen'}},
+  {id: 'trad', label: {en: 'Trad', nl: 'Trad'}}
 ];
 
 export const experienceOptions: OptionsType[] = [
-  { id: 'sp', label: { en: 'Single Pitch', nl: 'Single Pitch' } },
-  { id: 'mp', label: { en: 'Multi Pitch', nl: 'Multi Pitch' } },
-  { id: 'trad', label: { en: 'Trad', nl: 'Trad' } }
+  {id: 'sp', label: {en: 'Single Pitch', nl: 'Single Pitch'}},
+  {id: 'mp', label: {en: 'Multi Pitch', nl: 'Multi Pitch'}},
+  {id: 'trad', label: {en: 'Trad', nl: 'Trad'}}
 ];
 
 export const memberOptions: OptionsType[] = [
-  { id: 'member', label: { en: 'Member', nl: 'Lid' } },
+  {id: 'member', label: {en: 'Member', nl: 'Lid'}},
   {
     id: 'affiliated',
-    label: { en: 'Affiliated', nl: 'Aangeslotene' }
+    label: {en: 'Affiliated', nl: 'Aangeslotene'}
   },
-  { id: 'nonMember', label: { en: 'Non Member', nl: 'Niet Lid' } },
-  { id: 'pending', label: { en: 'Pending', nl: 'In afwachting' } }
+  {id: 'nonMember', label: {en: 'Non Member', nl: 'Niet Lid'}},
+  {id: 'pending', label: {en: 'Pending', nl: 'In afwachting'}}
 ];
 
 export const labelOptions: OptionsType[] = [
-  { id: 'activity', label: { en: 'Activity', nl: 'Activiteit' } },
-  { id: 'course', label: { en: 'Course', nl: 'Cursus' } },
-  { id: 'training', label: { en: 'Training', nl: 'Training' } },
-  { id: 'weekend', label: { en: 'Weekend', nl: 'Weekend' } },
-  { id: 'sp', label: { en: 'Single Pitch', nl: 'Single Pitch' } },
-  { id: 'mp', label: { en: 'Multi Pitch', nl: 'Multi Pitch' } },
-  { id: 'education', label: { en: 'Education', nl: 'Opleiding' } },
-  { id: 'boulder', label: { en: 'Bouldering', nl: 'Boulderen' } },
-  { id: 'trad', label: { en: 'Trad', nl: 'Trad' } },
-  { id: 'member', label: { en: 'Member', nl: 'Lid' } },
-  { id: 'affiliated', label: { en: 'Affiliated', nl: 'Aangeslotene' } },
-  { id: 'donor', label: { en: 'Donor', nl: 'Donateur' } },
-  { id: 'nonMember', label: { en: 'Non Member', nl: 'Niet Lid' } },
-  { id: 'pending', label: { en: 'Pending', nl: 'In afwachting' } },
-  { id: 'text', label: { en: 'Text Question', nl: 'Tekstvraag' } },
-  { id: 'multipleChoice', label: { en: 'Option Question', nl: 'Meerkeuzevraag' } },
-  { id: 'number', label: { en: 'Number Question', nl: 'Getalvraag' } },
-  { id: 'boolean', label: { en: 'Checkbox Question', nl: 'Checkboxvraag' } },
-  { id: 'date', label: { en: 'Date & Time Question', nl: 'Datum- & Tijdvraag' } },
-  { id: 'admin', label: { en: 'Admin', nl: 'Beheerder' } },
-  { id: 'treasurer', label: { en: 'Treasurer', nl: 'Penningmeester' } },
-  { id: 'secretary', label: { en: 'Secretary', nl: 'Secretaris' } },
-  { id: 'chair', label: { en: 'Chair', nl: 'Voorzitter' } },
-  { id: 'viceChair', label: { en: 'Vice Chair', nl: 'Vicevoorzitter' } },
-  { id: 'climbingCommissar', label: { en: 'Climbing Commissar', nl: 'Klimcommissaris' } }
+  {id: 'activity', label: {en: 'Activity', nl: 'Activiteit'}},
+  {id: 'course', label: {en: 'Course', nl: 'Cursus'}},
+  {id: 'training', label: {en: 'Training', nl: 'Training'}},
+  {id: 'weekend', label: {en: 'Weekend', nl: 'Weekend'}},
+  {id: 'sp', label: {en: 'Single Pitch', nl: 'Single Pitch'}},
+  {id: 'mp', label: {en: 'Multi Pitch', nl: 'Multi Pitch'}},
+  {id: 'education', label: {en: 'Education', nl: 'Opleiding'}},
+  {id: 'boulder', label: {en: 'Bouldering', nl: 'Boulderen'}},
+  {id: 'trad', label: {en: 'Trad', nl: 'Trad'}},
+  {id: 'member', label: {en: 'Member', nl: 'Lid'}},
+  {id: 'affiliated', label: {en: 'Affiliated', nl: 'Aangeslotene'}},
+  {id: 'donor', label: {en: 'Donor', nl: 'Donateur'}},
+  {id: 'nonMember', label: {en: 'Non Member', nl: 'Niet Lid'}},
+  {id: 'pending', label: {en: 'Pending', nl: 'In afwachting'}},
+  {id: 'text', label: {en: 'Text Question', nl: 'Tekstvraag'}},
+  {id: 'multipleChoice', label: {en: 'Option Question', nl: 'Meerkeuzevraag'}},
+  {id: 'number', label: {en: 'Number Question', nl: 'Getalvraag'}},
+  {id: 'boolean', label: {en: 'Checkbox Question', nl: 'Checkboxvraag'}},
+  {id: 'date', label: {en: 'Date & Time Question', nl: 'Datum- & Tijdvraag'}},
+  {id: 'admin', label: {en: 'Admin', nl: 'Beheerder'}},
+  {id: 'treasurer', label: {en: 'Treasurer', nl: 'Penningmeester'}},
+  {id: 'secretary', label: {en: 'Secretary', nl: 'Secretaris'}},
+  {id: 'chair', label: {en: 'Chair', nl: 'Voorzitter'}},
+  {id: 'viceChair', label: {en: 'Vice Chair', nl: 'Vicevoorzitter'}},
+  {id: 'climbingCommissar', label: {en: 'Climbing Commissar', nl: 'Klimcommissaris'}}
 ];
 
 export const rentOptions: rentOption[] = [
@@ -310,18 +354,18 @@ export const rentOptions: rentOption[] = [
     },
     price: 0.5
   },
-  { name: { en: 'Sling', nl: 'Schlinge' }, price: 0.5 },
-  { name: { en: 'Climbing helmet', nl: 'Klimhelm' }, price: 1.0 },
-  { name: { en: 'Harness', nl: 'Heupgordel' }, price: 1.5 },
-  { name: { en: 'Via ferrata set', nl: 'Klettersteigset' }, price: 0.5 },
-  { name: { en: 'Ohm', nl: 'Ohm' }, price: 1.0 },
+  {name: {en: 'Sling', nl: 'Schlinge'}, price: 0.5},
+  {name: {en: 'Climbing helmet', nl: 'Klimhelm'}, price: 1.0},
+  {name: {en: 'Harness', nl: 'Heupgordel'}, price: 1.5},
+  {name: {en: 'Via ferrata set', nl: 'Klettersteigset'}, price: 0.5},
+  {name: {en: 'Ohm', nl: 'Ohm'}, price: 1.0},
   {
-    name: { en: 'Bivouac sack', nl: 'Bivakzak' },
+    name: {en: 'Bivouac sack', nl: 'Bivakzak'},
     price: 1.0,
-    remark: { en: '(per month)', nl: '(per maand)' }
+    remark: {en: '(per month)', nl: '(per maand)'}
   },
-  { name: { en: 'Ice axe', nl: 'Pickel' }, price: 0.5 },
-  { name: { en: 'Ice drill', nl: 'IJsboor' }, price: 1.0 },
+  {name: {en: 'Ice axe', nl: 'Pickel'}, price: 0.5},
+  {name: {en: 'Ice drill', nl: 'IJsboor'}, price: 1.0},
   {
     name: {
       en: 'Crampons (incl. crampon cover)',
@@ -329,11 +373,11 @@ export const rentOptions: rentOption[] = [
     },
     price: 0.5
   },
-  { name: { en: 'Tarp', nl: 'Tarp' }, price: 1.5 },
+  {name: {en: 'Tarp', nl: 'Tarp'}, price: 1.5},
   {
-    name: { en: 'Ice axes (per two)', nl: 'IJsbijl (per twee)' },
+    name: {en: 'Ice axes (per two)', nl: 'IJsbijl (per twee)'},
     price: 15.0,
-    remark: { en: '(per week)', nl: '(per week)' }
+    remark: {en: '(per week)', nl: '(per week)'}
   },
   {
     name: {
@@ -342,24 +386,24 @@ export const rentOptions: rentOption[] = [
     },
     price: 0.5
   },
-  { name: { en: 'Camalot/Friend', nl: 'Camalot/Friend' }, price: 0.5 },
-  { name: { en: 'Other trad gear', nl: 'Overig trad gear' }, price: 1.0 },
+  {name: {en: 'Camalot/Friend', nl: 'Camalot/Friend'}, price: 0.5},
+  {name: {en: 'Other trad gear', nl: 'Overig trad gear'}, price: 1.0},
   {
-    name: { en: 'Quickdraws (per 6)', nl: 'Setjes (per 6 stuks)' },
+    name: {en: 'Quickdraws (per 6)', nl: 'Setjes (per 6 stuks)'},
     price: 0.5
   },
-  { name: { en: 'Crash pad', nl: 'Crashpad' }, price: 3.5 },
-  { name: { en: 'Single rope', nl: 'Enkeltouw' }, price: 1.5 },
-  { name: { en: 'Alpine rope', nl: 'Alpien touw' }, price: 1.5 },
+  {name: {en: 'Crash pad', nl: 'Crashpad'}, price: 3.5},
+  {name: {en: 'Single rope', nl: 'Enkeltouw'}, price: 1.5},
+  {name: {en: 'Alpine rope', nl: 'Alpien touw'}, price: 1.5},
   {
-    name: { en: 'Double rope (per strand)', nl: 'Dubbeltouw (per streng)' },
+    name: {en: 'Double rope (per strand)', nl: 'Dubbeltouw (per streng)'},
     price: 1.0
   },
-  { name: { en: 'Training rope', nl: 'Oefentouw' }, price: 0.0 },
-  { name: { en: 'Stove', nl: 'Brander' }, price: 0.5 },
-  { name: { en: 'Cooking gear', nl: 'Kookgerei' }, price: 0.0 },
+  {name: {en: 'Training rope', nl: 'Oefentouw'}, price: 0.0},
+  {name: {en: 'Stove', nl: 'Brander'}, price: 0.5},
+  {name: {en: 'Cooking gear', nl: 'Kookgerei'}, price: 0.0},
   {
-    name: { en: 'Topo', nl: 'Topo' },
+    name: {en: 'Topo', nl: 'Topo'},
     price: 0.0,
     remark: {
       en: '(€5.00 per month after 1 month)',
@@ -372,6 +416,6 @@ export const rentOptions: rentOption[] = [
       nl: 'Klimset (heupgordel, safebiner, zekerapparaat)'
     },
     price: 5.0,
-    remark: { en: '(for max. 6 months)', nl: '(voor max. 6 maanden)' }
+    remark: {en: '(for max. 6 months)', nl: '(voor max. 6 maanden)'}
   }
 ];

@@ -3,16 +3,18 @@ import GenericPage from './GenericPage.tsx';
 import ContentCard from '../components/ContentCard.tsx';
 import { Event, EventType, WeekendType } from '../types.ts';
 import EventCard from '../components/event/EventCard.tsx';
-import { useApiState } from '../providers/ApiProvider.tsx';
 import { useLanguage } from '../providers/LanguageProvider.tsx';
 import NewEventButton from '../components/events/NewEventButton.tsx';
 import EventsFilter from '../components/events/EventsFilter.tsx';
 import moment from 'moment/moment';
 import {Switch} from '@mui/material';
+import {useEvents} from '../hooks/useEvents.ts';
+import {useEventRegistrations} from '../hooks/useEventRegistrations.ts';
 
 export default function Events() {
   const { text } = useLanguage();
-  const { events, registeredEvents } = useApiState();
+  const {events} = useEvents();
+  const {userEventRegistrations} = useEventRegistrations();
   const [category, setCategory] = useState<EventType | 'all'>(
     'all'
   );
@@ -78,7 +80,7 @@ export default function Events() {
                         }),
                       }}
                       agendaPage={true}
-                      registration={registeredEvents.find((e) => e.eventId === event.id)}
+                      registration={userEventRegistrations.find((e) => e.eventId === event.id)}
                     />
                   ))
               )}

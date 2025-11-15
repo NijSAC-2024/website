@@ -5,9 +5,9 @@ import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import TextCard from '../../components/TextCard';
 import { useLanguage } from '../../providers/LanguageProvider';
-import { useApiState } from '../../providers/ApiProvider';
 import UserDetails from '../UserDetails.tsx';
 import ContentCard from '../ContentCard.tsx';
+import {useUsers} from '../../hooks/useUsers.ts';
 
 interface AcceptingMembersProps {
   expanded: Record<string, boolean>;
@@ -19,7 +19,7 @@ export default function AcceptingMembers({
   toggleExpand
 }: AcceptingMembersProps) {
   const { text } = useLanguage();
-  const { users, updateUser } = useApiState()
+  const { users, updateUser } = useUsers()
 
   const pendingUsers = users.filter((u) => u.status === 'pending');
 

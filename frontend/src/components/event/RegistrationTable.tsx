@@ -1,38 +1,44 @@
-import { Table, TableBody, TableCell, TableRow } from '@mui/material';
-import { Registration } from '../../types.ts';
-import { useLanguage } from '../../providers/LanguageProvider.tsx';
+import {Table, TableBody, TableCell, TableRow} from '@mui/material';
+import {Registration} from '../../types.ts';
+import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import RegistrationRow from './RegistrationRow.tsx';
-import {useAuth} from '../../providers/AuthProvider.tsx';
 import {isAdminOrBoard} from '../../util.ts';
-import {useApiState} from '../../providers/ApiProvider.tsx';
+import {useEventRegistrations} from '../../hooks/useEventRegistrations.ts';
+import {useEvents} from '../../hooks/useEvents.ts';
+import {useUsers} from '../../hooks/useUsers.ts';
 
 interface RegistrationTableProps {
   onEditClick: (registration: Registration) => void;
 }
 
-export default function RegistrationTable({ onEditClick }: RegistrationTableProps) {
-  const { text } = useLanguage();
-  const { user } = useAuth()
-  const { event, registrations } = useApiState()
+export default function RegistrationTable({onEditClick}: RegistrationTableProps) {
+  const {text} = useLanguage();
+  const {user} = useUsers();
+  const {eventRegistrations} = useEventRegistrations();
+  const {currentEvent} = useEvents();
+
+  if (!currentEvent) {
+    return null;
+  }
 
   return (
     <div className="overflow-x-auto">
       <div className="min-w-max">
         <Table>
           <TableBody>
-            {isAdminOrBoard(user) && (
+            {user && isAdminOrBoard(user) && (
               <TableRow>
                 <TableCell><b>{text('Name', 'Naam')}</b></TableCell>
-                {event?.questions.map((q) => (
+                {currentEvent.questions.map((q) => (
                   <TableCell key={q.id}><b>{`${text(q.question)} ${q.required ? '*' : ''}`}</b></TableCell>
                 ))}
                 <TableCell><b>{text('Attended', 'Aanwezig')}</b></TableCell>
                 <TableCell><b>{text('Actions', 'Acties')}</b></TableCell>
               </TableRow>
             )}
-            {registrations?.map((r) => (
+            {eventRegistrations?.map((r) => (
               <RegistrationRow
-                key={r.userId}
+                key={r.id}
                 registration={r}
                 onEditClick={onEditClick}
               />

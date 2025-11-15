@@ -1,20 +1,18 @@
 import { FormEvent, useState } from 'react';
 import { Box, Button, FormControl, FormHelperText } from '@mui/material';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
-import { useAuth } from '../../providers/AuthProvider.tsx';
-import { useApiState } from '../../providers/ApiProvider.tsx';
 import { ErrorType, Language } from '../../types.ts';
 import { passwordValidator, repeatPasswordValidator } from '../../validator.ts';
 import ContentCard from '../ContentCard.tsx';
 import PasswordField from '../PasswordField.tsx';
-import {useAppState} from '../../providers/AppStateProvider.tsx';
 import {isAdminOrBoard} from '../../util.ts';
+import {useWebsite} from '../../hooks/useState.ts';
+import {useUsers} from '../../hooks/useUsers.ts';
 
 export default function ChangePassword() {
   const { text } = useLanguage();
-  const { user } = useAuth();
-  const { updateUserPassword } = useApiState();
-  const { route } = useAppState()
+  const { user } = useUsers();
+  const {state: {routerState: {params}}} = useWebsite()
 
   const [password, setPassword] = useState({ password: '', repeatPassword: '' });
   const [passwordErrors, setPasswordErrors] = useState<{ password: ErrorType; repeatPassword: ErrorType }>({
@@ -22,7 +20,11 @@ export default function ChangePassword() {
     repeatPassword: false,
   });
 
-  const canEdit = isAdminOrBoard(user) || route.params!.id === user?.id
+  if (!user) {
+    return null
+  }
+
+  const canEdit = isAdminOrBoard(user) || params.user_id === user.id
   if (!canEdit) {return null;}
 
   const handlePasswordChange = (field: 'password' | 'repeatPassword', value: string) => {
@@ -38,9 +40,9 @@ export default function ChangePassword() {
 
   const handleChangePassword = async (event: FormEvent) => {
     event.preventDefault();
-    if (!canEdit || !route.params!.id) {return;}
+    if (!canEdit || !params.user_id) {return;}
     if (Object.values(passwordErrors).some((v) => v)) {return;}
-    await updateUserPassword(route.params!.id, password.password);
+    await updateUserPassword(params.user_id, password.password);
   };
 
   return (

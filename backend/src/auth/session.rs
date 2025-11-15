@@ -1,3 +1,5 @@
+use crate::data_source::UserStore;
+use crate::user::{User};
 use crate::{
     AppState,
     auth::{
@@ -50,11 +52,6 @@ impl TryFrom<PgSession> for Session {
     }
 }
 
-struct PwHash {
-    id: Uuid,
-    pw_hash: Option<String>,
-}
-
 impl Session {
     pub fn roles(&self) -> &Roles {
         &self.roles
@@ -103,11 +100,10 @@ impl Session {
         session.try_into()
     }
 
-    pub async fn new(credentials: UserCredentials, db: &PgPool) -> AppResult<Session> {
-        let PwHash { id, pw_hash } = match sqlx::query_as!(
-            PwHash,
+    pub async fn new(credentials: UserCredentials, db: &PgPool) -> AppResult<(Session, User)> {
+        let user = match sqlx::query!(
             r#"
-            SELECT id, pw_hash
+            SELECT id as "id:UserId", pw_hash
             FROM "user"
             WHERE email = $1
             "#,
@@ -122,7 +118,7 @@ impl Session {
         }?;
 
         // If the user currently has no password set
-        let pw_hash = pw_hash.ok_or(Error::Unauthorized)?;
+        let pw_hash = user.pw_hash.ok_or(Error::Unauthorized)?;
 
         let parsed_hash = PasswordHash::new(&pw_hash).map_err(Error::Argon2)?;
         credentials.verify_pwd(&parsed_hash)?;
@@ -147,18 +143,19 @@ impl Session {
                    expiration
             FROM new_session 
                 JOIN "user" u ON user_id = u.id
-                     
             "#,
             cookie_value,
-            id,
+            *user.id,
         )
         .fetch_one(db)
         .await?
         .try_into()?;
 
+        let user = UserStore::new(db.clone()).get(&user.id).await?;
+
         trace!("Created new session for user {}", credentials.email);
 
-        Ok(session)
+        Ok((session, user))
     }
 
     pub async fn delete(self, db: &PgPool) -> AppResult<()> {
