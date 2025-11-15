@@ -13,6 +13,8 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
+use axum_extra::extract::CookieJar;
+use sqlx::PgPool;
 
 enum UpdateAccess {
     Anything,
@@ -47,9 +49,11 @@ fn read_all_access(session: &Session) -> AppResult<ReadAccess> {
 }
 
 pub async fn register(
+    db: PgPool,
     store: UserStore,
+    jar: CookieJar,
     ValidatedJson(new): ValidatedJson<RegisterNewUser>,
-) -> AppResult<(StatusCode, Json<User>)> {
+) -> AppResult<impl IntoResponse> {
     let pwd_hash = new.pwd_hash()?;
     let user = UserContent {
         first_name: new.first_name,
@@ -71,7 +75,9 @@ pub async fn register(
     let user = store.create(&user).await?;
     store.update_pwd(&user.id, Some(&pwd_hash)).await?;
 
-    Ok((StatusCode::CREATED, Json(user)))
+    let session = Session::new(&db, &user.id).await?;
+
+    Ok((StatusCode::CREATED, jar.add(session.into_cookie()), Json(user)))
 }
 
 pub async fn who_am_i(store: UserStore, session: Option<Session>) -> ApiResult<User> {

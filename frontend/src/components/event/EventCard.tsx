@@ -5,7 +5,7 @@ import moment from 'moment';
 import { Chip } from '@mui/material';
 import {getLabel, truncateMarkdown} from '../../util.ts';
 import 'moment/dist/locale/nl';
-import {DateType, Event, Registration} from '../../types.ts';
+import {DateType, Event} from '../../types.ts';
 import Markdown from 'react-markdown';
 import RegisterButton from '../register/RegisterButton.tsx';
 import {useWebsite} from '../../hooks/useState.ts';
@@ -13,12 +13,12 @@ import {useWebsite} from '../../hooks/useState.ts';
 interface AgendaCardProps {
   event: Event;
   agendaPage: boolean;
-  registration?: Registration;
 }
 
-export default function EventCard({ event, agendaPage, registration }: AgendaCardProps) {
+export default function EventCard({ event, agendaPage }: AgendaCardProps) {
   const {navigate} = useWebsite()
   const { text, language } = useLanguage();
+
   moment.locale(language);
 
   const formatDate = (date: DateType): string => {
@@ -144,16 +144,7 @@ export default function EventCard({ event, agendaPage, registration }: AgendaCar
             </p>
           </div>
           <RegisterButton
-            registrationPeriod={event.registrationPeriod}
-            requiredMembershipStatus={event.requiredMembershipStatus}
-            title={event.name}
-            questions={event.questions}
-            registrationMax={event.registrationMax}
-            waitingListMax={event.waitingListMax}
-            registrationCount={event.registrationCount}
-            waitingListCount={event.waitingListCount}
             eventId={event.id}
-            registration={registration}
           />
         </div>
       )}

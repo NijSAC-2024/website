@@ -15,7 +15,7 @@ interface UserMenuProps {
 
 export default function UserMenu({toggleDropdown}: UserMenuProps) {
   const { text } = useLanguage();
-  const { user } = useUsers();
+  const { user, logout } = useUsers();
   const {navigate} = useWebsite()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);

@@ -1,4 +1,4 @@
-import {Language, labelOptions, BasicUser, User} from './types.ts';
+import {Language, labelOptions, User} from './types.ts';
 
 export function getLabel(id: string): Language {
   const categoryOption = labelOptions.find((option) => option.id === id);

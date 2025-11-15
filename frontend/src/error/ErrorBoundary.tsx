@@ -1,5 +1,5 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
-import Error from './Error';
+import ErrorPage from './ErrorPage.tsx';
 import { WebsiteError } from './error';
 
 interface Props {
@@ -7,7 +7,7 @@ interface Props {
 }
 
 interface State {
-  error?: Error;
+  error?: ErrorPage;
 }
 
 export default class ErrorBoundary extends Component<Props, State> {
@@ -15,22 +15,22 @@ export default class ErrorBoundary extends Component<Props, State> {
     error: undefined,
   };
 
-  public static getDerivedStateFromError(e: Error): State {
+  public static getDerivedStateFromError(e: ErrorPage): State {
     // Update state so the next render will show the fallback UI.
     return { error: e };
   }
 
-  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  public componentDidCatch(error: ErrorPage, errorInfo: ErrorInfo) {
     console.error('Uncaught error:', error, errorInfo);
   }
 
   public render() {
     if (this.state.error) {
       if (this.state.error instanceof WebsiteError) {
-        return <Error error={this.state.error} />;
+        return <ErrorPage error={this.state.error} />;
       }
 
-      return <Error error={new WebsiteError(`Unexpected error: ${this.state.error}`, 500)} />;
+      return <ErrorPage error={new WebsiteError(`Unexpected error: ${this.state.error}`, 500)} />;
     }
 
     return this.props.children;

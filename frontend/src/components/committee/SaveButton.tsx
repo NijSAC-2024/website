@@ -6,7 +6,7 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AreYouSure from '../AreYouSure.tsx';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
-import {useWebsite} from "../../hooks/useState.ts";
+import {useWebsite} from '../../hooks/useState.ts';
 
 interface SaveButtonProps {
   id: string;

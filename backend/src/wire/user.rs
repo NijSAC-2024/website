@@ -16,7 +16,6 @@ use std::{
 use time::OffsetDateTime;
 use uuid::Uuid;
 use validator::Validate;
-use crate::auth::role::Role;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, derive_more::Display, sqlx::Type)]
 #[sqlx(transparent)]

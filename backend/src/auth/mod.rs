@@ -18,7 +18,7 @@ pub async fn login(
     ValidatedJson(credentials): ValidatedJson<UserCredentials>,
 ) -> Result<impl IntoResponse, Error> {
     trace!("Login attempt for user {}", credentials.email);
-    let (session, user) = Session::new(credentials, &db).await?;
+    let (session, user) = Session::from_credentials(credentials, &db).await?;
     Ok((jar.add(session.into_cookie()), Json(user)))
 }
 

@@ -123,7 +123,7 @@ export default function EditEventCard({
                 variant="outlined"
                 onChange={(e) => handleEventChange({createdBy: e.target.value})}
               >
-                {committees.filter(c => (myCommittees.some(uc => uc.committeeId == c.id && uc.left == null) || isAdminOrBoard(user))).map((committee) => (
+                {committees.filter(c => (myCommittees.some(uc => uc.committeeId == c.id && uc.left == null) || user && isAdminOrBoard(user))).map((committee) => (
                   <MenuItem key={committee.id} value={committee.id}>
                     {text(committee.name)}
                   </MenuItem>

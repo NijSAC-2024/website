@@ -1,6 +1,6 @@
 import {EventContent, toEventContent} from '../../types.ts';
 import {Button} from '@mui/material';
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import EditRegistrations from './EditRegistrations.tsx';
 import EditEventCard from './EditEventCard.tsx';
 import EditDescription from './EditDescription.tsx';
@@ -14,7 +14,7 @@ import {useEvents} from '../../hooks/useEvents.ts';
 export default function EditEvent() {
   const {text} = useLanguage();
   const {navigate, state: {routerState: {params, name: routeName}}} = useWebsite();
-  const {currentEvent} = useEvents();
+  const {currentEvent, createEvent, updateEvent} = useEvents();
 
   let initialEvent: EventContent | null = null;
   if (routeName === 'events.new') {
@@ -38,11 +38,10 @@ export default function EditEvent() {
 
   const [event, setEvent] = useState<EventContent | null>(initialEvent);
 
-
   const id = params.event_id;
 
   if (!event) {
-    return <></>;
+    return null;
   }
 
   const handleEventChange = (changes: Partial<EventContent>) => {

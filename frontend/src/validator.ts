@@ -32,6 +32,7 @@ export const emailValidator = (value: string): Language | false => {
   return false;
 };
 
+//FIXME increase password length check
 export const passwordValidator = (value?: string): Language | false => {
   if (!value || value.length < 3) {
     return {

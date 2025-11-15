@@ -6,7 +6,7 @@ import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import {CommitteeContent, toCommitteeContent} from '../../types.ts';
 import SaveButton from './SaveButton.tsx';
 import MarkdownEditor from '../markdown/MarkdownEditor.tsx';
-import {useWebsite} from "../../hooks/useState.ts";
+import {useWebsite} from '../../hooks/useState.ts';
 
 export default function EditCommittee() {
   const { text } = useLanguage();

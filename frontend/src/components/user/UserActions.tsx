@@ -1,4 +1,4 @@
-import {useState, MouseEvent, useEffect} from 'react';
+import {useState, MouseEvent} from 'react';
 import {
   IconButton,
   Tooltip,
@@ -8,10 +8,9 @@ import {
 } from '@mui/material';
 import SwitchAccountIcon from '@mui/icons-material/SwitchAccount';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
-import {User, RoleType, roleOptions} from '../../types.ts';
+import {RoleType, roleOptions} from '../../types.ts';
 import GroupIcon from '@mui/icons-material/Group';
 import {isAdminOrBoard} from '../../util.ts';
-import {useWebsite} from '../../hooks/useState.ts';
 import {useUsers} from '../../hooks/useUsers.ts';
 import {useCommittees} from '../../hooks/useCommittees.ts';
 
@@ -20,23 +19,11 @@ export default function UserActions() {
   const { text } = useLanguage();
   const { user } = useUsers();
   const {myCommittees, committees} = useCommittees();
-  const {state: {routerState: {params}}} = useWebsite();
+  const {currentUser} = useUsers();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [committeeAnchor, setCommitteeAnchor] = useState<null | HTMLElement>(null);
-  const [viewUser, setViewUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    if (!!user && !(params.user_id === user?.id)) {
-      getUser(params.user_id).then((u) => {
-        if (u) {
-          setViewUser(u);
-        }
-      });
-    } else if (user) {
-      setViewUser(user);
-    }
-  }, [params, user]);
+  
 
   if (!user || !isAdminOrBoard(user)) {return null;}
 
@@ -54,24 +41,24 @@ export default function UserActions() {
   };
 
   const toggleRole = async (role: RoleType) => {
-    if (!viewUser) {return;}
-    const newRoles = viewUser.roles.includes(role)
-      ? viewUser.roles.filter((r) => r !== role)
-      : [...viewUser.roles, role];
+    if (!currentUser) {return;}
+    const newRoles = currentUser.roles.includes(role)
+      ? currentUser.roles.filter((r) => r !== role)
+      : [...currentUser.roles, role];
 
-    await updateUser(viewUser.id, { ...viewUser, roles: newRoles });
-    setViewUser({ ...viewUser, roles: newRoles });
+    await updateUser(currentUser.id, { ...currentUser, roles: newRoles });
+    setcurrentUser({ ...currentUser, roles: newRoles });
     handleClose();
   };
 
   const toggleCommittee = async (committeeId: string) => {
-    if (!viewUser) {return;}
+    if (!currentUser) {return;}
     const inCommittee = myCommittees.some((c) => c.committeeId === committeeId && c.left == null);
 
     if (inCommittee) {
-      await removeUserFromCommittee(committeeId, viewUser.id,);
+      await removeUserFromCommittee(committeeId, currentUser.id,);
     } else {
-      await addUserToCommittee(committeeId, viewUser.id, );
+      await addUserToCommittee(committeeId, currentUser.id, );
     }
     handleClose();
   };
@@ -120,7 +107,7 @@ export default function UserActions() {
             onClick={() => toggleRole(role.id as RoleType)}
           >
             <Checkbox
-              checked={viewUser?.roles.includes(role.id as RoleType) || false}
+              checked={currentUser?.roles.includes(role.id as RoleType) || false}
               size="small"
             />
             {text(role.label)}

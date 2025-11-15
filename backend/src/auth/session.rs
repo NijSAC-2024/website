@@ -1,5 +1,5 @@
 use crate::data_source::UserStore;
-use crate::user::{User};
+use crate::user::User;
 use crate::{
     AppState,
     auth::{
@@ -100,7 +100,10 @@ impl Session {
         session.try_into()
     }
 
-    pub async fn new(credentials: UserCredentials, db: &PgPool) -> AppResult<(Session, User)> {
+    pub async fn from_credentials(
+        credentials: UserCredentials,
+        db: &PgPool,
+    ) -> AppResult<(Session, User)> {
         let user = match sqlx::query!(
             r#"
             SELECT id as "id:UserId", pw_hash
@@ -123,13 +126,23 @@ impl Session {
         let parsed_hash = PasswordHash::new(&pw_hash).map_err(Error::Argon2)?;
         credentials.verify_pwd(&parsed_hash)?;
 
+        let session = Self::new(db, &user.id).await?;
+
+        let user = UserStore::new(db.clone()).get(&user.id).await?;
+
+        trace!("Created new session for user {}", credentials.email);
+
+        Ok((session, user))
+    }
+
+    pub async fn new(db: &PgPool, user_id: &UserId) -> AppResult<Session> {
         let cookie_value = Alphanumeric.sample_string(&mut rand::rng(), 32);
 
-        let session = sqlx::query_as!(
+        Ok(sqlx::query_as!(
             PgSession,
             r#"
             WITH new_session AS (
-                INSERT INTO session 
+                INSERT INTO session
                     (
                      cookie_value,
                      user_id,
@@ -141,21 +154,15 @@ impl Session {
                    roles,
                    status AS "status: MembershipStatus",
                    expiration
-            FROM new_session 
+            FROM new_session
                 JOIN "user" u ON user_id = u.id
             "#,
             cookie_value,
-            *user.id,
+            **user_id,
         )
         .fetch_one(db)
         .await?
-        .try_into()?;
-
-        let user = UserStore::new(db.clone()).get(&user.id).await?;
-
-        trace!("Created new session for user {}", credentials.email);
-
-        Ok((session, user))
+        .try_into()?)
     }
 
     pub async fn delete(self, db: &PgPool) -> AppResult<()> {

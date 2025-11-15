@@ -82,7 +82,7 @@ export default function Committee() {
                     >
                       <TableCell component="th" scope="row">
                         <p className="hover:cursor-pointer hover:opacity-60 transition-all duration-100"
-                          onClick={() => navigate('user', {id: member.id})}>{`${member.firstName} ${member.infix ?? ''} ${member.lastName}`}</p>
+                          onClick={() => navigate('user', {user_id: member.id})}>{`${member.firstName} ${member.infix ?? ''} ${member.lastName}`}</p>
                       </TableCell>
                     </TableRow>
                   ))}

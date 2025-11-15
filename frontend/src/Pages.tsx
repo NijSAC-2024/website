@@ -1,6 +1,5 @@
 import {JSX, useEffect} from 'react';
 import {RouteName} from './routes.ts';
-import Error from './error/Error.tsx';
 import Home from './pages/Home.tsx';
 import Signup from './pages/Signup.tsx';
 import Events from './pages/Events.tsx';
@@ -20,8 +19,11 @@ import {SnackbarProvider} from 'notistack';
 import Success from './components/alerts/Success.tsx';
 import Warning from './components/alerts/Warning.tsx';
 import Info from './components/alerts/Info.tsx';
+import Error from './components/alerts/Error.tsx';
+
 import {useThemeMode} from './providers/ThemeProvider.tsx';
 import {useLanguage} from './providers/LanguageProvider.tsx';
+import ErrorPage from './error/ErrorPage.tsx';
 
 const PageContent: { [key in RouteName]: JSX.Element | null } = {
   index: <Home/>,
@@ -48,7 +50,7 @@ export function Pages() {
   } = useWebsite();
 
   // TODO move theming to separate file
-  const { themeMode, checkDarkMode, setTheme } = useThemeMode();
+  const {themeMode, checkDarkMode, setTheme} = useThemeMode();
   const isDarkMode = checkDarkMode();
   const language = useLanguage();
 
@@ -115,8 +117,7 @@ export function Pages() {
     if (e.ctrlKey && e.key === ',') {
       if (themeMode == 'dark') {
         setTheme('light');
-      }
-      else if (themeMode == 'light') {
+      } else if (themeMode == 'light') {
         setTheme('dark');
       }
     }
@@ -135,13 +136,13 @@ export function Pages() {
   });
 
   if (error) {
-    return <Error error={error}/>;
+    return <ErrorPage error={error}/>;
   }
 
   return (
     <ThemeProvider theme={darkTheme}>
-      <CssBaseline />
-      <MainMenu />
+      <CssBaseline/>
+      <MainMenu/>
       <SnackbarProvider
         maxSnack={3}
         autoHideDuration={5000}

@@ -9,12 +9,10 @@ import EventsFilter from '../components/events/EventsFilter.tsx';
 import moment from 'moment/moment';
 import {Switch} from '@mui/material';
 import {useEvents} from '../hooks/useEvents.ts';
-import {useEventRegistrations} from '../hooks/useEventRegistrations.ts';
 
 export default function Events() {
   const { text } = useLanguage();
   const {events} = useEvents();
-  const {userEventRegistrations} = useEventRegistrations();
   const [category, setCategory] = useState<EventType | 'all'>(
     'all'
   );
@@ -80,7 +78,6 @@ export default function Events() {
                         }),
                       }}
                       agendaPage={true}
-                      registration={userEventRegistrations.find((e) => e.eventId === event.id)}
                     />
                   ))
               )}

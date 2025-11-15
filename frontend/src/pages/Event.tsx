@@ -9,16 +9,14 @@ import {isAdminOrBoard} from '../util.ts';
 import {useWebsite} from '../hooks/useState.ts';
 import {useUsers} from '../hooks/useUsers.ts';
 import {useEvents} from '../hooks/useEvents.ts';
-import {useEventRegistrations} from '../hooks/useEventRegistrations.ts';
 import {useCommittees} from '../hooks/useCommittees.ts';
 
 export default function Event() {
   const {text} = useLanguage();
   const {navigate} = useWebsite();
   const {currentEvent} = useEvents();
-  const {userEventRegistrations} = useEventRegistrations();
   const {myCommittees} = useCommittees();
-  const { user} = useUsers();
+  const {user} = useUsers();
 
 
   if (!currentEvent) {
@@ -57,8 +55,7 @@ export default function Event() {
             )}
           </div>
 
-          <EventCard event={currentEvent} agendaPage={false}
-            registration={userEventRegistrations.find((e) => e.eventId === currentEvent.id)}/>
+          <EventCard event={currentEvent} agendaPage={false}/>
           <DescriptionCard
             descriptionMarkdown={currentEvent.description || {en: '', nl: ''}}
             experience={currentEvent.metadata?.experience || []}

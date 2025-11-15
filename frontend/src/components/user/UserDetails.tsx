@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from 'react';
+import {FormEvent, useEffect, useState} from 'react';
 import { TextField, Button, Box, FormControl } from '@mui/material';
 import {Language, toUserContent, UserContent} from '../../types';
 import { FormErrors } from '../signup/SignupForm';
@@ -16,10 +16,9 @@ import {useUsers} from '../../hooks/useUsers.ts';
 
 export default function UserDetails() {
   const { text } = useLanguage();
-  const { user } = useUsers();
+  const { user, currentUser } = useUsers();
   const {state: {routerState: {params}}} = useWebsite();
-  const [viewUser, setViewUser] = useState(user);
-  const [form, setForm] = useState<UserContent>(toUserContent(user));
+  const [form, setForm] = useState<UserContent | null>(currentUser ? toUserContent(currentUser) : null);
   const [errors, setErrors] = useState<FormErrors>({
     firstName: false,
     infix: false,
@@ -36,27 +35,19 @@ export default function UserDetails() {
     importantInfo: false,
   });
 
-  const isMe = params.user_id === user?.id
-  const canEdit = isAdminOrBoard(user) || isMe
-
-
   useEffect(() => {
-    if (!isMe && !!user) {
-      getUser(params.user_id).then((u) => {
-        if (u) {
-          setViewUser(u);
-          setForm(toUserContent(u));
-        }
-      });
-    } else if (user) {
-      setViewUser(user);
-      setForm(toUserContent(user));
-    }
-  }, [isMe, params, user]);
+    // FIXME: currently, this is required as otherwise navigating directly from one account to another would not
+    //  re-fill the form
+    setForm(currentUser ? toUserContent(currentUser) : null)
+  }, [currentUser]);
 
-  if (!user) {
+  if (!user || !currentUser) {
     return null
   }
+
+  const isMe = params.user_id === user.id
+  const canEdit = isAdminOrBoard(user) || isMe
+
 
   const handleChange = (field: keyof UserContent, value: string | number) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -82,17 +73,15 @@ export default function UserDetails() {
 
   const handleSave = async (event: FormEvent) => {
     event.preventDefault();
-    if (!canEdit || !viewUser) {return;}
+    if (!canEdit || !currentUser) {return;}
     if (Object.values(errors).some((v) => v)) {return;}
-    await updateUser(viewUser.userId, { ...viewUser, ...form });
+    await updateUser(currentUser.id, { ...currentUser, ...form });
   };
-
-  if (!viewUser) {return null;}
 
   return (
     <ContentCard className="grid gap-1">
       <div className="flex justify-between w-full">
-        <h1>{isMe? text('My account', 'Mijn account') : `${viewUser.firstName.charAt(0).toUpperCase() + viewUser.firstName.slice(1)}'s account`}</h1>
+        <h1>{isMe? text('My account', 'Mijn account') : `${currentUser.firstName.charAt(0).toUpperCase() + currentUser.firstName.slice(1)}'s account`}</h1>
         <UserActions />
       </div>
 
@@ -177,11 +166,11 @@ export default function UserDetails() {
             </FormControl>
 
             <b>{text('Membership status', 'Lidmaatschapsstatus')}</b>
-            <span className="xl:col-span-3">{text(getLabel(viewUser.status))}</span>
+            <span className="xl:col-span-3">{text(getLabel(currentUser.status))}</span>
 
             <b>{text('Roles', 'Rollen')}</b>
             <span className="xl:col-span-3">
-              {viewUser.roles && viewUser.roles.map((r) => text(getLabel(r))).join(', ')}
+              {currentUser.roles && currentUser.roles.map((r) => text(getLabel(r))).join(', ')}
             </span>
           </TextCard>
 
@@ -277,13 +266,13 @@ export default function UserDetails() {
       ) : (
         <TextCard className="px-3 xl:px-6 py-3 grid xl:grid-cols-4 gap-2 xl:gap-5 mb-3 items-center">
           <b>{text('First name', 'Voornaam')}</b>
-          <span className="xl:col-span-3">{viewUser.firstName}</span>
+          <span className="xl:col-span-3">{currentUser.firstName}</span>
 
           <b>{text('Infix', 'Tussenvoegsel')}</b>
-          <span className="xl:col-span-3">{viewUser.infix}</span>
+          <span className="xl:col-span-3">{currentUser.infix}</span>
 
           <b>{text('Last name', 'Achternaam')}</b>
-          <span className="xl:col-span-3">{viewUser.lastName}</span>
+          <span className="xl:col-span-3">{currentUser.lastName}</span>
         </TextCard>
       )}
     </ContentCard>

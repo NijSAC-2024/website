@@ -1,27 +1,31 @@
 import GenericPage from './GenericPage.tsx';
 import ContentCard from '../components/ContentCard.tsx';
 import SignupForm from '../components/signup/SignupForm.tsx';
-import { Button, Chip, Collapse } from '@mui/material';
-import { useState } from 'react';
+import {Button, Chip, Collapse} from '@mui/material';
+import {useState} from 'react';
 import SignupOptions from '../components/signup/SingupOptions.tsx';
-import { useLanguage } from '../providers/LanguageProvider.tsx';
+import {useLanguage} from '../providers/LanguageProvider.tsx';
 import {MembershipStatus, UserContent} from '../types.ts';
 import {useWebsite} from '../hooks/useState.ts';
+import {useUsers} from '../hooks/useUsers.ts';
 
 interface MembershipType {
   id: MembershipStatus;
-  label: {en: string, nl: string}
+  label: { en: string, nl: string };
 }
 
 export default function Signup() {
-  const { text } = useLanguage();
-  const { createUser } = useApiState()
-  const {navigate} = useWebsite()
+  const {text} = useLanguage();
+  const {navigate} = useWebsite();
+  const {signup} = useUsers();
   const [membership, setMembership] = useState<MembershipType>({
     id: 'member', label: {en: 'Member', nl: 'Lid'}
   });
   const [selectedMembership, setSelectedMembership] = useState<boolean>(false);
   const [newUser, setNewUser] = useState<UserContent>({
+    importantInfo: '',
+    infix: '',
+    roles: [],
     firstName: '',
     lastName: '',
     phone: '',
@@ -36,13 +40,14 @@ export default function Signup() {
     status: 'pending'
   });
 
-  const handleSubmit = () => {
-    createUser(newUser);
-    navigate('events');
+  const handleSubmit = async () => {
+    if (await signup(newUser)) {
+      navigate('events');
+    }
   };
 
   const handleChange = (field: keyof UserContent, value: string | number) => {
-    setNewUser(prev => ({ ...prev, [field]: value }));
+    setNewUser(prev => ({...prev, [field]: value}));
   };
 
   const handleExtraordinaryMember = () => {
@@ -54,7 +59,7 @@ export default function Signup() {
     setSelectedMembership(true);
   };
   const handleDonor = () => {
-    setMembership({id: 'donor', label: { en: 'Donor', nl: 'Donateur' }});
+    setMembership({id: 'donor', label: {en: 'Donor', nl: 'Donateur'}});
     setSelectedMembership(true);
   };
   const handleChangeMembership = () => {
@@ -94,7 +99,7 @@ export default function Signup() {
         </div>
         <Collapse in={selectedMembership} timeout="auto" unmountOnExit>
           <div className="px-7 pt-5 pb-7 border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
-            <SignupForm newUser={newUser} handleChange={handleChange} handleSubmit={handleSubmit} />
+            <SignupForm newUser={newUser} handleChange={handleChange} handleSubmit={handleSubmit}/>
           </div>
         </Collapse>
       </ContentCard>

@@ -64,6 +64,7 @@ export interface Registration extends Partial<BasicUser> {
   registrationId: string;
   eventId: string;
   attended?: boolean;
+  userId?: string,
   waitingListPosition?: number;
   answers: Array<Answer>;
   created: string;
@@ -225,41 +226,66 @@ export interface State {
   committees: Committee[] | null;
   committeeMembers: BasicUser[] | null;
   locations: Location[] | null;
+  // The logged-in user
   user: User | null;
+  // The user to display, e.g., as an admin
+  currentUser: User | null;
   users: User[] | null;
   routerState: RouterState;
   nextRouterState: RouterState | null;
+  // Set to true after log-in in or out to make sure all data is re-fetched
+  forceReload: boolean;
   error: WebsiteError | null;
 }
 
 export type Action =
   | {
-    type: 'set_user';
-    user: User | null;
+    type: 'login';
+    user: User;
   } | {
     type: 'set_users';
-    users: User[];
+    users: User[] | null;
+  } | {
+    type: 'set_current_user';
+    user: User | null;
+  } | {
+    type: 'logout';
+  } | {
+    type: 'reset_force_reload';
   } | {
     type: 'set_events';
-    events: Event[];
+    events: Event[] | null;
+  } | {
+    type: 'add_event';
+    event: Event;
+  } | {
+    type: 'delete_event';
+    eventId: string;
   } | {
     type: 'set_locations';
     locations: Location[];
   } | {
     type: 'set_event_registrations';
-    registrations: Registration[];
+    registrations: Registration[] | null;
   } | {
     type: 'set_user_event_registrations';
-    registrations: Registration[];
+    registrations: Registration[] | null;
+  } | {
+    type: 'add_event_registration';
+    registration: Registration;
+  } | {
+    type: 'delete_event_registration';
+    registrationId: string;
+    eventId: string,
   } | {
     type: 'set_my_committees';
-    committees: UserCommittee[];
+    committees: UserCommittee[] | null;
   } | {
     type: 'set_committees';
     committees: Committee[];
   } | {
     type: 'set_committee_members';
-    members: BasicUser[];
+    members: BasicUser[] | null;
   } | {
     type: 'set_error';
     error: WebsiteError;

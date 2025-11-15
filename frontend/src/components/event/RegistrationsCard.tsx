@@ -21,6 +21,7 @@ interface RegistrationsCardProps {
 export default function RegistrationsCard({ questions }: RegistrationsCardProps) {
   const { text } = useLanguage();
   const {currentEvent} = useEvents();
+  const {updateRegistration, createRegistration, deleteRegistration} = useEventRegistrations();
   const {eventRegistrations} = useEventRegistrations();
   const { user } = useUsers();
 
@@ -41,11 +42,11 @@ export default function RegistrationsCard({ questions }: RegistrationsCardProps)
     setRegisterDialogOpen(true);
   };
 
-  const handleRegistration = async (answers: Answer[], registrationId?: string, userId?: string, waitinListPosition?: number) => {
+  const handleRegistration = async (answers: Answer[], registrationId?: string, userId?: string, waitingListPosition?: number) => {
     if (registrationId) {
-      await updateRegistration(currentEvent.id, registrationId, answers, undefined, waitinListPosition);
+      await updateRegistration(currentEvent.id, registrationId, answers, undefined, waitingListPosition);
     } else {
-      await createRegistration(currentEvent.id, userId, answers);
+      await createRegistration(currentEvent.id, userId || null, answers);
     }
     setRegisterDialogOpen(false);
     setSelectedRegistration(null);
@@ -65,7 +66,7 @@ export default function RegistrationsCard({ questions }: RegistrationsCardProps)
 
   return (
     <>
-      {((!!user && currentEvent.requiredMembershipStatus.includes(user.status)) || currentEvent.requiredMembershipStatus.includes('nonMember')) && currentEvent.registrationPeriod && (
+      {eventRegistrations && currentEvent.registrationPeriod && (
         <ContentCard className="xl:col-span-3">
           <h1>{text('Registrations', 'Inschrijvingen')}</h1>
           <p>
@@ -90,13 +91,6 @@ export default function RegistrationsCard({ questions }: RegistrationsCardProps)
 
           {eventRegistrations && eventRegistrations.length > 0 ? (
             <RegistrationTable
-              registrations={eventRegistrations.sort((a, b) =>
-                `${a.firstName} ${a.infix ?? ''} ${a.lastName}`.localeCompare(
-                  `${b.firstName} ${b.infix ?? ''} ${b.lastName}`,
-                ),
-              )}
-              questions={questions}
-              eventId={currentEvent.id}
               onEditClick={handleEditClick}
             />
           ) : (

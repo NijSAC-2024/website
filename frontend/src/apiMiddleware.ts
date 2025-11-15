@@ -21,12 +21,12 @@ export async function get<T>(path: string): Promise<T> {
 
 export default async function apiMiddleware(
   navState: NavigationState,
-  router: Router,
+  _router: Router,
   dispatch: Dispatch<Action>
 ): Promise<FullRouterState> {
   let user: User | null = null;
 
-  if (navState.state.user === null) {
+  if (navState.state.user === null || navState.state.forceReload) {
     const response = await fetch('/api/whoami', {
       method: 'GET',
       headers: {
@@ -35,10 +35,10 @@ export default async function apiMiddleware(
     });
 
     if (response.status === 401) {
-      dispatch({type: 'set_user', user: null});
+      dispatch({type: 'logout'});
     } else if (response.ok) {
       user = (await response.json()) as User;
-      dispatch({type: 'set_user', user: user});
+      dispatch({type: 'login', user: user});
     } else {
       throw new WebsiteError(`Failed to check login status: (${response.status} ${response.statusText})`, response.status);
     }
@@ -46,22 +46,12 @@ export default async function apiMiddleware(
     user = navState.state.user;
   }
 
-  if (!navState.state.events && navState.state.events === null) {
-    dispatch({type: 'set_events', events: await get('/api/event')});
-  }
+  const forceReload = navState.state.forceReload;
 
-  if (!navState.state.registrations && navState.to.name === 'events.event') {
-    dispatch({
-      type: 'set_event_registrations',
-      registrations: await get(`/api/event/${navState.to.params.event_id}/registration`)
-    });
-  }
-
-  if (user && !navState.state.userEventRegistrations && navState.to.name === 'events') {
-    dispatch({
-      type: 'set_user_event_registrations',
-      registrations: await get(`/api/user/${user.id}/event_registrations`)
-    });
+  let events = navState.state.events;
+  if (!navState.state.events || forceReload) {
+    events = await get('/api/event');
+    dispatch({type: 'set_events', events});
   }
 
   if (!navState.state.locations && navState.to.name.startsWith('events')) {
@@ -71,12 +61,6 @@ export default async function apiMiddleware(
     });
   }
 
-  if (user && !navState.state.myCommittees) {
-    dispatch({
-      type: 'set_my_committees',
-      committees: await get(`/api/user/${user.id}/committees`)
-    });
-  }
 
   if (!navState.state.committees) {
     dispatch({
@@ -85,13 +69,66 @@ export default async function apiMiddleware(
     });
   }
 
-  if (user &&
-    !navState.state.committeeMembers &&
-    navState.to.name.startsWith('committees.committee')) {
-    dispatch({
-      type: 'set_committee_members',
-      members: await get(`/api/committee/${navState.to.params.committee_id}/members`)
-    });
+  if (user) {
+    if ((user.status === 'member' || user.status === 'affiliated')) {
+      if ((!navState.state.userEventRegistrations || forceReload) && navState.to.name.startsWith('events')) {
+        dispatch({
+          type: 'set_user_event_registrations',
+          registrations: await get(`/api/user/${user.id}/event_registrations`)
+        });
+      }
+
+      if ((!navState.state.userEventRegistrations || forceReload) && navState.to.name === 'user') {
+        dispatch({
+          type: 'set_user_event_registrations',
+          registrations: await get(`/api/user/${navState.to.params.user_id}/event_registrations`)
+        });
+      }
+
+      if (!navState.state.myCommittees || forceReload) {
+        dispatch({
+          type: 'set_my_committees',
+          committees: await get(`/api/user/${user.id}/committees`)
+        });
+      }
+
+      if ((forceReload || navState.to.params.committee_id !== navState.from.params.committee_id) &&
+        navState.to.name.startsWith('committees.committee')) {
+        dispatch({
+          type: 'set_committee_members',
+          members: await get(`/api/committee/${navState.to.params.committee_id}/members`)
+        });
+      }
+    }
+    console.log(navState.state.currentUser);
+    console.log(navState.to.params.user_id);
+    console.log((navState.state.currentUser?.id !== navState.to.params.user_id || forceReload));
+    if ((navState.state.currentUser?.id !== navState.to.params.user_id || forceReload) &&
+      navState.to.name === 'user') {
+      dispatch({
+        type: 'set_current_user',
+        user: await get(`/api/user/${navState.to.params.user_id}`)
+      });
+    }
+  }
+
+  if (navState.to.params.event_id !== navState.from.params.event_id || forceReload) {
+    if (navState.to.name === 'events.event') {
+      const currentEvent = events?.find((e) => e.id === navState.to.params.event_id);
+      if (currentEvent &&
+        ((user &&
+            currentEvent.requiredMembershipStatus.includes(user.status))
+          || currentEvent.requiredMembershipStatus.includes('nonMember'))) {
+        dispatch({
+          type: 'set_event_registrations',
+          registrations: await get(`/api/event/${navState.to.params.event_id}/registration`)
+        });
+      }
+    }
+  }
+
+  if (forceReload) {
+    dispatch({type: 'reset_force_reload'});
   }
 
   return navState.to;
