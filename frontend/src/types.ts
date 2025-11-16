@@ -249,6 +249,12 @@ export type Action =
     type: 'set_current_user';
     user: User | null;
   } | {
+    type: 'delete_user';
+    userId: string;
+  } | {
+    type: 'add_user';
+    user: User;
+  } | {
     type: 'logout';
   } | {
     type: 'reset_force_reload';

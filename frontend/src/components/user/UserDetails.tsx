@@ -1,11 +1,11 @@
 import {FormEvent, useEffect, useState} from 'react';
-import { TextField, Button, Box, FormControl } from '@mui/material';
+import {TextField, Button, Box, FormControl} from '@mui/material';
 import {Language, toUserContent, UserContent} from '../../types';
-import { FormErrors } from '../signup/SignupForm';
-import { useLanguage } from '../../providers/LanguageProvider';
+import {FormErrors} from '../signup/SignupForm';
+import {useLanguage} from '../../providers/LanguageProvider';
 import {
   emailValidator, emergencyContactNameValidator, nameValidator,
-  onlyNumbersValidator, optionalOnlyLetterNumberValidator, optionalOnlyLetterValidator, phoneValidator
+  onlyNumbersValidator, optionalOnlyLetterValidator, phoneValidator
 } from '../../validator';
 import ContentCard from '../ContentCard.tsx';
 import TextCard from '../TextCard.tsx';
@@ -15,8 +15,8 @@ import {useWebsite} from '../../hooks/useState.ts';
 import {useUsers} from '../../hooks/useUsers.ts';
 
 export default function UserDetails() {
-  const { text } = useLanguage();
-  const { user, currentUser } = useUsers();
+  const {text} = useLanguage();
+  const {user, currentUser, updateUser} = useUsers();
   const {state: {routerState: {params}}} = useWebsite();
   const [form, setForm] = useState<UserContent | null>(currentUser ? toUserContent(currentUser) : null);
   const [errors, setErrors] = useState<FormErrors>({
@@ -38,19 +38,19 @@ export default function UserDetails() {
   useEffect(() => {
     // FIXME: currently, this is required as otherwise navigating directly from one account to another would not
     //  re-fill the form
-    setForm(currentUser ? toUserContent(currentUser) : null)
+    setForm(currentUser ? toUserContent(currentUser) : null);
   }, [currentUser]);
 
-  if (!user || !currentUser) {
-    return null
+  if (!user || !currentUser || !form) {
+    return null;
   }
 
-  const isMe = params.user_id === user.id
-  const canEdit = isAdminOrBoard(user) || isMe
+  const isMe = params.user_id === user.id;
+  const canEdit = isAdminOrBoard(user) || isMe;
 
 
   const handleChange = (field: keyof UserContent, value: string | number) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
+    setForm((prev) => (prev ? {...prev, [field]: value} : null));
   };
 
   const validateInputs = () => {
@@ -60,39 +60,43 @@ export default function UserDetails() {
       lastName: nameValidator(form.lastName),
       phone: phoneValidator(form.phone),
       email: emailValidator(form.email),
-      importantInfo: optionalOnlyLetterNumberValidator(form.importantInfo),
-      studentNumber: onlyNumbersValidator(form.studentNumber.toString()),
-      sportcardNumber: onlyNumbersValidator(form.sportcardNumber.toString()),
-      nkbvNumber: onlyNumbersValidator(form.nkbvNumber.toString()),
-      iceContactName: emergencyContactNameValidator(form.iceContactName),
-      iceContactEmail: emailValidator(form.iceContactEmail),
-      iceContactPhone: phoneValidator(form.iceContactPhone),
+      importantInfo: (form.importantInfo?.length || 0) > 2000,
+      studentNumber: !!form.studentNumber && onlyNumbersValidator(form.studentNumber.toString()),
+      sportcardNumber: !!form.sportcardNumber && onlyNumbersValidator(form.sportcardNumber.toString()),
+      nkbvNumber: !!form.nkbvNumber && onlyNumbersValidator(form.nkbvNumber.toString()),
+      iceContactName: !!form.iceContactName && emergencyContactNameValidator(form.iceContactName),
+      iceContactEmail: !!form.iceContactEmail && emailValidator(form.iceContactEmail),
+      iceContactPhone: !!form.iceContactPhone && phoneValidator(form.iceContactPhone),
       password: false,
     });
   };
 
   const handleSave = async (event: FormEvent) => {
     event.preventDefault();
-    if (!canEdit || !currentUser) {return;}
-    if (Object.values(errors).some((v) => v)) {return;}
-    await updateUser(currentUser.id, { ...currentUser, ...form });
+    if (!canEdit || !currentUser) {
+      return;
+    }
+    if (Object.values(errors).some((v) => v)) {
+      return;
+    }
+    await updateUser(currentUser.id, {...currentUser, ...form});
   };
 
   return (
     <ContentCard className="grid gap-1">
       <div className="flex justify-between w-full">
-        <h1>{isMe? text('My account', 'Mijn account') : `${currentUser.firstName.charAt(0).toUpperCase() + currentUser.firstName.slice(1)}'s account`}</h1>
-        <UserActions />
+        <h1>{isMe ? text('My account', 'Mijn account') : `${currentUser.firstName.charAt(0).toUpperCase() + currentUser.firstName.slice(1)}'s account`}</h1>
+        <UserActions/>
       </div>
 
       {canEdit ? (
-        <Box component="form" onSubmit={handleSave}>
+        <Box component="form" onSubmit={handleSave} key={currentUser.id}>
           {/* Personal information */}
           <h2>{text('Personal information', 'Persoonlijke informatie')}</h2>
           <TextCard className="px-3 xl:px-6 py-3 grid xl:grid-cols-4 gap-2 xl:gap-5 mb-3 items-center">
             <b>{text('First name', 'Voornaam')}</b>
             <FormControl className="xl:col-span-3">
-              <TextField 
+              <TextField
                 disabled={!isAdminOrBoard(user)}
                 size="small"
                 value={form.firstName}

@@ -100,9 +100,6 @@ export default async function apiMiddleware(
         });
       }
     }
-    console.log(navState.state.currentUser);
-    console.log(navState.to.params.user_id);
-    console.log((navState.state.currentUser?.id !== navState.to.params.user_id || forceReload));
     if ((navState.state.currentUser?.id !== navState.to.params.user_id || forceReload) &&
       navState.to.name === 'user') {
       dispatch({

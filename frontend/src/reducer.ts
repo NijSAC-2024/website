@@ -12,6 +12,12 @@ const actionHandler: {
   set_users: function (state, action) {
     return {...state, users: action.users};
   },
+  add_user: function (state, action) {
+    return {...state, users: [...state.users || [], action.user]};
+  },
+  delete_user: function (state, action) {
+    return {...state, users: state.users?.filter(u => u.id !== action.userId) || []};
+  },
   set_current_user: function (state, action) {
     return {...state, currentUser: action.user};
   },
