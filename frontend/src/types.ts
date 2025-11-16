@@ -143,10 +143,6 @@ export interface UserCommittee {
   left?: string;
 }
 
-export function toCommitteeContent(committee: Committee | undefined): CommitteeContent {
-  return {...committee} as unknown as CommitteeContent;
-}
-
 export interface Committee extends CommitteeContent {
   id: string;
   created: string;
@@ -292,6 +288,12 @@ export type Action =
   } | {
     type: 'set_committee_members';
     members: BasicUser[] | null;
+  } | {
+    type: 'add_committee';
+    committee: Committee;
+  } | {
+    type: 'delete_committee';
+    committeeId: string;
   } | {
     type: 'set_error';
     error: WebsiteError;

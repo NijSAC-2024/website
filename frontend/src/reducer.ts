@@ -77,6 +77,12 @@ const actionHandler: {
   set_committees(state: State, action) {
     return {...state, committees: action.committees};
   },
+  add_committee(state: State, action) {
+    return {...state, committees: [...state.committees || [], action.committee]};
+  },
+  delete_committee(state: State, action) {
+    return {...state, committees: state.committees?.filter(c => c.id !== action.committeeId) || null};
+  },
   set_committee_members(state: State, action) {
     return {...state, committeeMembers: action.members};
   },
