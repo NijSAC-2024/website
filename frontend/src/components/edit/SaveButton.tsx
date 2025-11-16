@@ -10,6 +10,7 @@ import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import {EventContent} from '../../types.ts';
 import moment from 'moment';
 import {useWebsite} from '../../hooks/useState.ts';
+import {useEvents} from '../../hooks/useEvents.ts';
 
 interface SaveButtonProps {
   id: string;
@@ -19,7 +20,8 @@ interface SaveButtonProps {
 
 export default function SaveButton({ id, handleSave, event }: SaveButtonProps) {
   const { text } = useLanguage();
-  const {navigate} = useWebsite()
+  const {navigate} = useWebsite();
+  const {deleteEvent} = useEvents();
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
 

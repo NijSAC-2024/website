@@ -138,7 +138,7 @@ impl Session {
     pub async fn new(db: &PgPool, user_id: &UserId) -> AppResult<Session> {
         let cookie_value = Alphanumeric.sample_string(&mut rand::rng(), 32);
 
-        Ok(sqlx::query_as!(
+        sqlx::query_as!(
             PgSession,
             r#"
             WITH new_session AS (
@@ -162,7 +162,7 @@ impl Session {
         )
         .fetch_one(db)
         .await?
-        .try_into()?)
+        .try_into()
     }
 
     pub async fn delete(self, db: &PgPool) -> AppResult<()> {

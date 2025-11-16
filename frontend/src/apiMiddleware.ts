@@ -78,6 +78,13 @@ export default async function apiMiddleware(
         });
       }
 
+      if ((forceReload || !navState.state.users) && navState.to.name === 'members') {
+        dispatch({
+          type: 'set_users',
+          users: await get('/api/user'),
+        });
+      }
+
       if ((!navState.state.userEventRegistrations || forceReload) && navState.to.name === 'user') {
         dispatch({
           type: 'set_user_event_registrations',

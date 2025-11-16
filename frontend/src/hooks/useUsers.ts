@@ -2,7 +2,7 @@ import {useContext} from 'react';
 import {useWebsite, WebsiteContext} from './useState.ts';
 import {enqueueSnackbar} from 'notistack';
 import {useLanguage} from '../providers/LanguageProvider.tsx';
-import {apiFetch} from '../api.ts';
+import {apiFetch, apiFetchVoid} from '../api.ts';
 import {User, UserContent} from '../types.ts';
 import {useSelector} from './useSelector.ts';
 
@@ -92,5 +92,21 @@ export function useUsers() {
     }
   }
 
-  return {user, users, currentUser, logout, login, signup, updateUser};
+  const updateUserPassword = async (userId: string, newPwd: string): Promise<boolean> => {
+    const {error} = await apiFetchVoid(`/user/${userId}/password`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({password: newPwd})
+    });
+
+    if (error) {
+      enqueueSnackbar(`${error.message}: ${error.reference}`, {variant: 'error'});
+      return false;
+    } else {
+      enqueueSnackbar('Updated password', {variant: 'success'});
+      return true;
+    }
+  }
+
+  return {user, users, currentUser, logout, login, signup, updateUser, updateUserPassword};
 }

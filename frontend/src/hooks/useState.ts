@@ -30,7 +30,8 @@ export const WebsiteContext = createContext<{
     committees: null,
     committeeMembers: null,
     users: null,
-    forceReload: false
+    forceReload: false,
+    currentUser: null
   },
   dispatch: () => {
     throw new Error('WebsiteContext must be used within WebsiteProvider');
@@ -51,6 +52,7 @@ const router = new Router(routes);
 
 export function useLoadWebsite() {
   const [state, dispatch] = useReducer(reducer, {
+    currentUser: null,
     forceReload: false,
     committeeMembers: null,
     committees: null,

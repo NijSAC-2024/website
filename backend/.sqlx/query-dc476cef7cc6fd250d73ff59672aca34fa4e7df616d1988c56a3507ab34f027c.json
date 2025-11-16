@@ -1,11 +1,11 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT \n                id as user_id,\n                first_name,\n                infix,\n                last_name\n            FROM \"user\"\n            WHERE id != '00000000-0000-0000-0000-000000000000'\n            ORDER BY last_name\n            LIMIT $1\n            OFFSET $2\n            ",
+  "query": "\n            SELECT \n                id,\n                first_name,\n                infix,\n                last_name\n            FROM \"user\"\n            WHERE id != '00000000-0000-0000-0000-000000000000'\n            ORDER BY last_name\n            LIMIT $1\n            OFFSET $2\n            ",
   "describe": {
     "columns": [
       {
         "ordinal": 0,
-        "name": "user_id",
+        "name": "id",
         "type_info": "Uuid"
       },
       {
@@ -37,5 +37,5 @@
       false
     ]
   },
-  "hash": "279e68809ea3001363b25bc00d7142382480cbebe74eeaac4277fb7a5655af8c"
+  "hash": "dc476cef7cc6fd250d73ff59672aca34fa4e7df616d1988c56a3507ab34f027c"
 }

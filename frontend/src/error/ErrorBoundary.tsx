@@ -7,7 +7,7 @@ interface Props {
 }
 
 interface State {
-  error?: ErrorPage;
+  error?: WebsiteError;
 }
 
 export default class ErrorBoundary extends Component<Props, State> {
@@ -15,12 +15,12 @@ export default class ErrorBoundary extends Component<Props, State> {
     error: undefined,
   };
 
-  public static getDerivedStateFromError(e: ErrorPage): State {
+  public static getDerivedStateFromError(e: WebsiteError): State {
     // Update state so the next render will show the fallback UI.
     return { error: e };
   }
 
-  public componentDidCatch(error: ErrorPage, errorInfo: ErrorInfo) {
+  public componentDidCatch(error: WebsiteError, errorInfo: ErrorInfo) {
     console.error('Uncaught error:', error, errorInfo);
   }
 

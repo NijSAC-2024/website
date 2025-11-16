@@ -77,7 +77,11 @@ pub async fn register(
 
     let session = Session::new(&db, &user.id).await?;
 
-    Ok((StatusCode::CREATED, jar.add(session.into_cookie()), Json(user)))
+    Ok((
+        StatusCode::CREATED,
+        jar.add(session.into_cookie()),
+        Json(user),
+    ))
 }
 
 pub async fn who_am_i(store: UserStore, session: Option<Session>) -> ApiResult<User> {

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            WITH new_session AS (\n                INSERT INTO session \n                    (\n                     cookie_value,\n                     user_id,\n                     expiration\n                ) VALUES ($1, $2, now() + '1 month')\n                RETURNING *)\n            SELECT cookie_value,\n                   u.id AS user_id,\n                   roles,\n                   status AS \"status: MembershipStatus\",\n                   expiration\n            FROM new_session \n                JOIN \"user\" u ON user_id = u.id\n                     \n            ",
+  "query": "\n            WITH new_session AS (\n                INSERT INTO session\n                    (\n                     cookie_value,\n                     user_id,\n                     expiration\n                ) VALUES ($1, $2, now() + '1 month')\n                RETURNING *)\n            SELECT cookie_value,\n                   u.id AS user_id,\n                   roles,\n                   status AS \"status: MembershipStatus\",\n                   expiration\n            FROM new_session\n                JOIN \"user\" u ON user_id = u.id\n            ",
   "describe": {
     "columns": [
       {
@@ -56,5 +56,5 @@
       false
     ]
   },
-  "hash": "dcfb730b2010b6b2c1d900504e99ec0d11b72f2b419d6436245368119d69dd13"
+  "hash": "fd7ed3101374c211da4df9182feb002e66e039ac6737cfddb16f2c0215666f7a"
 }

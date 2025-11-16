@@ -15,12 +15,12 @@ import {
 import { rentOptions, ReservationItemType, ReservationType } from '../types.ts';
 import { useState } from 'react';
 import RentalForm from '../components/rental/RentalForm.tsx';
-import { useAuth } from '../providers/AuthProvider.tsx';
 import { useLanguage } from '../providers/LanguageProvider.tsx';
+import {useUsers} from '../hooks/useUsers.ts';
 
 export default function MaterialRental() {
   const { text } = useLanguage();
-  const { isLoggedIn, toggleAuthOpen } = useAuth();
+  const {user} = useUsers();
   const [rentFormOpen, setRentFormOpen] = useState<boolean>(false);
   const now = new Date();
   const [reservation, setReservation] = useState<ReservationType>({
@@ -79,7 +79,7 @@ export default function MaterialRental() {
               <Link href={'https://nijsac.nl/api/file/serve/66be0721c0839'}>
                 {text(
                   'material regulations (Dutch)',
-                  'materiaalregelement'
+                  'materiaalreglement'
                 )}
               </Link>
               {text(
@@ -111,10 +111,10 @@ export default function MaterialRental() {
           <div className="mt-5">
             <Button
               fullWidth
-              onClick={isLoggedIn ? toggleDialog : toggleAuthOpen}
+              onClick={user ? toggleDialog : toggleAuthOpen}
               variant="contained"
             >
-              {isLoggedIn
+              {user
                 ? text('Make Request', 'Dien aanvraag in')
                 : text(
                   'Login to make a request',
