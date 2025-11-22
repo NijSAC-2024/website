@@ -48,7 +48,7 @@ export default function RegistrationRow({registration, onEditClick}: Registratio
         return <TableCell key={`${registration.registrationId}-${q.id}`}>{answer || ''}</TableCell>;
       })}
 
-      {currentEvent && user && isAdminOrBoard(user) && (
+      {user && isAdminOrBoard(user) && (
         <>
           <TableCell>
             <Checkbox

@@ -166,8 +166,6 @@ export interface BasicUser {
   firstName: string;
   infix?: string;
   lastName: string;
-  roles: RoleType[];
-  status: MembershipStatus;
 }
 
 export interface UserContent extends Omit<BasicUser, 'id'> {
@@ -184,6 +182,8 @@ export interface UserContent extends Omit<BasicUser, 'id'> {
   iceContactName: string;
   iceContactEmail: string;
   iceContactPhone: string;
+  roles: RoleType[];
+  status: MembershipStatus;
 }
 
 export interface User extends Omit<UserContent, 'password'> {
@@ -288,6 +288,14 @@ export type Action =
   } | {
     type: 'set_committee_members';
     members: BasicUser[] | null;
+  } | {
+    type: 'add_committee_member';
+    user: BasicUser;
+    committeeId: string;
+  } | {
+    type: 'delete_committee_member';
+    userId: string;
+    committeeId: string;
   } | {
     type: 'add_committee';
     committee: Committee;

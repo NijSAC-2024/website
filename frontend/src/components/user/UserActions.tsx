@@ -7,7 +7,7 @@ import {
   Checkbox,
 } from '@mui/material';
 import SwitchAccountIcon from '@mui/icons-material/SwitchAccount';
-import { useLanguage } from '../../providers/LanguageProvider.tsx';
+import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import {RoleType, roleOptions} from '../../types.ts';
 import GroupIcon from '@mui/icons-material/Group';
 import {isAdminOrBoard} from '../../util.ts';
@@ -16,16 +16,20 @@ import {useCommittees} from '../../hooks/useCommittees.ts';
 
 
 export default function UserActions() {
-  const { text } = useLanguage();
-  const { user } = useUsers();
-  const {myCommittees, committees} = useCommittees();
-  const {currentUser} = useUsers();
+  const {text} = useLanguage();
+  const {user} = useUsers();
+  const {myCommittees, committees, addUserToCommittee, deleteUserFromCommittee} = useCommittees();
+  const {currentUser, updateUser} = useUsers();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [committeeAnchor, setCommitteeAnchor] = useState<null | HTMLElement>(null);
-  
 
-  if (!user || !isAdminOrBoard(user)) {return null;}
+
+  if (!user || !isAdminOrBoard(user)) {
+    return null;
+  }
+
+  console.log(myCommittees);
 
   const handleRoleMenuOpen = (event: MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -41,24 +45,28 @@ export default function UserActions() {
   };
 
   const toggleRole = async (role: RoleType) => {
-    if (!currentUser) {return;}
+    if (!currentUser) {
+      return;
+    }
     const newRoles = currentUser.roles.includes(role)
       ? currentUser.roles.filter((r) => r !== role)
       : [...currentUser.roles, role];
 
-    await updateUser(currentUser.id, { ...currentUser, roles: newRoles });
-    setcurrentUser({ ...currentUser, roles: newRoles });
-    handleClose();
+    if (await updateUser(currentUser.id, {...currentUser, roles: newRoles})) {
+      handleClose();
+    }
   };
 
   const toggleCommittee = async (committeeId: string) => {
-    if (!currentUser) {return;}
+    if (!currentUser) {
+      return;
+    }
     const inCommittee = myCommittees.some((c) => c.committeeId === committeeId && c.left == null);
 
     if (inCommittee) {
-      await removeUserFromCommittee(committeeId, currentUser.id,);
+      await deleteUserFromCommittee(committeeId, currentUser.id);
     } else {
-      await addUserToCommittee(committeeId, currentUser.id, );
+      await addUserToCommittee(committeeId, currentUser.id);
     }
     handleClose();
   };
@@ -68,13 +76,13 @@ export default function UserActions() {
       <div className="flex">
         <Tooltip title={text('Change committees', 'Wijzig commissies')}>
           <IconButton onClick={(e) => handleCommitteeMenuOpen(e)}>
-            <GroupIcon />
+            <GroupIcon/>
           </IconButton>
         </Tooltip>
-        
+
         <Tooltip title={text('Change role', 'Wijzig rol')}>
           <IconButton onClick={(e) => handleRoleMenuOpen(e)}>
-            <SwitchAccountIcon />
+            <SwitchAccountIcon/>
           </IconButton>
         </Tooltip>
       </div>
@@ -92,7 +100,7 @@ export default function UserActions() {
               key={committee.id}
               onClick={() => toggleCommittee(committee.id)}
             >
-              <Checkbox checked={inCommittee} size="small" />
+              <Checkbox checked={inCommittee} size="small"/>
               {text(committee.name)}
             </MenuItem>
           );

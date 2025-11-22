@@ -92,13 +92,6 @@ export default async function apiMiddleware(
         });
       }
 
-      if (!navState.state.myCommittees || forceReload) {
-        dispatch({
-          type: 'set_my_committees',
-          committees: await get(`/api/user/${user.id}/committees`)
-        });
-      }
-
       if ((forceReload || navState.to.params.committee_id !== navState.from.params.committee_id) &&
         navState.to.name.startsWith('committees.committee')) {
         dispatch({
@@ -108,10 +101,14 @@ export default async function apiMiddleware(
       }
     }
     if ((navState.state.currentUser?.id !== navState.to.params.user_id || forceReload) &&
-      navState.to.name === 'user') {
+      navState.to.name.startsWith('user')) {
       dispatch({
         type: 'set_current_user',
         user: await get(`/api/user/${navState.to.params.user_id}`)
+      });
+      dispatch({
+        type: 'set_my_committees',
+        committees: await get(`/api/user/${navState.to.params.user_id}/committees`)
       });
     }
   }

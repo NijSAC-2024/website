@@ -1,4 +1,4 @@
-import {Action, State} from './types';
+import {Action, State, UserCommittee} from './types';
 
 const actionHandler: {
   [action in Action['type']]: (state: State, action: Extract<Action, { type: action }>) => State;
@@ -85,6 +85,26 @@ const actionHandler: {
   },
   set_committee_members(state: State, action) {
     return {...state, committeeMembers: action.members};
+  },
+  add_committee_member(state: State, action) {
+    return {
+      ...state,
+      committeeMembers: [...state.committeeMembers || [], action.user],
+      myCommittees: [...state.myCommittees || [], {
+        committeeId: action.committeeId,
+        joined: Date.now().toString(),
+        left: undefined,
+        userId: state.currentUser?.id,
+        role: 'member'
+      } as UserCommittee],
+    };
+  },
+  delete_committee_member(state: State, action) {
+    return {
+      ...state,
+      committeeMembers: state.committeeMembers?.filter(m => m.id !== action.userId) || null,
+      myCommittees: state.myCommittees?.filter(c => c.committeeId !== action.committeeId) || null
+    };
   },
   set_locations: function (state, action) {
     return {...state, locations: action.locations};

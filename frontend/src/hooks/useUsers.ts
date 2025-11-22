@@ -74,7 +74,7 @@ export function useUsers() {
     }
   };
 
-  const updateUser = async (userId: string, user: UserContent): Promise<boolean> => {
+  const updateUser = async (userId: string, user: Omit<UserContent, 'password'>): Promise<boolean> => {
     const {data, error} = await apiFetch<User>(`/user/${userId}`, {
       method: 'PUT',
       headers: {'Content-Type': 'application/json'},
@@ -87,6 +87,9 @@ export function useUsers() {
     } else {
       dispatch({type: 'delete_user', userId: userId});
       dispatch({type: 'add_user', user: data});
+      if (state.currentUser && state.currentUser.id === userId){
+        dispatch({type: 'set_current_user', user: data});
+      }
       enqueueSnackbar(`Updated user: ${user.firstName} ${user.lastName}`, {variant: 'success'});
       return true;
     }

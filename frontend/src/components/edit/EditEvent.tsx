@@ -54,11 +54,13 @@ export default function EditEvent() {
 
   const handleSave = async (bool: boolean) => {
     if (id) {
-      await updateEvent(id, {...event, isPublished: bool});
-      navigate('events.event', {event_id: id});
+      if (await updateEvent(id, {...event, isPublished: bool})){
+        navigate('events.event', {event_id: id});
+      }
     } else {
-      await createEvent({...event, isPublished: bool});
-      navigate('events');
+      if (await createEvent({...event, isPublished: bool})){
+        navigate('events');
+      }
     }
   };
 

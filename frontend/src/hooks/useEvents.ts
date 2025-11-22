@@ -12,20 +12,21 @@ export function useEvents() {
   const routerState = useSelector((state) => state.routerState);
   const currentEvent = events.find((o) => o.id === routerState.params.event_id) || null;
 
-  const createEvent = async (content: EventContent) => {
+  const createEvent = async (content: EventContent): Promise<boolean> => {
     const {error, data: event} = await apiFetch<Event>('/event', {
       method: 'POST',
       body: JSON.stringify(content)
     });
     if (error) {
       enqueueSnackbar(`${error.message}: ${error.reference}`, {variant: 'error'});
-      return;
+      return false;
     }
     dispatch({type: 'add_event', event});
     enqueueSnackbar(text('Event created', 'Evenement aangemaakt'), {variant: 'success'});
+    return true;
   };
 
-  const updateEvent = async (eventId: string, content: EventContent) => {
+  const updateEvent = async (eventId: string, content: EventContent): Promise<boolean> => {
     const {error, data: event} = await apiFetch<Event>(`/event/${eventId}`,
       {
         method: 'PUT',
@@ -34,23 +35,24 @@ export function useEvents() {
     );
     if (error) {
       enqueueSnackbar(`${error.message}: ${error.reference}`, {variant: 'error'});
-      return;
+      return false;
     }
     dispatch({type: 'delete_event', eventId});
     dispatch({type: 'add_event', event});
     enqueueSnackbar(text('Event updated', 'Evenement bijgewerkt'), {variant: 'success'});
+    return true;
   };
 
   const deleteEvent = async (eventId: string) => {
-    const { error } = await apiFetchVoid(`/event/${eventId}`, {
+    const {error} = await apiFetchVoid(`/event/${eventId}`, {
       method: 'DELETE'
     });
     if (error) {
-      enqueueSnackbar(`${error.message}: ${error.reference}`, { variant: 'error' });
+      enqueueSnackbar(`${error.message}: ${error.reference}`, {variant: 'error'});
       return;
     }
     dispatch({type: 'delete_event', eventId});
-    enqueueSnackbar(text('Event deleted', 'Evenement verwijderd'), { variant: 'success' });
+    enqueueSnackbar(text('Event deleted', 'Evenement verwijderd'), {variant: 'success'});
   };
 
   return {events, currentEvent, createEvent, updateEvent, deleteEvent};

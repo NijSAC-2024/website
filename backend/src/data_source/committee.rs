@@ -211,19 +211,23 @@ impl CommitteeStore {
         Ok(())
     }
 
-    pub async fn add_user(&self, committee_id: &Uuid, user_id: &Uuid) -> AppResult<()> {
-        sqlx::query!(
+    pub async fn add_user(&self, committee_id: &Uuid, user_id: &Uuid) -> AppResult<BasicUser> {
+        Ok(sqlx::query_as!(
+            BasicUser,
             r#"
-            INSERT INTO user_committee (id, user_id, committee_id, joined)
-            VALUES ($1, $2, $3, now())
+            WITH t AS (
+                INSERT INTO user_committee (id, user_id, committee_id, joined)
+                VALUES ($1, $2, $3, now())
+                RETURNING user_id)
+            SELECT u.id, u.first_name, u.last_name, u.infix
+            FROM t JOIN "user" u ON u.id = t.user_id
             "#,
             Uuid::now_v7(),
             user_id,
             committee_id
         )
-        .execute(&self.db)
-        .await?;
-        Ok(())
+        .fetch_one(&self.db)
+        .await?)
     }
 
     pub async fn remove_user(&self, committee_id: &Uuid, user_id: &Uuid) -> AppResult<()> {

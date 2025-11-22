@@ -27,7 +27,7 @@ export default function MobileMenu() {
   const { text } = useLanguage();
   const {navigate} = useWebsite()
   const { checkDarkMode } = useThemeMode()
-  const { isLoggedIn, toggleAuthOpen } = useUsers();
+  const { user } = useUsers();
   const [openMenu, setOpenMenu] = useState<MenuType>(undefined);
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
   const isDarkMode = checkDarkMode();
@@ -328,7 +328,7 @@ export default function MobileMenu() {
           </Collapse>
 
           {/* Login+Become Member / Logout */}
-          {!isLoggedIn ? (
+          {!user ? (
             <>
               {/* Settings */}
               <ListItem disablePadding>

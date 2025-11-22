@@ -1,6 +1,6 @@
 import {useSelector} from './useSelector.ts';
 import {WebsiteError} from '../error/error.ts';
-import {Committee, CommitteeContent} from '../types.ts';
+import {BasicUser, Committee, CommitteeContent} from '../types.ts';
 import {apiFetch, apiFetchVoid} from '../api.ts';
 import {enqueueSnackbar} from 'notistack';
 import {useLanguage} from '../providers/LanguageProvider.tsx';
@@ -62,5 +62,41 @@ export function useCommittees() {
     enqueueSnackbar(text('Committee deleted', 'Committee verwijderd'), {variant: 'success'});
   };
 
-  return {myCommittees, committees, committee, committeeMembers, createCommittee, updateCommittee, deleteCommittee};
+  const addUserToCommittee = async (committeeId: string, userId: string): Promise<boolean> => {
+    const {data, error} = await apiFetch<BasicUser>(`/committee/${committeeId}/user/${userId}`, {
+      method: 'POST',
+    });
+    if (error) {
+      enqueueSnackbar(`${error.message}: ${error.reference}`, {variant: 'error'});
+      return false;
+    }
+    dispatch({type: 'add_committee_member', user: data, committeeId});
+    enqueueSnackbar(text('User added to committee', 'Gebruiker an committee toevoegt'), {variant: 'success'});
+    return true;
+  };
+
+  const deleteUserFromCommittee = async (committeeId: string, userId: string): Promise<boolean> => {
+    const {error} = await apiFetchVoid(`/committee/${committeeId}/user/${userId}`, {
+      method: 'DELETE',
+    });
+    if (error) {
+      enqueueSnackbar(`${error.message}: ${error.reference}`, {variant: 'error'});
+      return false;
+    }
+    dispatch({type: 'delete_committee_member', userId, committeeId});
+    enqueueSnackbar(text('User removed from committee', 'Gebruiker uit committee gehaald'), {variant: 'success'});
+    return true;
+  };
+
+  return {
+    myCommittees,
+    committees,
+    committee,
+    committeeMembers,
+    createCommittee,
+    updateCommittee,
+    deleteCommittee,
+    addUserToCommittee,
+    deleteUserFromCommittee
+  };
 }

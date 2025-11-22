@@ -1,0 +1,42 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            WITH t AS (\n                INSERT INTO user_committee (id, user_id, committee_id, joined)\n                VALUES ($1, $2, $3, now())\n                RETURNING user_id)\n            SELECT u.id, u.first_name, u.last_name, u.infix\n            FROM t JOIN \"user\" u ON u.id = t.user_id\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "first_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "last_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "infix",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "d2ac797737666d4e5acc541ab8a51352bce57698fbb48439d264cbcffb70e880"
+}

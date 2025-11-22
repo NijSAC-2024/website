@@ -75,11 +75,12 @@ pub async fn delete_committee(
     store.delete(&id).await
 }
 
+/// Add a user to a committee. Returns the [`BasicUser`] that was added
 pub async fn add_user_to_committee(
     store: CommitteeStore,
     session: Session,
     Path((id, user_id)): Path<(CommitteeId, UserId)>,
-) -> ApiResult<()> {
+) -> ApiResult<BasicUser> {
     committee_access(&session, &id, &store).await?;
     Ok(Json(store.add_user(&id, &user_id).await?))
 }

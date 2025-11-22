@@ -5,7 +5,7 @@ use crate::{
     auth::{role::MembershipStatus, session::Session},
     data_source::UserStore,
     error::{AppResult, Error},
-    user::{BasicUser, Password, RegisterNewUser, User, UserContent, UserId},
+    user::{Password, RegisterNewUser, User, UserContent, UserId},
 };
 use axum::{
     Json,
@@ -107,11 +107,20 @@ pub async fn get_all_users(
     store: UserStore,
     session: Session,
     ValidatedQuery(pagination): ValidatedQuery<Pagination>,
-) -> AppResult<Json<Vec<BasicUser>>> {
-    if session.membership_status().is_member() {
-        Ok(Json(store.get_all_basic_info(&pagination).await?))
-    } else {
-        Err(Error::Unauthorized)
+) -> AppResult<Response> {
+    let total = store.count().await?;
+
+    match read_all_access(&session)? {
+        ReadAccess::Full => Ok((
+            total.as_header(),
+            Json(store.get_all_detailed(&pagination).await?),
+        )
+            .into_response()),
+        ReadAccess::Limited => Ok((
+            total.as_header(),
+            Json(store.get_all_basic_info(&pagination).await?),
+        )
+            .into_response()),
     }
 }
 
