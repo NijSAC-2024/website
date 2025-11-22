@@ -1,3 +1,4 @@
+use std::panic::Location;
 use crate::{
     api::{ApiResult, ValidatedJson, is_admin_or_board},
     auth::{role::MembershipStatus, session::Session},
@@ -13,6 +14,7 @@ use crate::{
 use axum::{Json, extract::Path};
 use time::OffsetDateTime;
 use tracing::{debug, info, trace, warn};
+use uuid::Uuid;
 
 fn has_registration_access(id: &UserId, session: &Session) -> AppResult<()> {
     if is_admin_or_board(session).is_ok() || id == session.user_id() {
@@ -27,9 +29,9 @@ pub async fn get_event_registrations(
     Path(id): Path<EventId>,
     session: Option<Session>,
 ) -> ApiResult<serde_json::Value> {
-    let event = store.get_event(&id, true).await?;
+    let event: Event<Location> = store.get_event(&id, true).await?;
 
-    // Admins always get full access
+    // Admins/board → detailed
     if let Some(ref session) = session
         && is_admin_or_board(session).is_ok()
     {
@@ -37,7 +39,30 @@ pub async fn get_event_registrations(
         return Ok(Json(serde_json::to_value(regs)?));
     }
 
-    // If NonMember is accepted → anyone can view registrations
+    let worga_user = event
+        .content
+        .metadata
+        .get("worga")
+        .and_then(|v| v.as_str())
+        .and_then(|s| Uuid::parse_str(s).ok());
+
+    // worga user → detailed
+    if let (Some(session), Some(worga_uuid)) = (&session, worga_user) {
+        if **session.user_id() == worga_uuid {
+            let regs = store.get_registrations_detailed(&id).await?;
+            return Ok(Json(serde_json::to_value(regs)?));
+        }
+    }
+
+    // Committee member → detailed
+    if let Some(ref session) = session {
+        if store.ensure_user_in_committee(session, &event.content.created_by).await.is_ok() {
+            let regs = store.get_registrations_detailed(&id).await?;
+            return Ok(Json(serde_json::to_value(regs)?));
+        }
+    }
+
+    // Public if NonMember accepted
     if event
         .content
         .required_membership_status
@@ -47,12 +72,12 @@ pub async fn get_event_registrations(
         return Ok(Json(serde_json::to_value(regs)?));
     }
 
-    // Otherwise, user must be logged in AND have matching membership
+    // Summary for matching membership
     if let Some(ref session) = session
         && event
-            .content
-            .required_membership_status
-            .contains(&session.membership_status())
+        .content
+        .required_membership_status
+        .contains(&session.membership_status())
     {
         let regs = store.get_registered_users(&id).await?;
         return Ok(Json(serde_json::to_value(regs)?));

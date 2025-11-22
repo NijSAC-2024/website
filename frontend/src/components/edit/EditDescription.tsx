@@ -134,7 +134,7 @@ export default function EditDescription({
                   {text('No one assigned', 'Niemand toegewezen')}
                 </MenuItem>
                 {eventRegistrations?.map((registration, index) => (
-                  <MenuItem key={index} value={`${registration.firstName} ${registration.infix ?? ''} ${registration.lastName}`}>
+                  <MenuItem key={index} value={registration.id}>
                     {`${registration.firstName} ${registration.infix ?? ''} ${registration.lastName}`}
                   </MenuItem>
                 ))}

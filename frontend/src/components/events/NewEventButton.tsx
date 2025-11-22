@@ -21,7 +21,7 @@ export default function NewEventButton() {
       <div className="fixed bottom-5 right-5 z-10">
         <Fab variant="extended" color="primary" onClick={() => navigate('events.new')}>
           <AddIcon className="mr-2"/>
-          <p>{text('Add event', 'Voeg evenement toe')}</p>
+          {text('Add event', 'Voeg evenement toe')}
         </Fab>
       </div>
     );

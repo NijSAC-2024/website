@@ -5,7 +5,7 @@ import {Button, Fab} from '@mui/material';
 import RegistrationsCard from '../components/event/RegistrationsCard.tsx';
 import DescriptionCard from '../components/event/DescriptionCard.tsx';
 import {useLanguage} from '../providers/LanguageProvider.tsx';
-import {isAdminOrBoard} from '../util.ts';
+import {inCommittee, isAdminOrBoard} from '../util.ts';
 import {useWebsite} from '../hooks/useState.ts';
 import {useUsers} from '../hooks/useUsers.ts';
 import {useEvents} from '../hooks/useEvents.ts';
@@ -25,7 +25,7 @@ export default function Event() {
 
   return (
     <>
-      {user && (isAdminOrBoard(user) || myCommittees.some(uc => uc.left == null && uc.committeeId === currentEvent.createdBy)) && (
+      {user && (isAdminOrBoard(user) || inCommittee(myCommittees, currentEvent)) && (
         <div className="fixed bottom-5 right-5 z-10">
           <Fab
             variant="extended"
@@ -33,7 +33,7 @@ export default function Event() {
             onClick={() => navigate('events.event.edit', {event_id: currentEvent.id})}
           >
             <EditIcon className="mr-2"/>
-            {text('Edit currentEvent', 'Evenement bewerken')}
+            {text('Edit event', 'Evenement bewerken')}
           </Fab>
         </div>
       )}

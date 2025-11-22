@@ -21,7 +21,7 @@ export function useUsers() {
       .then((response) => {
         if (response.ok) {
           dispatch({type: 'logout'});
-          enqueueSnackbar(text('logged out', 'uitgelogd'), {variant: 'success'});
+          enqueueSnackbar(text('You logged out', 'Je bent uitgelogd'), {variant: 'success'});
           navigate('index');
         } else {
           enqueueSnackbar(text('error', 'error'), {variant: 'error'});
@@ -38,7 +38,7 @@ export function useUsers() {
     if (error) {
       switch (error.message) {
       case 'Unauthorized':
-        enqueueSnackbar('Incorrect email or password.', {variant: 'error'});
+        enqueueSnackbar(text('Incorrect email or password', 'Ongeldig email of wachtwoord'), {variant: 'error'});
         break;
       default:
         enqueueSnackbar(`${error.message}: ${error.reference}`, {variant: 'error'});
@@ -46,7 +46,7 @@ export function useUsers() {
       return false;
     } else {
       dispatch({type: 'login', user});
-      enqueueSnackbar('You logged in', {variant: 'success'});
+      enqueueSnackbar(text('You logged in', 'Je bent ingelogd'), {variant: 'success'});
       return true;
     }
   };
@@ -61,7 +61,7 @@ export function useUsers() {
     if (error) {
       switch (error.message) {
       case 'Conflict':
-        enqueueSnackbar(text('Email is already in use.', 'E-mail is al in gebruik.'), {variant: 'error'});
+        enqueueSnackbar(text('Email is already in use', 'E-mail is al in gebruik'), {variant: 'error'});
         break;
       default:
         enqueueSnackbar(`${error.message}: ${error.reference}`, {variant: 'error'});

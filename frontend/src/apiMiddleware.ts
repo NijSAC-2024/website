@@ -76,6 +76,14 @@ export default async function apiMiddleware(
           type: 'set_user_event_registrations',
           registrations: await get(`/api/user/${user.id}/event_registrations`)
         });
+        dispatch({
+          type: 'set_my_committees',
+          committees: await get(`/api/user/${user.id}/committees`)
+        });
+        dispatch({
+          type: 'set_users',
+          users: await get('/api/user'),
+        });
       }
 
       if ((forceReload || !navState.state.users) && navState.to.name === 'members') {

@@ -143,8 +143,8 @@ export default function RegisterButton({
       if (user && !event.requiredMembershipStatus.includes(user.status)) {
         return <Button variant="contained" disabled>{renderClock()}{text('Register', 'Inschrijven')}</Button>;
       }
-      return <Button variant="contained"
-        onClick={toggleAuthOpen}>{text('Login to register', 'Login om in te schrijven')}</Button>;
+      //TODO: Open login dialog
+      return <Button variant="contained">{text('Login to register', 'Login om in te schrijven')}</Button>;
     } else if (user && isAdminOrBoard(user)) {
       return <Button variant="contained" onClick={handleRegistrationClick}>{text('Register', 'Inschrijven')}</Button>;
     }

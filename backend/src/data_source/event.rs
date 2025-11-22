@@ -192,7 +192,7 @@ impl TryFrom<PgRegistration> for Registration {
 }
 
 impl EventStore {
-    async fn ensure_user_in_committee(
+    pub(crate) async fn ensure_user_in_committee(
         &self,
         session: &Session,
         committee_id: &Uuid,

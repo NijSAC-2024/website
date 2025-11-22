@@ -64,7 +64,6 @@ export interface Registration extends Partial<BasicUser> {
   registrationId: string;
   eventId: string;
   attended?: boolean;
-  userId?: string,
   waitingListPosition?: number;
   answers: Array<Answer>;
   created: string;

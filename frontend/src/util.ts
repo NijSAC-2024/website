@@ -1,4 +1,4 @@
-import {Language, labelOptions, User} from './types.ts';
+import {Language, labelOptions, User, Event, UserCommittee} from './types.ts';
 
 export function getLabel(id: string): Language {
   const categoryOption = labelOptions.find((option) => option.id === id);
@@ -38,4 +38,12 @@ export function isAdminOrBoard(user: User): boolean {
   ];
 
   return user.roles.some(role => allowedRoles.includes(role));
+}
+
+export function isWorga(event: Event, user: User): boolean {
+  return event.metadata?.worga === user.id
+}
+
+export function inCommittee(committees: UserCommittee[], event: Event, ): boolean {
+  return committees.some(uc => uc.left == null && uc.committeeId === event.createdBy)
 }

@@ -7,12 +7,13 @@ import AreYouSure from '../AreYouSure.tsx';
 import RegistrationTable from './RegistrationTable.tsx';
 import RegistrationDialog from './RegistrationDialog.tsx';
 import RegisterUserAutocomplete from './RegisterUserAutocomplete.tsx';
-import {isAdminOrBoard} from '../../util.ts';
+import {inCommittee, isAdminOrBoard} from '../../util.ts';
 import AccessAlarmIcon from '@mui/icons-material/AccessAlarm';
 import moment from 'moment';
 import {useUsers} from '../../hooks/useUsers.ts';
 import {useEvents} from '../../hooks/useEvents.ts';
 import {useEventRegistrations} from '../../hooks/useEventRegistrations.ts';
+import {useCommittees} from "../../hooks/useCommittees.ts";
 
 interface RegistrationsCardProps {
   questions: Question[];
@@ -24,6 +25,7 @@ export default function RegistrationsCard({ questions }: RegistrationsCardProps)
   const {updateRegistration, createRegistration, deleteRegistration} = useEventRegistrations();
   const {eventRegistrations} = useEventRegistrations();
   const { user } = useUsers();
+  const {myCommittees} = useCommittees();
 
   const [registerDialogOpen, setRegisterDialogOpen] = useState(false);
   const [selectedRegistration, setSelectedRegistration] = useState<Registration | null>(null);
@@ -75,7 +77,7 @@ export default function RegistrationsCard({ questions }: RegistrationsCardProps)
             {moment(currentEvent.registrationPeriod.end).format('DD MMM HH:mm')}
           </p>
 
-          {user && isAdminOrBoard(user) && (
+          {user && (isAdminOrBoard(user) || inCommittee(myCommittees, currentEvent)) && (
             <Box className="mt-2 grid" component="form" onSubmit={(e) => { e.preventDefault(); toggleRegisterDialog(); }}>
               <FormControl>
                 <RegisterUserAutocomplete
