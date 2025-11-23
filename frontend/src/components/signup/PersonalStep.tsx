@@ -1,7 +1,6 @@
 import {Box, FormControl, FormHelperText, TextField} from '@mui/material';
 import FormControls from './FormControls.tsx';
 import {useLanguage} from '../../providers/LanguageProvider.tsx';
-import PasswordField from '../PasswordField.tsx';
 import { StepProps } from './SignupForm.tsx';
 import {Language} from '../../types.ts';
 
