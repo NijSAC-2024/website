@@ -16,6 +16,12 @@ pub struct UserStore {
     db: PgPool,
 }
 
+impl UserStore {
+    pub fn new(db: PgPool) -> Self {
+        Self { db }
+    }
+}
+
 impl FromRequestParts<AppState> for UserStore {
     type Rejection = Error;
 
@@ -30,15 +36,15 @@ impl FromRequestParts<AppState> for UserStore {
 }
 
 #[derive(Debug)]
-struct PgUser {
+pub struct PgUser {
     id: Uuid,
     first_name: String,
     infix: Option<String>,
     last_name: String,
     phone: String,
-    student_number: Option<i32>,
-    nkbv_number: Option<i32>,
-    sportcard_number: Option<i32>,
+    student_number: Option<String>,
+    nkbv_number: Option<String>,
+    sportcard_number: Option<String>,
     ice_contact_name: Option<String>,
     ice_contact_email: Option<String>,
     ice_contact_phone: Option<String>,
@@ -201,11 +207,28 @@ impl UserStore {
         .try_into()
     }
 
+    pub async fn get_basic_info(&self, id: &UserId) -> AppResult<BasicUser> {
+        Ok(sqlx::query_as!(
+            BasicUser,
+            r#"
+            SELECT
+                id,
+                first_name,
+                infix,
+                last_name
+            FROM "user" WHERE id = $1
+            "#,
+            id.deref()
+        )
+        .fetch_one(&self.db)
+        .await?)
+    }
+
     pub async fn get_all_detailed(&self, pagination: &Pagination) -> AppResult<Vec<User>> {
         sqlx::query_as!(
             PgUser,
             r#"
-            SELECT 
+            SELECT
                 id,
                 first_name,
                 infix,
@@ -244,7 +267,7 @@ impl UserStore {
             BasicUser,
             r#"
             SELECT 
-                id as user_id,
+                id,
                 first_name,
                 infix,
                 last_name

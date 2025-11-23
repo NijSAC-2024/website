@@ -1,10 +1,10 @@
-import { DateTimePicker } from '@mui/x-date-pickers';
+import {DateTimePicker} from '@mui/x-date-pickers';
 import moment from 'moment';
-import { IconButton, Tooltip } from '@mui/material';
+import {IconButton, Tooltip} from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import { DateType, EventContent } from '../../types.ts';
-import { useLanguage } from '../../providers/LanguageProvider.tsx';
+import {DateType, EventContent} from '../../types.ts';
+import {useLanguage} from '../../providers/LanguageProvider.tsx';
 
 interface EditDatesProps {
   dates: DateType[];
@@ -15,11 +15,11 @@ export default function EditDates({
   dates,
   handleEventChange
 }: EditDatesProps) {
-  const { text } = useLanguage();
+  const {text} = useLanguage();
 
   return (
     <>
-      <hr />
+      <hr/>
       Dates
       <div className="grid gap-3">
         {dates.map((date, index) => (
@@ -29,7 +29,7 @@ export default function EditDates({
                 label={`${text('Start Date', 'Startdatum')} ${index + 1}`}
                 value={moment(date.start)}
                 onChange={(date) => {
-                  dates[index] = { start: date!.toISOString(), end: dates[0].end };
+                  dates[index] = {start: date!.toISOString(), end: dates[index].end};
                   handleEventChange({
                     dates
                   });
@@ -39,10 +39,17 @@ export default function EditDates({
                 label={`${text('End Date', 'Einddatum')} ${index + 1}`}
                 value={moment(date.end)}
                 onChange={(date) => {
-                  dates[index] = { end: date!.toISOString(), start: dates[0].start };
                   handleEventChange({
-                    dates
-                  });
+                    dates: [
+                      ...dates.slice(0, index), // Copy all elements *before* the index
+                      {
+                        ...dates[index], // Copy existing properties of the element at the index
+                        end: date!.toISOString(), // Apply the change
+                      },
+                      ...dates.slice(index + 1) // Copy all elements *after* the index
+                    ]
+                  }
+                  );
                 }}
               />
             </div>
@@ -52,9 +59,9 @@ export default function EditDates({
                   <IconButton
                     size="small"
                     color="error"
-                    onClick={() => handleEventChange({ dates: dates.filter((_, i) => i !== index) })}
+                    onClick={() => handleEventChange({dates: dates.filter((_, i) => i !== index)})}
                   >
-                    <DeleteIcon fontSize="medium" />
+                    <DeleteIcon fontSize="medium"/>
                   </IconButton>
                 </Tooltip>
               </div>
@@ -65,10 +72,10 @@ export default function EditDates({
           <Tooltip title={text('Add Date', 'Voeg Datum Toe')}>
             <IconButton size="small" color="primary" onClick={() => {
               const now = new Date();
-              handleEventChange({ dates: [...dates, { start: now.toISOString(), end: now.toISOString() }] });
+              handleEventChange({dates: [...dates, {start: now.toISOString(), end: now.toISOString()}]});
             }}
             >
-              <AddIcon fontSize="large" />
+              <AddIcon fontSize="large"/>
             </IconButton>
           </Tooltip>
         </div>

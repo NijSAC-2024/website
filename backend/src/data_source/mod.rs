@@ -1,3 +1,4 @@
+pub(crate) mod committee;
 pub(crate) mod event;
 mod file;
 mod location;

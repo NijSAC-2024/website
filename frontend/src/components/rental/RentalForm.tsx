@@ -127,7 +127,7 @@ export default function RentalForm({
         </Button>
         <p>
           {text(
-            '* Please note that your request still needs to be approved by the Matcie. You can view your requests and their status on your account page.',
+            '* Please note that your request still needs to be approved by the Matcie. You can view your requests and their status on your user page.',
             '* Let op: je aanvraag moet nog worden goedgekeurd door de Matcie. Je kunt je aanvragen en de status ervan bekijken op je accountpagina.'
           )}
         </p>

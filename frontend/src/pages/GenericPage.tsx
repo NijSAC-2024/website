@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { useMediaQuery } from '@mui/material';
+import {useThemeMode} from '../providers/ThemeProvider.tsx';
 
 interface GenericPageProps {
   children: ReactNode;
@@ -10,25 +10,20 @@ export default function GenericPage({
   children,
   image = '/images/test-header-image.jpg'
 }: GenericPageProps) {
-  const isMobile = useMediaQuery('(max-width: 992px)');
+  const { checkDarkMode } = useThemeMode()
+  const darkMode = checkDarkMode();
+    
   return (
     <div className="w-full">
-      {!isMobile ? (
-        <div
-          className={
-            'relative w-full min-h-80 bg-cover bg-center brightness-70'
-          }
-          style={{ backgroundImage: `url('${image?.startsWith('https://') || image?.startsWith('/') ? image : `/api/file/${image}`}')` }}
-        ></div>
-      ) : (
-        <div
-          className={
-            'relative w-full min-h-80 bg-cover bg-center brightness-70'
-          }
-          style={{ backgroundImage: `url('${image}')` }}
-        ></div>
-      )}
-      <div className="relative w-[90%] lg:w-[80%] max-w-[1000px] mx-auto xl:mt-[-6rem] mt-[-14rem] pb-10">
+      <div
+        className="relative w-full min-h-[50vh] bg-cover bg-center"
+        style={{
+          backgroundImage: `linear-gradient(to top, ${darkMode? 'rgb(18, 18, 18), rgba(18, 18, 18, 0.4)' : 'rgb(255, 255, 255), rgba(255, 255, 255, 0)'}), url('${
+            image?.startsWith('https://') || image?.startsWith('/') ? image : `/api/file/${image}`
+          }')`
+        }}
+      ></div>
+      <div className="relative w-[95%] xl:w-[80%] max-w-[1000px] mx-auto xl:mt-[-35vh] mt-[-37.5vh] pb-20">
         {children}
       </div>
     </div>

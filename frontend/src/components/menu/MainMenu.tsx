@@ -1,55 +1,37 @@
-import { useEffect, useState } from 'react';
-import { Button, Dialog, DialogActions, DialogContent, useMediaQuery } from '@mui/material';
+import {Button, Dialog, DialogActions, DialogContent, useMediaQuery} from '@mui/material';
 import LoginForm from '../LoginForm.tsx';
 
 import DesktopMenu from './DesktopMenu.tsx';
 import MobileMenu from './MobileMenu.tsx';
-import { useAuth } from '../../providers/AuthProvider.tsx';
-import { useLanguage } from '../../providers/LanguageProvider.tsx';
+import {useLanguage} from '../../providers/LanguageProvider.tsx';
+import {useState} from 'react';
+
+export type MenuType =
+  | 'association'
+  | 'climbing'
+  | 'alps'
+  | undefined;
 
 export default function MainMenu() {
-  const { text } = useLanguage();
-  const { authOpen, toggleAuthOpen } = useAuth();
-  const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
-  const [offset, setOffset] = useState<number>(window.scrollY);
+  const {text} = useLanguage();
   const isMobile = useMediaQuery('(max-width: 992px)');
-
-  const toggleDropdown = () => {
-    setDropdownOpen((prevState) => !prevState);
-  };
-
-  useEffect(() => {
-    const onScroll = () => setOffset(window.scrollY);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+  const [showLogin, setShowLogin] = useState(false);
 
   return (
     <>
-      <div
-        className={
-          (offset === 0 && !dropdownOpen
-            ? 'bg-transparent text-white'
-            : 'bg-white dark:bg-[#121212] shadow-lg text-black dark:text-white') +
-          ' fixed transition-all duration-200 ease-in-out z-10 w-full'
-        }
-      >
-        {isMobile ? (
-          <MobileMenu
-            handleLoginOpen={toggleAuthOpen}
-            dropdownOpen={dropdownOpen}
-            toggleDropdown={toggleDropdown}
-          />
-        ) : (
-          <DesktopMenu handleLoginOpen={toggleAuthOpen} />
-        )}
-      </div>
-      <Dialog open={authOpen} onClose={toggleAuthOpen} fullWidth>
+      {isMobile ? (
+        <MobileMenu setShowLogin={setShowLogin}/>
+      ) : (
+        <DesktopMenu setShowLogin={setShowLogin}/>
+      )}
+      <Dialog open={showLogin} onClose={() => setShowLogin(false)} fullWidth>
         <DialogContent>
-          <LoginForm />
+          <LoginForm close={() => {
+            setShowLogin(false)
+          }}/>
         </DialogContent>
         <DialogActions>
-          <Button onClick={toggleAuthOpen}>
+          <Button onClick={() => setShowLogin(false)}>
             {text('Close', 'Sluit')}
           </Button>
         </DialogActions>

@@ -27,7 +27,7 @@ services:
     ports: [ "127.0.0.1:5432:5432" ]
 
   frontend:
-    image: node:20
+    image: node:24
     depends_on: [ backend ]
     volumes:
       - ./frontend:/app

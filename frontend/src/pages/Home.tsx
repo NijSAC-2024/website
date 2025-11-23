@@ -31,7 +31,7 @@ export default function Home() {
 
   return (
     <GenericPage>
-      <ContentCard className="grid gap-5 p-7">
+      <ContentCard className="grid gap-5">
         <h2>
           {text('Welcome to the NijSAC website.', 'Welkom op de NijSAC website.')}
         </h2>

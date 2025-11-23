@@ -6,12 +6,12 @@ import moment from 'moment';
 import OptionSelector from '../OptionSelector.tsx';
 import EditRegistrationQuestions from './EditRegistrationQuestions.tsx';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
-import { useState } from 'react';
 
 interface EditRegistrationProps {
   requiredMembershipStatus: MembershipStatus[];
   dates: Array<DateType>;
   registrationMax?: number;
+  waitingListMax?: number;
   registrationPeriod?: DateType;
   questions: Question[];
   handleEventChange: (update: Partial<EventContent>) => void;
@@ -21,12 +21,12 @@ export default function EditRegistrations({
   requiredMembershipStatus,
   dates,
   registrationMax,
+  waitingListMax,
   registrationPeriod,
   questions,
   handleEventChange,
 }: EditRegistrationProps) {
   const { text } = useLanguage();
-  const [hasRegistrationLimit, setHasRegistrationLimit] = useState(!!registrationMax);
   const handleToggleRegistrations = () => {
     if (registrationPeriod) {
       handleEventChange({ registrationPeriod: undefined });
@@ -43,9 +43,9 @@ export default function EditRegistrations({
 
   return (
     <ContentCard className="xl:col-span-3">
-      <div className="flex justify-between p-7">
+      <div className="grid xl:grid-cols-2 justify-between">
         <h1>{text('Registrations', 'Inschrijvingen')}</h1>
-        <div className="flex items-center">
+        <div className="flex items-center xl:justify-end">
           <p>{text('Allow registrations', 'Open voor inschrijvingen')}</p>
           <Switch
             checked={!!registrationPeriod}
@@ -54,37 +54,68 @@ export default function EditRegistrations({
         </div>
       </div>
       <Collapse in={!!registrationPeriod} timeout="auto" unmountOnExit>
-        <div className="grid p-7 gap-3 border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
+        <div className="grid gap-3 border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
           {/* Max Registrations and Registration Dates */}
           <div className="flex items-center">
             <p>
               {text('Maximum registrations', 'Maximum inschrjvingen')}
             </p>
             <Switch
-              checked={hasRegistrationLimit}
-              onChange={(_, checked) => {
-                setHasRegistrationLimit(checked);
-                handleEventChange({ registrationMax: checked ? 10 : undefined });
-              }}
+              checked={!!registrationMax}
+              onChange={(_, checked) => handleEventChange({
+                waitingListMax: undefined,
+                registrationMax: checked ? 10 : undefined,
+              })}
             />
           </div>
-          <Collapse in={hasRegistrationLimit} timeout="auto" unmountOnExit>
-            <TextField
-              fullWidth
-              type="number"
-              label={text(
-                'Maximum Registrations',
-                'Maximaal Aantal Inschrijvingen'
-              )}
-              value={registrationMax || 0}
-              onChange={(e) => {
-                registrationMax = parseInt(e.target.value);
-                if (!isNaN(registrationMax) && registrationMax > 0) {
-                  handleEventChange({ registrationMax });
-                }
-              }}
-            />
+          <Collapse in={!!registrationMax} timeout="auto" unmountOnExit>
+            <div className="grid">
+              <TextField
+                fullWidth
+                type="number"
+                label={text(
+                  'Maximum Registrations',
+                  'Maximaal Aantal Inschrijvingen'
+                )}
+                value={registrationMax || 0}
+                onChange={(e) => {
+                  registrationMax = parseInt(e.target.value);
+                  if (!isNaN(registrationMax) && registrationMax > 0) {
+                    handleEventChange({ registrationMax });
+                  }
+                }}
+              />
+              <div className="flex items-center mb-3">
+                <p>
+                  {text('Maximum waiting queue', 'Maximale wachtrij')}
+                </p>
+                <Switch
+                  checked={waitingListMax !== undefined}
+                  onChange={(_, checked) => {
+                    handleEventChange({ waitingListMax: checked ? 10 : undefined });
+                  }}
+                />
+              </div>
+              <Collapse in={waitingListMax !== undefined} timeout="auto" unmountOnExit>
+                <TextField
+                  fullWidth
+                  type="number"
+                  label={text(
+                    'Maximum Waiting Queue',
+                    'Maximale Wachtrij'
+                  )}
+                  value={waitingListMax || 0}
+                  onChange={(e) => {
+                    waitingListMax = parseInt(e.target.value);
+                    if (!isNaN(waitingListMax) && waitingListMax >= 0) {
+                      handleEventChange({ waitingListMax });
+                    }
+                  }}
+                />
+              </Collapse>
+            </div>
           </Collapse>
+
           <div className="grid grid-cols-2 gap-3">
             <DateTimePicker
               label={text(

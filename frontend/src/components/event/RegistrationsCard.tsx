@@ -1,60 +1,129 @@
 import ContentCard from '../ContentCard.tsx';
-import { Table, TableBody, TableCell, TableRow } from '@mui/material';
+import { Box, FormControl } from '@mui/material';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
-import { useAuth } from '../../providers/AuthProvider.tsx';
-import { Question } from '../../types.ts';
-import { useEvents } from '../../hooks/useEvents.ts';
+import {Answer, BasicUser, Question, Registration} from '../../types.ts';
+import { useState } from 'react';
+import AreYouSure from '../AreYouSure.tsx';
+import RegistrationTable from './RegistrationTable.tsx';
+import RegistrationDialog from './RegistrationDialog.tsx';
+import RegisterUserAutocomplete from './RegisterUserAutocomplete.tsx';
+import {inCommittee, isAdminOrBoard} from '../../util.ts';
+import AccessAlarmIcon from '@mui/icons-material/AccessAlarm';
+import moment from 'moment';
+import {useUsers} from '../../hooks/useUsers.ts';
+import {useEvents} from '../../hooks/useEvents.ts';
+import {useEventRegistrations} from '../../hooks/useEventRegistrations.ts';
+import {useCommittees} from '../../hooks/useCommittees.ts';
 
 interface RegistrationsCardProps {
   questions: Question[];
 }
 
 export default function RegistrationsCard({ questions }: RegistrationsCardProps) {
-  const { registrations } = useEvents();
   const { text } = useLanguage();
-  const { isLoggedIn, user } = useAuth();
+  const {currentEvent} = useEvents();
+  const {updateRegistration, createRegistration, deleteRegistration} = useEventRegistrations();
+  const {eventRegistrations} = useEventRegistrations();
+  const { user } = useUsers();
+  const {myCommittees} = useCommittees();
+
+  const [registerDialogOpen, setRegisterDialogOpen] = useState(false);
+  const [selectedRegistration, setSelectedRegistration] = useState<Registration | null>(null);
+  const [selectedUser, setSelectedUser] = useState<BasicUser | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
+  if (!currentEvent) {
+    return null
+  }
+
+  const toggleRegisterDialog = () => setRegisterDialogOpen((prev) => !prev);
+
+  const handleEditClick = (registration: Registration) => {
+    setSelectedUser(null);
+    setSelectedRegistration(registration);
+    setRegisterDialogOpen(true);
+  };
+
+  const handleRegistration = async (answers: Answer[], registrationId?: string, userId?: string, waitingListPosition?: number) => {
+    if (registrationId) {
+      await updateRegistration(currentEvent.id, registrationId, answers, undefined, waitingListPosition);
+    } else {
+      await createRegistration(currentEvent.id, userId || null, answers);
+    }
+    setRegisterDialogOpen(false);
+    setSelectedRegistration(null);
+    setSelectedUser(null);
+  };
+
+  const handleDeregisterClick = () => setConfirmOpen(true);
+
+  const handleConfirmDeregister = async () => {
+    if (selectedRegistration) {
+      await deleteRegistration(currentEvent.id, selectedRegistration.registrationId);
+    }
+    setConfirmOpen(false);
+    setRegisterDialogOpen(false);
+    setSelectedRegistration(null);
+  };
 
   return (
     <>
-      {isLoggedIn && (
-        <ContentCard className="xl:col-span-3 p-7">
-          <h1>{text('Participants', 'Deelnemers')}</h1>
-          <Table>
-            <TableBody>
-              {/* TODO: proper access management */}
-              {questions.length > 0 && user?.roles.includes('admin') && (
-                <TableRow>
-                  <TableCell>
-                    <b>{text('Name', 'Naam')}</b>
-                  </TableCell>
-                  {questions.map((question) => (
-                    <TableCell key={question.id}>
-                      <b>{text(question.question)}</b>
-                    </TableCell>
-                  ))}
-                </TableRow>
-              )}
-              {registrations?.map((registration) => (
-                <TableRow
-                  key={registration.userId}
-                  sx={{
-                    '&:last-child td, &:last-child th': {
-                      border: 0
-                    }
-                  }}
-                >
-                  <TableCell>{`${registration?.firstName} ${registration?.infix ?? ''} ${registration?.lastName}`}</TableCell>
-                  {questions.map((question) => (
-                    <TableCell key={`${registration.userId}-${question.id}`}>
-                      {registration.answers.find((a) => a.questionId === question.id)?.answer || ''}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+      {eventRegistrations && currentEvent.registrationPeriod && (
+        <ContentCard className="xl:col-span-3">
+          <h1>{text('Registrations', 'Inschrijvingen')}</h1>
+          <p>
+            <AccessAlarmIcon className=" mr-2" />
+            {text('Registrations close at ', 'Inschrijvingen sluiten op ')}
+            {moment(currentEvent.registrationPeriod.end).format('DD MMM HH:mm')}
+          </p>
+
+          {user && (isAdminOrBoard(user) || inCommittee(myCommittees, currentEvent)) && (
+            <Box className="mt-2 grid" component="form" onSubmit={(e) => { e.preventDefault(); toggleRegisterDialog(); }}>
+              <FormControl>
+                <RegisterUserAutocomplete
+                  registrations={eventRegistrations}
+                  selectedUser={selectedUser}
+                  setSelectedUser={setSelectedUser}
+                  setSelectedRegistration={setSelectedRegistration}
+                  toggleRegisterDialog={toggleRegisterDialog}
+                />
+              </FormControl>
+            </Box>
+          )}
+
+          {eventRegistrations && eventRegistrations.length > 0 ? (
+            <RegistrationTable
+              onEditClick={handleEditClick}
+            />
+          ) : (
+            <p className="mt-2">{text('No registrations yet', 'Nog geen deelnemers')}</p>
+          )}
         </ContentCard>
       )}
+
+      {currentEvent && (
+        <RegistrationDialog
+          open={registerDialogOpen}
+          toggleDialog={toggleRegisterDialog}
+          name={currentEvent.name}
+          questions={questions}
+          selectedRegistration={selectedRegistration}
+          selectedUser={selectedUser}
+          handleRegistration={handleRegistration}
+          handleDeregisterClick={handleDeregisterClick}
+        />
+      )}
+
+      <AreYouSure
+        open={confirmOpen}
+        title={text('Deregister', 'Uitschrijven')}
+        message={text(
+          'Are you sure you want to deregister this user?',
+          'Weet je zeker dat je deze gebruiker wilt uitschrijven?'
+        )}
+        onConfirm={handleConfirmDeregister}
+        onCancel={() => setConfirmOpen(false)}
+      />
     </>
   );
 }

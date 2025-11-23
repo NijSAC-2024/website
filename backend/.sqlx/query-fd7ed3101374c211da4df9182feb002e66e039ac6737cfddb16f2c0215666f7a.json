@@ -1,0 +1,60 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            WITH new_session AS (\n                INSERT INTO session\n                    (\n                     cookie_value,\n                     user_id,\n                     expiration\n                ) VALUES ($1, $2, now() + '1 month')\n                RETURNING *)\n            SELECT cookie_value,\n                   u.id AS user_id,\n                   roles,\n                   status AS \"status: MembershipStatus\",\n                   expiration\n            FROM new_session\n                JOIN \"user\" u ON user_id = u.id\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "cookie_value",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 1,
+        "name": "user_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "roles",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 3,
+        "name": "status: MembershipStatus",
+        "type_info": {
+          "Custom": {
+            "name": "membership_status",
+            "kind": {
+              "Enum": [
+                "pending",
+                "member",
+                "affiliated",
+                "non_member",
+                "donor"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "expiration",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "fd7ed3101374c211da4df9182feb002e66e039ac6737cfddb16f2c0215666f7a"
+}

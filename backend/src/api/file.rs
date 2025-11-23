@@ -1,7 +1,7 @@
 use crate::{
     Pagination, ValidatedQuery,
     api::ApiResult,
-    auth::{role::Role, session::Session},
+    auth::session::Session,
     data_source::FileStore,
     error::{AppResult, Error},
     file::{FileId, FileMetadata},
@@ -21,34 +21,11 @@ use mime::{IMAGE, IMAGE_JPEG, Mime};
 use std::io::Cursor;
 use tracing::info;
 
-fn upload_access(session: &Session) -> AppResult<()> {
-    if session.membership_status().is_member()
-        && session.roles().iter().any(|role| {
-            matches!(
-                role,
-                Role::Admin
-                    | Role::Treasurer
-                    | Role::Secretary
-                    | Role::Chair
-                    | Role::ViceChair
-                    | Role::ClimbingCommissar
-                    | Role::ActivityCommissionMember
-            )
-        })
-    {
-        Ok(())
-    } else {
-        Err(Error::Unauthorized)
-    }
-}
-
 pub async fn upload(
     store: FileStore,
     session: Session,
     mut multipart: Multipart,
 ) -> ApiResult<Vec<FileMetadata>> {
-    upload_access(&session)?;
-
     let mut result = vec![];
     while let Some(field) = multipart.next_field().await.unwrap() {
         let name = field.name().unwrap().to_string();
@@ -59,20 +36,16 @@ pub async fn upload(
             .map_err(|_| Error::BadRequest("Could not parse MIME type"))?;
         let mut data = field.bytes().await.unwrap();
 
-        if let Some(c_t) = &content_type {
-            if c_t.type_() == IMAGE {
-                let (d, c) = reduce_image_size(&data)?;
-                (data, content_type) = (d, Some(c));
-            }
+        if let Some(c_t) = &content_type
+            && c_t.type_() == IMAGE
+        {
+            let (d, c) = reduce_image_size(&data)?;
+            (data, content_type) = (d, Some(c));
         }
 
         let len = data.len();
 
-        result.push(
-            store
-                .create(&name, content_type, session.user_id(), data)
-                .await?,
-        );
+        result.push(store.create(&name, content_type, data, &session).await?);
         info!(
             "User {} Uploaded file '{}' with {} bytes",
             &session.user_id(),
@@ -141,11 +114,10 @@ pub async fn get_files(
     session: Session,
     ValidatedQuery(pagination): ValidatedQuery<Pagination>,
 ) -> AppResult<(HeaderMap, Json<Vec<FileMetadata>>)> {
-    upload_access(&session)?;
     let total = store.count().await?;
 
     Ok((
         total.as_header(),
-        Json(store.get_all_metadata(pagination).await?),
+        Json(store.get_all_metadata(pagination, &session).await?),
     ))
 }

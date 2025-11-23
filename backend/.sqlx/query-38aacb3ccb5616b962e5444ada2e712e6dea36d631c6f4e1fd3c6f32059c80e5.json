@@ -1,0 +1,216 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT e.id,\n                   l.id as location_id,\n                   l.name_en as location_name_en,\n                   l.name_nl as location_name_nl,\n                   l.description_nl as location_description_nl,\n                   l.description_en as location_description_en,\n                   l.reusable as location_reusable,\n                   l.created as location_created,\n                   l.updated as location_updated,\n                   e.name_nl,\n                   e.name_en,\n                   e.image,\n                   e.description_nl,\n                   e.description_en,\n                   e.start_dates,\n                   e.end_dates,\n                   e.registration_start,\n                   e.registration_end,\n                   e.registration_max,\n                   e.waiting_list_max,\n                   e.is_published,\n                   e.required_membership_status as \"required_membership_status:Vec<MembershipStatus>\",\n                   e.event_type,\n                   e.questions,\n                   e.metadata,\n                   count(r.user_id) FILTER ( WHERE r.waiting_list_position IS NULL ) as \"registration_count!\",\n                   count(r.user_id) FILTER ( WHERE r.waiting_list_position IS NOT NULL ) as \"waiting_list_count!\",\n                   e.created_by,\n                   e.created,\n                   e.updated\n            FROM event e\n                JOIN location l ON e.location_id = l.id\n                LEFT JOIN event_registration r ON r.event_id = e.id\n            WHERE e.is_published OR $1\n            GROUP BY e.id, l.id\n            ORDER BY start_dates[1]\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "location_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "location_name_en",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "location_name_nl",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "location_description_nl",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "location_description_en",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "location_reusable",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 7,
+        "name": "location_created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 8,
+        "name": "location_updated",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 9,
+        "name": "name_nl",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 10,
+        "name": "name_en",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 11,
+        "name": "image",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 12,
+        "name": "description_nl",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 13,
+        "name": "description_en",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 14,
+        "name": "start_dates",
+        "type_info": "TimestamptzArray"
+      },
+      {
+        "ordinal": 15,
+        "name": "end_dates",
+        "type_info": "TimestamptzArray"
+      },
+      {
+        "ordinal": 16,
+        "name": "registration_start",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 17,
+        "name": "registration_end",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 18,
+        "name": "registration_max",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 19,
+        "name": "waiting_list_max",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 20,
+        "name": "is_published",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 21,
+        "name": "required_membership_status:Vec<MembershipStatus>",
+        "type_info": {
+          "Custom": {
+            "name": "membership_status[]",
+            "kind": {
+              "Array": {
+                "Custom": {
+                  "name": "membership_status",
+                  "kind": {
+                    "Enum": [
+                      "pending",
+                      "member",
+                      "affiliated",
+                      "non_member",
+                      "donor"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "ordinal": 22,
+        "name": "event_type",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 23,
+        "name": "questions",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 24,
+        "name": "metadata",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 25,
+        "name": "registration_count!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 26,
+        "name": "waiting_list_count!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 27,
+        "name": "created_by",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 28,
+        "name": "created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 29,
+        "name": "updated",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Bool"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      null,
+      null,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "38aacb3ccb5616b962e5444ada2e712e6dea36d631c6f4e1fd3c6f32059c80e5"
+}

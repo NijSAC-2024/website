@@ -1,0 +1,69 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE committee\n            SET\n                name_nl = $2,\n                name_en = $3,\n                description_nl = $4,\n                description_en = $5,\n                image = $6,\n                updated = now()\n            WHERE id = $1\n            RETURNING\n                id,\n                name_nl,\n                name_en,\n                description_nl,\n                description_en,\n                created,\n                updated,\n                image\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "name_nl",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "name_en",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "description_nl",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "description_en",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 6,
+        "name": "updated",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "image",
+        "type_info": "Uuid"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "b37307870f7e274b2c29e62f4a59688b4ac2e37aab281de293b919053c3600f6"
+}

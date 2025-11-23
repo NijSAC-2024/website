@@ -14,7 +14,7 @@ async fn main() {
         .init();
 
     let state = AppState::new().await.unwrap();
-    sqlx::migrate!().run(state.pool()).await.unwrap();
+    // sqlx::migrate!().run(state.pool()).await.unwrap();
 
     let app = create_router(state);
     let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
@@ -29,13 +29,18 @@ async fn main() {
 }
 
 async fn shutdown_signal() {
+    #[cfg(unix)]
     let mut terminate = signal::unix::signal(signal::unix::SignalKind::terminate())
         .expect("failed to install signal handler");
 
+    #[cfg(unix)]
     tokio::select! {
         _ = signal::ctrl_c() => {},
         _ = terminate.recv() => {},
     }
+
+    #[cfg(not(unix))]
+    signal::ctrl_c().await.expect("failed to listen for ctrl_c");
 
     info!("signal received, starting graceful shutdown");
 }

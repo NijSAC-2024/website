@@ -3,12 +3,12 @@ import GroupIcon from '@mui/icons-material/Group';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import moment from 'moment';
 import { Chip } from '@mui/material';
-import { getLabel } from '../../util.ts';
+import {getLabel, truncateMarkdown} from '../../util.ts';
 import 'moment/dist/locale/nl';
-import { DateType, Event } from '../../types.ts';
+import {DateType, Event} from '../../types.ts';
 import Markdown from 'react-markdown';
-import RegisterButton from '../RegisterButton.tsx';
-import { useAppState } from '../../providers/AppStateProvider.tsx';
+import RegisterButton from '../register/RegisterButton.tsx';
+import {useWebsite} from '../../hooks/useState.ts';
 
 interface AgendaCardProps {
   event: Event;
@@ -16,8 +16,9 @@ interface AgendaCardProps {
 }
 
 export default function EventCard({ event, agendaPage }: AgendaCardProps) {
-  const { navigate } = useAppState();
+  const {navigate} = useWebsite()
   const { text, language } = useLanguage();
+
   moment.locale(language);
 
   const formatDate = (date: DateType): string => {
@@ -30,19 +31,19 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
     const startMonth = start.getMonth();
     const endMonth = end.getMonth();
 
-    if (start === end) {
-      return moment(start).utc().format('DD MMM HH:mm');
+    if (date.start === date.end) {
+      return moment(start).format('DD MMM HH:mm');
     } else if (startDay === endDay) {
       return (
-        moment(start).utc().format('DD MMM HH:mm') +
+        moment(start).format('DD MMM HH:mm') +
         ' - ' +
-        moment(end).utc().format('HH:mm')
+        moment(end).format('HH:mm')
       );
     } else if (!agendaPage) {
       return (
-        moment(start).utc().format('DD MMM HH:mm') +
+        moment(start).format('DD MMM HH:mm') +
         ' - ' +
-        moment(end).utc().format('DD MMM HH:mm')
+        moment(end).format('DD MMM HH:mm')
       );
     } else {
       if (startMonth === endMonth) {
@@ -57,28 +58,6 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
     }
   };
 
-  const truncateMarkdown = (markdown: string, maxLength: number): string => {
-    if (markdown.length <= maxLength) {
-      return markdown;
-    }
-
-    let truncated = markdown.slice(0, maxLength);
-    const lastCut = Math.max(
-      truncated.lastIndexOf(' '),
-      truncated.lastIndexOf('\n')
-    );
-    truncated = lastCut > -1 ? truncated.slice(0, lastCut) : truncated;
-
-    const unmatchedTags = (truncated.match(/(\*\*|\*|_|`)/g) || []).length % 2;
-    if (unmatchedTags) {
-      truncated = truncated.slice(
-        0,
-        truncated.lastIndexOf((truncated.match(/(\*\*|\*|_|`)/g) || []).pop()!)
-      );
-    }
-    return truncated.trim() + '…';
-  };
-
   let imageUrl = '/images/test-header-image.jpg'
   if (event.image) {
     imageUrl = (event.image?.startsWith('https://') ? event.image : `/api/file/${event.image}`)
@@ -86,9 +65,9 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
 
   return (
     <div
-      className="w-full rounded-2xl bg-inherit border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] flex flex-col relative justify-between">
+      className="w-full rounded-2xl bg-[rgba(255,255,255,0.9)] dark:bg-[rgba(18,18,18,0.7)] border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] flex flex-col relative justify-between">
       <div
-        onClick={() => navigate('event', { id: event.id })}
+        onClick={() => navigate('events.event', { event_id: event.id })}
         className={agendaPage ? 'hover:cursor-pointer' : ''}
       >
         <Chip
@@ -165,13 +144,7 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
             </p>
           </div>
           <RegisterButton
-            registrationPeriod={event.registrationPeriod}
-            requiredMembershipStatus={event.requiredMembershipStatus}
-            title={event.name}
-            questions={event.questions}
-            registrationMax={event.registrationMax}
-            registrationCount={event.registrationCount}
-            id={event.id}
+            eventId={event.id}
           />
         </div>
       )}

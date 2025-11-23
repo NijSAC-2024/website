@@ -1,41 +1,68 @@
 import GenericPage from './GenericPage.tsx';
 import ContentCard from '../components/ContentCard.tsx';
 import SignupForm from '../components/signup/SignupForm.tsx';
-import { Button, Chip, Collapse } from '@mui/material';
-import { useState } from 'react';
+import {Button, Chip, Collapse} from '@mui/material';
+import {useState} from 'react';
 import SignupOptions from '../components/signup/SingupOptions.tsx';
-import { useLanguage } from '../providers/LanguageProvider.tsx';
-
-type MembershipTypeEN = 'Member' | 'Extraordinary Member' | 'Donor';
-type MembershipTypeNL = 'Lid' | 'Buitengewoon Lid' | 'Donateur';
+import {useLanguage} from '../providers/LanguageProvider.tsx';
+import {MembershipStatus, UserContent} from '../types.ts';
+import {useWebsite} from '../hooks/useState.ts';
+import {useUsers} from '../hooks/useUsers.ts';
 
 interface MembershipType {
-  en: MembershipTypeEN;
-  nl: MembershipTypeNL;
+  id: MembershipStatus;
+  label: { en: string, nl: string };
 }
 
 export default function Signup() {
-  const { text } = useLanguage();
+  const {text} = useLanguage();
+  const {navigate} = useWebsite();
+  const {signup} = useUsers();
   const [membership, setMembership] = useState<MembershipType>({
-    en: 'Member',
-    nl: 'Lid'
+    id: 'member', label: {en: 'Member', nl: 'Lid'}
   });
   const [selectedMembership, setSelectedMembership] = useState<boolean>(false);
+  const [newUser, setNewUser] = useState<UserContent>({
+    importantInfo: '',
+    infix: '',
+    roles: [],
+    firstName: '',
+    lastName: '',
+    phone: '',
+    iceContactName: '',
+    iceContactEmail: '',
+    iceContactPhone: '',
+    email: '',
+    password: '',
+    nkbvNumber: 0,
+    sportcardNumber: 0,
+    studentNumber: 0,
+    status: 'pending'
+  });
+
+  const handleSubmit = async () => {
+    if (await signup(newUser)) {
+      navigate('events');
+    }
+  };
+
+  const handleChange = (field: keyof UserContent, value: string | number) => {
+    setNewUser(prev => ({...prev, [field]: value}));
+  };
 
   const handleExtraordinaryMember = () => {
-    setMembership({ en: 'Extraordinary Member', nl: 'Buitengewoon Lid' });
+    setMembership({id: 'affiliated', label: {en: 'Affiliated', nl: 'Aangeslotene'}});
     setSelectedMembership(true);
   };
   const handleMember = () => {
-    setMembership({ en: 'Member', nl: 'Lid' });
+    setMembership({id: 'member', label: {en: 'Member', nl: 'Lid'}});
     setSelectedMembership(true);
   };
   const handleDonor = () => {
-    setMembership({ en: 'Donor', nl: 'Donateur' });
+    setMembership({id: 'donor', label: {en: 'Donor', nl: 'Donateur'}});
     setSelectedMembership(true);
   };
-
-  const handleChange = () => {
+  const handleChangeMembership = () => {
     setSelectedMembership(false);
   };
   return (
@@ -52,12 +79,12 @@ export default function Signup() {
                   text(
                     'Selected membership: ',
                     'Geselecteerd lidmaatschap: '
-                  ) + text(membership.en, membership.nl)
+                  ) + text(membership.label)
                 }
                 color="primary"
               />
               <div className=""></div>
-              <Button onClick={handleChange}>
+              <Button onClick={handleChangeMembership}>
                 {text('Change', 'Verander')}
               </Button>
             </div>
@@ -72,7 +99,7 @@ export default function Signup() {
         </div>
         <Collapse in={selectedMembership} timeout="auto" unmountOnExit>
           <div className="px-7 pt-5 pb-7 border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
-            <SignupForm />
+            <SignupForm newUser={newUser} handleChange={handleChange} handleSubmit={handleSubmit}/>
           </div>
         </Collapse>
       </ContentCard>

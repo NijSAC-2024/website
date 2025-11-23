@@ -7,7 +7,7 @@ interface TextCardProps {
 
 export default function TextCard({ children, className }: TextCardProps) {
   return (
-    <div className={className + ' bg-neutral-100 dark:bg-neutral-900 rounded-xl'}>
+    <div className={className + ' bg-[rgba(245,245,245,0.7)] dark:bg-[rgba(23,23,23,0.7)] rounded-xl'}>
       {children}
     </div>
   );

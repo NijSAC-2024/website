@@ -1,10 +1,14 @@
+mod committee;
 mod event;
 mod file;
 mod location;
 mod material;
 mod user;
 
-use crate::error::Error;
+use crate::{
+    auth::{role::Role, session::Session},
+    error::{AppResult, Error},
+};
 use axum::{
     Json,
     extract::{
@@ -13,6 +17,7 @@ use axum::{
     },
     http::request::Parts,
 };
+pub use committee::*;
 pub use event::*;
 pub use file::*;
 pub use location::*;
@@ -74,5 +79,23 @@ where
         let Query(value) = Query::<T>::from_request_parts(parts, state).await?;
         value.validate()?;
         Ok(ValidatedQuery(value))
+    }
+}
+
+pub(crate) fn is_admin_or_board(session: &Session) -> AppResult<()> {
+    if session.roles().iter().any(|role| {
+        matches!(
+            role,
+            Role::Admin
+                | Role::Treasurer
+                | Role::Secretary
+                | Role::Chair
+                | Role::ViceChair
+                | Role::ClimbingCommissar
+        )
+    }) {
+        Ok(())
+    } else {
+        Err(Error::Unauthorized)
     }
 }

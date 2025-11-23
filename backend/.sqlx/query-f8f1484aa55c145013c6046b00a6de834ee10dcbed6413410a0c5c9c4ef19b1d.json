@@ -31,17 +31,17 @@
       {
         "ordinal": 5,
         "name": "student_number",
-        "type_info": "Int4"
+        "type_info": "Text"
       },
       {
         "ordinal": 6,
         "name": "nkbv_number",
-        "type_info": "Int4"
+        "type_info": "Text"
       },
       {
         "ordinal": 7,
         "name": "sportcard_number",
-        "type_info": "Int4"
+        "type_info": "Text"
       },
       {
         "ordinal": 8,
@@ -78,8 +78,9 @@
               "Enum": [
                 "pending",
                 "member",
-                "extraordinary",
-                "non_member"
+                "affiliated",
+                "non_member",
+                "donor"
               ]
             }
           }
@@ -108,9 +109,9 @@
         "Text",
         "Text",
         "Text",
-        "Int4",
-        "Int4",
-        "Int4",
+        "Text",
+        "Text",
+        "Text",
         "Text",
         "Text",
         "Text",
@@ -123,8 +124,9 @@
               "Enum": [
                 "pending",
                 "member",
-                "extraordinary",
-                "non_member"
+                "affiliated",
+                "non_member",
+                "donor"
               ]
             }
           }

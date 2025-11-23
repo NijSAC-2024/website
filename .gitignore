@@ -122,3 +122,5 @@ sketch
 
 dist
 *.tsbuildinfo
+
+.idea

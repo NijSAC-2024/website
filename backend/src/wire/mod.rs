@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
+pub mod committee;
 pub mod event;
 pub mod file;
 pub mod location;

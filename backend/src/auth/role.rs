@@ -7,24 +7,20 @@ pub type Roles = Vec<Role>;
 #[non_exhaustive]
 pub enum Role {
     Admin,
-
     Treasurer,
     Secretary,
     Chair,
     ViceChair,
     ClimbingCommissar,
-
-    ActivityCommissionMember,
-    // TODO extend
 }
 
-#[derive(sqlx::Type, Serialize, Deserialize, Debug, Clone, Copy)]
+#[derive(sqlx::Type, Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
 #[sqlx(type_name = "membership_status", rename_all = "snake_case")]
 #[serde(rename_all = "camelCase")]
 pub enum MembershipStatus {
     Pending,
     Member,
-    Extraordinary,
+    Affiliated,
     NonMember,
     Donor,
 }
@@ -35,7 +31,7 @@ impl MembershipStatus {
             MembershipStatus::Pending | MembershipStatus::NonMember | MembershipStatus::Donor => {
                 false
             }
-            MembershipStatus::Member | MembershipStatus::Extraordinary => true,
+            MembershipStatus::Member | MembershipStatus::Affiliated => true,
         }
     }
 }

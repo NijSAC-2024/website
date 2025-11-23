@@ -1,12 +1,9 @@
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import {
-  Checklist as ChecklistIcon,
   Code as CodeIcon,
   FormatBold as BoldIcon,
   FormatItalic as ItalicIcon,
-  FormatListBulleted as BulletsIcon,
-  FormatListNumbered as EnumerateIcon,
   FormatQuote as QuoteIcon,
   Image as ImageIcon,
   Link as LinkIcon,
@@ -63,21 +60,6 @@ export default function MarkdownEditorToolbar({
       <Tooltip title={text('Insert Image', 'Afbeelding toevoegen')}>
         <IconButton onClick={() => insertMarkdown('![](url)')}>
           <ImageIcon fontSize="small" />
-        </IconButton>
-      </Tooltip>
-      <Tooltip title={text('Unordered List', 'Ongeordende lijst')}>
-        <IconButton onClick={() => insertMarkdown('- ')}>
-          <BulletsIcon fontSize="small" />
-        </IconButton>
-      </Tooltip>
-      <Tooltip title={text('Ordered List', 'Geordende lijst')}>
-        <IconButton onClick={() => insertMarkdown('1. ')}>
-          <EnumerateIcon fontSize="small" />
-        </IconButton>
-      </Tooltip>
-      <Tooltip title={text('Checklist', 'Checklist')}>
-        <IconButton onClick={() => insertMarkdown('- [ ] ')}>
-          <ChecklistIcon fontSize="small" />
         </IconButton>
       </Tooltip>
     </div>

@@ -11,7 +11,7 @@ interface SingupOptionsProps {
 export default function SingupOptions({
   handleMember,
   handleExtraordinaryMember,
-  handleDonor
+  handleDonor,
 }: SingupOptionsProps) {
   const { text } = useLanguage();
   return (
@@ -32,12 +32,6 @@ export default function SingupOptions({
                 {text(
                   'You are enrolled as student  or PhD at the Radboud University or Hogeschool van Arnhem en Nijmegen, or graduated at most a year ago at one of these educational institutions.',
                   'Je bent ingeschreven als student of doet een PhD aan Radboud Universiteit of de Hogeschool van Arnhem en Nijmegen, of je bent maximaal een jaar geleden van één van deze twee instanties afgestudeerd.'
-                )}
-              </li>
-              <li>
-                {text(
-                  'You are a member of the NKBV.',
-                  'Je bent NKBV-lid.'
                 )}
               </li>
               <li>
@@ -79,7 +73,7 @@ export default function SingupOptions({
           </div>
         </TextCard>
         <TextCard className="px-7 py-5 xl:mt-5">
-          <h2>{text('Extraordinary Member', 'Buitengewoon Lid')}</h2>
+          <h2>{text('Affiliated', 'Aangeslotene')}</h2>
           <h3>{text('Requirements:', 'Eisen:')}</h3>
           <div className="p-3">
             <ul className="list-disc ml-2">
@@ -87,12 +81,6 @@ export default function SingupOptions({
                 {text(
                   'You are enrolled as student or PhD at the Radboud University or Hogeschool van Arnhem en Nijmegen, or graduated at most a year ago at one of these educational institutions.',
                   'Je bent ingeschreven als student of doet een PhD aan Radboud Universiteit of de Hogeschool van Arnhem en Nijmegen, of je bent maximaal een jaar geleden van één van deze twee instanties afgestudeerd.'
-                )}
-              </li>
-              <li>
-                {text(
-                  'You are a member of the NKBV.',
-                  'Je bent NKBV-lid.'
                 )}
               </li>
               <li>
@@ -123,15 +111,15 @@ export default function SingupOptions({
           <Divider />
           <p className="mt-3">
             {text(
-              'A extraordinary membership costs 50 euros per year.',
-              'Een buitengewoon lidmaatschap kost 50 euro per jaar.'
+              'It costs 50 euros per year to be affiliated with NijSAC.',
+              'Het kost 50 euro per jaar om aangeslotene te zijn van NijSAC.'
             )}
           </p>
           <div className="grid justify-items-end mt-5">
             <Button variant="contained" onClick={handleExtraordinaryMember}>
               {text(
-                'Register as extraorinary member',
-                'Inschrijven als buitengewoon lid'
+                'Register as affiliated',
+                'Inschrijven als aangeslotene'
               )}
             </Button>
           </div>

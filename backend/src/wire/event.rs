@@ -1,4 +1,11 @@
-use crate::{Language, auth::role::MembershipStatus, error::Error, file::FileId, user::BasicUser};
+use crate::{
+    Language,
+    auth::role::MembershipStatus,
+    error::Error,
+    file::FileId,
+    user::{BasicUser, UserId},
+};
+use derive_more::{Display, From, Into};
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 use std::{borrow::Cow, ops::Deref, str::FromStr};
@@ -7,15 +14,13 @@ use time::OffsetDateTime;
 use uuid::Uuid;
 use validator::{Validate, ValidationError};
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, From, Display, Into)]
 #[serde(transparent)]
 pub struct EventId(Uuid);
 
-impl From<Uuid> for EventId {
-    fn from(id: Uuid) -> Self {
-        Self(id)
-    }
-}
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, From, Display, Into)]
+#[serde(transparent)]
+pub struct RegistrationId(Uuid);
 
 impl Deref for EventId {
     type Target = Uuid;
@@ -25,9 +30,11 @@ impl Deref for EventId {
     }
 }
 
-impl From<EventId> for Uuid {
-    fn from(event_id: EventId) -> Self {
-        event_id.0
+impl Deref for RegistrationId {
+    type Target = Uuid;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
     }
 }
 
@@ -103,6 +110,7 @@ pub struct EventContent<T> {
     #[serde(default)]
     pub metadata: serde_json::Value,
     pub location: T,
+    pub created_by: Uuid,
 }
 
 #[derive(Serialize, Deserialize, Debug, Validate)]
@@ -127,8 +135,10 @@ fn validate_date(event: &Date) -> Result<(), ValidationError> {
 #[derive(Serialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Registration {
+    pub registration_id: RegistrationId,
+    pub event_id: EventId,
     #[serde(flatten)]
-    pub user: BasicUser,
+    pub user: Option<BasicUser>,
     pub attended: Option<bool>,
     pub waiting_list_position: Option<i32>,
     pub answers: Vec<Answer>,
@@ -141,6 +151,7 @@ pub struct Registration {
 #[derive(Deserialize, Debug, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct NewRegistration {
+    pub user_id: Option<UserId>,
     pub answers: Vec<Answer>,
     pub attended: Option<bool>,
     pub waiting_list_position: Option<i32>,
@@ -164,11 +175,11 @@ pub struct Question {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", tag = "type")]
 pub enum QuestionType {
-    ShortText,
-    LongText,
+    Text,
     Number,
-    Time,
-    MultipleChoice(Vec<String>),
+    MultipleChoice { options: Vec<Language> },
+    Boolean,
+    Date,
 }

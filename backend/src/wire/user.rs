@@ -10,14 +10,15 @@ use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 use sqlx::FromRow;
 use std::{
-    fmt::{Debug, Display, Formatter},
+    fmt::{Debug, Formatter},
     ops::Deref,
 };
 use time::OffsetDateTime;
 use uuid::Uuid;
 use validator::Validate;
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, derive_more::Display, sqlx::Type)]
+#[sqlx(transparent)]
 #[serde(transparent)]
 pub struct UserId(Uuid);
 
@@ -32,12 +33,6 @@ impl Deref for UserId {
 
     fn deref(&self) -> &Self::Target {
         &self.0
-    }
-}
-
-impl Display for UserId {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.0)
     }
 }
 
@@ -60,36 +55,24 @@ pub struct User {
 pub struct UserContent {
     #[validate(length(min = 1, max = 100))]
     pub first_name: String,
-    #[validate(length(min = 1, max = 100))]
+    #[validate(length(max = 100))]
     pub infix: Option<String>,
-    #[validate(length(min = 1, max = 100))]
+    #[validate(length(max = 100))]
     pub last_name: String,
     pub phone: String,
-    #[validate(range(
-        min = 0,
-        max = 999_999_999,
-        message = "Student Number must contain a maximum of 9 numbers"
-    ))]
-    pub student_number: Option<i32>,
-    #[validate(range(
-        min = 0,
-        max = 999_999_999,
-        message = "NKBV Number must contain a maximum of 9 numbers"
-    ))]
-    pub nkbv_number: Option<i32>,
-    #[validate(range(
-        min = 0,
-        max = 999_999_999,
-        message = "Sportcard Number must contain a maximum of 9 numbers"
-    ))]
-    pub sportcard_number: Option<i32>,
+    #[validate(length(min = 5, max = 20))]
+    pub student_number: Option<String>,
+    #[validate(length(min = 5, max = 20))]
+    pub nkbv_number: Option<String>,
+    #[validate(length(min = 5, max = 20))]
+    pub sportcard_number: Option<String>,
     #[validate(length(min = 1, max = 100))]
     pub ice_contact_name: Option<String>,
     #[validate(email)]
     pub ice_contact_email: Option<String>,
     #[validate(length(min = 1, max = 100))]
     pub ice_contact_phone: Option<String>,
-    #[validate(length(min = 1, max = 10000))]
+    #[validate(length(max = 1000))]
     pub important_info: Option<String>,
     pub roles: Roles,
     pub status: MembershipStatus,
@@ -148,7 +131,7 @@ impl Debug for UserCredentials {
 pub struct RegisterNewUser {
     #[validate(length(min = 1, max = 100))]
     pub first_name: String,
-    #[validate(length(min = 1, max = 100))]
+    #[validate(length(max = 100))]
     pub infix: Option<String>,
     #[validate(length(min = 1, max = 100))]
     pub last_name: String,
@@ -161,31 +144,19 @@ pub struct RegisterNewUser {
     ))]
     password: String,
     pub phone: String,
-    #[validate(range(
-        min = 0,
-        max = 999_999_999,
-        message = "Student Number must contain a maximum of 9 numbers"
-    ))]
-    pub student_number: Option<i32>,
-    #[validate(range(
-        min = 0,
-        max = 999_999_999,
-        message = "NKBV Number must contain a maximum of 9 numbers"
-    ))]
-    pub nkbv_number: Option<i32>,
-    #[validate(range(
-        min = 0,
-        max = 999_999_999,
-        message = "Sportcard Number must contain a maximum of 9 numbers"
-    ))]
-    pub sportcard_number: Option<i32>,
+    #[validate(length(min = 5, max = 20))]
+    pub student_number: Option<String>,
+    #[validate(length(min = 5, max = 20))]
+    pub nkbv_number: Option<String>,
+    #[validate(length(min = 5, max = 20))]
+    pub sportcard_number: Option<String>,
     #[validate(length(min = 1, max = 100))]
     pub ice_contact_name: Option<String>,
     #[validate(email)]
     pub ice_contact_email: Option<String>,
     #[validate(length(min = 1, max = 100))]
     pub ice_contact_phone: Option<String>,
-    #[validate(length(min = 1, max = 10000))]
+    #[validate(length(max = 1000))]
     pub important_info: Option<String>,
     pub status: MembershipStatus,
 }
@@ -213,7 +184,7 @@ impl Debug for RegisterNewUser {
 #[derive(Serialize, Debug, FromRow)]
 #[serde(rename_all = "camelCase")]
 pub struct BasicUser {
-    pub user_id: UserId,
+    pub id: UserId,
     pub first_name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub infix: Option<String>,

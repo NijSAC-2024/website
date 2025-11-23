@@ -11,7 +11,7 @@ VALUES ('24e2256c-4612-4774-a8ce-168c7817fbd4',
         '2025-01-01 13:14:17.997000 +00:00',
         '10',
         '9',
-        '30269618-160d-4a56-83af-7fc0c1996235',
+        '11111111-1111-1111-1111-111111111111',
         '2024-11-01 13:14:17.997000 +00:00',
         '2024-11-01 13:14:17.997000 +00:00',
         'activity',
@@ -22,7 +22,39 @@ VALUES ('24e2256c-4612-4774-a8ce-168c7817fbd4',
               "en": "What is your favorite color?",
               "nl": "Wat is je favoriete kleur?"
             },
-            "questionType": "shortText",
+            "questionType": {
+              "type": "multipleChoice",
+              "options": [
+                {
+                  "en": "Red",
+                  "nl": "Rood"
+                },
+                {
+                  "en": "Green",
+                  "nl": "Groen"
+                },
+                {
+                  "en": "Blue",
+                  "nl": "Blauw"
+                },
+                {
+                  "en": "Yellow",
+                  "nl": "Geel"
+                },
+                {
+                  "en": "Black",
+                  "nl": "Zwart"
+                },
+                {
+                  "en": "White",
+                  "nl": "Wit"
+                },
+                {
+                  "en": "Other",
+                  "nl": "Andere"
+                }
+              ]
+            },
             "required": true
           }
         ]',
