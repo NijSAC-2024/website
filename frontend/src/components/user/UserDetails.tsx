@@ -59,7 +59,6 @@ export default function UserDetails() {
                     message: text('Name must be at least 2 characters long', 'Naam moet ten minste 2 karakters lang zijn')
                   }
                 })}
-                name={'firstName'}
                 control={control}
                 disabled={!isAdminOrBoard(user)}
               />
@@ -77,7 +76,6 @@ export default function UserDetails() {
                     )
                   }
                 })}
-                name={'infix'}
                 control={control}
                 disabled={!isAdminOrBoard(user)}
               />
@@ -93,7 +91,6 @@ export default function UserDetails() {
                     message: text('Name must be at least 2 characters long', 'Naam moet ten minste 2 karakters lang zijn')
                   }
                 })}
-                name={'lastName'}
                 control={control}
                 disabled={!isAdminOrBoard(user)}
               />
@@ -109,7 +106,6 @@ export default function UserDetails() {
                     message: text('Invalid phone number', 'Ongeldig telefoonnummer')
                   }
                 })}
-                name={'phone'}
                 control={control}
               />
             </FormControl>
@@ -124,7 +120,6 @@ export default function UserDetails() {
                     message: text('Invalid email address', 'Ongeldig e-mailadres')
                   }
                 })}
-                name={'email'}
                 control={control}
               />
             </FormControl>
@@ -138,7 +133,6 @@ export default function UserDetails() {
                     message: text('At most 2000 characters', 'Maximaal 2000 karakters')
                   }
                 })}
-                name={'importantInfo'}
                 control={control}
               />
             </FormControl>
@@ -168,7 +162,6 @@ export default function UserDetails() {
                     message: text('At most 20 characters', 'Maximaal 20 karakters')
                   }
                 })}
-                name={'studentNumber'}
                 control={control}
               />
             </FormControl>
@@ -186,7 +179,6 @@ export default function UserDetails() {
                     message: text('At most 20 characters', 'Maximaal 20 karakters')
                   }
                 })}
-                name={'sportcardNumber'}
                 control={control}
               />
             </FormControl>
@@ -204,7 +196,6 @@ export default function UserDetails() {
                     message: text('At most 20 characters', 'Maximaal 20 karakters')
                   }
                 })}
-                name={'nkbvNumber'}
                 control={control}
               />
             </FormControl>
@@ -226,7 +217,6 @@ export default function UserDetails() {
                     message: text('At most 30 characters', 'Maximaal 30 karakters')
                   }
                 })}
-                name={'iceContactName'}
                 control={control}
               />
             </FormControl>
@@ -240,7 +230,6 @@ export default function UserDetails() {
                     message: text('Invalid email address', 'Ongeldig e-mailadres')
                   }
                 })}
-                name={'iceContactEmail'}
                 control={control}
               />
             </FormControl>
@@ -254,7 +243,6 @@ export default function UserDetails() {
                     message: text('Invalid phone number', 'Ongeldig telefoonnummer')
                   }
                 })}
-                name={'iceContactPhone'}
                 control={control}
               />
             </FormControl>

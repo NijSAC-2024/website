@@ -70,7 +70,7 @@ export function useCommittees() {
       enqueueSnackbar(`${error.message}: ${error.reference}`, {variant: 'error'});
       return false;
     }
-    dispatch({type: 'add_committee_member', user: data, committeeId});
+    dispatch({type: 'add_committee_member', user: data, committeeId, role: 'member'});
     enqueueSnackbar(text('User added to committee', 'Gebruiker an committee toevoegt'), {variant: 'success'});
     return true;
   };

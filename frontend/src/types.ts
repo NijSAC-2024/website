@@ -1,6 +1,6 @@
 import {WebsiteError} from './error/error.ts';
 import {RouterState} from './router.ts';
-import {Control, FieldValues} from 'react-hook-form';
+import {Control, FieldValues, Path} from 'react-hook-form';
 import {HTMLInputTypeAttribute} from 'react';
 
 export type ThemeType = 'dark' | 'light' | 'auto';
@@ -293,6 +293,7 @@ export type Action =
     type: 'add_committee_member';
     user: BasicUser;
     committeeId: string;
+    role: CommitteeRoleType;
   } | {
     type: 'delete_committee_member';
     userId: string;
@@ -316,7 +317,7 @@ export type Action =
   };
 
 export interface FormInputProps<T extends FieldValues> {
-  name: string;
+  name: Path<T>;
   disabled?: boolean;
   control: Control<T>;
   type?: HTMLInputTypeAttribute;

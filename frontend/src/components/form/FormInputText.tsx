@@ -1,8 +1,8 @@
-import {Controller} from 'react-hook-form';
+import {Controller, FieldValues} from 'react-hook-form';
 import TextField from '@mui/material/TextField';
 import {FormInputProps} from '../../types.ts';
 
-export const FormInputText = ({name, control, disabled, type}: FormInputProps) => {
+export const FormInputText = <T extends FieldValues, >({name, control, disabled, type}: FormInputProps<T>) => {
   return (
     <Controller
       name={name}

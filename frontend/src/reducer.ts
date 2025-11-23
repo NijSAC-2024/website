@@ -95,7 +95,7 @@ const actionHandler: {
         joined: Date.now().toString(),
         left: undefined,
         userId: state.currentUser?.id,
-        role: 'member'
+        role: action.role
       } as UserCommittee],
     };
   },
