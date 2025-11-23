@@ -18,7 +18,7 @@ import RentalForm from '../components/rental/RentalForm.tsx';
 import { useLanguage } from '../providers/LanguageProvider.tsx';
 import {useUsers} from '../hooks/useUsers.ts';
 
-export default function MaterialRental() {
+export default function MaterialRental({setShowLogin}: { setShowLogin: (show: boolean) => void }) {
   const { text } = useLanguage();
   const {user} = useUsers();
   const [rentFormOpen, setRentFormOpen] = useState<boolean>(false);
@@ -111,7 +111,7 @@ export default function MaterialRental() {
           <div className="mt-5">
             <Button
               fullWidth
-              onClick={user ? toggleDialog : toggleAuthOpen}
+              onClick={() => user ? toggleDialog : setShowLogin(true)}
               variant="contained"
             >
               {user

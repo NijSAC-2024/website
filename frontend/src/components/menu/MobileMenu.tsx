@@ -13,21 +13,21 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
 import {useState} from 'react';
-import { ExpandLess, ExpandMore } from '@mui/icons-material';
-import { useLanguage } from '../../providers/LanguageProvider.tsx';
+import {ExpandLess, ExpandMore} from '@mui/icons-material';
+import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import UserMenu from './UserMenu.tsx';
 import SettingsIcon from '@mui/icons-material/Settings';
 import {useThemeMode} from '../../providers/ThemeProvider.tsx';
-import { MenuType } from './MainMenu.tsx';
+import {MenuType} from './MainMenu.tsx';
 import {useWebsite} from '../../hooks/useState.ts';
 import {RouteName} from '../../routes.ts';
 import {useUsers} from '../../hooks/useUsers.ts';
 
-export default function MobileMenu() {
-  const { text } = useLanguage();
-  const {navigate} = useWebsite()
-  const { checkDarkMode } = useThemeMode()
-  const { user } = useUsers();
+export default function MobileMenu({setShowLogin}: { setShowLogin: (show: boolean) => void }) {
+  const {text} = useLanguage();
+  const {navigate} = useWebsite();
+  const {checkDarkMode} = useThemeMode();
+  const {user} = useUsers();
   const [openMenu, setOpenMenu] = useState<MenuType>(undefined);
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
   const isDarkMode = checkDarkMode();
@@ -66,9 +66,9 @@ export default function MobileMenu() {
         />
         <IconButton size="large" color="inherit" onClick={toggleDropdown}>
           {dropdownOpen ? (
-            <CloseIcon fontSize="large" />
+            <CloseIcon fontSize="large"/>
           ) : (
-            <MenuIcon fontSize="large" />
+            <MenuIcon fontSize="large"/>
           )}
         </IconButton>
       </Toolbar>
@@ -93,7 +93,7 @@ export default function MobileMenu() {
             </ListItemButton>
           </ListItem>
 
-          <Divider />
+          <Divider/>
 
           {/* Association */}
           <ListItem onClick={() => toggleMenu('association')} disablePadding>
@@ -103,7 +103,7 @@ export default function MobileMenu() {
                 className="uppercase px-10"
               />
               <ListItemIcon>
-                {openMenu === 'association' ? <ExpandLess /> : <ExpandMore />}
+                {openMenu === 'association' ? <ExpandLess/> : <ExpandMore/>}
               </ListItemIcon>
             </ListItemButton>
           </ListItem>
@@ -168,7 +168,7 @@ export default function MobileMenu() {
                 className="uppercase px-10"
               />
               <ListItemIcon>
-                {openMenu === 'climbing' ? <ExpandLess /> : <ExpandMore />}
+                {openMenu === 'climbing' ? <ExpandLess/> : <ExpandMore/>}
               </ListItemIcon>
             </ListItemButton>
           </ListItem>
@@ -231,7 +231,7 @@ export default function MobileMenu() {
                 className="uppercase px-10"
               />
               <ListItemIcon>
-                {openMenu === 'alps' ? <ExpandLess /> : <ExpandMore />}
+                {openMenu === 'alps' ? <ExpandLess/> : <ExpandMore/>}
               </ListItemIcon>
             </ListItemButton>
           </ListItem>
@@ -332,21 +332,23 @@ export default function MobileMenu() {
             <>
               {/* Settings */}
               <ListItem disablePadding>
-                <ListItemButton onClick={() => {navigate('settings');
-                  toggleDropdown();}}>
+                <ListItemButton onClick={() => {
+                  navigate('settings');
+                  toggleDropdown();
+                }}>
                   <ListItemText
                     primary={text('Settings', 'Instellingen')}
                     className="uppercase px-10"
                   />
                   <ListItemIcon>
-                    <SettingsIcon />
+                    <SettingsIcon/>
                   </ListItemIcon>
                 </ListItemButton>
               </ListItem>
 
               <Divider/>
 
-              <ListItem onClick={() => console.log("open login")} disablePadding>
+              <ListItem onClick={() => setShowLogin(true)} disablePadding>
                 <ListItemButton>
                   <ListItemText
                     primary={text('Login', 'Login')}

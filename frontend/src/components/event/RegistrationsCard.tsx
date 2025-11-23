@@ -13,7 +13,7 @@ import moment from 'moment';
 import {useUsers} from '../../hooks/useUsers.ts';
 import {useEvents} from '../../hooks/useEvents.ts';
 import {useEventRegistrations} from '../../hooks/useEventRegistrations.ts';
-import {useCommittees} from "../../hooks/useCommittees.ts";
+import {useCommittees} from '../../hooks/useCommittees.ts';
 
 interface RegistrationsCardProps {
   questions: Question[];

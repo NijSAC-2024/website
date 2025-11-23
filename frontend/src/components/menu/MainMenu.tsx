@@ -20,7 +20,7 @@ export default function MainMenu() {
   return (
     <>
       {isMobile ? (
-        <MobileMenu/>
+        <MobileMenu setShowLogin={setShowLogin}/>
       ) : (
         <DesktopMenu setShowLogin={setShowLogin}/>
       )}
