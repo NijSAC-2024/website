@@ -14,7 +14,7 @@ async fn main() {
         .init();
 
     let state = AppState::new().await.unwrap();
-    sqlx::migrate!().run(state.pool()).await.unwrap();
+    // sqlx::migrate!().run(state.pool()).await.unwrap();
 
     let app = create_router(state);
     let addr = SocketAddr::from(([0, 0, 0, 0], 3000));

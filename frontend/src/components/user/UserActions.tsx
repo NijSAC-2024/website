@@ -29,8 +29,6 @@ export default function UserActions() {
     return null;
   }
 
-  console.log(myCommittees);
-
   const handleRoleMenuOpen = (event: MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };

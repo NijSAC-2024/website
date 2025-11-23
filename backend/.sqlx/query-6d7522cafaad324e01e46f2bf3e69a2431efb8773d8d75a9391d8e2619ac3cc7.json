@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            UPDATE \"user\"\n            SET phone = $2,\n                student_number = $3,\n                nkbv_number = $4,\n                sportcard_number = $5,\n                ice_contact_name = $6,\n                ice_contact_email = $7,\n                ice_contact_phone = $8,\n                important_info = $9,\n                email = $10,\n                updated = now()\n            WHERE id = $1\n            RETURNING\n                id,\n                first_name,\n                infix,\n                last_name,\n                phone,\n                student_number,\n                nkbv_number,\n                sportcard_number,\n                ice_contact_name,\n                ice_contact_email,\n                ice_contact_phone,\n                important_info,\n                roles,\n                status AS \"status: MembershipStatus\",\n                email,\n                created,\n                updated\n            ",
+  "query": "\n            SELECT\n                id,\n                first_name,\n                infix,\n                last_name,\n                phone,\n                student_number,\n                nkbv_number,\n                sportcard_number,\n                ice_contact_name,\n                ice_contact_email,\n                ice_contact_phone,\n                important_info,\n                roles,\n                status AS \"status: MembershipStatus\",\n                email,\n                created,\n                updated\n            FROM \"user\"\n            WHERE id != '00000000-0000-0000-0000-000000000000'\n            ORDER BY last_name\n            LIMIT $1\n            OFFSET $2\n            ",
   "describe": {
     "columns": [
       {
@@ -104,16 +104,8 @@
     ],
     "parameters": {
       "Left": [
-        "Uuid",
-        "Text",
-        "Text",
-        "Text",
-        "Text",
-        "Text",
-        "Text",
-        "Text",
-        "Text",
-        "Text"
+        "Int8",
+        "Int8"
       ]
     },
     "nullable": [
@@ -136,5 +128,5 @@
       false
     ]
   },
-  "hash": "b555332a18c024341a01eda83a6a2f22718edb4e00474c11b2fc30928c659255"
+  "hash": "6d7522cafaad324e01e46f2bf3e69a2431efb8773d8d75a9391d8e2619ac3cc7"
 }

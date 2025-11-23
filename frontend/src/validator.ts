@@ -23,7 +23,7 @@ export const nameValidator = (value: string): Language | false => {
 };
 
 export const emailValidator = (value: string): Language | false => {
-  if (!/^[a-zA-Z0-9._:$!%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]+$/.test(value)) {
+  if (!/^[\w.!#$%&'*+/=?^`{|}~-]+@[a-z\d](?:[a-z\d-]{0,61}[a-z\d])?(?:\.[a-z\d](?:[a-z\d-]{0,61}[a-z\d])?)*$/i.test(value)) {
     return {
       en: 'Invalid email address',
       nl: 'Ongeldig e-mailadres',

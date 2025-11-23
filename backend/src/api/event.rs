@@ -1,4 +1,3 @@
-use std::panic::Location;
 use crate::{
     api::{ApiResult, ValidatedJson, is_admin_or_board},
     auth::{role::MembershipStatus, session::Session},

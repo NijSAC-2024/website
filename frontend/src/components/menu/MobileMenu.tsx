@@ -346,7 +346,7 @@ export default function MobileMenu() {
 
               <Divider/>
 
-              <ListItem onClick={toggleAuthOpen} disablePadding>
+              <ListItem onClick={() => console.log("open login")} disablePadding>
                 <ListItemButton>
                   <ListItemText
                     primary={text('Login', 'Login')}

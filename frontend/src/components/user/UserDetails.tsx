@@ -1,47 +1,31 @@
-import {FormEvent, useEffect, useState} from 'react';
-import {TextField, Button, Box, FormControl} from '@mui/material';
-import {Language, toUserContent, UserContent} from '../../types';
-import {FormErrors} from '../signup/SignupForm';
+import {useEffect} from 'react';
+import {Button, Box, FormControl} from '@mui/material';
+import {UserContent} from '../../types';
 import {useLanguage} from '../../providers/LanguageProvider';
-import {
-  emailValidator, emergencyContactNameValidator, nameValidator,
-  onlyNumbersValidator, optionalOnlyLetterValidator, phoneValidator
-} from '../../validator';
 import ContentCard from '../ContentCard.tsx';
 import TextCard from '../TextCard.tsx';
 import {getLabel, isAdminOrBoard} from '../../util.ts';
 import UserActions from './UserActions.tsx';
 import {useWebsite} from '../../hooks/useState.ts';
 import {useUsers} from '../../hooks/useUsers.ts';
+import {SubmitHandler, useForm} from 'react-hook-form';
+import {FormInputText} from '../form/FormInputText.tsx';
+
+type FormInputs = Omit<UserContent, 'status' | 'roles'>;
 
 export default function UserDetails() {
   const {text} = useLanguage();
   const {user, currentUser, updateUser} = useUsers();
   const {state: {routerState: {params}}} = useWebsite();
-  const [form, setForm] = useState<UserContent | null>(currentUser ? toUserContent(currentUser) : null);
-  const [errors, setErrors] = useState<FormErrors>({
-    firstName: false,
-    infix: false,
-    lastName: false,
-    phone: false,
-    email: false,
-    password: false,
-    studentNumber: false,
-    sportcardNumber: false,
-    nkbvNumber: false,
-    iceContactName: false,
-    iceContactEmail: false,
-    iceContactPhone: false,
-    importantInfo: false,
+  const {register, handleSubmit, control, reset, formState} = useForm<FormInputs>({
+    defaultValues: currentUser!,
   });
 
   useEffect(() => {
-    // FIXME: currently, this is required as otherwise navigating directly from one account to another would not
-    //  re-fill the form
-    setForm(currentUser ? toUserContent(currentUser) : null);
-  }, [currentUser]);
+    reset(currentUser!);
+  }, [currentUser, reset]);
 
-  if (!user || !currentUser || !form) {
+  if (!user || !currentUser) {
     return null;
   }
 
@@ -49,37 +33,8 @@ export default function UserDetails() {
   const canEdit = isAdminOrBoard(user) || isMe;
 
 
-  const handleChange = (field: keyof UserContent, value: string | number) => {
-    setForm((prev) => (prev ? {...prev, [field]: value} : null));
-  };
-
-  const validateInputs = () => {
-    setErrors({
-      firstName: nameValidator(form.firstName),
-      infix: optionalOnlyLetterValidator(form.infix),
-      lastName: nameValidator(form.lastName),
-      phone: phoneValidator(form.phone),
-      email: emailValidator(form.email),
-      importantInfo: (form.importantInfo?.length || 0) > 2000,
-      studentNumber: !!form.studentNumber && onlyNumbersValidator(form.studentNumber.toString()),
-      sportcardNumber: !!form.sportcardNumber && onlyNumbersValidator(form.sportcardNumber.toString()),
-      nkbvNumber: !!form.nkbvNumber && onlyNumbersValidator(form.nkbvNumber.toString()),
-      iceContactName: !!form.iceContactName && emergencyContactNameValidator(form.iceContactName),
-      iceContactEmail: !!form.iceContactEmail && emailValidator(form.iceContactEmail),
-      iceContactPhone: !!form.iceContactPhone && phoneValidator(form.iceContactPhone),
-      password: false,
-    });
-  };
-
-  const handleSave = async (event: FormEvent) => {
-    event.preventDefault();
-    if (!canEdit || !currentUser) {
-      return;
-    }
-    if (Object.values(errors).some((v) => v)) {
-      return;
-    }
-    await updateUser(currentUser.id, {...currentUser, ...form});
+  const handleSave: SubmitHandler<FormInputs> = async (user) => {
+    await updateUser(currentUser.id, {...currentUser, ...user});
   };
 
   return (
@@ -90,82 +45,101 @@ export default function UserDetails() {
       </div>
 
       {canEdit ? (
-        <Box component="form" onSubmit={handleSave} key={currentUser.id}>
+        <Box component="form" onSubmit={handleSubmit(handleSave)} key={currentUser.id}>
           {/* Personal information */}
           <h2>{text('Personal information', 'Persoonlijke informatie')}</h2>
           <TextCard className="px-3 xl:px-6 py-3 grid xl:grid-cols-4 gap-2 xl:gap-5 mb-3 items-center">
             <b>{text('First name', 'Voornaam')}</b>
             <FormControl className="xl:col-span-3">
-              <TextField
+              <FormInputText
+                {...register('firstName', {
+                  required: text('Name must be at least 2 characters long', 'Naam moet ten minste 2 karakters lang zijn'),
+                  minLength: {
+                    value: 2,
+                    message: text('Name must be at least 2 characters long', 'Naam moet ten minste 2 karakters lang zijn')
+                  }
+                })}
+                name={'firstName'}
+                control={control}
                 disabled={!isAdminOrBoard(user)}
-                size="small"
-                value={form.firstName}
-                fullWidth
-                onChange={(e) => handleChange('firstName', e.target.value)}
-                error={!!errors.firstName}
-                helperText={errors.firstName && text(errors.firstName as Language)}
               />
             </FormControl>
 
             <b>{text('Infix', 'Tussenvoegsel')}</b>
             <FormControl className="xl:col-span-3">
-              <TextField
+              <FormInputText
+                {...register('infix', {
+                  pattern: {
+                    value: /^[a-zA-Z\s'-]*$/,
+                    message: text(
+                      'Only letters, spaces, apostrophes, and hyphens are allowed',
+                      'Alleen letters, spaties, apostroffen en koppeltekens zijn toegestaan'
+                    )
+                  }
+                })}
+                name={'infix'}
+                control={control}
                 disabled={!isAdminOrBoard(user)}
-                size="small"
-                value={form.infix}
-                fullWidth
-                onChange={(e) => handleChange('infix', e.target.value)}
-                error={!!errors.infix}
-                helperText={errors.infix && text(errors.infix as Language)}
               />
             </FormControl>
 
             <b>{text('Last name', 'Achternaam')}</b>
             <FormControl className="xl:col-span-3">
-              <TextField
+              <FormInputText
+                {...register('lastName', {
+                  required: text('Name must be at least 2 characters long', 'Naam moet ten minste 2 karakters lang zijn'),
+                  minLength: {
+                    value: 2,
+                    message: text('Name must be at least 2 characters long', 'Naam moet ten minste 2 karakters lang zijn')
+                  }
+                })}
+                name={'lastName'}
+                control={control}
                 disabled={!isAdminOrBoard(user)}
-                size="small"
-                value={form.lastName}
-                fullWidth
-                onChange={(e) => handleChange('lastName', e.target.value)}
-                error={!!errors.lastName}
-                helperText={errors.lastName && text(errors.lastName as Language)}
               />
             </FormControl>
 
             <b>{text('Phone number', 'Telefoonnummer')}</b>
             <FormControl className="xl:col-span-3">
-              <TextField
-                size="small"
-                value={form.phone}
-                fullWidth
-                onChange={(e) => handleChange('phone', e.target.value)}
-                error={!!errors.phone}
-                helperText={errors.phone && text(errors.phone as Language)}
+              <FormInputText
+                {...register('phone', {
+                  required: text('Invalid phone number', 'Ongeldig telefoonnummer'),
+                  pattern: {
+                    value: /^\+?[0-9\s-]{7,15}$/,
+                    message: text('Invalid phone number', 'Ongeldig telefoonnummer')
+                  }
+                })}
+                name={'phone'}
+                control={control}
               />
             </FormControl>
 
             <b>{text('Email', 'E-mailadres')}</b>
             <FormControl className="xl:col-span-3">
-              <TextField
-                size="small"
-                value={form.email}
-                fullWidth
-                onChange={(e) => handleChange('email', e.target.value)}
-                error={!!errors.email}
-                helperText={errors.email && text(errors.email as Language)}
+              <FormInputText
+                {...register('email', {
+                  required: text('Invalid email address', 'Ongeldig e-mailadres'),
+                  pattern: {
+                    value: /^[\w.!#$%&'*+/=?^`{|}~-]+@[a-z\d](?:[a-z\d-]{0,61}[a-z\d])?(?:\.[a-z\d](?:[a-z\d-]{0,61}[a-z\d])?)*$/i,
+                    message: text('Invalid email address', 'Ongeldig e-mailadres')
+                  }
+                })}
+                name={'email'}
+                control={control}
               />
             </FormControl>
 
             <b>{text('Important information', 'Belangrijke informatie')}</b>
             <FormControl className="xl:col-span-3">
-              <TextField
-                size="small"
-                value={form.importantInfo}
-                fullWidth
-                onChange={(e) => handleChange('importantInfo', e.target.value)}
-                error={!!errors.importantInfo}
-                helperText={errors.importantInfo && text(errors.importantInfo as Language)}
+              <FormInputText
+                {...register('importantInfo', {
+                  maxLength: {
+                    value: 2000,
+                    message: text('At most 2000 characters', 'Maximaal 2000 karakters')
+                  }
+                })}
+                name={'importantInfo'}
+                control={control}
               />
             </FormControl>
 
@@ -183,40 +157,55 @@ export default function UserDetails() {
           <TextCard className="px-3 xl:px-6 py-3 grid xl:grid-cols-4 gap-2 xl:gap-5 mb-3 items-center">
             <b>{text('Student number', 'Studentnummer')}</b>
             <FormControl className="xl:col-span-3">
-              <TextField
-                size="small"
-                type="number"
-                value={form.studentNumber}
-                fullWidth
-                onChange={(e) => handleChange('studentNumber', parseInt(e.target.value) || 0)}
-                error={!!errors.studentNumber}
-                helperText={errors.studentNumber && text(errors.studentNumber as Language)}
+              <FormInputText
+                {...register('studentNumber', {
+                  minLength: {
+                    value: 5,
+                    message: text('At least 5 characters', 'Minimaal 5 karakters')
+                  },
+                  maxLength: {
+                    value: 20,
+                    message: text('At most 20 characters', 'Maximaal 20 karakters')
+                  }
+                })}
+                name={'studentNumber'}
+                control={control}
               />
             </FormControl>
 
             <b>{text('Sportscard number', 'Sportkaartnummer')}</b>
             <FormControl className="xl:col-span-3">
-              <TextField
-                size="small"
-                type="number"
-                value={form.sportcardNumber}
-                fullWidth
-                onChange={(e) => handleChange('sportcardNumber', parseInt(e.target.value) || 0)}
-                error={!!errors.sportcardNumber}
-                helperText={errors.sportcardNumber && text(errors.sportcardNumber as Language)}
+              <FormInputText
+                {...register('sportcardNumber', {
+                  minLength: {
+                    value: 5,
+                    message: text('At least 5 characters', 'Minimaal 5 karakters')
+                  },
+                  maxLength: {
+                    value: 20,
+                    message: text('At most 20 characters', 'Maximaal 20 karakters')
+                  }
+                })}
+                name={'sportcardNumber'}
+                control={control}
               />
             </FormControl>
 
             <b>{text('NKBV number', 'NKBV-nummer')}</b>
             <FormControl className="xl:col-span-3">
-              <TextField
-                size="small"
-                type="number"
-                value={form.nkbvNumber}
-                fullWidth
-                onChange={(e) => handleChange('nkbvNumber', parseInt(e.target.value) || 0)}
-                error={!!errors.nkbvNumber}
-                helperText={errors.nkbvNumber && text(errors.nkbvNumber as Language)}
+              <FormInputText
+                {...register('nkbvNumber', {
+                  minLength: {
+                    value: 5,
+                    message: text('At least 5 characters', 'Minimaal 5 karakters')
+                  },
+                  maxLength: {
+                    value: 20,
+                    message: text('At most 20 characters', 'Maximaal 20 karakters')
+                  }
+                })}
+                name={'nkbvNumber'}
+                control={control}
               />
             </FormControl>
           </TextCard>
@@ -226,43 +215,53 @@ export default function UserDetails() {
           <TextCard className="px-3 xl:px-6 py-3 grid xl:grid-cols-4 gap-2 xl:gap-5 items-center">
             <b>{text('ICE contact name', 'ICE contact naam')}</b>
             <FormControl className="xl:col-span-3">
-              <TextField
-                size="small"
-                value={form.iceContactName}
-                fullWidth
-                onChange={(e) => handleChange('iceContactName', e.target.value)}
-                error={!!errors.iceContactName}
-                helperText={errors.iceContactName && text(errors.iceContactName as Language)}
+              <FormInputText
+                {...register('iceContactName', {
+                  minLength: {
+                    value: 5,
+                    message: text('At least 2 characters', 'Minimaal 2 karakters')
+                  },
+                  maxLength: {
+                    value: 20,
+                    message: text('At most 30 characters', 'Maximaal 30 karakters')
+                  }
+                })}
+                name={'iceContactName'}
+                control={control}
               />
             </FormControl>
 
             <b>{text('ICE email', 'ICE e-mailadres')}</b>
             <FormControl className="xl:col-span-3">
-              <TextField
-                size="small"
-                value={form.iceContactEmail}
-                fullWidth
-                onChange={(e) => handleChange('iceContactEmail', e.target.value)}
-                error={!!errors.iceContactEmail}
-                helperText={errors.iceContactEmail && text(errors.iceContactEmail as Language)}
+              <FormInputText
+                {...register('iceContactEmail', {
+                  pattern: {
+                    value: /^[\w.!#$%&'*+/=?^`{|}~-]+@[a-z\d](?:[a-z\d-]{0,61}[a-z\d])?(?:\.[a-z\d](?:[a-z\d-]{0,61}[a-z\d])?)*$/i,
+                    message: text('Invalid email address', 'Ongeldig e-mailadres')
+                  }
+                })}
+                name={'iceContactEmail'}
+                control={control}
               />
             </FormControl>
 
             <b>{text('ICE phone number', 'ICE telefoonnummer')}</b>
             <FormControl className="xl:col-span-3">
-              <TextField
-                size="small"
-                value={form.iceContactPhone}
-                fullWidth
-                onChange={(e) => handleChange('iceContactPhone', e.target.value)}
-                error={!!errors.iceContactPhone}
-                helperText={errors.iceContactPhone && text(errors.iceContactPhone as Language)}
+              <FormInputText
+                {...register('iceContactPhone', {
+                  pattern: {
+                    value: /^\+?[0-9\s-]{7,15}$/,
+                    message: text('Invalid phone number', 'Ongeldig telefoonnummer')
+                  }
+                })}
+                name={'iceContactPhone'}
+                control={control}
               />
             </FormControl>
           </TextCard>
 
           <div className="flex justify-end mt-5">
-            <Button variant="contained" color="primary" type="submit" onClick={validateInputs}>
+            <Button variant="contained" color="primary" type="submit" loading={formState.isSubmitting}>
               {text('Save changes', 'Wijzigingen opslaan')}
             </Button>
           </div>

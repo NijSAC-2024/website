@@ -60,24 +60,12 @@ pub struct UserContent {
     #[validate(length(max = 100))]
     pub last_name: String,
     pub phone: String,
-    #[validate(range(
-        min = 0,
-        max = 999_999_999,
-        message = "Student Number must contain a maximum of 9 numbers"
-    ))]
-    pub student_number: Option<i32>,
-    #[validate(range(
-        min = 0,
-        max = 999_999_999,
-        message = "NKBV Number must contain a maximum of 9 numbers"
-    ))]
-    pub nkbv_number: Option<i32>,
-    #[validate(range(
-        min = 0,
-        max = 999_999_999,
-        message = "Sportcard Number must contain a maximum of 9 numbers"
-    ))]
-    pub sportcard_number: Option<i32>,
+    #[validate(length(min = 5, max = 20))]
+    pub student_number: Option<String>,
+    #[validate(length(min = 5, max = 20))]
+    pub nkbv_number: Option<String>,
+    #[validate(length(min = 5, max = 20))]
+    pub sportcard_number: Option<String>,
     #[validate(length(min = 1, max = 100))]
     pub ice_contact_name: Option<String>,
     #[validate(email)]
@@ -156,24 +144,12 @@ pub struct RegisterNewUser {
     ))]
     password: String,
     pub phone: String,
-    #[validate(range(
-        min = 0,
-        max = 999_999_999,
-        message = "Student Number must contain a maximum of 9 numbers"
-    ))]
-    pub student_number: Option<i32>,
-    #[validate(range(
-        min = 0,
-        max = 999_999_999,
-        message = "NKBV Number must contain a maximum of 9 numbers"
-    ))]
-    pub nkbv_number: Option<i32>,
-    #[validate(range(
-        min = 0,
-        max = 999_999_999,
-        message = "Sportcard Number must contain a maximum of 9 numbers"
-    ))]
-    pub sportcard_number: Option<i32>,
+    #[validate(length(min = 5, max = 20))]
+    pub student_number: Option<String>,
+    #[validate(length(min = 5, max = 20))]
+    pub nkbv_number: Option<String>,
+    #[validate(length(min = 5, max = 20))]
+    pub sportcard_number: Option<String>,
     #[validate(length(min = 1, max = 100))]
     pub ice_contact_name: Option<String>,
     #[validate(email)]

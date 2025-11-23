@@ -1,5 +1,7 @@
 import {WebsiteError} from './error/error.ts';
 import {RouterState} from './router.ts';
+import {Control} from 'react-hook-form';
+import {HTMLInputTypeAttribute} from 'react';
 
 export type ThemeType = 'dark' | 'light' | 'auto';
 
@@ -312,6 +314,13 @@ export type Action =
     type: 'set_route';
     routerState: RouterState;
   };
+
+export interface FormInputProps {
+  name: string;
+  disabled?: boolean;
+  control: Control<any, any, any>;
+  type?: HTMLInputTypeAttribute;
+}
 
 export type MenuType =
   | 'association'
