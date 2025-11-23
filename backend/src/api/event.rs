@@ -46,19 +46,22 @@ pub async fn get_event_registrations(
         .and_then(|s| Uuid::parse_str(s).ok());
 
     // worga user → detailed
-    if let (Some(session), Some(worga_uuid)) = (&session, worga_user) {
-        if **session.user_id() == worga_uuid {
-            let regs = store.get_registrations_detailed(&id).await?;
-            return Ok(Json(serde_json::to_value(regs)?));
-        }
+    if let (Some(session), Some(worga_uuid)) = (&session, worga_user)
+        && **session.user_id() == worga_uuid
+    {
+        let regs = store.get_registrations_detailed(&id).await?;
+        return Ok(Json(serde_json::to_value(regs)?));
     }
 
     // Committee member → detailed
-    if let Some(ref session) = session {
-        if store.ensure_user_in_committee(session, &event.content.created_by).await.is_ok() {
-            let regs = store.get_registrations_detailed(&id).await?;
-            return Ok(Json(serde_json::to_value(regs)?));
-        }
+    if let Some(ref session) = session
+        && store
+            .ensure_user_in_committee(session, &event.content.created_by)
+            .await
+            .is_ok()
+    {
+        let regs = store.get_registrations_detailed(&id).await?;
+        return Ok(Json(serde_json::to_value(regs)?));
     }
 
     // Public if NonMember accepted
@@ -74,9 +77,9 @@ pub async fn get_event_registrations(
     // Summary for matching membership
     if let Some(ref session) = session
         && event
-        .content
-        .required_membership_status
-        .contains(&session.membership_status())
+            .content
+            .required_membership_status
+            .contains(&session.membership_status())
     {
         let regs = store.get_registered_users(&id).await?;
         return Ok(Json(serde_json::to_value(regs)?));

@@ -1,7 +1,6 @@
-use crate::committee::{CommitteeId, CommitteeRole, UserCommittee};
 use crate::{
     AppState, Language,
-    committee::{Committee, CommitteeContent},
+    committee::{Committee, CommitteeContent, CommitteeId, CommitteeRole, UserCommittee},
     error::{AppResult, Error},
     user::{BasicUser, UserId},
 };

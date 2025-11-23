@@ -1,6 +1,4 @@
-use crate::Language;
-use crate::file::FileId;
-use crate::user::UserId;
+use crate::{Language, file::FileId, user::UserId};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::ops::Deref;
 use time::OffsetDateTime;

@@ -5,9 +5,10 @@ mod location;
 mod material;
 mod user;
 
-use crate::auth::role::Role;
-use crate::auth::session::Session;
-use crate::error::{AppResult, Error};
+use crate::{
+    auth::{role::Role, session::Session},
+    error::{AppResult, Error},
+};
 use axum::{
     Json,
     extract::{

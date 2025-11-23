@@ -1,10 +1,8 @@
-use crate::api::is_admin_or_board;
-use crate::committee::CommitteeRole;
 use crate::{
     ValidatedJson,
-    api::ApiResult,
+    api::{ApiResult, is_admin_or_board},
     auth::session::Session,
-    committee::{Committee, CommitteeContent, CommitteeId, UserCommittee},
+    committee::{Committee, CommitteeContent, CommitteeId, CommitteeRole, UserCommittee},
     data_source::committee::CommitteeStore,
     error::{AppResult, Error},
     user::{BasicUser, UserId},

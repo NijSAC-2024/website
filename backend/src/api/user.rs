@@ -1,7 +1,6 @@
-use crate::api::is_admin_or_board;
 use crate::{
     Pagination,
-    api::{ApiResult, ValidatedJson, ValidatedQuery},
+    api::{ApiResult, ValidatedJson, ValidatedQuery, is_admin_or_board},
     auth::{role::MembershipStatus, session::Session},
     data_source::UserStore,
     error::{AppResult, Error},

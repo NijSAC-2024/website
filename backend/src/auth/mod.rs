@@ -1,8 +1,7 @@
 use crate::{
     api::ValidatedJson, auth::session::Session, error::Error, wire::user::UserCredentials,
 };
-use axum::Json;
-use axum::response::IntoResponse;
+use axum::{Json, response::IntoResponse};
 use axum_extra::extract::{CookieJar, cookie::Cookie};
 use sqlx::PgPool;
 use tracing::trace;

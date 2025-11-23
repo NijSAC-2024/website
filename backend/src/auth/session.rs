@@ -1,13 +1,12 @@
-use crate::data_source::UserStore;
-use crate::user::User;
 use crate::{
     AppState,
     auth::{
         COOKIE_NAME,
         role::{MembershipStatus, Roles},
     },
+    data_source::UserStore,
     error::{AppResult, Error},
-    user::UserId,
+    user::{User, UserId},
     wire::user::UserCredentials,
 };
 use argon2::PasswordHash;

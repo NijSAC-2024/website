@@ -4,9 +4,8 @@ use crate::{
     wire::event::{Event, EventContent, EventId},
 };
 
-use crate::auth::session::Session;
 use crate::{
-    auth::role::MembershipStatus,
+    auth::{role::MembershipStatus, session::Session},
     error::AppResult,
     event::{Date, NewRegistration, Registration, RegistrationId},
     location::{Location, LocationContent, LocationId},
