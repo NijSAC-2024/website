@@ -6,7 +6,8 @@ permissions:
 on:
   pull_request:
   push:
-
+    branches:
+      - main
 
 jobs:
   build-backend:
@@ -144,7 +145,7 @@ jobs:
 
       - name: Check formatting
         working-directory: backend
-        run: cargo +nightly fmt --all --check -- --config imports_granularity="Crate"
+        run: cargo +nightly fmt --all --check
 
   clippy:
     name: Clippy
