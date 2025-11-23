@@ -320,7 +320,10 @@ export interface FormInputProps<T extends FieldValues> {
   name: Path<T>;
   disabled?: boolean;
   control: Control<T>;
+  label?: string;
   type?: HTMLInputTypeAttribute;
+  autoComplete?: string;
+  size?: 'small' | 'medium';
 }
 
 export type MenuType =

@@ -2,7 +2,7 @@ import {Controller, FieldValues} from 'react-hook-form';
 import TextField from '@mui/material/TextField';
 import {FormInputProps} from '../../types.ts';
 
-export const FormInputText = <T extends FieldValues, >({name, control, disabled, type}: FormInputProps<T>) => {
+export const FormInputText = <T extends FieldValues, >({name, control, disabled, type, autoComplete, label, size}: FormInputProps<T>) => {
   return (
     <Controller
       name={name}
@@ -16,13 +16,15 @@ export const FormInputText = <T extends FieldValues, >({name, control, disabled,
           <TextField
             type={type}
             helperText={error ? error.message : null}
-            size="small"
+            size={size || 'small'}
             error={!!error}
             onChange={onChange}
             value={value}
             fullWidth
             disabled={disabled || formState.isSubmitting}
             variant="outlined"
+            label={label}
+            autoComplete={autoComplete}
           />
         )}
     />

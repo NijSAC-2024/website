@@ -60,11 +60,11 @@ pub struct UserContent {
     #[validate(length(max = 100))]
     pub last_name: String,
     pub phone: String,
-    #[validate(length(min = 5, max = 20))]
+    #[validate(length(min = 0, max = 20))]
     pub student_number: Option<String>,
-    #[validate(length(min = 5, max = 20))]
+    #[validate(length(min = 0, max = 20))]
     pub nkbv_number: Option<String>,
-    #[validate(length(min = 5, max = 20))]
+    #[validate(length(min = 0, max = 20))]
     pub sportcard_number: Option<String>,
     #[validate(length(min = 1, max = 100))]
     pub ice_contact_name: Option<String>,
