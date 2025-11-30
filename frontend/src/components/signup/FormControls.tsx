@@ -1,22 +1,20 @@
-import React, {useState} from 'react';
+import {useState} from 'react';
 import {Button, Checkbox, FormControlLabel} from '@mui/material';
 import {useLanguage} from '../../providers/LanguageProvider.tsx';
 
 interface FormControlsProps {
   activeStep: number;
   handleBack: () => void;
-  handleNext: (e: React.FormEvent) => void;
-  validateInputs: () => void;
+  handleNext: () => void;
 }
 
 export default function FormControls({
   activeStep,
   handleBack,
   handleNext,
-  validateInputs,
-}:FormControlsProps) {
-  const { text } = useLanguage()
-  const [consent, setConsent] = useState<boolean>(false)
+}: FormControlsProps) {
+  const {text} = useLanguage();
+  const [consent, setConsent] = useState<boolean>(false);
   return (
     <>
       {activeStep === 3 && (
@@ -52,8 +50,7 @@ export default function FormControls({
           </Button>
         ) : (
           <Button
-            type="submit"
-            onClick={validateInputs}
+            onClick={handleNext}
           >
             {text('Next', 'Volgende')}
           </Button>

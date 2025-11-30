@@ -5,9 +5,7 @@ import {Button, Chip, Collapse} from '@mui/material';
 import {useState} from 'react';
 import SignupOptions from '../components/signup/SingupOptions.tsx';
 import {useLanguage} from '../providers/LanguageProvider.tsx';
-import {MembershipStatus, UserContent} from '../types.ts';
-import {useWebsite} from '../hooks/useState.ts';
-import {useUsers} from '../hooks/useUsers.ts';
+import {MembershipStatus} from '../types.ts';
 
 interface MembershipType {
   id: MembershipStatus;
@@ -16,39 +14,11 @@ interface MembershipType {
 
 export default function Signup() {
   const {text} = useLanguage();
-  const {navigate} = useWebsite();
-  const {signup} = useUsers();
   const [membership, setMembership] = useState<MembershipType>({
     id: 'member', label: {en: 'Member', nl: 'Lid'}
   });
   const [selectedMembership, setSelectedMembership] = useState<boolean>(false);
-  const [newUser, setNewUser] = useState<UserContent>({
-    importantInfo: '',
-    infix: '',
-    roles: [],
-    firstName: '',
-    lastName: '',
-    phone: '',
-    iceContactName: '',
-    iceContactEmail: '',
-    iceContactPhone: '',
-    email: '',
-    password: '',
-    nkbvNumber: 0,
-    sportcardNumber: 0,
-    studentNumber: 0,
-    status: 'pending'
-  });
 
-  const handleSubmit = async () => {
-    if (await signup(newUser)) {
-      navigate('events');
-    }
-  };
-
-  const handleChange = (field: keyof UserContent, value: string | number) => {
-    setNewUser(prev => ({...prev, [field]: value}));
-  };
 
   const handleExtraordinaryMember = () => {
     setMembership({id: 'affiliated', label: {en: 'Affiliated', nl: 'Aangeslotene'}});
@@ -97,9 +67,9 @@ export default function Signup() {
             />
           </Collapse>
         </div>
-        <Collapse in={selectedMembership} timeout="auto" unmountOnExit>
+        <Collapse in={selectedMembership} timeout="auto">
           <div className="px-7 pt-5 pb-7 border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
-            <SignupForm newUser={newUser} handleChange={handleChange} handleSubmit={handleSubmit}/>
+            <SignupForm membershipType={membership.id}/>
           </div>
         </Collapse>
       </ContentCard>

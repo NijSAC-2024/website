@@ -170,16 +170,13 @@ export interface BasicUser {
 }
 
 export interface UserContent extends Omit<BasicUser, 'id'> {
-  firstName: string;
-  infix?: string;
-  lastName: string;
   phone: string;
   email: string;
   password: string;
   importantInfo?: string;
-  studentNumber: number;
-  nkbvNumber: number;
-  sportcardNumber: number;
+  studentNumber: string;
+  nkbvNumber: string;
+  sportcardNumber: string;
   iceContactName: string;
   iceContactEmail: string;
   iceContactPhone: string;
@@ -324,6 +321,9 @@ export interface FormInputProps<T extends FieldValues> {
   type?: HTMLInputTypeAttribute;
   autoComplete?: string;
   size?: 'small' | 'medium';
+  multiline?: boolean;
+  minRows?: number;
+  className?: string;
 }
 
 export type MenuType =

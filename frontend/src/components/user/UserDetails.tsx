@@ -1,5 +1,5 @@
 import {useEffect} from 'react';
-import {Button, Box, FormControl} from '@mui/material';
+import {Button, Box} from '@mui/material';
 import {UserContent} from '../../types';
 import {useLanguage} from '../../providers/LanguageProvider';
 import ContentCard from '../ContentCard.tsx';
@@ -50,92 +50,86 @@ export default function UserDetails() {
           <h2>{text('Personal information', 'Persoonlijke informatie')}</h2>
           <TextCard className="px-3 xl:px-6 py-3 grid xl:grid-cols-4 gap-2 xl:gap-5 mb-3 items-center">
             <b>{text('First name', 'Voornaam')}</b>
-            <FormControl className="xl:col-span-3">
-              <FormInputText
-                {...register('firstName', {
-                  required: text('Name must be at least 2 characters long', 'Naam moet ten minste 2 karakters lang zijn'),
-                  minLength: {
-                    value: 2,
-                    message: text('Name must be at least 2 characters long', 'Naam moet ten minste 2 karakters lang zijn')
-                  }
-                })}
-                control={control}
-                disabled={!isAdminOrBoard(user)}
-              />
-            </FormControl>
+            <FormInputText
+              className="xl:col-span-3"
+              {...register('firstName', {
+                required: text('Name must be at least 2 characters long', 'Naam moet ten minste 2 karakters lang zijn'),
+                minLength: {
+                  value: 2,
+                  message: text('Name must be at least 2 characters long', 'Naam moet ten minste 2 karakters lang zijn')
+                }
+              })}
+              control={control}
+              disabled={!isAdminOrBoard(user)}
+            />
 
             <b>{text('Infix', 'Tussenvoegsel')}</b>
-            <FormControl className="xl:col-span-3">
-              <FormInputText
-                {...register('infix', {
-                  pattern: {
-                    value: /^[a-zA-Z\s'-]*$/,
-                    message: text(
-                      'Only letters, spaces, apostrophes, and hyphens are allowed',
-                      'Alleen letters, spaties, apostroffen en koppeltekens zijn toegestaan'
-                    )
-                  }
-                })}
-                control={control}
-                disabled={!isAdminOrBoard(user)}
-              />
-            </FormControl>
+            <FormInputText
+              className="xl:col-span-3"
+              {...register('infix', {
+                pattern: {
+                  value: /^[a-zA-Z\s'-]{0,15}$/,
+                  message: text(
+                    'Only letters, spaces, apostrophes, and hyphens are allowed',
+                    'Alleen letters, spaties, apostroffen en koppeltekens zijn toegestaan'
+                  )
+                }
+              })}
+              control={control}
+              disabled={!isAdminOrBoard(user)}
+            />
 
             <b>{text('Last name', 'Achternaam')}</b>
-            <FormControl className="xl:col-span-3">
-              <FormInputText
-                {...register('lastName', {
-                  required: text('Name must be at least 2 characters long', 'Naam moet ten minste 2 karakters lang zijn'),
-                  minLength: {
-                    value: 2,
-                    message: text('Name must be at least 2 characters long', 'Naam moet ten minste 2 karakters lang zijn')
-                  }
-                })}
-                control={control}
-                disabled={!isAdminOrBoard(user)}
-              />
-            </FormControl>
+            <FormInputText
+              className="xl:col-span-3"
+              {...register('lastName', {
+                required: text('Name must be at least 2 characters long', 'Naam moet ten minste 2 karakters lang zijn'),
+                minLength: {
+                  value: 2,
+                  message: text('Name must be at least 2 characters long', 'Naam moet ten minste 2 karakters lang zijn')
+                }
+              })}
+              control={control}
+              disabled={!isAdminOrBoard(user)}
+            />
 
             <b>{text('Phone number', 'Telefoonnummer')}</b>
-            <FormControl className="xl:col-span-3">
-              <FormInputText
-                {...register('phone', {
-                  required: text('Invalid phone number', 'Ongeldig telefoonnummer'),
-                  pattern: {
-                    value: /^\+?[0-9\s-]{7,15}$/,
-                    message: text('Invalid phone number', 'Ongeldig telefoonnummer')
-                  }
-                })}
-                control={control}
-              />
-            </FormControl>
+            <FormInputText
+              className="xl:col-span-3"
+              {...register('phone', {
+                required: text('Invalid phone number', 'Ongeldig telefoonnummer'),
+                pattern: {
+                  value: /^\+?[0-9\s-]{7,15}$/,
+                  message: text('Invalid phone number', 'Ongeldig telefoonnummer')
+                }
+              })}
+              control={control}
+            />
 
             <b>{text('Email', 'E-mailadres')}</b>
-            <FormControl className="xl:col-span-3">
-              <FormInputText
-                {...register('email', {
-                  required: text('Invalid email address', 'Ongeldig e-mailadres'),
-                  pattern: {
-                    value: /^[\w.!#$%&'*+/=?^`{|}~-]+@[a-z\d](?:[a-z\d-]{0,61}[a-z\d])?(?:\.[a-z\d](?:[a-z\d-]{0,61}[a-z\d])?)*$/i,
-                    message: text('Invalid email address', 'Ongeldig e-mailadres')
-                  }
-                })}
-                control={control}
-              />
-            </FormControl>
+            <FormInputText
+              className="xl:col-span-3"
+              {...register('email', {
+                required: text('Invalid email address', 'Ongeldig e-mailadres'),
+                pattern: {
+                  value: /^[\w.!#$%&'*+/=?^`{|}~-]+@[a-z\d](?:[a-z\d-]{0,61}[a-z\d])?(?:\.[a-z\d](?:[a-z\d-]{0,61}[a-z\d])?)*$/i,
+                  message: text('Invalid email address', 'Ongeldig e-mailadres')
+                }
+              })}
+              control={control}
+            />
 
             <b>{text('Important information', 'Belangrijke informatie')}</b>
-            <FormControl className="xl:col-span-3">
-              <FormInputText
-                {...register('importantInfo', {
-                  maxLength: {
-                    value: 2000,
-                    message: text('At most 2000 characters', 'Maximaal 2000 karakters')
-                  }
-                })}
-                control={control}
-              />
-            </FormControl>
+            <FormInputText
+              className="xl:col-span-3"
+              {...register('importantInfo', {
+                maxLength: {
+                  value: 2000,
+                  message: text('At most 2000 characters', 'Maximaal 2000 karakters')
+                }
+              })}
+              control={control}
+            />
 
             <b>{text('Membership status', 'Lidmaatschapsstatus')}</b>
             <span className="xl:col-span-3">{text(getLabel(currentUser.status))}</span>
@@ -150,102 +144,97 @@ export default function UserDetails() {
           <h2>{text('Education & Insurance', 'Educatie & Verzekering')}</h2>
           <TextCard className="px-3 xl:px-6 py-3 grid xl:grid-cols-4 gap-2 xl:gap-5 mb-3 items-center">
             <b>{text('Student number', 'Studentnummer')}</b>
-            <FormControl className="xl:col-span-3">
-              <FormInputText
-                {...register('studentNumber', {
-                  minLength: {
-                    value: 5,
-                    message: text('At least 5 characters', 'Minimaal 5 karakters')
-                  },
-                  maxLength: {
-                    value: 20,
-                    message: text('At most 20 characters', 'Maximaal 20 karakters')
-                  }
-                })}
-                control={control}
-              />
-            </FormControl>
+            <FormInputText
+              className="xl:col-span-3"
+              {...register('studentNumber', {
+                minLength: {
+                  value: 5,
+                  message: text('At least 5 characters', 'Minimaal 5 karakters')
+                },
+                maxLength: {
+                  value: 20,
+                  message: text('At most 20 characters', 'Maximaal 20 karakters')
+                }
+              })}
+              control={control}
+            />
 
             <b>{text('Sportscard number', 'Sportkaartnummer')}</b>
-            <FormControl className="xl:col-span-3">
-              <FormInputText
-                {...register('sportcardNumber', {
-                  minLength: {
-                    value: 5,
-                    message: text('At least 5 characters', 'Minimaal 5 karakters')
-                  },
-                  maxLength: {
-                    value: 20,
-                    message: text('At most 20 characters', 'Maximaal 20 karakters')
-                  }
-                })}
-                control={control}
-              />
-            </FormControl>
+            <FormInputText
+              className="xl:col-span-3"
+              {...register('sportcardNumber', {
+                minLength: {
+                  value: 5,
+                  message: text('At least 5 characters', 'Minimaal 5 karakters')
+                },
+                maxLength: {
+                  value: 20,
+                  message: text('At most 20 characters', 'Maximaal 20 karakters')
+                }
+              })}
+              control={control}
+            />
 
             <b>{text('NKBV number', 'NKBV-nummer')}</b>
-            <FormControl className="xl:col-span-3">
-              <FormInputText
-                {...register('nkbvNumber', {
-                  minLength: {
-                    value: 5,
-                    message: text('At least 5 characters', 'Minimaal 5 karakters')
-                  },
-                  maxLength: {
-                    value: 20,
-                    message: text('At most 20 characters', 'Maximaal 20 karakters')
-                  }
-                })}
-                control={control}
-              />
-            </FormControl>
+            <FormInputText
+              className="xl:col-span-3"
+              {...register('nkbvNumber', {
+                minLength: {
+                  value: 5,
+                  message: text('At least 5 characters', 'Minimaal 5 karakters')
+                },
+                maxLength: {
+                  value: 20,
+                  message: text('At most 20 characters', 'Maximaal 20 karakters')
+                }
+              })}
+              control={control}
+            />
           </TextCard>
 
           {/* Emergency contact */}
           <h2>{text('Emergency contact', 'Contact noodgevallen')}</h2>
           <TextCard className="px-3 xl:px-6 py-3 grid xl:grid-cols-4 gap-2 xl:gap-5 items-center">
             <b>{text('ICE contact name', 'ICE contact naam')}</b>
-            <FormControl className="xl:col-span-3">
-              <FormInputText
-                {...register('iceContactName', {
-                  minLength: {
-                    value: 5,
-                    message: text('At least 2 characters', 'Minimaal 2 karakters')
-                  },
-                  maxLength: {
-                    value: 20,
-                    message: text('At most 30 characters', 'Maximaal 30 karakters')
-                  }
-                })}
-                control={control}
-              />
-            </FormControl>
+            <FormInputText
+              className="xl:col-span-3"
+              {...register('iceContactName', {
+                minLength: {
+                  value: 2,
+                  message: text('At least 2 characters', 'Minimaal 2 karakters')
+                },
+                maxLength: {
+                  value: 20,
+                  message: text('At most 30 characters', 'Maximaal 30 karakters')
+                }
+              })}
+              control={control}
+            />
 
             <b>{text('ICE email', 'ICE e-mailadres')}</b>
-            <FormControl className="xl:col-span-3">
-              <FormInputText
-                {...register('iceContactEmail', {
-                  pattern: {
-                    value: /^[\w.!#$%&'*+/=?^`{|}~-]+@[a-z\d](?:[a-z\d-]{0,61}[a-z\d])?(?:\.[a-z\d](?:[a-z\d-]{0,61}[a-z\d])?)*$/i,
-                    message: text('Invalid email address', 'Ongeldig e-mailadres')
-                  }
-                })}
-                control={control}
-              />
-            </FormControl>
+            <FormInputText
+              className="xl:col-span-3"
+              {...register('iceContactEmail', {
+                pattern: {
+                  value: /^[\w.!#$%&'*+/=?^`{|}~-]+@[a-z\d](?:[a-z\d-]{0,61}[a-z\d])?(?:\.[a-z\d](?:[a-z\d-]{0,61}[a-z\d])?)*$/i,
+                  message: text('Invalid email address', 'Ongeldig e-mailadres')
+                }
+              })}
+              type='email'
+              control={control}
+            />
 
             <b>{text('ICE phone number', 'ICE telefoonnummer')}</b>
-            <FormControl className="xl:col-span-3">
-              <FormInputText
-                {...register('iceContactPhone', {
-                  pattern: {
-                    value: /^\+?[0-9\s-]{7,15}$/,
-                    message: text('Invalid phone number', 'Ongeldig telefoonnummer')
-                  }
-                })}
-                control={control}
-              />
-            </FormControl>
+            <FormInputText
+              className="xl:col-span-3"
+              {...register('iceContactPhone', {
+                pattern: {
+                  value: /^\+?[0-9\s-]{7,15}$/,
+                  message: text('Invalid phone number', 'Ongeldig telefoonnummer')
+                }
+              })}
+              control={control}
+            />
           </TextCard>
 
           <div className="flex justify-end mt-5">
