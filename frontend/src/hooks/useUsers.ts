@@ -51,7 +51,7 @@ export function useUsers() {
     }
   };
 
-  const signup = async (user: UserContent): Promise<boolean> => {
+  const signup = async (user: Omit<UserContent, 'roles'>): Promise<boolean> => {
     const {data, error} = await apiFetch<User>('/register', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},

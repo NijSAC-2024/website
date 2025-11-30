@@ -1,56 +1,58 @@
-import {Button, FormControl, InputLabel, MenuItem, Select, TextField} from '@mui/material';
-import {DateType, EventContent, EventType, Language, Metadata, typesOptions, WeekendType} from '../../types.ts';
-import OptionSelector from '../OptionSelector.tsx';
+import {Button} from '@mui/material';
+import { EventContent, typesOptions} from '../../types.ts';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import {ChangeEvent, useState} from 'react';
-import EditDates from './EditDates.tsx';
 import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import {isAdminOrBoard} from '../../util.ts';
 import {useUsers} from '../../hooks/useUsers.ts';
 import {useLocations} from '../../hooks/useLocations.ts';
 import {useCommittees} from '../../hooks/useCommittees.ts';
+import {Control, UseFormGetValues, UseFormRegister, UseFormSetValue} from 'react-hook-form';
+import {EditEventForm} from './EditEvent.tsx';
+import {FormInputSelect} from '../form/FormInputSelect.tsx';
+import FormInputOptionSelector from '../form/FormInputOptionSelector.tsx';
+import {FormInputText} from '../form/FormInputText.tsx';
 
 interface EditAgendaCardProps {
-  category: EventType;
-  image?: string;
-  metadata?: Metadata;
-  name: Language;
-  dates: DateType[];
-  location: string;
-  createdBy?: string;
-  handleEventChange: (changes: Partial<EventContent>) => void;
+  control: Control<EditEventForm>,
+  register: UseFormRegister<EditEventForm>,
+  setValue: UseFormSetValue<EventContent>;
+  getValues: UseFormGetValues<EventContent>;
 }
 
 export default function EditEventCard({
-  category,
-  image,
-  metadata,
-  name,
-  dates,
-  location,
-  createdBy,
-  handleEventChange
+  control,
+  register,
+  setValue,
+  getValues
 }: EditAgendaCardProps) {
   const {text} = useLanguage();
   const {user} = useUsers();
   const {locations} = useLocations();
   const {committees, myCommittees} = useCommittees();
   const [uploading, setUploading] = useState(false);
-  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+
+  const handleImageChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       setUploading(true);
       const formData = new FormData();
       formData.append(file.name, file);
-      fetch('/api/file', {
+      const response = await fetch('/api/file', {
         method: 'POST',
         body: formData
-      }).then((response) => response.json()).then((uploadInfo) => {
-        handleEventChange({image: uploadInfo[0].id});
-        setUploading(false);
       });
+      const uploadInfo = await response.json();
+      setValue('image', uploadInfo[0].id);
+      setUploading(false);
     }
   };
+
+  if (!user) {
+    return null;
+  }
+
+  const image = getValues('image');
 
   return (
     <div
@@ -85,121 +87,89 @@ export default function EditEventCard({
           </form>
           {/* Category, Committee and Type */}
           <div className="grid gap-3">
-            <FormControl fullWidth>
-              <InputLabel id="select-label">
-                {text('Category*', 'Categorie*')}
-              </InputLabel>
-              <Select
-                labelId="select-label"
-                value={category}
-                label={text('Category*', 'Categorie*')}
-                variant="outlined"
-                onChange={(e) => {
-                  handleEventChange({eventType: e.target.value as EventType});
-                }}
-              >
-                <MenuItem value="activity">
-                  {text('Activity', 'Activiteit')}
-                </MenuItem>
-                <MenuItem value="course">
-                  {text('Course', 'Cursus')}
-                </MenuItem>
-                <MenuItem value="training">
-                  {text('Training', 'Training')}
-                </MenuItem>
-                <MenuItem value="weekend">
-                  {text('Weekend', 'Weekend')}
-                </MenuItem>
-              </Select>
-            </FormControl>
-            <FormControl fullWidth>
-              <InputLabel id="committee-select-label">
-                {text('Committee*', 'Commissie*')}
-              </InputLabel>
-              <Select
-                labelId="committee-select-label"
-                value={createdBy}
-                label={text('Committee*', 'Commissie*')}
-                variant="outlined"
-                onChange={(e) => handleEventChange({createdBy: e.target.value})}
-              >
-                {committees.filter(c => (myCommittees.some(uc => uc.committeeId == c.id && uc.left == null) || user && isAdminOrBoard(user))).map((committee) => (
-                  <MenuItem key={committee.id} value={committee.id}>
-                    {text(committee.name)}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <OptionSelector
-              options={typesOptions}
-              selected={metadata?.type}
-              onChange={(selectedTypes) =>
-                handleEventChange({
-                  metadata: {
-                    ...metadata,
-                    type: selectedTypes as WeekendType[]
-                  }
-                })
-              }
-              label={'Type'}
+            <FormInputSelect
+              {...register('eventType')}
+              control={control}
+              label={text('Category*', 'Categorie*')}
+              options={[
+                {value: 'activity', label: text('Activity', 'Activiteit')},
+                {value: 'course', label: text('Course', 'Cursus')},
+                {value: 'training', label: text('Training', 'Training')},
+                {value: 'weekend', label: text('Weekend', 'Weekend')},
+
+              ]}
+            />
+            <FormInputSelect
+              {...register('createdBy')}
+              control={control}
+              label={text('Committee*', 'Commissie*')}
+              options={committees.filter(c => (myCommittees.some(uc => uc.committeeId == c.id && uc.left == null) || isAdminOrBoard(user))).map(committee => {
+                return {value: committee.id, label: text(committee.name)};
+              })}
+            />
+            <FormInputOptionSelector
+              {...register('metadata.type')}
+              control={control}
+              label="Type"
+              options={typesOptions.map(({id, label}) => {return {value: id, label: text(label)}})}
             />
           </div>
           {/* Title */}
           <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
-            <TextField
-              value={name.en}
+            <FormInputText
+              {...register('name.en', {
+                required: text('An English name is required', 'Een Engelse naam is vereist'),
+                minLength: {value: 3, message: text('Name must be at least 3 characters', 'De naam moet minimaal 3 tekens bevatten')}
+              })}
               label={text('Title English*', 'Titel Engels*')}
-              onChange={(e) =>
-                handleEventChange({
-                  name: {
-                    ...name,
-                    en: e.target.value
-                  }
-                })
-              }
+              control={control}
+              size='medium'
             />
-            <TextField
-              value={name.nl}
+            <FormInputText
+              {...register('name.nl', {
+                required: text('A Dutch name is required', 'Een Nederlandse naam is vereist'),
+                minLength: {value: 3, message: text('Name must be at least 3 characters', 'De naam moet minimaal 3 tekens bevatten')}
+              })}
               label={text('Title Dutch*', 'Titel Nederlands*')}
-              onChange={(e) =>
-                handleEventChange({
-                  name: {
-                    ...name,
-                    nl: e.target.value
-                  }
-                })
-              }
+              control={control}
+              size='medium'
             />
           </div>
           {/*Location*/}
-          <FormControl fullWidth>
-            <InputLabel id="select-label">
-              {text('Location*', 'Locatie*')}
-            </InputLabel>
-            <Select
-              required
-              labelId="select-label"
-              value={location}
-              label={text('Location*', 'Locatie*')}
-              onChange={(e) =>
-                handleEventChange({location: e.target.value})
-              }
-              variant="outlined"
-            >
-              {locations?.map((l) => (
-                <MenuItem key={l.id} value={l.id}>
-                  {text(l.name)}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          {/*Dates*/}
-          <EditDates
-            dates={dates}
-            handleEventChange={handleEventChange}
+          <FormInputSelect
+            {...register('location')}
+            control={control}
+            label={text('Location*', 'Locatie*')}
+            options={locations.map(l => {return {value: l.id, label: text(l.name)}})}
           />
+          {/*<FormControl fullWidth>*/}
+          {/*  <InputLabel id="select-label">*/}
+          {/*    {text('Location*', 'Locatie*')}*/}
+          {/*  </InputLabel>*/}
+          {/*  <Select*/}
+          {/*    required*/}
+          {/*    labelId="select-label"*/}
+          {/*    value={location}*/}
+          {/*    label={text('Location*', 'Locatie*')}*/}
+          {/*    onChange={(e) =>*/}
+          {/*      handleEventChange({location: e.target.value})*/}
+          {/*    }*/}
+          {/*    variant="outlined"*/}
+          {/*  >*/}
+          {/*    {locations?.map((l) => (*/}
+          {/*      <MenuItem key={l.id} value={l.id}>*/}
+          {/*        {text(l.name)}*/}
+          {/*      </MenuItem>*/}
+          {/*    ))}*/}
+          {/*  </Select>*/}
+          {/*</FormControl>*/}
+          {/*Dates*/}
+          {/*<EditDates*/}
+          {/*  dates={dates}*/}
+          {/*  handleEventChange={handleEventChange}*/}
+          {/*/>*/}
         </div>
       </div>
     </div>
   );
-}
+};

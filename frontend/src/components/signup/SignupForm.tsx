@@ -1,155 +1,107 @@
-import {FormEvent, useState} from 'react';
+import {useState} from 'react';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
-import { useLanguage } from '../../providers/LanguageProvider.tsx';
-import {ErrorType, UserContent} from '../../types.ts';
+import {useLanguage} from '../../providers/LanguageProvider.tsx';
+import {MembershipStatus, UserContent} from '../../types.ts';
 import PersonalStep from './PersonalStep.tsx';
 import EducationStep from './EducationStep.tsx';
 import EmergencyContactStep from './EmergencyContactStep.tsx';
 import OverviewStep from './OverviewStep.tsx';
-import {
-  emailValidator, emergencyContactNameValidator,
-  nameValidator, onlyNumbersValidator,
-  optionalOnlyLetterNumberValidator,
-  optionalOnlyLetterValidator,
-  passwordValidator,
-  phoneValidator,
-} from '../../validator.ts';
+import {Control, useForm, UseFormRegister} from 'react-hook-form';
+import FormControls from './FormControls.tsx';
+import {useUsers} from '../../hooks/useUsers.ts';
+import {useWebsite} from '../../hooks/useState.ts';
+
+export type SignupFormForm = Omit<UserContent, 'roles'>;
 
 export interface StepProps {
-  newUser: UserContent;
-  errors: FormErrors;
-  handleChange: (field: keyof UserContent, value: string | number) => void;
-  handleNext: (e: FormEvent) => void;
-  handleBack: () => void;
-  handleSubmit: () => void;
-  validateInputs: () => void;
-}
-
-export interface FormErrors {
-  firstName: ErrorType
-  infix: ErrorType;
-  lastName: ErrorType;
-  phone: ErrorType;
-  studentNumber: ErrorType;
-  nkbvNumber: ErrorType;
-  sportcardNumber: ErrorType;
-  iceContactName: ErrorType;
-  iceContactEmail: ErrorType;
-  iceContactPhone: ErrorType;
-  importantInfo: ErrorType;
-  email: ErrorType;
-  password: ErrorType;
+  control: Control<SignupFormForm>,
+  register: UseFormRegister<SignupFormForm>,
 }
 
 const steps = [
-  {id: 0, label: {en: 'Personal', nl: 'Persoonlijk' }},
+  {id: 0, label: {en: 'Personal', nl: 'Persoonlijk'}},
   {id: 1, label: {en: 'Education & Insurance', nl: 'Educatie & Verzekering'}},
   {id: 2, label: {en: 'Emergency contact', nl: 'Contact noodgevallen'}},
   {id: 3, label: {en: 'Overview', nl: 'Overzicht'}}
 ];
 
-interface SignupFormProps {
-  newUser: UserContent;
-  handleChange: (field: keyof UserContent, value: string | number) => void;
-  handleSubmit: () => void;
-}
-
-export default function SignupForm({newUser, handleChange, handleSubmit}: SignupFormProps) {
-  const { text } = useLanguage();
+export default function SignupForm({membershipType}: {
+  membershipType: Omit<MembershipStatus, 'pending' | 'nonMember'>
+}) {
+  const {text} = useLanguage();
+  const {signup} = useUsers();
+  const {navigate} = useWebsite();
   const [activeStep, setActiveStep] = useState<number>(0);
-
-  const [errors, setErrors] = useState<FormErrors>({
-    firstName: false,
-    infix: false,
-    lastName: false,
-    phone: false,
-    email: false,
-    password: false,
-    studentNumber: false,
-    sportcardNumber: false,
-    nkbvNumber: false,
-    iceContactName: false,
-    iceContactEmail: false,
-    iceContactPhone: false,
-    importantInfo: false,
+  const {
+    register,
+    control,
+    handleSubmit,
+    getFieldState,
+    trigger,
+    getValues
+  } = useForm<SignupFormForm>({
+    reValidateMode: 'onChange',
+    defaultValues: {
+      firstName: '',
+      infix: '',
+      lastName: '',
+      phone: '',
+      email: '',
+      password: '',
+      importantInfo: '',
+      studentNumber: '',
+      nkbvNumber: '',
+      sportcardNumber: '',
+      iceContactName: '',
+      iceContactEmail: '',
+      iceContactPhone: '',
+      status: membershipType as MembershipStatus,
+    }
   });
 
-  const stepErrorKeys: Record<number, (keyof typeof errors)[]> = {
+  const stepErrorKeys: Record<number, (keyof SignupFormForm)[]> = {
     0: ['firstName', 'lastName', 'infix', 'phone', 'email', 'password', 'importantInfo'],
     1: ['studentNumber', 'sportcardNumber', 'nkbvNumber'],
     2: ['iceContactName', 'iceContactEmail', 'iceContactPhone'],
   };
 
-  const handleNext = async (event: FormEvent) => {
-    event.preventDefault();
+  const handleNext = async () => {
     const keysToCheck = stepErrorKeys[activeStep] || [];
-    if (keysToCheck.some((key) => errors[key])) {
-      return;
+    await trigger(keysToCheck);
+    for (const key of keysToCheck) {
+      if (getFieldState(key).invalid) {
+        return;
+      }
     }
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    if (activeStep === 3) {
+      await handleSubmit(async newUser => {
+        if (await signup(newUser)) {
+          navigate('index');
+        }
+      })();
+    } else {
+      setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    }
   };
 
   const handleBack = () => {
     setActiveStep(prev => prev - 1);
   };
 
-  const validateInputs = () => {
-    switch (activeStep) {
-    case 0: {
-      setErrors({
-        ...errors,
-        firstName: nameValidator(newUser.firstName),
-        infix: optionalOnlyLetterValidator(newUser.infix),
-        lastName: nameValidator(newUser.lastName),
-        phone: phoneValidator(newUser.phone),
-        email: emailValidator(newUser.email),
-        password: passwordValidator(newUser.password),
-        importantInfo: optionalOnlyLetterNumberValidator(newUser.importantInfo)
-      });
-      break;
-    }
-    case 1: {
-      setErrors({
-        ...errors,
-        studentNumber: onlyNumbersValidator(newUser.studentNumber.toString()),
-        sportcardNumber: onlyNumbersValidator(newUser.sportcardNumber.toString()),
-        nkbvNumber: onlyNumbersValidator(newUser.nkbvNumber.toString())
-      });
-      break;
-    }
-    case 2: {
-      setErrors({
-        ...errors,
-        iceContactName: emergencyContactNameValidator(newUser.iceContactName),
-        iceContactEmail: emailValidator(newUser.iceContactEmail),
-        iceContactPhone: phoneValidator(newUser.iceContactPhone)
-      });
-      break;
-    }
-    default:
-      break;
-    }
-  };
-
-  const stepProps: StepProps = {
-    newUser,
-    errors,
-    handleChange,
-    handleNext,
-    handleBack,
-    handleSubmit,
-    validateInputs,
-  };
-
   const renderStepContent = () => {
     switch (activeStep) {
-    case 0: return <PersonalStep {...stepProps} />;
-    case 1: return <EducationStep {...stepProps} />;
-    case 2: return <EmergencyContactStep {...stepProps} />;
-    case 3: return <OverviewStep {...stepProps} />;
-    default: return null;
+    case 0:
+      return <PersonalStep control={control} register={register}/>;
+    case 1:
+      return <EducationStep control={control} register={register}/>;
+    case 2:
+      return <EmergencyContactStep control={control} register={register}/>;
+    case 3:
+      return <OverviewStep getValues={getValues}/>;
+    default:
+      return null;
     }
   };
 
@@ -168,6 +120,12 @@ export default function SignupForm({newUser, handleChange, handleSubmit}: Signup
       </Stepper>
 
       {renderStepContent()}
+
+      <FormControls
+        activeStep={activeStep}
+        handleBack={handleBack}
+        handleNext={handleNext}
+      />
     </div>
   );
 }

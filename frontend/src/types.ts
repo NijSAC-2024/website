@@ -44,7 +44,7 @@ export interface OptionsType {
     | WeekendType
     | EventType
     | MembershipStatus
-    | QuestionType
+    // | QuestionType
     | ExperienceType
     | QuestionTypeType
     | RoleType
@@ -170,16 +170,13 @@ export interface BasicUser {
 }
 
 export interface UserContent extends Omit<BasicUser, 'id'> {
-  firstName: string;
-  infix?: string;
-  lastName: string;
   phone: string;
   email: string;
   password: string;
   importantInfo?: string;
-  studentNumber: number;
-  nkbvNumber: number;
-  sportcardNumber: number;
+  studentNumber: string;
+  nkbvNumber: string;
+  sportcardNumber: string;
   iceContactName: string;
   iceContactEmail: string;
   iceContactPhone: string;
@@ -320,7 +317,14 @@ export interface FormInputProps<T extends FieldValues> {
   name: Path<T>;
   disabled?: boolean;
   control: Control<T>;
+  label?: string;
   type?: HTMLInputTypeAttribute;
+  autoComplete?: string;
+  size?: 'small' | 'medium';
+  multiline?: boolean;
+  minRows?: number;
+  className?: string;
+  placeholder?: string;
 }
 
 export type MenuType =
@@ -338,7 +342,7 @@ export const roleOptions: OptionsType[] = [
   {id: 'climbingCommissar', label: {en: 'Climbing Commissar', nl: 'Klimcommissaris'}}
 ];
 
-export const typesOptions: OptionsType[] = [
+export const typesOptions = [
   {id: 'sp', label: {en: 'Single Pitch', nl: 'Single Pitch'}},
   {id: 'mp', label: {en: 'Multi Pitch', nl: 'Multi Pitch'}},
   {id: 'education', label: {en: 'Education', nl: 'Opleiding'}},
@@ -346,7 +350,7 @@ export const typesOptions: OptionsType[] = [
   {id: 'trad', label: {en: 'Trad', nl: 'Trad'}}
 ];
 
-export const experienceOptions: OptionsType[] = [
+export const experienceOptions = [
   {id: 'sp', label: {en: 'Single Pitch', nl: 'Single Pitch'}},
   {id: 'mp', label: {en: 'Multi Pitch', nl: 'Multi Pitch'}},
   {id: 'trad', label: {en: 'Trad', nl: 'Trad'}}

@@ -1,105 +1,116 @@
-import {Box, FormControl, FormHelperText, TextField} from '@mui/material';
-import FormControls from './FormControls.tsx';
+import {Box} from '@mui/material';
 import {useLanguage} from '../../providers/LanguageProvider.tsx';
-import PasswordField from '../PasswordField.tsx';
-import { StepProps } from './SignupForm.tsx';
-import {Language} from '../../types.ts';
+import {StepProps} from './SignupForm.tsx';
+import {FormInputText} from '../form/FormInputText.tsx';
+import {FormInputPassword} from '../form/FormInputPassword.tsx';
 
 export default function PersonalStep({
-  newUser,
-  errors,
-  handleChange,
-  handleNext,
-  handleBack,
-  validateInputs,
+  register,
+  control,
 }: StepProps) {
-  const { text } = useLanguage()
+  const {text} = useLanguage();
   return (
-    <Box className="grid xl:grid-cols-10 gap-y-4 gap-x-2.5" component="form" onSubmit={handleNext}>
-      <FormControl className="xl:col-span-4">
-        <TextField
-          label={text('First Name', 'Voornaam')}
-          value={newUser.firstName}
-          onChange={(e) => handleChange('firstName', e.target.value)}
-          variant="outlined"
-          error={!!errors.firstName}
-          helperText={errors.firstName && text(errors.firstName as Language)}
-        />
-      </FormControl>
+    <Box className="grid xl:grid-cols-10 gap-y-4 gap-x-2.5">
+      <FormInputText
+        className="xl:col-span-4"
+        {...register('firstName', {
+          required: text('Name must be at least 2 characters long', 'Naam moet ten minste 2 karakters lang zijn'),
+          minLength: {
+            value: 2,
+            message: text('Name must be at least 2 characters long', 'Naam moet ten minste 2 karakters lang zijn')
+          }
+        })}
+        control={control}
+        label={text('First Name', 'Voornaam')}
+        size="medium"
+      />
 
-      <FormControl className="xl:col-span-2">
-        <TextField
-          label={text('Infix', 'Tussenvoegsel')}
-          value={newUser.infix}
-          onChange={(e) => handleChange('infix', e.target.value)}
-          variant="outlined"
-          error={!!errors.infix}
-          helperText={errors.infix && text(errors.infix as Language)}
-        />
-      </FormControl>
+      <FormInputText
+        className="xl:col-span-2"
+        label={text('Infix', 'Tussenvoegsel')}
+        {...register('infix', {
+          pattern: {
+            value: /^[a-zA-Z\s'-]{0,15}$/,
+            message: text(
+              'Only letters, spaces, apostrophes, and hyphens are allowed',
+              'Alleen letters, spaties, apostroffen en koppeltekens zijn toegestaan'
+            )
+          }
+        })}
+        control={control}
+        size="medium"
+      />
 
-      <FormControl className="xl:col-span-4">
-        <TextField
-          label={text('Last Name', 'Achternaam')}
-          value={newUser.lastName}
-          onChange={(e) => handleChange('lastName', e.target.value)}
-          variant="outlined"
-          error={!!errors.lastName}
-          helperText={errors.lastName && text(errors.lastName as Language)}
-        />
-      </FormControl>
+      <FormInputText
+        className="xl:col-span-4"
+        label={text('Last Name', 'Achternaam')}
+        {...register('lastName', {
+          required: text('Name must be at least 2 characters long', 'Naam moet ten minste 2 karakters lang zijn'),
+          minLength: {
+            value: 2,
+            message: text('Name must be at least 2 characters long', 'Naam moet ten minste 2 karakters lang zijn')
+          }
+        })}
+        control={control}
+        size="medium"
+      />
 
-      <FormControl className="xl:col-span-10">
-        <TextField
-          label={text('Phone', 'Telefoon')}
-          value={newUser.phone}
-          onChange={(e) => handleChange('phone', e.target.value)}
-          variant="outlined"
-          error={!!errors.phone}
-          helperText={errors.phone && text(errors.phone as Language)}
-        />
-      </FormControl>
+      <FormInputText
+        className="xl:col-span-10"
+        label={text('Phone', 'Telefoon')}
+        {...register('phone', {
+          required: text('Invalid phone number', 'Ongeldig telefoonnummer'),
+          pattern: {
+            value: /^\+?[0-9\s-]{7,15}$/,
+            message: text('Invalid phone number', 'Ongeldig telefoonnummer')
+          }
+        })}
+        control={control}
+        size="medium"
+      />
 
-      <FormControl className="xl:col-span-5">
-        <TextField
-          label={text('Email', 'E-mail')}
-          value={newUser.email}
-          onChange={(e) => handleChange('email', e.target.value)}
-          variant="outlined"
-          error={!!errors.email}
-          helperText={errors.email && text(errors.email as Language)}
-        />
-      </FormControl>
+      <FormInputText
+        className="xl:col-span-5"
+        label={text('Email', 'E-mail')}
+        {...register('email', {
+          required: text('Invalid email address', 'Ongeldig e-mailadres'),
+          pattern: {
+            value: /^[\w.!#$%&'*+/=?^`{|}~-]+@[a-z\d](?:[a-z\d-]{0,61}[a-z\d])?(?:\.[a-z\d](?:[a-z\d-]{0,61}[a-z\d])?)*$/i,
+            message: text('Invalid email address', 'Ongeldig e-mailadres')
+          }
+        })}
+        control={control}
+        size="medium"
+      />
 
-      <FormControl className="xl:col-span-5" error={!!errors.password}>
-        <PasswordField
-          value={newUser.password!}
-          onChange={(e) => handleChange('password', e.target.value)}
-          label={text('Password', 'Wachtwoord')}
-        />
-        {errors.password && <FormHelperText>{text(errors.password as Language)}</FormHelperText>}
-      </FormControl>
+      <FormInputPassword
+        className="xl:col-span-5"
+        label={text('Password', 'Wachtwoord')}
+        {...register('password', {
+          required: text('Password must be at least 10 characters long', 'Wachtwoord moet minimaal 10 karakters lang zijn'),
+          minLength: {
+            value: 10,
+            message: text('Password must be at least 10 characters long', 'Wachtwoord moet minimaal 10 karakters lang zijn')
+          }
+        })}
+        size="medium"
+        control={control}
+      />
 
-      <FormControl className="xl:col-span-10">
-        <TextField
-          multiline
-          label={text('Important Info (allergies etc.)', 'Belangrijke info (allergieën etc.)')}
-          value={newUser.importantInfo}
-          onChange={(e) => handleChange('importantInfo', e.target.value)}
-          variant="outlined"
-          error={!!errors.importantInfo}
-          helperText={errors.importantInfo && text(errors.importantInfo as Language)}
-        />
-      </FormControl>
-
-      <div className="xl:col-span-10">
-        <FormControls
-          activeStep={0}
-          handleBack={handleBack}
-          handleNext={handleNext}
-          validateInputs={validateInputs}
-        />
-      </div>
+      <FormInputText
+        className="xl:col-span-10"
+        multiline
+        minRows={2}
+        label={text('Important Info (allergies etc.)', 'Belangrijke info (allergieën etc.)')}
+        {...register('importantInfo', {
+          maxLength: {
+            value: 2000,
+            message: text('At most 2000 characters', 'Maximaal 2000 karakters')
+          }
+        })}
+        control={control}
+        size="medium"
+      />
     </Box>
   );
 };

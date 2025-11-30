@@ -14,6 +14,7 @@ use axum::{
 };
 use axum_extra::extract::CookieJar;
 use sqlx::PgPool;
+use tracing::info;
 
 enum UpdateAccess {
     Anything,
@@ -144,7 +145,13 @@ pub async fn update_pwd(
     ValidatedJson(pwd): ValidatedJson<Password>,
 ) -> AppResult<()> {
     update_access(&id, &session)?;
-    store.update_pwd(&id, Some(&pwd.pwd_hash()?)).await
+    store.update_pwd(&id, Some(&pwd.pwd_hash()?)).await?;
+    info!(
+        updated_user_id = id.to_string(),
+        user_id = session.user_id().to_string(),
+        "updated password"
+    );
+    Ok(())
 }
 
 pub async fn delete_user(
