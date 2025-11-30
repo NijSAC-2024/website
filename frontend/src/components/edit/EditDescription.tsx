@@ -2,42 +2,47 @@ import MarkdownEditor from '../markdown/MarkdownEditor.tsx';
 import {FormControl, InputLabel, MenuItem, Select, TextField} from '@mui/material';
 import OptionSelector from '../OptionSelector.tsx';
 import {
-  EventContent, EventType,
+  EventContent,
   experienceOptions,
   ExperienceType,
-  Language,
-  Metadata,
+  Language, typesOptions,
 } from '../../types.ts';
-import { useLanguage } from '../../providers/LanguageProvider.tsx';
+import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import {useEventRegistrations} from '../../hooks/useEventRegistrations.ts';
+import {Control, UseFormGetValues, UseFormRegister, UseFormSetValue} from 'react-hook-form';
+import {EditEventForm} from './EditEvent.tsx';
+import {FormInputText} from '../form/FormInputText.tsx';
+import FormInputOptionSelector from '../form/FormInputOptionSelector.tsx';
+import {FormInputSelect} from '../form/FormInputSelect.tsx';
 
 interface EditDescriptionProps {
-  description?: Language;
-  metadata?: Metadata;
-  handleEventChange: (change: Partial<EventContent>) => void;
-  category: EventType;
+  control: Control<EditEventForm>,
+  register: UseFormRegister<EditEventForm>,
+  setValue: UseFormSetValue<EventContent>;
+  getValues: UseFormGetValues<EventContent>;
 }
 
 export default function EditDescription({
-  description,
-  metadata,
-  handleEventChange,
-  category
-}: EditDescriptionProps) {
-  const { text } = useLanguage();
-  const { eventRegistrations } = useEventRegistrations();
+                                          control,
+                                          register,
+                                          setValue,
+                                          getValues
+                                        }: EditDescriptionProps) {
+  const {text} = useLanguage();
+  const {eventRegistrations} = useEventRegistrations();
 
 
   const handleMarkdown = (markdown: Language) => {
-    handleEventChange({ description: markdown });
+    handleEventChange({description: markdown});
   };
 
   return (
-    <div className="xl:col-span-2 flex flex-col justify-between w-full rounded-2xl bg-[rgba(255,255,255,0.9)] dark:bg-[rgba(18,18,18,0.7)] border border-solid border-b-2 border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)] border-b-[#1976d2] dark:border-b-[#90caf9]">
+    <div
+      className="xl:col-span-2 flex flex-col justify-between w-full rounded-2xl bg-[rgba(255,255,255,0.9)] dark:bg-[rgba(18,18,18,0.7)] border border-solid border-b-2 border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)] border-b-[#1976d2] dark:border-b-[#90caf9]">
       {/* Description */}
       <div>
         <MarkdownEditor
-          initialMarkdown={description}
+          initialMarkdown={getValues('description')}
           handleMarkdown={handleMarkdown}
         />
       </div>
@@ -45,10 +50,10 @@ export default function EditDescription({
       {/* Gear and Experience */}
       <div
         className="grid xl:grid-cols-2 gap-3 px-7 py-5 border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
-        <TextField
+        <FormInputText
           multiline
-          fullWidth
-          value={metadata?.gear?.en}
+          {...register('metadata.gear.en')}
+          control={control}
           label={text(
             'Necessary Gear English ',
             'Benodigde Uitrusting Engels'
@@ -57,22 +62,12 @@ export default function EditDescription({
             'Separated by commas',
             'Gescheiden door komma\'s'
           )}
-          onChange={(e) =>
-            handleEventChange({
-              metadata: {
-                ...metadata,
-                gear: {
-                  nl: metadata?.gear?.nl || '',
-                  en: e.target.value
-                }
-              }
-            })
-          }
+          size='medium'
         />
-        <TextField
+        <FormInputText
           multiline
-          fullWidth
-          value={metadata?.gear?.nl}
+          {...register('metadata.gear.nl')}
+          control={control}
           label={text(
             'Necessary Gear Dutch',
             'Benodigde Uitrusting Nederlands'
@@ -81,66 +76,36 @@ export default function EditDescription({
             'Separated by commas',
             'Gescheiden door komma\'s'
           )}
-          onChange={(e) =>
-            handleEventChange({
-              metadata: {
-                ...metadata,
-                gear: {
-                  en: metadata?.gear?.en || '',
-                  nl: e.target.value
-                }
-              }
-            })
-          }
+          size='medium'
         />
         <div className="xl:col-span-2 grid">
-          <OptionSelector
-            options={experienceOptions}
-            selected={metadata?.experience}
-            onChange={(selected) =>
-              handleEventChange({
-                metadata: {
-                  ...metadata,
-                  experience: selected as ExperienceType[]
-                }
-              })
-            }
+          <FormInputOptionSelector
+            {...register('metadata.experience')}
+            control={control}
             label={text('Necessary Experience', 'Benodigde Ervaring')}
+            options={experienceOptions.map(({id, label}) => {
+              return {value: id, label: text(label)};
+            })}
           />
         </div>
 
         {/* Worga */}
-        {category === 'weekend' && (
+        {getValues('eventType') === 'weekend' && (
           <div className="xl:col-span-2 grid">
-            <FormControl fullWidth>
-              <InputLabel id="worga-select-label">
-                {text('Weekend Organiser', 'Worga')}
-              </InputLabel>
-              <Select
-                labelId="worga-select-label"
-                value={metadata?.worga}
-                label={text('Weekend Organiser', 'Worga')}
-                variant="outlined"
-                onChange={(e) =>
-                  handleEventChange({
-                    metadata: {
-                      ...metadata,
-                      worga: e.target.value
-                    }
-                  })
-                }
-              >
-                <MenuItem value={'nobody'}>
-                  {text('No one assigned', 'Niemand toegewezen')}
-                </MenuItem>
-                {eventRegistrations?.map((registration, index) => (
-                  <MenuItem key={index} value={registration.id}>
-                    {`${registration.firstName} ${registration.infix ?? ''} ${registration.lastName}`}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
+            <FormInputSelect
+              {...register('metadata.worga')}
+              label={text('Weekend Organiser', 'Worga')}
+              control={control}
+              options={[{
+                value: 'nobody',
+                label: text('No one assigned', 'Niemand toegewezen')
+              }, ...eventRegistrations?.map((registration) => {
+                return {
+                  value: registration.registrationId,
+                  label: `${registration.firstName} ${registration.infix ?? ''} ${registration.lastName}`
+                };
+              }) || []]}
+            />
           </div>
         )}
       </div>

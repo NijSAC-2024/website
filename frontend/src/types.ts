@@ -44,7 +44,7 @@ export interface OptionsType {
     | WeekendType
     | EventType
     | MembershipStatus
-    | QuestionType
+    // | QuestionType
     | ExperienceType
     | QuestionTypeType
     | RoleType
@@ -324,6 +324,7 @@ export interface FormInputProps<T extends FieldValues> {
   multiline?: boolean;
   minRows?: number;
   className?: string;
+  placeholder?: string;
 }
 
 export type MenuType =
@@ -341,7 +342,7 @@ export const roleOptions: OptionsType[] = [
   {id: 'climbingCommissar', label: {en: 'Climbing Commissar', nl: 'Klimcommissaris'}}
 ];
 
-export const typesOptions: OptionsType[] = [
+export const typesOptions = [
   {id: 'sp', label: {en: 'Single Pitch', nl: 'Single Pitch'}},
   {id: 'mp', label: {en: 'Multi Pitch', nl: 'Multi Pitch'}},
   {id: 'education', label: {en: 'Education', nl: 'Opleiding'}},
@@ -349,7 +350,7 @@ export const typesOptions: OptionsType[] = [
   {id: 'trad', label: {en: 'Trad', nl: 'Trad'}}
 ];
 
-export const experienceOptions: OptionsType[] = [
+export const experienceOptions = [
   {id: 'sp', label: {en: 'Single Pitch', nl: 'Single Pitch'}},
   {id: 'mp', label: {en: 'Multi Pitch', nl: 'Multi Pitch'}},
   {id: 'trad', label: {en: 'Trad', nl: 'Trad'}}

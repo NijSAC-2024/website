@@ -3,7 +3,7 @@ import TextField from '@mui/material/TextField';
 import {FormInputProps} from '../../types.ts';
 import {FormControl} from '@mui/material';
 
-export const FormInputText = <T extends FieldValues, >({name, control, disabled, type, autoComplete, label, size, multiline, minRows, className}: FormInputProps<T>) => {
+export const FormInputText = <T extends FieldValues, >({name, control, disabled, type, autoComplete, label, size, multiline, minRows, className, placeholder}: FormInputProps<T>) => {
   return (
     <Controller
       name={name}
@@ -29,6 +29,7 @@ export const FormInputText = <T extends FieldValues, >({name, control, disabled,
               variant="outlined"
               label={label}
               autoComplete={autoComplete}
+              placeholder={placeholder}
             />
           </FormControl>
         )}
