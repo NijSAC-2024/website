@@ -1,24 +1,36 @@
 import {useLanguage} from '../providers/LanguageProvider.tsx';
-import {Button, Fab, Table, TableBody, TableCell, TableRow} from '@mui/material';
+import {Button, Fab, IconButton, Table, TableBody, TableCell, TableRow, Tooltip} from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import GenericPage from './GenericPage.tsx';
 import ContentCard from '../components/ContentCard.tsx';
 import remarkGfm from 'remark-gfm';
 import Markdown from 'react-markdown';
-import {BasicUser} from '../types.ts';
-import {isAdminOrBoard} from '../util.ts';
+import {CommitteeUser} from '../types.ts';
+import {getLabel, isAdminOrBoard, isChair} from '../util.ts';
 import {useWebsite} from '../hooks/useState.ts';
 import {useUsers} from '../hooks/useUsers.ts';
 import {useCommittees} from '../hooks/useCommittees.ts';
+import EventSeatIcon from '@mui/icons-material/EventSeat';
+import AreYouSure from '../components/AreYouSure.tsx';
+import {useState} from 'react';
 
 export default function Committee() {
   const {text} = useLanguage();
   const {navigate} = useWebsite();
   const {user} = useUsers();
-  const {myCommittees, committee, committeeMembers} = useCommittees();
+  const {committee, committeeMembers, makeChair} = useCommittees();
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+  const [selectedMember, setSelectedMember] = useState<CommitteeUser | null>(null);
+
+  const toggleDialog = () => setDialogOpen((prevState) => !prevState);
 
   if (!committee) {
     return <></>;
+  }
+
+  const handleMakeChair = async () => {
+    await makeChair(committee.id, selectedMember!.id);
+    toggleDialog();
   }
 
   let imageUrl = '/images/test-header-image.jpg';
@@ -28,7 +40,7 @@ export default function Committee() {
 
   return (
     <>
-      {user && ((myCommittees.some(uc => uc.committeeId === committee.id && uc.role === 'chair' && uc.left == null)) || isAdminOrBoard(user)) && (
+      {user && (isChair(committeeMembers, user.id)|| isAdminOrBoard(user.roles)) && (
         <div className="fixed bottom-5 right-5 z-10">
           <Fab
             variant="extended"
@@ -75,14 +87,25 @@ export default function Committee() {
               <h2>{text('Members', 'Leden')}</h2>
               <Table>
                 <TableBody>
-                  {committeeMembers.map((member: BasicUser) => (
+                  {committeeMembers.map((member: CommitteeUser) => (
                     <TableRow
                       key={member.id}
                       sx={{'&:last-child td, &:last-child th': {border: 0}}}
                     >
                       <TableCell component="th" scope="row">
-                        <p className="hover:cursor-pointer hover:opacity-60 transition-all duration-100"
-                          onClick={() => navigate('user', {user_id: member.id})}>{`${member.firstName} ${member.infix ?? ''} ${member.lastName}`}</p>
+                        <div className="flex justify-between items-center">
+                          <div className="grid hover:cursor-pointer hover:opacity-60 transition-all duration-100" onClick={() => navigate('user', {user_id: member.id})}>
+                            <p>{`${member.firstName} ${member.infix ?? ''} ${member.lastName}`}</p>
+                            {member.role === 'chair' && <i className="text-xs">{text(getLabel(member.role))}</i>}
+                          </div>
+                          {(isAdminOrBoard(user.roles) || isChair(committeeMembers, user.id)) && member.role !== 'chair' &&
+                              <Tooltip title={text('Make chair of committee', 'Maak commissiehoofd')}>
+                                <IconButton size="small" onClick={() => {setSelectedMember(member); toggleDialog()}}>
+                                  <EventSeatIcon/>
+                                </IconButton>
+                              </Tooltip>
+                          }
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -92,6 +115,15 @@ export default function Committee() {
           )}
         </div>
       </GenericPage>
+      <AreYouSure
+        open={dialogOpen}
+        onCancel={toggleDialog}
+        onConfirm={handleMakeChair}
+        message={text(
+          'You are about to make this user the chair of the committee.',
+          'Je staat op het punt deze gebruiker hoofd te maken van de commissie.'
+        )}
+      />
     </>
   );
 }

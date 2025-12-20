@@ -1,6 +1,6 @@
 import {useSelector} from './useSelector.ts';
 import {WebsiteError} from '../error/error.ts';
-import {BasicUser, Committee, CommitteeContent} from '../types.ts';
+import {BasicUser, Committee, CommitteeContent, CommitteeUser} from '../types.ts';
 import {apiFetch, apiFetchVoid} from '../api.ts';
 import {enqueueSnackbar} from 'notistack';
 import {useLanguage} from '../providers/LanguageProvider.tsx';
@@ -88,6 +88,39 @@ export function useCommittees() {
     return true;
   };
 
+  const makeChair = async (committeeId: string, userId: string): Promise<boolean> => {
+    const {error} = await apiFetchVoid(
+      `/committee/${committeeId}/user/${userId}/chair`,
+      { method: 'POST' }
+    );
+
+    if (error) {
+      enqueueSnackbar(`${error.message}: ${error.reference}`, {variant: 'error'});
+      return false;
+    }
+
+    const updatedMembers: CommitteeUser[] = committeeMembers.map((m) => {
+      if (m.role === 'chair') {
+        return {...m, role: 'member'};
+      }
+      if (m.id === userId) {
+        return {...m, role: 'chair'};
+      }
+      return m;
+    });
+
+    dispatch({
+      type: 'set_committee_members',
+      members: updatedMembers,
+    });
+
+    enqueueSnackbar(
+      text('Chair updated', 'Voorzitter bijgewerkt'),
+      {variant: 'success'}
+    );
+    return true;
+  };
+
   return {
     myCommittees,
     committees,
@@ -97,6 +130,7 @@ export function useCommittees() {
     updateCommittee,
     deleteCommittee,
     addUserToCommittee,
-    deleteUserFromCommittee
+    deleteUserFromCommittee,
+    makeChair
   };
 }

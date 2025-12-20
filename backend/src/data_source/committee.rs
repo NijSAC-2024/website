@@ -1,13 +1,16 @@
 use crate::{
     AppState, Language,
-    committee::{Committee, CommitteeContent, CommitteeId, CommitteeRole, UserCommittee},
-    error::{AppResult, Error},
+    committee::{
+        Committee, CommitteeContent, CommitteeId, CommitteeRole, CommitteeUser, UserCommittee,
+    },
+    error::{AppResult, Error, Error::BadRequest},
     user::{BasicUser, UserId},
 };
 use axum::{extract::FromRequestParts, http::request::Parts};
 use sqlx::PgPool;
 use time::OffsetDateTime;
 use uuid::Uuid;
+
 pub struct CommitteeStore {
     db: PgPool,
 }
@@ -59,30 +62,58 @@ impl TryFrom<PgCommittee> for Committee {
     }
 }
 
-pub struct PgUserCommittee {
-    pub id: Uuid,
-    pub user_id: UserId,
-    pub committee_id: CommitteeId,
+pub struct PgCommitteeUser {
+    pub id: UserId,
+    pub first_name: String,
+    pub infix: Option<String>,
+    pub last_name: String,
     pub role: CommitteeRole,
-    pub joined: OffsetDateTime,
-    pub left: Option<OffsetDateTime>,
 }
 
-impl TryFrom<PgUserCommittee> for UserCommittee {
+impl TryFrom<PgCommitteeUser> for CommitteeUser {
     type Error = Error;
 
-    fn try_from(pg: PgUserCommittee) -> Result<Self, Self::Error> {
+    fn try_from(pg: PgCommitteeUser) -> Result<Self, Self::Error> {
         Ok(Self {
-            user_id: pg.user_id,
-            committee_id: pg.committee_id,
+            user: BasicUser {
+                id: pg.id,
+                first_name: pg.first_name,
+                infix: pg.infix,
+                last_name: pg.last_name,
+            },
             role: pg.role,
-            joined: pg.joined,
-            left: pg.left,
         })
     }
 }
 
 impl CommitteeStore {
+    pub async fn ensure_user_in_committee(
+        &self,
+        user_id: &Uuid,
+        committee_id: &Uuid,
+    ) -> AppResult<()> {
+        let in_committee = sqlx::query_scalar!(
+            r#"
+            SELECT EXISTS(
+                SELECT 1
+                FROM user_committee
+                WHERE user_id = $1
+                  AND committee_id = $2
+                  AND "left" IS NULL
+            )
+            "#,
+            *user_id,
+            *committee_id
+        )
+        .fetch_one(&self.db)
+        .await?
+        .unwrap_or(false);
+
+        if !in_committee {
+            return Err(BadRequest("This user is not in committee"));
+        }
+        Ok(())
+    }
     pub async fn get_one(&self, id: &Uuid) -> AppResult<Committee> {
         sqlx::query_as!(
             PgCommittee,
@@ -244,15 +275,19 @@ impl CommitteeStore {
         Ok(())
     }
 
-    pub async fn get_committee_members(&self, committee_id: &Uuid) -> AppResult<Vec<BasicUser>> {
-        Ok(sqlx::query_as!(
-            BasicUser,
+    pub async fn get_committee_members(
+        &self,
+        committee_id: &Uuid,
+    ) -> AppResult<Vec<CommitteeUser>> {
+        sqlx::query_as!(
+            PgCommitteeUser,
             r#"
             SELECT
                 u.id,
                 u.first_name,
                 u.infix,
-                u.last_name
+                u.last_name,
+                uc.role AS "role: CommitteeRole"
             FROM "user" u
             JOIN user_committee uc ON u.id = uc.user_id
             WHERE uc.committee_id = $1 AND uc."left" IS NULL
@@ -260,14 +295,17 @@ impl CommitteeStore {
             committee_id
         )
         .fetch_all(&self.db)
-        .await?)
+        .await?
+        .into_iter()
+        .map(TryInto::try_into)
+        .collect()
     }
 
     pub async fn get_committees_for_user(&self, user_id: &Uuid) -> AppResult<Vec<UserCommittee>> {
-        sqlx::query_as!(
-            PgUserCommittee,
+        Ok(sqlx::query_as!(
+            UserCommittee,
             r#"
-            SELECT id, user_id, committee_id, role AS "role: CommitteeRole", joined, "left"
+            SELECT user_id, committee_id, role AS "role: CommitteeRole", joined, "left"
             FROM user_committee
             WHERE user_id = $1
             ORDER BY joined DESC
@@ -275,9 +313,36 @@ impl CommitteeStore {
             user_id
         )
         .fetch_all(&self.db)
-        .await?
-        .into_iter()
-        .map(TryInto::try_into)
-        .collect::<Result<Vec<UserCommittee>, Error>>()
+        .await?)
+    }
+
+    pub async fn make_chair(&self, committee_id: &Uuid, user_id: &Uuid) -> AppResult<()> {
+        sqlx::query!(
+            r#"
+            UPDATE user_committee
+            SET role = 'member'
+            WHERE committee_id = $1
+              AND role = 'chair'
+              AND "left" IS NULL
+            "#,
+            committee_id
+        )
+        .execute(&self.db)
+        .await?;
+
+        sqlx::query!(
+            r#"
+            UPDATE user_committee
+            SET role = 'chair'
+            WHERE committee_id = $1
+              AND user_id = $2
+              AND "left" IS NULL
+            "#,
+            committee_id,
+            user_id
+        )
+        .execute(&self.db)
+        .await?;
+        Ok(())
     }
 }

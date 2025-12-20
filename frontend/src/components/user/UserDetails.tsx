@@ -30,7 +30,7 @@ export default function UserDetails() {
   }
 
   const isMe = params.user_id === user.id;
-  const canEdit = isAdminOrBoard(user) || isMe;
+  const canEdit = isAdminOrBoard(user.roles) || isMe;
 
 
   const handleSave: SubmitHandler<FormInputs> = async (user) => {
@@ -60,7 +60,7 @@ export default function UserDetails() {
                   }
                 })}
                 control={control}
-                disabled={!isAdminOrBoard(user)}
+                disabled={!isAdminOrBoard(user.roles)}
               />
             </FormControl>
 
@@ -77,7 +77,7 @@ export default function UserDetails() {
                   }
                 })}
                 control={control}
-                disabled={!isAdminOrBoard(user)}
+                disabled={!isAdminOrBoard(user.roles)}
               />
             </FormControl>
 
@@ -92,7 +92,7 @@ export default function UserDetails() {
                   }
                 })}
                 control={control}
-                disabled={!isAdminOrBoard(user)}
+                disabled={!isAdminOrBoard(user.roles)}
               />
             </FormControl>
 

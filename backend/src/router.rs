@@ -6,9 +6,9 @@ use crate::{
         get_committees, get_event, get_event_registrations, get_file_content, get_file_metadata,
         get_files, get_location, get_locations, get_material_list, get_registration, get_user,
         get_user_committees, get_user_events, get_user_materials, get_user_registrations,
-        location_used_by, register, remove_user_from_committee, update_committee, update_event,
-        update_location, update_pwd, update_registration, update_user, update_user_material,
-        upload, who_am_i,
+        location_used_by, make_chair, register, remove_user_from_committee, update_committee,
+        update_event, update_location, update_pwd, update_registration, update_user,
+        update_user_material, upload, who_am_i,
     },
     auth::{login, logout},
     state::AppState,
@@ -19,7 +19,6 @@ use axum::{
     routing::{get, post, put},
 };
 use memory_serve::{MemoryServe, load_assets};
-// use memory_serve::{MemoryServe, load_assets};
 use tower_http::{trace, trace::TraceLayer};
 use tracing::Level;
 
@@ -101,6 +100,7 @@ fn api_router() -> Router<AppState> {
             "/committee/{:id}/user/{:user_id}",
             post(add_user_to_committee).delete(remove_user_from_committee),
         )
+        .route("/committee/{:id}/user/{:user_id}/chair", post(make_chair))
         .route("/committee/{:id}/members", get(get_committee_members))
 }
 

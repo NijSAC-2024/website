@@ -16,7 +16,7 @@ export default function NewEventButton() {
     return null;
   }
 
-  if (isAdminOrBoard(user) || myCommittees.some(uc => uc.left == null)) {
+  if (isAdminOrBoard(user.roles) || myCommittees.some(uc => uc.left == null)) {
     return (
       <div className="fixed bottom-5 right-5 z-10">
         <Fab variant="extended" color="primary" onClick={() => navigate('events.new')}>

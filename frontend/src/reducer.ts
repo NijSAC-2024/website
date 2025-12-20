@@ -89,7 +89,7 @@ const actionHandler: {
   add_committee_member(state: State, action) {
     return {
       ...state,
-      committeeMembers: [...state.committeeMembers || [], action.user],
+      committeeMembers: [...state.committeeMembers || [], { ...action.user, role: action.role }],
       myCommittees: [...state.myCommittees || [], {
         committeeId: action.committeeId,
         joined: Date.now().toString(),

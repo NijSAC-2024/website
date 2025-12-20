@@ -2,7 +2,7 @@ import {Checkbox, TableCell, TableRow, IconButton} from '@mui/material';
 import {Edit} from '@mui/icons-material';
 import moment from 'moment';
 import {Registration} from '../../types.ts';
-import {inCommittee, isAdminOrBoard, isWorga} from '../../util.ts';
+import {inCommittee, isAdminOrBoard, isChair, isWorga} from '../../util.ts';
 import {useWebsite} from '../../hooks/useState.ts';
 import {useEvents} from '../../hooks/useEvents.ts';
 import {useUsers} from '../../hooks/useUsers.ts';
@@ -30,14 +30,14 @@ export default function RegistrationRow({registration, onEditClick}: Registratio
       <TableCell>
         {<p className="hover:cursor-pointer hover:opacity-60 transition-all duration-100"
           onClick={() => registration.id && navigate('user', {user_id: registration.id})}>
-          {user && (isAdminOrBoard(user) || isWorga(currentEvent, user) || inCommittee(myCommittees, currentEvent)) && registration.waitingListPosition !== undefined ?
+          {user && (isAdminOrBoard(user.roles) || isWorga(currentEvent, user) || inCommittee(myCommittees, currentEvent.createdBy)) && registration.waitingListPosition !== undefined ?
             <span
               className="text-[#1976d2] dark:text-[#90caf9]">{`${registration.firstName} ${registration.infix ?? ''} ${registration.lastName}`}</span>
             : `${registration.firstName} ${registration.infix ?? ''} ${registration.lastName}`}
         </p>}
       </TableCell>
 
-      {user && (isAdminOrBoard(user) || isWorga(currentEvent, user) || inCommittee(myCommittees, currentEvent)) && currentEvent?.questions.map((q) => {
+      {user && (isAdminOrBoard(user.roles) || isWorga(currentEvent, user) || inCommittee(myCommittees, currentEvent.createdBy)) && currentEvent?.questions.map((q) => {
         const answer = registration.answers?.find((a) => a.questionId === q.id)?.answer;
 
         if (q.questionType.type === 'boolean') {
@@ -50,7 +50,7 @@ export default function RegistrationRow({registration, onEditClick}: Registratio
         return <TableCell key={`${registration.registrationId}-${q.id}`}>{answer || ''}</TableCell>;
       })}
 
-      {user && (isAdminOrBoard(user) || inCommittee(myCommittees, currentEvent)) && (
+      {user && (isAdminOrBoard(user.roles) || isChair(myCommittees, currentEvent.createdBy)) && (
         <>
           <TableCell>
             <Checkbox

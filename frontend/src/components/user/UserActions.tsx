@@ -25,7 +25,7 @@ export default function UserActions() {
   const [committeeAnchor, setCommitteeAnchor] = useState<null | HTMLElement>(null);
 
 
-  if (!user || !isAdminOrBoard(user)) {
+  if (!user || !isAdminOrBoard(user.roles)) {
     return null;
   }
 

@@ -121,7 +121,7 @@ export interface EventContent {
   questions: Question[];
   metadata?: Metadata;
   location: string;
-  createdBy?: string;
+  createdBy: string;
 }
 
 export interface Location extends LocationContent {
@@ -134,6 +134,10 @@ export interface LocationContent {
   name: Language;
   reusable: boolean;
   description?: Language;
+}
+
+export interface CommitteeUser extends BasicUser {
+  role: CommitteeRoleType;
 }
 
 export interface UserCommittee {
@@ -221,7 +225,7 @@ export interface State {
   userEventRegistrations: Registration[] | null;
   myCommittees: UserCommittee[] | null;
   committees: Committee[] | null;
-  committeeMembers: BasicUser[] | null;
+  committeeMembers: CommitteeUser[] | null;
   locations: Location[] | null;
   // The logged-in user
   user: User | null;
@@ -288,7 +292,7 @@ export type Action =
     committees: Committee[];
   } | {
     type: 'set_committee_members';
-    members: BasicUser[] | null;
+    members: CommitteeUser[] | null;
   } | {
     type: 'add_committee_member';
     user: BasicUser;
