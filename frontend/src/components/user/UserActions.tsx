@@ -10,7 +10,7 @@ import SwitchAccountIcon from '@mui/icons-material/SwitchAccount';
 import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import {RoleType, roleOptions} from '../../types.ts';
 import GroupIcon from '@mui/icons-material/Group';
-import {isAdminOrBoard} from '../../util.ts';
+import {isAdminOrBoard, isChair} from '../../util.ts';
 import {useUsers} from '../../hooks/useUsers.ts';
 import {useCommittees} from '../../hooks/useCommittees.ts';
 
@@ -18,14 +18,15 @@ import {useCommittees} from '../../hooks/useCommittees.ts';
 export default function UserActions() {
   const {text} = useLanguage();
   const {user} = useUsers();
-  const {myCommittees, committees, addUserToCommittee, deleteUserFromCommittee} = useCommittees();
+  const {myCommittees, currentCommittees, committees, addUserToCommittee, deleteUserFromCommittee} = useCommittees();
   const {currentUser, updateUser} = useUsers();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [committeeAnchor, setCommitteeAnchor] = useState<null | HTMLElement>(null);
 
+  console.log(myCommittees)
 
-  if (!user || !isAdminOrBoard(user.roles)) {
+  if (!user || !(isAdminOrBoard(user.roles) || isChair(myCommittees, user.id))) {
     return null;
   }
 
@@ -59,7 +60,7 @@ export default function UserActions() {
     if (!currentUser) {
       return;
     }
-    const inCommittee = myCommittees.some((c) => c.committeeId === committeeId && c.left == null);
+    const inCommittee = currentCommittees.some((c) => c.committeeId === committeeId && c.left == null);
 
     if (inCommittee) {
       await deleteUserFromCommittee(committeeId, currentUser.id);
@@ -92,7 +93,7 @@ export default function UserActions() {
         onClose={handleClose}
       >
         {committees.map((committee) => {
-          const inCommittee = myCommittees.some((c) => c.committeeId === committee.id && c.left == null);
+          const inCommittee = currentCommittees.some((c) => c.committeeId === committee.id && c.left == null);
           return (
             <MenuItem
               key={committee.id}

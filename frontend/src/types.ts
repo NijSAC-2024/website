@@ -14,11 +14,11 @@ export type EventType = 'activity' | 'course' | 'training' | 'weekend';
 export type ErrorType = Language | boolean;
 
 export type MembershipStatus =
-  | 'pending'
-  | 'member'
-  | 'affiliated'
-  | 'nonMember'
-  | 'donor';
+    | 'pending'
+    | 'member'
+    | 'affiliated'
+    | 'nonMember'
+    | 'donor';
 
 export type CommitteeRoleType = 'chair' | 'member';
 
@@ -32,23 +32,23 @@ export interface QuestionType {
 export type LanguageEnum = 'nl' | 'en';
 
 export type RoleType =
-  | 'admin'
-  | 'treasurer'
-  | 'secretary'
-  | 'chair'
-  | 'viceChair'
-  | 'climbingCommissar'
+    | 'admin'
+    | 'treasurer'
+    | 'secretary'
+    | 'chair'
+    | 'viceChair'
+    | 'climbingCommissar'
 
 export interface OptionsType {
   id:
-    | WeekendType
-    | EventType
-    | MembershipStatus
-    | QuestionType
-    | ExperienceType
-    | QuestionTypeType
-    | RoleType
-    | CommitteeRoleType;
+        | WeekendType
+        | EventType
+        | MembershipStatus
+        | QuestionType
+        | ExperienceType
+        | QuestionTypeType
+        | RoleType
+        | CommitteeRoleType;
   label: Language;
 }
 
@@ -223,7 +223,10 @@ export interface State {
   registrations: Registration[] | null;
   // Holds the registrations a logged-in user is registered for
   userEventRegistrations: Registration[] | null;
+  // The committees of the logged-in user
   myCommittees: UserCommittee[] | null;
+  // The committees of the user to display
+  currentCommittees: UserCommittee[] | null;
   committees: Committee[] | null;
   committeeMembers: CommitteeUser[] | null;
   locations: Location[] | null;
@@ -240,85 +243,87 @@ export interface State {
 }
 
 export type Action =
-  | {
-    type: 'login';
-    user: User;
-  } | {
-    type: 'set_users';
-    users: User[] | null;
-  } | {
-    type: 'set_current_user';
-    user: User | null;
-  } | {
-    type: 'delete_user';
-    userId: string;
-  } | {
-    type: 'add_user';
-    user: User;
-  } | {
-    type: 'logout';
-  } | {
-    type: 'reset_force_reload';
-  } | {
-    type: 'set_events';
-    events: Event[] | null;
-  } | {
-    type: 'add_event';
-    event: Event;
-  } | {
-    type: 'delete_event';
-    eventId: string;
-  } | {
-    type: 'set_locations';
-    locations: Location[];
-  } | {
-    type: 'set_event_registrations';
-    registrations: Registration[] | null;
-  } | {
-    type: 'set_user_event_registrations';
-    registrations: Registration[] | null;
-  } | {
-    type: 'add_event_registration';
-    registration: Registration;
-  } | {
-    type: 'delete_event_registration';
-    registrationId: string;
-    eventId: string,
-  } | {
-    type: 'set_my_committees';
-    committees: UserCommittee[] | null;
-  } | {
-    type: 'set_committees';
-    committees: Committee[];
-  } | {
-    type: 'set_committee_members';
-    members: CommitteeUser[] | null;
-  } | {
-    type: 'add_committee_member';
-    user: BasicUser;
-    committeeId: string;
-    role: CommitteeRoleType;
-  } | {
-    type: 'delete_committee_member';
-    userId: string;
-    committeeId: string;
-  } | {
-    type: 'add_committee';
-    committee: Committee;
-  } | {
-    type: 'delete_committee';
-    committeeId: string;
-  } | {
-    type: 'set_error';
-    error: WebsiteError;
-  } | {
-    type: 'set_next_router_state';
-    nextRouterState: RouterState | null;
-  }
-  | {
-    type: 'set_route';
-    routerState: RouterState;
-  };
+    | {
+      type: 'login';
+      user: User;
+    } | {
+      type: 'set_users';
+      users: User[] | null;
+    } | {
+      type: 'set_current_user';
+      user: User | null;
+    } | {
+      type: 'delete_user';
+      userId: string;
+    } | {
+      type: 'add_user';
+      user: User;
+    } | {
+      type: 'logout';
+    } | {
+      type: 'reset_force_reload';
+    } | {
+      type: 'set_events';
+      events: Event[] | null;
+    } | {
+      type: 'add_event';
+      event: Event;
+    } | {
+      type: 'delete_event';
+      eventId: string;
+    } | {
+      type: 'set_locations';
+      locations: Location[];
+    } | {
+      type: 'set_event_registrations';
+      registrations: Registration[] | null;
+    } | {
+      type: 'set_user_event_registrations';
+      registrations: Registration[] | null;
+    } | {
+      type: 'add_event_registration';
+      registration: Registration;
+    } | {
+      type: 'delete_event_registration';
+      registrationId: string;
+      eventId: string,
+    } | {
+      type: 'set_my_committees';
+      committees: UserCommittee[] | null;
+    } | {
+      type: 'set_current_committees';
+      committees: UserCommittee[] | null;
+    } | {
+      type: 'set_committees';
+      committees: Committee[];
+    } | {
+      type: 'set_committee_members';
+      members: CommitteeUser[] | null;
+    } | {
+      type: 'add_committee_member';
+      user: BasicUser;
+      committeeId: string;
+    } | {
+      type: 'delete_committee_member';
+      userId: string;
+      committeeId: string;
+    } | {
+      type: 'add_committee';
+      committee: Committee;
+    } | {
+      type: 'delete_committee';
+      committeeId: string;
+    } | {
+      type: 'set_error';
+      error: WebsiteError;
+    } | {
+      type: 'set_next_router_state';
+      nextRouterState: RouterState | null;
+    }
+    | {
+      type: 'set_route';
+      routerState: RouterState;
+    };
 
 export interface FormInputProps<T extends FieldValues> {
   name: Path<T>;
@@ -328,10 +333,10 @@ export interface FormInputProps<T extends FieldValues> {
 }
 
 export type MenuType =
-  | 'association'
-  | 'climbing'
-  | 'alps'
-  | undefined;
+    | 'association'
+    | 'climbing'
+    | 'alps'
+    | undefined;
 
 export const roleOptions: OptionsType[] = [
   {id: 'admin', label: {en: 'Admin', nl: 'Beheerder'}},

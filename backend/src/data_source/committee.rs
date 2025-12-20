@@ -317,23 +317,26 @@ impl CommitteeStore {
     }
 
     pub async fn make_chair(&self, committee_id: &Uuid, user_id: &Uuid) -> AppResult<()> {
-        sqlx::query!(
+        // close current chair and capture id
+        let old_chair_id: Option<Uuid> = sqlx::query_scalar!(
             r#"
             UPDATE user_committee
-            SET role = 'member'
+            SET "left" = now()
             WHERE committee_id = $1
               AND role = 'chair'
               AND "left" IS NULL
+            RETURNING user_id
             "#,
-            committee_id
+            committee_id,
         )
-        .execute(&self.db)
+        .fetch_optional(&self.db)
         .await?;
 
+        // close current entry of new chair
         sqlx::query!(
             r#"
             UPDATE user_committee
-            SET role = 'chair'
+            SET "left" = now()
             WHERE committee_id = $1
               AND user_id = $2
               AND "left" IS NULL
@@ -343,6 +346,33 @@ impl CommitteeStore {
         )
         .execute(&self.db)
         .await?;
+
+        // insert new chair entry
+        sqlx::query!(
+            r#"
+            INSERT INTO user_committee (committee_id, user_id, role, joined)
+            VALUES ($1, $2, 'chair', now())
+            "#,
+            committee_id,
+            user_id
+        )
+        .execute(&self.db)
+        .await?;
+
+        // old chair continues as member
+        if let Some(old_id) = old_chair_id {
+            sqlx::query!(
+                r#"
+                INSERT INTO user_committee (committee_id, user_id, role, joined)
+                VALUES ($1, $2, 'member', now())
+                "#,
+                committee_id,
+                old_id
+            )
+            .execute(&self.db)
+            .await?;
+        }
+
         Ok(())
     }
 }

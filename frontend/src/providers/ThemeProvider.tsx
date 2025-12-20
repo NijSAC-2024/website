@@ -1,5 +1,5 @@
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import { useCookies } from 'react-cookie';
+import {createContext, ReactNode, useContext, useEffect, useState} from 'react';
+import {useCookies} from 'react-cookie';
 import {ThemeType} from '../types.ts';
 
 interface ThemeContextType {
@@ -14,9 +14,9 @@ interface ThemeProviderProps {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export default function ThemeProvider({ children }: ThemeProviderProps) {
+export default function ThemeProvider({children}: ThemeProviderProps) {
   const [themeCookie, setThemeCookie] = useCookies(['theme']);
-  const [themeMode, setThemeMode] = useState<ThemeType>(themeCookie.theme? themeCookie.theme : 'light');
+  const [themeMode, setThemeMode] = useState<ThemeType>(themeCookie.theme ? themeCookie.theme : 'dark');
 
   const checkDarkMode = () => {
     return themeMode === 'dark' || (themeMode === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);

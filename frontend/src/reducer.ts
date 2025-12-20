@@ -74,6 +74,9 @@ const actionHandler: {
   set_my_committees(state: State, action) {
     return {...state, myCommittees: action.committees};
   },
+  set_current_committees(state: State, action) {
+    return {...state, currentCommittees: action.committees};
+  },
   set_committees(state: State, action) {
     return {...state, committees: action.committees};
   },
@@ -87,25 +90,42 @@ const actionHandler: {
     return {...state, committeeMembers: action.members};
   },
   add_committee_member(state: State, action) {
+    const now = new Date().toISOString();
+    const entry: UserCommittee = {
+      committeeId: action.committeeId,
+      joined: now,
+      left: undefined,
+      userId: state.currentUser?.id ?? '',
+      role: 'member',
+    };
     return {
       ...state,
-      committeeMembers: [...state.committeeMembers || [], { ...action.user, role: action.role }],
-      myCommittees: [...state.myCommittees || [], {
-        committeeId: action.committeeId,
-        joined: Date.now().toString(),
-        left: undefined,
-        userId: state.currentUser?.id,
-        role: action.role
-      } as UserCommittee],
+      committeeMembers: [...(state.committeeMembers || []), {...action.user, role: 'member'}],
+      currentCommittees: [...(state.currentCommittees || []), entry],
+      myCommittees: state.currentUser?.id === state.user?.id ? [...(state.myCommittees || []), entry] : state.myCommittees,
     };
   },
+
   delete_committee_member(state: State, action) {
+    const now = new Date().toISOString();
     return {
       ...state,
       committeeMembers: state.committeeMembers?.filter(m => m.id !== action.userId) || null,
-      myCommittees: state.myCommittees?.filter(c => c.committeeId !== action.committeeId) || null
+      currentCommittees: state.currentCommittees?.map(c =>
+        c.committeeId === action.committeeId && c.left === undefined
+          ? {...c, left: now}
+          : c
+      ) || null,
+      myCommittees: state.currentUser?.id === state.user?.id
+        ? state.myCommittees?.map(c =>
+          c.committeeId === action.committeeId && c.left === undefined
+            ? {...c, left: now}
+            : c
+        ) || null
+        : state.myCommittees,
     };
   },
+
   set_locations: function (state, action) {
     return {...state, locations: action.locations};
   },
@@ -129,7 +149,5 @@ function getActionHandler<T extends Action['type']>(
 
 export function reducer(state: State, action: Action): State {
   const handler = getActionHandler(action);
-  const newState = handler(state, action);
-  // console.log("action:", action, newState);
-  return newState;
+  return handler(state, action);
 }
