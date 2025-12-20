@@ -5,6 +5,8 @@ import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import {useUsers} from '../../hooks/useUsers.ts';
 import {useCommittees} from '../../hooks/useCommittees.ts';
 import {isAdminOrBoard, isChair} from '../../util.ts';
+import AreYouSure from '../AreYouSure.tsx';
+import {Committee} from '../../types.ts';
 
 export function ChangeCommittees() {
   const {text} = useLanguage();
@@ -16,9 +18,12 @@ export function ChangeCommittees() {
     addUserToCommittee,
     deleteUserFromCommittee,
   } = useCommittees();
-
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  
+  const [selectedCommittee, setSelectedCommittee] = useState<Committee | null>(null);
+
+  const toggleDialog = () => setDialogOpen(prev => !prev);
+
   if (!user || !(isAdminOrBoard(user.roles) || committees.some((c) => isChair(myCommittees, c.id)))) {
     return null;
   }
@@ -39,6 +44,7 @@ export function ChangeCommittees() {
     }
 
     setAnchorEl(null);
+    toggleDialog();
   };
 
   return (
@@ -57,7 +63,10 @@ export function ChangeCommittees() {
 
           return (
             (isAdminOrBoard(user.roles) || isChair(myCommittees, committee.id)) && (
-              <MenuItem key={committee.id} onClick={() => toggleCommittee(committee.id)}>
+              <MenuItem key={committee.id} onClick={() => {
+                setSelectedCommittee(committee);
+                toggleDialog()
+              }}>
                 <Checkbox checked={inCommittee} size="small"/>
                 {text(committee.name)}
               </MenuItem>
@@ -65,6 +74,11 @@ export function ChangeCommittees() {
           );
         })}
       </Menu>
+
+      <AreYouSure open={dialogOpen} onConfirm={() => toggleCommittee(selectedCommittee!.id)}
+        onCancel={toggleDialog}
+        message={`${text('You are about to ', 'Je staat op het punt om deze gebruiker ')}${currentCommittees.some(
+          (c) => c.committeeId === selectedCommittee?.id && c.left == null) ? text('remove this user from the ', 'te verwijderen van ') : text('add this user to the ', 'toe te voegen aan ')}${selectedCommittee ? text(selectedCommittee.name) : ''}.`}/>
     </>
   );
 }

@@ -14,7 +14,7 @@ export default function UserCommittees() {
   const [filterLeftCommittees, setFilterLeftCommittees] = useState<boolean>(false);
   const {navigate, state: {routerState: {params}}} = useWebsite();
   const {committees, currentCommittees} = useCommittees();
-  
+
   if (!committees || !currentCommittees || !user) {
     return null;
   }
@@ -36,7 +36,7 @@ export default function UserCommittees() {
         </div>
       </ContentCard>
 
-      <div className="grid xl:grid-cols-3 gap-5 mt-5">
+      <div className="grid grid-cols-2 xl:grid-cols-3 gap-5 mt-5">
         {filteredCommittees.filter((uc, index, self) =>
           index === self.findIndex(m => m.committeeId === uc.committeeId)
         ).map((userCommittee, index) => {

@@ -317,17 +317,17 @@ impl CommitteeStore {
     }
 
     pub async fn make_chair(&self, committee_id: &Uuid, user_id: &Uuid) -> AppResult<()> {
-        // close current chair and capture id
+        // close current chair and capture old chair id
         let old_chair_id: Option<Uuid> = sqlx::query_scalar!(
             r#"
-            UPDATE user_committee
-            SET "left" = now()
-            WHERE committee_id = $1
-              AND role = 'chair'
-              AND "left" IS NULL
-            RETURNING user_id
-            "#,
-            committee_id,
+        UPDATE user_committee
+        SET "left" = now()
+        WHERE committee_id = $1
+          AND role = 'chair'
+          AND "left" IS NULL
+        RETURNING user_id
+        "#,
+            committee_id
         )
         .fetch_optional(&self.db)
         .await?;
@@ -335,12 +335,12 @@ impl CommitteeStore {
         // close current entry of new chair
         sqlx::query!(
             r#"
-            UPDATE user_committee
-            SET "left" = now()
-            WHERE committee_id = $1
-              AND user_id = $2
-              AND "left" IS NULL
-            "#,
+        UPDATE user_committee
+        SET "left" = now()
+        WHERE committee_id = $1
+          AND user_id = $2
+          AND "left" IS NULL
+        "#,
             committee_id,
             user_id
         )
@@ -350,22 +350,24 @@ impl CommitteeStore {
         // insert new chair entry
         sqlx::query!(
             r#"
-            INSERT INTO user_committee (committee_id, user_id, role, joined)
-            VALUES ($1, $2, 'chair', now())
-            "#,
+        INSERT INTO user_committee (id, committee_id, user_id, role, joined)
+        VALUES ($1, $2, $3, 'chair', now())
+        "#,
+            Uuid::now_v7(),
             committee_id,
             user_id
         )
         .execute(&self.db)
         .await?;
 
-        // old chair continues as member
+        // insert old chair as member if exists
         if let Some(old_id) = old_chair_id {
             sqlx::query!(
                 r#"
-                INSERT INTO user_committee (committee_id, user_id, role, joined)
-                VALUES ($1, $2, 'member', now())
-                "#,
+            INSERT INTO user_committee (id, committee_id, user_id, role, joined)
+            VALUES ($1, $2, $3, 'member', now())
+            "#,
+                Uuid::now_v7(),
                 committee_id,
                 old_id
             )

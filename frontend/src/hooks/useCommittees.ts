@@ -1,6 +1,6 @@
 import {useSelector} from './useSelector.ts';
 import {WebsiteError} from '../error/error.ts';
-import {BasicUser, Committee, CommitteeContent} from '../types.ts';
+import {BasicUser, Committee, CommitteeContent, CommitteeRoleType} from '../types.ts';
 import {apiFetch, apiFetchVoid} from '../api.ts';
 import {enqueueSnackbar} from 'notistack';
 import {useLanguage} from '../providers/LanguageProvider.tsx';
@@ -109,26 +109,22 @@ export function useCommittees() {
             : m
       ),
     });
+    const oldChairId = committeeMembers.find(m => m.role === 'chair')?.id;
     dispatch({
       type: 'set_current_committees',
       committees: [
         ...(currentCommittees || []).map(c =>
-          c.committeeId === committeeId && c.left == null && (c.userId === userId || c.role === 'chair')
+          c.committeeId === committeeId && c.left == null && (c.userId === userId || c.userId === oldChairId)
             ? {...c, left: now}
             : c
         ),
-        {
+        {committeeId, userId, role: 'chair' as CommitteeRoleType, joined: now},
+        ...(oldChairId ? [{
           committeeId,
-          userId,
-          role: 'chair',
-          joined: now,
-        },
-        {
-          committeeId,
-          userId: committeeMembers.find(m => m.role === 'chair')?.id ?? '',
-          role: 'member',
-          joined: now,
-        },
+          userId: oldChairId,
+          role: 'member' as CommitteeRoleType,
+          joined: now
+        }] : []),
       ],
     });
     enqueueSnackbar(text('Chair updated', 'Hoofd bijgewerkt'), {variant: 'success'});
