@@ -5,11 +5,12 @@ import {useLanguage} from '../../providers/LanguageProvider';
 import ContentCard from '../ContentCard.tsx';
 import TextCard from '../TextCard.tsx';
 import {getLabel, isAdminOrBoard} from '../../util.ts';
-import UserActions from './UserActions.tsx';
 import {useWebsite} from '../../hooks/useState.ts';
 import {useUsers} from '../../hooks/useUsers.ts';
 import {SubmitHandler, useForm} from 'react-hook-form';
 import {FormInputText} from '../form/FormInputText.tsx';
+import {ChangeCommittees} from './ChangeCommittees.tsx';
+import {ChangeRoles} from './ChangeRoles.tsx';
 
 type FormInputs = Omit<UserContent, 'status' | 'roles'>;
 
@@ -30,7 +31,7 @@ export default function UserDetails() {
   }
 
   const isMe = params.user_id === user.id;
-  const canEdit = isAdminOrBoard(user) || isMe;
+  const canEdit = isAdminOrBoard(user.roles) || isMe;
 
 
   const handleSave: SubmitHandler<FormInputs> = async (user) => {
@@ -41,7 +42,10 @@ export default function UserDetails() {
     <ContentCard className="grid gap-1">
       <div className="flex justify-between w-full">
         <h1>{isMe ? text('My account', 'Mijn account') : `${currentUser.firstName.charAt(0).toUpperCase() + currentUser.firstName.slice(1)}'s account`}</h1>
-        <UserActions/>
+        <div className="flex">
+          <ChangeCommittees/>
+          <ChangeRoles/>
+        </div>
       </div>
 
       {canEdit ? (
@@ -60,7 +64,7 @@ export default function UserDetails() {
                   }
                 })}
                 control={control}
-                disabled={!isAdminOrBoard(user)}
+                disabled={!isAdminOrBoard(user.roles)}
               />
             </FormControl>
 
@@ -77,7 +81,7 @@ export default function UserDetails() {
                   }
                 })}
                 control={control}
-                disabled={!isAdminOrBoard(user)}
+                disabled={!isAdminOrBoard(user.roles)}
               />
             </FormControl>
 
@@ -92,7 +96,7 @@ export default function UserDetails() {
                   }
                 })}
                 control={control}
-                disabled={!isAdminOrBoard(user)}
+                disabled={!isAdminOrBoard(user.roles)}
               />
             </FormControl>
 

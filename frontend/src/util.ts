@@ -1,4 +1,4 @@
-import {Language, labelOptions, User, Event, UserCommittee} from './types.ts';
+import {Language, labelOptions, User, Event, UserCommittee, CommitteeUser, RoleType} from './types.ts';
 
 export function getLabel(id: string): Language {
   const categoryOption = labelOptions.find((option) => option.id === id);
@@ -27,7 +27,7 @@ export function truncateMarkdown(markdown: string, maxLength: number): string {
   return truncated.trim() + '…';
 }
 
-export function isAdminOrBoard(user: User): boolean {
+export function isAdminOrBoard(roles: RoleType[]): boolean {
   const allowedRoles = [
     'admin',
     'chair',
@@ -37,13 +37,38 @@ export function isAdminOrBoard(user: User): boolean {
     'climbingCommissar',
   ];
 
-  return user.roles.some(role => allowedRoles.includes(role));
+  return roles.some(role => allowedRoles.includes(role));
 }
 
 export function isWorga(event: Event, user: User): boolean {
   return event.metadata?.worga === user.id
 }
 
-export function inCommittee(committees: UserCommittee[], event: Event, ): boolean {
-  return committees.some(uc => uc.left == null && uc.committeeId === event.createdBy)
+export function inCommittee(committees: UserCommittee[], committeeId: string): boolean {
+  return committees.some(uc => uc.left == null && uc.committeeId === committeeId)
+}
+
+export function isChair(committeeMembers: CommitteeUser[], userId: string): boolean;
+export function isChair(userCommittees: UserCommittee[], committeeId: string): boolean;
+
+// Implementation
+export function isChair(
+  membersOrCommittees: CommitteeUser[] | UserCommittee[],
+  id: string
+): boolean {
+  if (membersOrCommittees.length === 0) {return false;}
+
+  const first = membersOrCommittees[0];
+
+  if ('id' in first) {
+    return (membersOrCommittees as CommitteeUser[]).some(
+      member => member.id === id && member.role === 'chair'
+    );
+  } else if ('committeeId' in first) {
+    return (membersOrCommittees as UserCommittee[]).some(
+      uc => uc.committeeId === id && uc.left == null && uc.role === 'chair'
+    );
+  }
+
+  return false;
 }

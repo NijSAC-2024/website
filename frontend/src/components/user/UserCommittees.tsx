@@ -13,13 +13,13 @@ export default function UserCommittees() {
   const {user} = useUsers();
   const [filterLeftCommittees, setFilterLeftCommittees] = useState<boolean>(false);
   const {navigate, state: {routerState: {params}}} = useWebsite();
-  const {committees, myCommittees} = useCommittees();
+  const {committees, currentCommittees} = useCommittees();
 
-  if (!committees || !myCommittees || !user) {
+  if (!committees || !currentCommittees || !user) {
     return null;
   }
 
-  const filteredCommittees = myCommittees.filter((uc) => uc.left == null || filterLeftCommittees);
+  const filteredCommittees = currentCommittees.filter((uc) => uc.left == null || filterLeftCommittees);
 
   return (
     <>
@@ -36,7 +36,7 @@ export default function UserCommittees() {
         </div>
       </ContentCard>
 
-      <div className="grid xl:grid-cols-3 gap-5 mt-5">
+      <div className="grid grid-cols-2 xl:grid-cols-3 gap-5 mt-5">
         {filteredCommittees.filter((uc, index, self) =>
           index === self.findIndex(m => m.committeeId === uc.committeeId)
         ).map((userCommittee, index) => {
@@ -48,8 +48,8 @@ export default function UserCommittees() {
           return (
             <div
               key={index}
-              onClick={() => navigate('committees', {committee_id: committee.id})}
-              className="hover:cursor-pointer w-full rounded-2xl bg-inherit border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] h-full"
+              onClick={() => navigate('committees.committee', {committee_id: committee.id})}
+              className="hover:cursor-pointer w-full rounded-2xl bg-[rgba(255,255,255,0.9)] dark:bg-[rgba(18,18,18,0.7)] border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] h-full"
             >
               <div className="p-5 grid gap-1">
                 <h1 className="text-3xl font-bold">
@@ -58,7 +58,7 @@ export default function UserCommittees() {
 
                 {/* Display history for current user */}
                 <div className="grid gap-1">
-                  {myCommittees
+                  {currentCommittees
                     .filter(uc => uc.committeeId === committee.id)
                     .map((uc, i) => (
                       <p className="italic" key={i}>

@@ -93,7 +93,7 @@ export default async function apiMiddleware(
         });
       }
 
-      if ((!navState.state.userEventRegistrations || forceReload) && navState.to.name === 'user') {
+      if ((!navState.state.userEventRegistrations || forceReload) && navState.to.params.user_id === user.id) {
         dispatch({
           type: 'set_user_event_registrations',
           registrations: await get(`/api/user/${navState.to.params.user_id}/event_registrations`)
@@ -101,7 +101,7 @@ export default async function apiMiddleware(
       }
 
       if ((forceReload || navState.to.params.committee_id !== navState.from.params.committee_id) &&
-        navState.to.name.startsWith('committees.committee')) {
+                navState.to.name.startsWith('committees.committee')) {
         dispatch({
           type: 'set_committee_members',
           members: await get(`/api/committee/${navState.to.params.committee_id}/members`)
@@ -109,14 +109,18 @@ export default async function apiMiddleware(
       }
     }
     if ((navState.state.currentUser?.id !== navState.to.params.user_id || forceReload) &&
-      navState.to.name.startsWith('user')) {
+            navState.to.name.startsWith('user')) {
       dispatch({
         type: 'set_current_user',
         user: await get(`/api/user/${navState.to.params.user_id}`)
       });
       dispatch({
-        type: 'set_my_committees',
+        type: 'set_current_committees',
         committees: await get(`/api/user/${navState.to.params.user_id}/committees`)
+      });
+      dispatch({
+        type: 'set_my_committees',
+        committees: await get(`/api/user/${user.id}/committees`)
       });
     }
   }
@@ -125,9 +129,9 @@ export default async function apiMiddleware(
     if (navState.to.name === 'events.event') {
       const currentEvent = events?.find((e) => e.id === navState.to.params.event_id);
       if (currentEvent &&
-        ((user &&
-            currentEvent.requiredMembershipStatus.includes(user.status))
-          || currentEvent.requiredMembershipStatus.includes('nonMember'))) {
+                ((user &&
+                        currentEvent.requiredMembershipStatus.includes(user.status))
+                    || currentEvent.requiredMembershipStatus.includes('nonMember'))) {
         dispatch({
           type: 'set_event_registrations',
           registrations: await get(`/api/event/${navState.to.params.event_id}/registration`)

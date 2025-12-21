@@ -30,7 +30,8 @@ export default function EditEvent() {
       eventType: 'activity',
       questions: [],
       location: '',
-      image: 'https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/76/52/1b/76521bcd-7c16-6404-b845-be35fc720792/AppIcon-0-0-1x_U007epad-0-85-220.png/1200x600wa.png'
+      image: 'https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/76/52/1b/76521bcd-7c16-6404-b845-be35fc720792/AppIcon-0-0-1x_U007epad-0-85-220.png/1200x600wa.png',
+      createdBy: ''
     };
   } else if (currentEvent) {
     initialEvent = toEventContent(currentEvent);
@@ -54,11 +55,11 @@ export default function EditEvent() {
 
   const handleSave = async (bool: boolean) => {
     if (id) {
-      if (await updateEvent(id, {...event, isPublished: bool})){
+      if (await updateEvent(id, {...event, isPublished: bool})) {
         navigate('events.event', {event_id: id});
       }
     } else {
-      if (await createEvent({...event, isPublished: bool})){
+      if (await createEvent({...event, isPublished: bool})) {
         navigate('events');
       }
     }
@@ -108,6 +109,8 @@ export default function EditEvent() {
           questions={event.questions}
           handleEventChange={handleEventChange}
           dates={event.dates}
+          category={event.eventType}
+          type={event.metadata?.type}
         />
       </div>
     </GenericPage>
