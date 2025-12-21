@@ -55,11 +55,11 @@ export default function EditEvent() {
 
   const handleSave = async (bool: boolean) => {
     if (id) {
-      if (await updateEvent(id, {...event, isPublished: bool})){
+      if (await updateEvent(id, {...event, isPublished: bool})) {
         navigate('events.event', {event_id: id});
       }
     } else {
-      if (await createEvent({...event, isPublished: bool})){
+      if (await createEvent({...event, isPublished: bool})) {
         navigate('events');
       }
     }
@@ -109,6 +109,8 @@ export default function EditEvent() {
           questions={event.questions}
           handleEventChange={handleEventChange}
           dates={event.dates}
+          category={event.eventType}
+          type={event.metadata?.type}
         />
       </div>
     </GenericPage>
