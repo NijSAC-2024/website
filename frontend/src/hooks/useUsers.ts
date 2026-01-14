@@ -52,10 +52,17 @@ export function useUsers() {
   };
 
   const signup = async (user: UserContent): Promise<boolean> => {
+    const user_register = {
+      ...user,
+      nkbvNumber: user.nkbvNumber.toString(),
+      studentNumber: user.studentNumber.toString(),
+      sportcardNumber: user.sportcardNumber.toString(),
+    };
+
     const {data, error} = await apiFetch<User>('/register', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(user)
+      body: JSON.stringify(user_register)
     });
 
     if (error) {

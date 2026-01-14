@@ -7,9 +7,12 @@ create table "user"
     infix             text,
     last_name         text              not null,
     phone             text              not null,
-    student_number    text,
-    nkbv_number       text,
-    sportcard_number  text,
+    student_number    text
+        constraint student_number_numeric check (student_number ~ '^\d*$'),
+    nkbv_number       text
+        constraint nkbv_number_numeric check (nkbv_number ~ '^\d*$'),
+    sportcard_number  text
+        constraint sportcard_number_numeric check (sportcard_number ~ '^\d*$'),
     ice_contact_name  text,
     ice_contact_email text,
     ice_contact_phone text,
@@ -57,19 +60,19 @@ create type committee_role as enum ('chair', 'member');
 
 create table committee
 (
-    id             uuid        primary key,
+    id             uuid primary key,
     name_nl        text        not null,
     name_en        text        not null,
     description_nl text        not null default '',
     description_en text        not null default '',
-    image                      uuid references file (id),
+    image          uuid references file (id),
     created        timestamptz not null,
     updated        timestamptz not null
 );
 
 create table user_committee
 (
-    id           uuid           primary key,
+    id           uuid primary key,
     user_id      uuid           not null references "user" (id) on delete cascade,
     committee_id uuid           not null references committee (id) on delete cascade,
     role         committee_role not null default 'member',
