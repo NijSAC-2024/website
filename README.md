@@ -26,4 +26,5 @@ docker exec -i website-db-1 psql -U nijsac -d nijsac -f /tmp/fixtures/event_regi
 docker exec -i website-db-1 psql -U nijsac -d nijsac -f /tmp/fixtures/event.sql
 docker exec -i website-db-1 psql -U nijsac -d nijsac -f /tmp/fixtures/location.sql
 docker exec -i website-db-1 psql -U nijsac -d nijsac -f /tmp/fixtures/user.sql
+psql -h localhost -U nijsac -d nijsac < backend/src/data_source/fixtures/pages.sql
 ```
