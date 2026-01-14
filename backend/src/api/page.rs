@@ -21,7 +21,6 @@ fn update_access(session: &Session) -> AppResult<()> {
                     | Role::Chair
                     | Role::ViceChair
                     | Role::ClimbingCommissar
-                    | Role::ActivityCommissionMember
             )
         })
     {

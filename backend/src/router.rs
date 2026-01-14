@@ -1,15 +1,15 @@
 use crate::{
     api::{
-        add_user_to_committee, create_committee, create_event, create_location,
+        add_user_to_committee, create_committee, create_event, create_location, create_page,
         create_registration, delete_committee, delete_event, delete_location, delete_registration,
         delete_user, get_activities, get_all_users, get_committee, get_committee_members,
         get_committees, get_event, get_event_registrations, get_file_content, get_file_metadata,
-        get_files, get_location, get_locations, get_material_list, get_registration, get_user,
-        get_user_committees, get_user_events, get_user_materials, get_user_registrations,
-        location_used_by, register, remove_user_from_committee, update_committee, update_event,
-        update_location, update_pwd, update_registration, update_user, update_user_material,
-        upload, who_am_i,create_location, create_page, delete_location, get_file_content, get_file_metadata, get_files, get_location, get_locations, get_user, get_user_registrations, location_used_by, state::AppState, update_location, update_page, upload
-},
+        get_files, get_location, get_locations, get_material_list, get_page_content,
+        get_registration, get_user, get_user_committees, get_user_events, get_user_materials,
+        get_user_registrations, location_used_by, register, remove_user_from_committee,
+        update_committee, update_event, update_location, update_page, update_pwd,
+        update_registration, update_user, update_user_material, upload, who_am_i,
+    },
     auth::{login, logout},
     state::AppState,
 };
@@ -89,10 +89,10 @@ fn api_router() -> Router<AppState> {
                 .delete(delete_location),
         )
         .route("/location/{:id}/used_by", get(location_used_by))
-        .route("/page/{:slug}",
-               get(get_page_content)
-                   .post(create_page)
-                    .put(update_page))
+        .route(
+            "/page/{:slug}",
+            get(get_page_content).post(create_page).put(update_page),
+        )
         .route("/committee", get(get_committees).post(create_committee))
         .route(
             "/committee/{:id}",

@@ -2,7 +2,6 @@ use crate::{
     AppState, Language,
     data_source::Count,
     error::{AppResult, Error},
-    location::{Location, LocationContent},
     page::{Page, PageContent},
 };
 use axum::{extract::FromRequestParts, http::request::Parts};
