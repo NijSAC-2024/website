@@ -1,0 +1,156 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE \"user\"\n            SET phone = $2,\n                student_number = $3,\n                nkbv_number = $4,\n                sportcard_number = $5,\n                ice_contact_name = $6,\n                ice_contact_email = $7,\n                ice_contact_phone = $8,\n                important_info = $9,\n                email = $10,\n                updated = now()\n            WHERE id = $1\n            RETURNING\n                id,\n                first_name,\n                infix,\n                last_name,\n                phone,\n                student_number,\n                nkbv_number,\n                sportcard_number,\n                ice_contact_name,\n                ice_contact_email,\n                ice_contact_phone,\n                important_info,\n                roles,\n                membership AS \"membership: Membership\",\n                status AS \"status: Status\",\n                email,\n                created,\n                updated\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "first_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "infix",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "last_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "phone",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "student_number",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "nkbv_number",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "sportcard_number",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "ice_contact_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 9,
+        "name": "ice_contact_email",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 10,
+        "name": "ice_contact_phone",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 11,
+        "name": "important_info",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 12,
+        "name": "roles",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 13,
+        "name": "membership: Membership",
+        "type_info": {
+          "Custom": {
+            "name": "membership",
+            "kind": {
+              "Enum": [
+                "non_member",
+                "member",
+                "affiliated",
+                "donor"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "ordinal": 14,
+        "name": "status: Status",
+        "type_info": {
+          "Custom": {
+            "name": "status",
+            "kind": {
+              "Enum": [
+                "pending",
+                "accepted",
+                "rejected"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "ordinal": 15,
+        "name": "email",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 16,
+        "name": "created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 17,
+        "name": "updated",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "295e68fe8e700a6e79744267bbf42474b7798204185169706a8f0ad2f4921646"
+}

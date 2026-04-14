@@ -1,0 +1,148 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT\n                id,\n                first_name,\n                infix,\n                last_name,\n                phone,\n                student_number,\n                nkbv_number,\n                sportcard_number,\n                ice_contact_name,\n                ice_contact_email,\n                ice_contact_phone,\n                important_info,\n                roles,\n                membership AS \"membership: Membership\",\n                status AS \"status: Status\",\n                email,\n                created,\n                updated\n            FROM \"user\"\n            WHERE id != '00000000-0000-0000-0000-000000000000'\n            ORDER BY last_name\n            LIMIT $1\n            OFFSET $2\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "first_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "infix",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "last_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "phone",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "student_number",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "nkbv_number",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "sportcard_number",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "ice_contact_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 9,
+        "name": "ice_contact_email",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 10,
+        "name": "ice_contact_phone",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 11,
+        "name": "important_info",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 12,
+        "name": "roles",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 13,
+        "name": "membership: Membership",
+        "type_info": {
+          "Custom": {
+            "name": "membership",
+            "kind": {
+              "Enum": [
+                "non_member",
+                "member",
+                "affiliated",
+                "donor"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "ordinal": 14,
+        "name": "status: Status",
+        "type_info": {
+          "Custom": {
+            "name": "status",
+            "kind": {
+              "Enum": [
+                "pending",
+                "accepted",
+                "rejected"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "ordinal": 15,
+        "name": "email",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 16,
+        "name": "created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 17,
+        "name": "updated",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "61aa85f784734067399de47f8036bb4503e582f32aa6f43a6dcf2900c217edf4"
+}

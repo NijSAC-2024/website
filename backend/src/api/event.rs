@@ -1,6 +1,9 @@
 use crate::{
     api::{ApiResult, ValidatedJson, is_admin_or_board},
-    auth::{role::{Membership, Status}, session::Session},
+    auth::{
+        role::{Membership, Status},
+        session::Session,
+    },
     data_source::event::EventStore,
     error::{AppResult, Error},
     event::{
