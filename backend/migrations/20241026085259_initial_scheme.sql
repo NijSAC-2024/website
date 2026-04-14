@@ -1,12 +1,13 @@
-create type membership_status as enum ('pending', 'member', 'affiliated', 'non_member', 'donor');
+create type membership as enum ('non_member', 'member', 'affiliated', 'donor');
+create type status as enum ('pending', 'accepted', 'rejected');
 
 create table "user"
 (
     id                uuid primary key,
-    first_name        text              not null,
+    first_name        text        not null,
     infix             text,
-    last_name         text              not null,
-    phone             text              not null,
+    last_name         text        not null,
+    phone             text        not null,
     student_number    text
         constraint student_number_numeric check (student_number ~ '^\d*$'),
     nkbv_number       text
@@ -17,12 +18,13 @@ create table "user"
     ice_contact_email text,
     ice_contact_phone text,
     important_info    text, -- In practice, it has shown to be useful, things like allergies, or other important stuff
-    roles             jsonb             not null,
-    status            membership_status not null,
-    email             text              not null unique,
+    roles             jsonb       not null,
+    membership        membership  not null,
+    status            status      not null,
+    email             text        not null unique,
     pw_hash           text,
-    created           timestamptz       not null,
-    updated           timestamptz       not null
+    created           timestamptz not null,
+    updated           timestamptz not null
 );
 
 create table session
@@ -82,24 +84,24 @@ create table user_committee
 
 create table event --event base
 (
-    id                         uuid primary key,
-    location_id                uuid                not null references location (id),
-    name_nl                    text                not null,
-    name_en                    text                not null,
-    image                      uuid references file (id),
-    start_dates                timestamptz[]       not null default '{}',
-    end_dates                  timestamptz[]       not null default '{}',
-    description_nl             text                not null default '',
-    description_en             text                not null default '', -- location also has its own description
-    registration_start         timestamptz,
-    registration_end           timestamptz,
-    registration_max           integer,
-    waiting_list_max           integer,
-    is_published               boolean             not null default true,
+    id                  uuid primary key,
+    location_id         uuid          not null references location (id),
+    name_nl             text          not null,
+    name_en             text          not null,
+    image               uuid references file (id),
+    start_dates         timestamptz[] not null default '{}',
+    end_dates           timestamptz[] not null default '{}',
+    description_nl      text          not null default '',
+    description_en      text          not null default '', -- location also has its own description
+    registration_start  timestamptz,
+    registration_end    timestamptz,
+    registration_max    integer,
+    waiting_list_max    integer,
+    is_published        boolean       not null default true,
     -- Courses only members, climbing activities only affiliated, activities only donors, some for all
     -- Null means that everyone, also externals can participate
-    required_membership_status membership_status[] not null default '{"member"}',
-    event_type                 text                not null,
+    required_membership membership[]  not null default '{"member"}',
+    event_type          text          not null,
     -- example scheme:
     -- [
     --  {
@@ -124,13 +126,13 @@ create table event --event base
     --    "required": true
     --  }
     -- ]
-    questions                  jsonb               not null,            -- if no questions are asked, use an empty array
+    questions           jsonb         not null,            -- if no questions are asked, use an empty array
     -- example scheme:
     -- { "weekendType": "singlePitch" }
-    metadata                   jsonb               not null,            -- if no metadata is given, use an empty object
-    created_by                 uuid                not null references committee (id),
-    created                    timestamptz         not null,
-    updated                    timestamptz         not null
+    metadata            jsonb         not null,            -- if no metadata is given, use an empty object
+    created_by          uuid          not null references committee (id),
+    created             timestamptz   not null,
+    updated             timestamptz   not null
 );
 
 create table event_registration

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            UPDATE \"user\"\n            SET first_name = $2,\n                infix = $3,\n                last_name = $4,\n                phone = $5,\n                student_number = $6,\n                nkbv_number = $7,\n                sportcard_number = $8,\n                ice_contact_name = $9,\n                ice_contact_email = $10,\n                ice_contact_phone = $11,\n                important_info = $12,\n                roles = $13,\n                status = $14,\n                email = $15,\n                updated = now()\n            WHERE id = $1\n            RETURNING\n                id,\n                first_name,\n                infix,\n                last_name,\n                phone,\n                student_number,\n                nkbv_number,\n                sportcard_number,\n                ice_contact_name,\n                ice_contact_email,\n                ice_contact_phone,\n                important_info,\n                roles,\n                status AS \"status: MembershipStatus\",\n                email,\n                created,\n                updated\n            ",
+  "query": "\n            UPDATE \"user\"\n            SET first_name = $2,\n                infix = $3,\n                last_name = $4,\n                phone = $5,\n                student_number = $6,\n                nkbv_number = $7,\n                sportcard_number = $8,\n                ice_contact_name = $9,\n                ice_contact_email = $10,\n                ice_contact_phone = $11,\n                important_info = $12,\n                roles = $13,\n                membership = $14,\n                status = $15,\n                email = $16,\n                updated = now()\n            WHERE id = $1\n            RETURNING\n                id,\n                first_name,\n                infix,\n                last_name,\n                phone,\n                student_number,\n                nkbv_number,\n                sportcard_number,\n                ice_contact_name,\n                ice_contact_email,\n                ice_contact_phone,\n                important_info,\n                roles,\n                membership AS \"membership: Membership\",\n                status AS \"status: Status\",\n                email,\n                created,\n                updated\n            ",
   "describe": {
     "columns": [
       {
@@ -70,16 +70,15 @@
       },
       {
         "ordinal": 13,
-        "name": "status: MembershipStatus",
+        "name": "membership: Membership",
         "type_info": {
           "Custom": {
-            "name": "membership_status",
+            "name": "membership",
             "kind": {
               "Enum": [
-                "pending",
+                "non_member",
                 "member",
                 "affiliated",
-                "non_member",
                 "donor"
               ]
             }
@@ -88,16 +87,32 @@
       },
       {
         "ordinal": 14,
+        "name": "status: Status",
+        "type_info": {
+          "Custom": {
+            "name": "status",
+            "kind": {
+              "Enum": [
+                "pending",
+                "accepted",
+                "rejected"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "ordinal": 15,
         "name": "email",
         "type_info": "Text"
       },
       {
-        "ordinal": 15,
+        "ordinal": 16,
         "name": "created",
         "type_info": "Timestamptz"
       },
       {
-        "ordinal": 16,
+        "ordinal": 17,
         "name": "updated",
         "type_info": "Timestamptz"
       }
@@ -119,14 +134,25 @@
         "Jsonb",
         {
           "Custom": {
-            "name": "membership_status",
+            "name": "membership",
+            "kind": {
+              "Enum": [
+                "non_member",
+                "member",
+                "affiliated",
+                "donor"
+              ]
+            }
+          }
+        },
+        {
+          "Custom": {
+            "name": "status",
             "kind": {
               "Enum": [
                 "pending",
-                "member",
-                "affiliated",
-                "non_member",
-                "donor"
+                "accepted",
+                "rejected"
               ]
             }
           }
@@ -151,8 +177,9 @@
       false,
       false,
       false,
+      false,
       false
     ]
   },
-  "hash": "2e1e1586f40d53207943ab8dff7e6a7a8db3e80a373fe889bd0b7b37193409ec"
+  "hash": "810eac39c41e57a4a81ce64c01b4b7a86f3c27cd735f258b9d69a056f2852855"
 }

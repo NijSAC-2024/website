@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            INSERT INTO \"user\"\n            (id,\n             first_name,\n             infix,\n             last_name,\n             phone,\n             student_number,\n             nkbv_number,\n             sportcard_number,\n             ice_contact_name,\n             ice_contact_email,\n             ice_contact_phone,\n             important_info,\n             roles,\n             status,\n             email,\n             created,\n             updated)\n            VALUES ($1,\n                    $2,\n                    $3,\n                    $4,\n                    $5,\n                    $6,\n                    $7,\n                    $8,\n                    $9,\n                    $10,\n                    $11,\n                    $12,\n                    $13,\n                    $14::membership_status,\n                    $15,\n                    now(),\n                    now())\n            RETURNING\n                id,\n                first_name,\n                infix,\n                last_name,\n                phone,\n                student_number,\n                nkbv_number,\n                sportcard_number,\n                ice_contact_name,\n                ice_contact_email,\n                ice_contact_phone,\n                important_info,\n                roles,\n                status AS \"status: MembershipStatus\",\n                email,\n                created,\n                updated\n            ",
+  "query": "\n            INSERT INTO \"user\"\n            (id,\n             first_name,\n             infix,\n             last_name,\n             phone,\n             student_number,\n             nkbv_number,\n             sportcard_number,\n             ice_contact_name,\n             ice_contact_email,\n             ice_contact_phone,\n             important_info,\n             roles,\n             membership,\n             status,\n             email,\n             created,\n             updated)\n            VALUES ($1,\n                    $2,\n                    $3,\n                    $4,\n                    $5,\n                    $6,\n                    $7,\n                    $8,\n                    $9,\n                    $10,\n                    $11,\n                    $12,\n                    $13,\n                    $14::membership,\n                    $15::status,\n                    $16,\n                    now(),\n                    now())\n            RETURNING\n                id,\n                first_name,\n                infix,\n                last_name,\n                phone,\n                student_number,\n                nkbv_number,\n                sportcard_number,\n                ice_contact_name,\n                ice_contact_email,\n                ice_contact_phone,\n                important_info,\n                roles,\n                membership AS \"membership: Membership\",\n                status AS \"status: Status\",\n                email,\n                created,\n                updated\n            ",
   "describe": {
     "columns": [
       {
@@ -70,16 +70,15 @@
       },
       {
         "ordinal": 13,
-        "name": "status: MembershipStatus",
+        "name": "membership: Membership",
         "type_info": {
           "Custom": {
-            "name": "membership_status",
+            "name": "membership",
             "kind": {
               "Enum": [
-                "pending",
+                "non_member",
                 "member",
                 "affiliated",
-                "non_member",
                 "donor"
               ]
             }
@@ -88,16 +87,32 @@
       },
       {
         "ordinal": 14,
+        "name": "status: Status",
+        "type_info": {
+          "Custom": {
+            "name": "status",
+            "kind": {
+              "Enum": [
+                "pending",
+                "accepted",
+                "rejected"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "ordinal": 15,
         "name": "email",
         "type_info": "Text"
       },
       {
-        "ordinal": 15,
+        "ordinal": 16,
         "name": "created",
         "type_info": "Timestamptz"
       },
       {
-        "ordinal": 16,
+        "ordinal": 17,
         "name": "updated",
         "type_info": "Timestamptz"
       }
@@ -119,14 +134,25 @@
         "Jsonb",
         {
           "Custom": {
-            "name": "membership_status",
+            "name": "membership",
+            "kind": {
+              "Enum": [
+                "non_member",
+                "member",
+                "affiliated",
+                "donor"
+              ]
+            }
+          }
+        },
+        {
+          "Custom": {
+            "name": "status",
             "kind": {
               "Enum": [
                 "pending",
-                "member",
-                "affiliated",
-                "non_member",
-                "donor"
+                "accepted",
+                "rejected"
               ]
             }
           }
@@ -151,8 +177,9 @@
       false,
       false,
       false,
+      false,
       false
     ]
   },
-  "hash": "f8f1484aa55c145013c6046b00a6de834ee10dcbed6413410a0c5c9c4ef19b1d"
+  "hash": "1d28dda555ccf379729b5c02fda3d53e8288ebc26da7122e2b061463206ca70f"
 }

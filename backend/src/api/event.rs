@@ -1,6 +1,9 @@
 use crate::{
     api::{ApiResult, ValidatedJson, is_admin_or_board},
-    auth::{role::MembershipStatus, session::Session},
+    auth::{
+        role::{Membership, Status},
+        session::Session,
+    },
     data_source::event::EventStore,
     error::{AppResult, Error},
     event::{
@@ -83,8 +86,8 @@ pub async fn get_event_registrations(
     // Public if NonMember accepted
     if event
         .content
-        .required_membership_status
-        .contains(&MembershipStatus::NonMember)
+        .required_membership
+        .contains(&Membership::NonMember)
     {
         let regs = store.get_registered_users(&id).await?;
         return Ok(Json(serde_json::to_value(regs)?));
@@ -94,8 +97,9 @@ pub async fn get_event_registrations(
     if let Some(ref session) = session
         && event
             .content
-            .required_membership_status
-            .contains(&session.membership_status())
+            .required_membership
+            .contains(&session.membership())
+        && session.status() == Status::Accepted
     {
         let regs = store.get_registered_users(&id).await?;
         return Ok(Json(serde_json::to_value(regs)?));
@@ -118,7 +122,7 @@ pub async fn get_user_events(
     Path(id): Path<UserId>,
     session: Session,
 ) -> ApiResult<Vec<Event<Location>>> {
-    if session.membership_status().is_member() {
+    if session.is_member() {
         Ok(Json(store.get_user_events(&id).await?))
     } else {
         Err(Error::Unauthorized)
@@ -233,8 +237,8 @@ pub async fn create_registration(
             })?;
     } else if !event
         .content
-        .required_membership_status
-        .contains(&MembershipStatus::NonMember)
+        .required_membership
+        .contains(&Membership::NonMember)
     {
         info!(
             event_id = event.id.to_string(),

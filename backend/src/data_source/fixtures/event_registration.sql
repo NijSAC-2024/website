@@ -10,7 +10,8 @@ VALUES ('555b616a-2059-40c3-94c7-3c887643d79d',
         ]',
         null,
         '2024-11-01 13:14:17.997000 +00:00',
-        '2024-11-01 13:14:17.997000 +00:00');
+        '2024-11-01 13:14:17.997000 +00:00')
+ON CONFLICT DO NOTHING;
 
 INSERT INTO event_registration (registration_id, event_id, user_id, answers, attended, created, updated)
 VALUES ('d7519662-3d4b-49b3-bbc8-b6cd34a40376',
@@ -24,4 +25,5 @@ VALUES ('d7519662-3d4b-49b3-bbc8-b6cd34a40376',
         ]',
         null,
         '2024-11-01 13:14:17.997000 +00:00',
-        '2024-11-01 13:14:17.997000 +00:00');
+        '2024-11-01 13:14:17.997000 +00:00')
+ON CONFLICT DO NOTHING;

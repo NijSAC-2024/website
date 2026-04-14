@@ -15,23 +15,29 @@ pub enum Role {
 }
 
 #[derive(sqlx::Type, Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
-#[sqlx(type_name = "membership_status", rename_all = "snake_case")]
+#[sqlx(type_name = "membership", rename_all = "snake_case")]
 #[serde(rename_all = "camelCase")]
-pub enum MembershipStatus {
-    Pending,
+pub enum Membership {
+    NonMember,
     Member,
     Affiliated,
-    NonMember,
     Donor,
 }
 
-impl MembershipStatus {
+#[derive(sqlx::Type, Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
+#[sqlx(type_name = "status", rename_all = "snake_case")]
+#[serde(rename_all = "camelCase")]
+pub enum Status {
+    Pending,
+    Accepted,
+    Rejected,
+}
+
+impl Membership {
     pub fn is_member(&self) -> bool {
         match self {
-            MembershipStatus::Pending | MembershipStatus::NonMember | MembershipStatus::Donor => {
-                false
-            }
-            MembershipStatus::Member | MembershipStatus::Affiliated => true,
+            Membership::Donor | Membership::NonMember => false,
+            Membership::Member | Membership::Affiliated => true,
         }
     }
 }

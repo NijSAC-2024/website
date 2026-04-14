@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT e.id,\n                   l.id as location_id,\n                   l.name_en as location_name_en,\n                   l.name_nl as location_name_nl,\n                   l.description_nl as location_description_nl,\n                   l.description_en as location_description_en,\n                   l.reusable as location_reusable,\n                   l.created as location_created,\n                   l.updated as location_updated,\n                   e.name_nl,\n                   e.name_en,\n                   e.image,\n                   e.description_nl,\n                   e.description_en,\n                   e.start_dates,\n                   e.end_dates,\n                   e.registration_start,\n                   e.registration_end,\n                   e.registration_max,\n                   e.waiting_list_max,\n                   e.is_published,\n                   e.required_membership_status as \"required_membership_status:Vec<MembershipStatus>\",\n                   e.event_type,\n                   e.questions,\n                   e.metadata,\n                   count(r.user_id) FILTER ( WHERE r.waiting_list_position IS NULL ) as \"registration_count!\",\n                   count(r.user_id) FILTER ( WHERE r.waiting_list_position IS NOT NULL ) as \"waiting_list_count!\",\n                   e.created_by,\n                   e.created,\n                   e.updated\n            FROM event e\n                JOIN location l ON e.location_id = l.id\n                LEFT JOIN event_registration r ON r.event_id = e.id\n            WHERE e.id = $1 AND\n                  (e.is_published OR $2)\n            GROUP BY e.id, l.id\n            ",
+  "query": "\n            SELECT e.id,\n                   l.id as location_id,\n                   l.name_en as location_name_en,\n                   l.name_nl as location_name_nl,\n                   l.description_nl as location_description_nl,\n                   l.description_en as location_description_en,\n                   l.reusable as location_reusable,\n                   l.created as location_created,\n                   l.updated as location_updated,\n                   e.name_nl,\n                   e.name_en,\n                   e.image,\n                   e.description_nl,\n                   e.description_en,\n                   e.start_dates,\n                   e.end_dates,\n                   e.registration_start,\n                   e.registration_end,\n                   e.registration_max,\n                   e.waiting_list_max,\n                   e.is_published,\n                   e.required_membership as \"required_membership:Vec<Membership>\",\n                   e.event_type,\n                   e.questions,\n                   e.metadata,\n                   count(r.user_id) FILTER ( WHERE r.waiting_list_position IS NULL ) as \"registration_count!\",\n                   count(r.user_id) FILTER ( WHERE r.waiting_list_position IS NOT NULL ) as \"waiting_list_count!\",\n                   e.created_by,\n                   e.created,\n                   e.updated\n            FROM event e\n                JOIN location l ON e.location_id = l.id\n                LEFT JOIN event_registration r ON r.event_id = e.id\n            WHERE e.id = $1 AND\n                  (e.is_published OR $2)\n            GROUP BY e.id, l.id\n            ",
   "describe": {
     "columns": [
       {
@@ -110,20 +110,19 @@
       },
       {
         "ordinal": 21,
-        "name": "required_membership_status:Vec<MembershipStatus>",
+        "name": "required_membership:Vec<Membership>",
         "type_info": {
           "Custom": {
-            "name": "membership_status[]",
+            "name": "membership[]",
             "kind": {
               "Array": {
                 "Custom": {
-                  "name": "membership_status",
+                  "name": "membership",
                   "kind": {
                     "Enum": [
-                      "pending",
+                      "non_member",
                       "member",
                       "affiliated",
-                      "non_member",
                       "donor"
                     ]
                   }
@@ -213,5 +212,5 @@
       false
     ]
   },
-  "hash": "4a8a51bf931ed4dd076e650cb564f5d807fc3c42c72636facfbf01f0b99e0c32"
+  "hash": "1661e6cde91695812dfb092e5a4e5d86388fef1a6556067f02e31fc7f61a2ef8"
 }

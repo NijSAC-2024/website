@@ -12,7 +12,7 @@ import {FormInputText} from '../form/FormInputText.tsx';
 import {ChangeCommittees} from './ChangeCommittees.tsx';
 import {ChangeRoles} from './ChangeRoles.tsx';
 
-type FormInputs = Omit<UserContent, 'status' | 'roles'>;
+type FormInputs = Omit<UserContent, 'membership' | 'status' | 'roles'>;
 
 export default function UserDetails() {
   const {text} = useLanguage();
@@ -141,8 +141,8 @@ export default function UserDetails() {
               />
             </FormControl>
 
-            <b>{text('Membership status', 'Lidmaatschapsstatus')}</b>
-            <span className="xl:col-span-3">{text(getLabel(currentUser.status))}</span>
+            <b>{text('Membership', 'Lidmaatschap')}</b>
+            <span className="xl:col-span-3">{text(getLabel(currentUser.membership))}</span>
 
             <b>{text('Roles', 'Rollen')}</b>
             <span className="xl:col-span-3">

@@ -1,6 +1,6 @@
 use crate::{
     Language,
-    auth::role::MembershipStatus,
+    auth::role::Membership,
     error::Error,
     file::FileId,
     user::{BasicUser, UserId},
@@ -103,7 +103,7 @@ pub struct EventContent<T> {
     #[validate(range(min = 0, max = 999, message = "Maximum waiting list is 999"))]
     pub waiting_list_max: Option<i32>,
     pub is_published: bool,
-    pub required_membership_status: Vec<MembershipStatus>,
+    pub required_membership: Vec<Membership>,
     pub event_type: ActivityType,
     #[validate[nested]]
     pub questions: Vec<Question>,

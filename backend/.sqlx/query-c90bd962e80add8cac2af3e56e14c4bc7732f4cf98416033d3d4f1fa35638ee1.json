@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            UPDATE \"user\"\n            SET phone = $2,\n                student_number = $3,\n                nkbv_number = $4,\n                sportcard_number = $5,\n                ice_contact_name = $6,\n                ice_contact_email = $7,\n                ice_contact_phone = $8,\n                important_info = $9,\n                email = $10,\n                updated = now()\n            WHERE id = $1\n            RETURNING\n                id,\n                first_name,\n                infix,\n                last_name,\n                phone,\n                student_number,\n                nkbv_number,\n                sportcard_number,\n                ice_contact_name,\n                ice_contact_email,\n                ice_contact_phone,\n                important_info,\n                roles,\n                status AS \"status: MembershipStatus\",\n                email,\n                created,\n                updated\n            ",
+  "query": "\n            SELECT \n                id,\n                first_name,\n                infix,\n                last_name,\n                phone,\n                student_number,\n                nkbv_number,\n                sportcard_number,\n                ice_contact_name,\n                ice_contact_email,\n                ice_contact_phone,\n                important_info,\n                roles,\n                membership AS \"membership: Membership\",\n                status AS \"status: Status\",\n                email,\n                created,\n                updated\n            FROM \"user\" WHERE id = $1\n            ",
   "describe": {
     "columns": [
       {
@@ -70,16 +70,15 @@
       },
       {
         "ordinal": 13,
-        "name": "status: MembershipStatus",
+        "name": "membership: Membership",
         "type_info": {
           "Custom": {
-            "name": "membership_status",
+            "name": "membership",
             "kind": {
               "Enum": [
-                "pending",
+                "non_member",
                 "member",
                 "affiliated",
-                "non_member",
                 "donor"
               ]
             }
@@ -88,32 +87,39 @@
       },
       {
         "ordinal": 14,
+        "name": "status: Status",
+        "type_info": {
+          "Custom": {
+            "name": "status",
+            "kind": {
+              "Enum": [
+                "pending",
+                "accepted",
+                "rejected"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "ordinal": 15,
         "name": "email",
         "type_info": "Text"
       },
       {
-        "ordinal": 15,
+        "ordinal": 16,
         "name": "created",
         "type_info": "Timestamptz"
       },
       {
-        "ordinal": 16,
+        "ordinal": 17,
         "name": "updated",
         "type_info": "Timestamptz"
       }
     ],
     "parameters": {
       "Left": [
-        "Uuid",
-        "Text",
-        "Text",
-        "Text",
-        "Text",
-        "Text",
-        "Text",
-        "Text",
-        "Text",
-        "Text"
+        "Uuid"
       ]
     },
     "nullable": [
@@ -133,8 +139,9 @@
       false,
       false,
       false,
+      false,
       false
     ]
   },
-  "hash": "b555332a18c024341a01eda83a6a2f22718edb4e00474c11b2fc30928c659255"
+  "hash": "c90bd962e80add8cac2af3e56e14c4bc7732f4cf98416033d3d4f1fa35638ee1"
 }

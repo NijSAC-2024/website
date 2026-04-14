@@ -1,13 +1,13 @@
-import { User } from '../types';
-import { getLabel } from '../util';
-import { useLanguage } from '../providers/LanguageProvider';
+import {User} from '../types';
+import {getLabel} from '../util';
+import {useLanguage} from '../providers/LanguageProvider';
 
 interface UserDetailsProps {
   user: User;
 }
 
-export default function UserDetails({ user }: UserDetailsProps) {
-  const { text } = useLanguage();
+export default function UserDetails({user}: UserDetailsProps) {
+  const {text} = useLanguage();
 
   return (
     <div className="py-3 grid grid-cols-4 gap-3">
@@ -23,9 +23,9 @@ export default function UserDetails({ user }: UserDetailsProps) {
       <b>{text('Important information', 'Belangrijke informatie')}</b>
       <span className="col-span-3">{user.importantInfo}</span>
 
-      <b>{text('Membership status', 'Lidmaatschapsstatus')}</b>
-      <span className="col-span-3">{text(getLabel(user.status))}</span>
-
+      <b>{text('Membership', 'Lidmaatschap')}</b>
+      <span className="col-span-3">{text(getLabel(user.membership))}</span>
+        
       <b>{text('Roles', 'Rollen')}</b>
       <span className="col-span-3">{user.roles.map((r) => text(getLabel(r))).join(', ')}</span>
 

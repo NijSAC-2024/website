@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT\n                id,\n                first_name,\n                infix,\n                last_name,\n                phone,\n                student_number,\n                nkbv_number,\n                sportcard_number,\n                ice_contact_name,\n                ice_contact_email,\n                ice_contact_phone,\n                important_info,\n                roles,\n                status AS \"status: MembershipStatus\",\n                email,\n                created,\n                updated\n            FROM \"user\"\n            WHERE id != '00000000-0000-0000-0000-000000000000'\n            ORDER BY last_name\n            LIMIT $1\n            OFFSET $2\n            ",
+  "query": "\n            SELECT\n                id,\n                first_name,\n                infix,\n                last_name,\n                phone,\n                student_number,\n                nkbv_number,\n                sportcard_number,\n                ice_contact_name,\n                ice_contact_email,\n                ice_contact_phone,\n                important_info,\n                roles,\n                membership AS \"membership: Membership\",\n                status AS \"status: Status\",\n                email,\n                created,\n                updated\n            FROM \"user\"\n            WHERE id != '00000000-0000-0000-0000-000000000000'\n            ORDER BY last_name\n            LIMIT $1\n            OFFSET $2\n            ",
   "describe": {
     "columns": [
       {
@@ -70,16 +70,15 @@
       },
       {
         "ordinal": 13,
-        "name": "status: MembershipStatus",
+        "name": "membership: Membership",
         "type_info": {
           "Custom": {
-            "name": "membership_status",
+            "name": "membership",
             "kind": {
               "Enum": [
-                "pending",
+                "non_member",
                 "member",
                 "affiliated",
-                "non_member",
                 "donor"
               ]
             }
@@ -88,16 +87,32 @@
       },
       {
         "ordinal": 14,
+        "name": "status: Status",
+        "type_info": {
+          "Custom": {
+            "name": "status",
+            "kind": {
+              "Enum": [
+                "pending",
+                "accepted",
+                "rejected"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "ordinal": 15,
         "name": "email",
         "type_info": "Text"
       },
       {
-        "ordinal": 15,
+        "ordinal": 16,
         "name": "created",
         "type_info": "Timestamptz"
       },
       {
-        "ordinal": 16,
+        "ordinal": 17,
         "name": "updated",
         "type_info": "Timestamptz"
       }
@@ -125,8 +140,9 @@
       false,
       false,
       false,
+      false,
       false
     ]
   },
-  "hash": "6d7522cafaad324e01e46f2bf3e69a2431efb8773d8d75a9391d8e2619ac3cc7"
+  "hash": "61aa85f784734067399de47f8036bb4503e582f32aa6f43a6dcf2900c217edf4"
 }

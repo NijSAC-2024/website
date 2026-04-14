@@ -1,7 +1,7 @@
 use crate::{
     Pagination,
     api::{ApiResult, ValidatedJson, ValidatedQuery, is_admin_or_board},
-    auth::{role::MembershipStatus, session::Session},
+    auth::{role::Status, session::Session},
     data_source::UserStore,
     error::{AppResult, Error},
     user::{Password, RegisterNewUser, User, UserContent, UserId},
@@ -40,7 +40,7 @@ enum ReadAccess {
 fn read_all_access(session: &Session) -> AppResult<ReadAccess> {
     if is_admin_or_board(session).is_ok() {
         Ok(ReadAccess::Full)
-    } else if session.membership_status().is_member() {
+    } else if session.is_member() {
         Ok(ReadAccess::Limited)
     } else {
         Err(Error::Unauthorized)
@@ -59,7 +59,8 @@ pub async fn register(
         infix: new.infix,
         last_name: new.last_name,
         roles: vec![],
-        status: MembershipStatus::Pending,
+        membership: new.membership,
+        status: Status::Pending,
         email: new.email,
         phone: new.phone,
         student_number: new.student_number,
@@ -96,6 +97,9 @@ pub async fn get_user(
     Path(id): Path<UserId>,
     session: Session,
 ) -> AppResult<Response> {
+    if id == *session.user_id() {
+        return Ok(Json(store.get(&id).await?).into_response());
+    }
     match read_all_access(&session)? {
         ReadAccess::Full => Ok(Json(store.get(&id).await?).into_response()),
         ReadAccess::Limited => Ok(Json(store.get_basic_info(&id).await?).into_response()),

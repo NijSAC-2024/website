@@ -100,7 +100,7 @@ pub async fn get_committee_members(
     Path(id): Path<CommitteeId>,
     session: Session,
 ) -> ApiResult<Vec<CommitteeUser>> {
-    if session.membership_status().is_member() {
+    if session.is_member() {
         Ok(Json(store.get_committee_members(&id).await?))
     } else {
         Err(Error::Unauthorized)
@@ -112,7 +112,7 @@ pub async fn get_user_committees(
     Path(id): Path<UserId>,
     session: Session,
 ) -> ApiResult<Vec<UserCommittee>> {
-    if session.membership_status().is_member() {
+    if session.is_member() {
         Ok(Json(store.get_committees_for_user(&id).await?))
     } else {
         Err(Error::Unauthorized)

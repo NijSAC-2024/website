@@ -21,7 +21,7 @@ pub struct LocationFilter {
 }
 
 fn update_access(session: &Session) -> AppResult<()> {
-    if session.membership_status().is_member()
+    if session.is_member()
         && session.roles().iter().any(|role| {
             matches!(
                 role,

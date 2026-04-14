@@ -23,7 +23,12 @@ export default function RegisterButton({
   moment.locale(language);
   const [registerDialogOpen, setRegisterDialogOpen] = useState<boolean>(false);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
-  const {userEventRegistrations, updateRegistration, createRegistration, deleteRegistration} = useEventRegistrations();
+  const {
+    userEventRegistrations,
+    updateRegistration,
+    createRegistration,
+    deleteRegistration
+  } = useEventRegistrations();
   const {events} = useEvents();
   const event = events.find(e => e.id === eventId);
   if (!event || !event.registrationPeriod) {
@@ -66,7 +71,10 @@ export default function RegisterButton({
     setRegisterDialogOpen(false);
   };
 
-  const canRegister: boolean = user && event.requiredMembershipStatus.includes(user.status) || event.requiredMembershipStatus.includes('nonMember');
+  const canRegister = (
+    (user && user.status === 'accepted' && event.requiredMembership.includes(user.membership))
+        || event.requiredMembership.includes('nonMember')
+  );
 
   const renderClock = () => {
     const now = moment();
@@ -142,13 +150,14 @@ export default function RegisterButton({
         return <Button variant="contained"
           onClick={handleRegistrationClick}>{renderClock()}{text('Register', 'Inschrijven')}</Button>;
       }
-      if (user && !event.requiredMembershipStatus.includes(user.status)) {
+      if (user && (!event.requiredMembership.includes(user.membership) || user.status !== 'accepted')) {
         return <Button variant="contained" disabled>{renderClock()}{text('Register', 'Inschrijven')}</Button>;
       }
       //TODO: Open login dialog
       return <Button variant="contained">{text('Login to register', 'Login om in te schrijven')}</Button>;
     } else if (user && isAdminOrBoard(user.roles)) {
-      return <Button variant="contained" onClick={handleRegistrationClick}>{text('Register', 'Inschrijven')}</Button>;
+      return <Button variant="contained"
+        onClick={handleRegistrationClick}>{text('Register', 'Inschrijven')}</Button>;
     }
 
     return (

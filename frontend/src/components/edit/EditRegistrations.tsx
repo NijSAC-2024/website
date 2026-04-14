@@ -4,7 +4,7 @@ import {
   EventContent,
   EventType,
   memberOptions,
-  MembershipStatus,
+  Membership,
   Question,
   WeekendType
 } from '../../types.ts';
@@ -17,7 +17,7 @@ import {useEffect, useRef} from 'react';
 import {mpQuestions, spQuestions, weekendQuestions} from './questionTemplates.ts';
 
 interface EditRegistrationProps {
-  requiredMembershipStatus: MembershipStatus[];
+  requiredMembership: Membership[];
   dates: Array<DateType>;
   registrationMax?: number;
   waitingListMax?: number;
@@ -29,7 +29,7 @@ interface EditRegistrationProps {
 }
 
 export default function EditRegistrations({
-  requiredMembershipStatus,
+  requiredMembership,
   dates,
   registrationMax,
   waitingListMax,
@@ -196,15 +196,15 @@ export default function EditRegistrations({
 
           <OptionSelector
             options={memberOptions}
-            selected={requiredMembershipStatus}
+            selected={requiredMembership}
             onChange={(selected) =>
               handleEventChange({
-                requiredMembershipStatus: selected as MembershipStatus[]
+                requiredMembership: selected as Membership[]
               })
             }
             label={text(
-              'Necessary Membership Status',
-              'Benodigd Lidmaatschapstatus'
+              'Required Membership',
+              'Benodigd Lidmaatschap'
             )}
           />
 

@@ -1,6 +1,6 @@
 use crate::{
     AppState, Pagination,
-    auth::role::MembershipStatus,
+    auth::role::{Membership, Status},
     data_source::Count,
     error::{AppResult, Error},
     user::BasicUser,
@@ -50,7 +50,8 @@ pub struct PgUser {
     ice_contact_phone: Option<String>,
     important_info: Option<String>,
     roles: serde_json::Value,
-    status: MembershipStatus,
+    membership: Membership,
+    status: Status,
     email: String,
     created: OffsetDateTime,
     updated: OffsetDateTime,
@@ -69,6 +70,7 @@ impl TryFrom<PgUser> for User {
                 infix: pg.infix,
                 last_name: pg.last_name,
                 roles: serde_json::from_value(pg.roles)?,
+                membership: pg.membership,
                 status: pg.status,
                 email: pg.email,
                 phone: pg.phone,
@@ -115,6 +117,7 @@ impl UserStore {
              ice_contact_phone,
              important_info,
              roles,
+             membership,
              status,
              email,
              created,
@@ -132,8 +135,9 @@ impl UserStore {
                     $11,
                     $12,
                     $13,
-                    $14::membership_status,
-                    $15,
+                    $14::membership,
+                    $15::status,
+                    $16,
                     now(),
                     now())
             RETURNING
@@ -150,7 +154,8 @@ impl UserStore {
                 ice_contact_phone,
                 important_info,
                 roles,
-                status AS "status: MembershipStatus",
+                membership AS "membership: Membership",
+                status AS "status: Status",
                 email,
                 created,
                 updated
@@ -168,7 +173,8 @@ impl UserStore {
             new.ice_contact_phone,
             new.important_info,
             serde_json::to_value(&new.roles)?,
-            new.status as MembershipStatus,
+            new.membership as Membership,
+            new.status as Status,
             new.email,
         )
         .fetch_one(&self.db)
@@ -194,7 +200,8 @@ impl UserStore {
                 ice_contact_phone,
                 important_info,
                 roles,
-                status AS "status: MembershipStatus",
+                membership AS "membership: Membership",
+                status AS "status: Status",
                 email,
                 created,
                 updated
@@ -242,7 +249,8 @@ impl UserStore {
                 ice_contact_phone,
                 important_info,
                 roles,
-                status AS "status: MembershipStatus",
+                membership AS "membership: Membership",
+                status AS "status: Status",
                 email,
                 created,
                 updated
@@ -301,8 +309,9 @@ impl UserStore {
                 ice_contact_phone = $11,
                 important_info = $12,
                 roles = $13,
-                status = $14,
-                email = $15,
+                membership = $14,
+                status = $15,
+                email = $16,
                 updated = now()
             WHERE id = $1
             RETURNING
@@ -319,7 +328,8 @@ impl UserStore {
                 ice_contact_phone,
                 important_info,
                 roles,
-                status AS "status: MembershipStatus",
+                membership AS "membership: Membership",
+                status AS "status: Status",
                 email,
                 created,
                 updated
@@ -337,7 +347,8 @@ impl UserStore {
             user.ice_contact_phone,
             user.important_info,
             serde_json::to_value(&user.roles)?,
-            user.status as MembershipStatus,
+            user.membership as Membership,
+            user.status as Status,
             user.email,
         )
         .fetch_one(&self.db)
@@ -375,7 +386,8 @@ impl UserStore {
                 ice_contact_phone,
                 important_info,
                 roles,
-                status AS "status: MembershipStatus",
+                membership AS "membership: Membership",
+                status AS "status: Status",
                 email,
                 created,
                 updated

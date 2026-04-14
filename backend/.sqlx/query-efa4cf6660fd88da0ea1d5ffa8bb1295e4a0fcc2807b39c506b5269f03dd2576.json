@@ -1,0 +1,76 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            WITH new_session AS (\n                INSERT INTO session\n                    (\n                     cookie_value,\n                     user_id,\n                     expiration\n                ) VALUES ($1, $2, now() + '1 month')\n                RETURNING *)\n            SELECT cookie_value,\n                   u.id AS user_id,\n                   roles,\n                   membership AS \"membership: Membership\",\n                   status AS \"status: Status\",\n                   expiration\n            FROM new_session\n                JOIN \"user\" u ON user_id = u.id\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "cookie_value",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 1,
+        "name": "user_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "roles",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 3,
+        "name": "membership: Membership",
+        "type_info": {
+          "Custom": {
+            "name": "membership",
+            "kind": {
+              "Enum": [
+                "non_member",
+                "member",
+                "affiliated",
+                "donor"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "status: Status",
+        "type_info": {
+          "Custom": {
+            "name": "status",
+            "kind": {
+              "Enum": [
+                "pending",
+                "accepted",
+                "rejected"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "expiration",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "efa4cf6660fd88da0ea1d5ffa8bb1295e4a0fcc2807b39c506b5269f03dd2576"
+}
