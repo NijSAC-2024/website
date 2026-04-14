@@ -1,0 +1,56 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT user_id, committee_id, role AS \"role: CommitteeRole\", joined, \"left\"\n            FROM user_committee\n            WHERE user_id = $1\n            ORDER BY joined DESC\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "user_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "committee_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "role: CommitteeRole",
+        "type_info": {
+          "Custom": {
+            "name": "committee_role",
+            "kind": {
+              "Enum": [
+                "chair",
+                "member"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "joined",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 4,
+        "name": "left",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "a4a9e5a5deef523f5155f4df09ce637c5e981b1101f06a69b5cb19f17829c093"
+}

@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO user_committee (id, committee_id, user_id, role, joined)\n            VALUES ($1, $2, $3, 'member', now())\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "9975663b34af8c4cfd62a1889f63795676184a1bb118c216c6c611a3c9db6224"
+}
