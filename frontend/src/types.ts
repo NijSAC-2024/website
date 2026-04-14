@@ -13,12 +13,13 @@ export type EventType = 'activity' | 'course' | 'training' | 'weekend';
 
 export type ErrorType = Language | boolean;
 
-export type MembershipStatus =
-    | 'pending'
+export type Membership =
     | 'member'
     | 'affiliated'
     | 'nonMember'
     | 'donor';
+
+export type Status = 'pending' | 'accepted' | 'rejected';
 
 export type CommitteeRoleType = 'chair' | 'member';
 
@@ -43,7 +44,8 @@ export interface OptionsType {
   id:
         | WeekendType
         | EventType
-        | MembershipStatus
+        | Membership
+        | Status
         | QuestionType
         | ExperienceType
         | QuestionTypeType
@@ -116,7 +118,7 @@ export interface EventContent {
   registrationMax?: number;
   waitingListMax?: number;
   isPublished: boolean;
-  requiredMembershipStatus: MembershipStatus[];
+  requiredMembership: Membership[];
   eventType: EventType;
   questions: Question[];
   metadata?: Metadata;
@@ -188,7 +190,8 @@ export interface UserContent extends Omit<BasicUser, 'id'> {
   iceContactEmail: string;
   iceContactPhone: string;
   roles: RoleType[];
-  status: MembershipStatus;
+  membership: Membership;
+  status: Status;
 }
 
 export interface User extends Omit<UserContent, 'password'> {
@@ -367,8 +370,8 @@ export const memberOptions: OptionsType[] = [
     id: 'affiliated',
     label: {en: 'Affiliated', nl: 'Aangeslotene'}
   },
+  {id: 'donor', label: {en: 'Donor', nl: 'Donateur'}},
   {id: 'nonMember', label: {en: 'Non Member', nl: 'Niet Lid'}},
-  {id: 'pending', label: {en: 'Pending', nl: 'In afwachting'}}
 ];
 
 export const labelOptions: OptionsType[] = [
@@ -386,6 +389,8 @@ export const labelOptions: OptionsType[] = [
   {id: 'donor', label: {en: 'Donor', nl: 'Donateur'}},
   {id: 'nonMember', label: {en: 'Non Member', nl: 'Niet Lid'}},
   {id: 'pending', label: {en: 'Pending', nl: 'In afwachting'}},
+  {id: 'accepted', label: {en: 'Accepted', nl: 'Geaccepteerd'}},
+  {id: 'rejected', label: {en: 'Rejected', nl: 'Afgewezen'}},
   {id: 'text', label: {en: 'Text Question', nl: 'Tekstvraag'}},
   {id: 'multipleChoice', label: {en: 'Option Question', nl: 'Meerkeuzevraag'}},
   {id: 'number', label: {en: 'Number Question', nl: 'Getalvraag'}},

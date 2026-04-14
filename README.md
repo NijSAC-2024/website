@@ -17,12 +17,13 @@ Windows
 docker exec website-db-1 rm -rf /tmp/fixtures
 ```
 ```shell
-docker cp backend/src/data_source/fixtures website-db-1:/tmp/fixtures
+docker exec website-db-1 mkdir -p /tmp/fixtures
+docker cp backend/src/data_source/fixtures/. website-db-1:/tmp/fixtures
 ```
 ```shell
-docker exec -i website-db-1 psql -U nijsac -d nijsac -f /tmp/fixtures/committee.sql
-docker exec -i website-db-1 psql -U nijsac -d nijsac -f /tmp/fixtures/event_registration.sql
-docker exec -i website-db-1 psql -U nijsac -d nijsac -f /tmp/fixtures/event.sql
-docker exec -i website-db-1 psql -U nijsac -d nijsac -f /tmp/fixtures/location.sql
 docker exec -i website-db-1 psql -U nijsac -d nijsac -f /tmp/fixtures/user.sql
+docker exec -i website-db-1 psql -U nijsac -d nijsac -f /tmp/fixtures/location.sql
+docker exec -i website-db-1 psql -U nijsac -d nijsac -f /tmp/fixtures/committee.sql
+docker exec -i website-db-1 psql -U nijsac -d nijsac -f /tmp/fixtures/event.sql
+docker exec -i website-db-1 psql -U nijsac -d nijsac -f /tmp/fixtures/event_registration.sql
 ```

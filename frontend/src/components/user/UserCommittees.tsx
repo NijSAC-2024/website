@@ -15,7 +15,7 @@ export default function UserCommittees() {
   const {navigate, state: {routerState: {params}}} = useWebsite();
   const {committees, currentCommittees} = useCommittees();
 
-  if (!committees || !currentCommittees || !user) {
+  if (!committees || !currentCommittees || !user || user.status != 'accepted') {
     return null;
   }
 

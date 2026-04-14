@@ -12,7 +12,7 @@ use axum::{Json, extract::Path, http::HeaderMap};
 // TODO this needs some rework
 
 fn read_all_access(session: &Session) -> AppResult<()> {
-    if session.membership_status().is_member()
+    if session.is_member()
         && session.roles().iter().any(|role| {
             matches!(
                 role,

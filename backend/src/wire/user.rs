@@ -1,5 +1,5 @@
 use crate::{
-    auth::role::{MembershipStatus, Roles},
+    auth::role::{Membership, Roles, Status},
     error::Error,
 };
 use argon2::{
@@ -75,7 +75,8 @@ pub struct UserContent {
     #[validate(length(max = 1000))]
     pub important_info: Option<String>,
     pub roles: Roles,
-    pub status: MembershipStatus,
+    pub membership: Membership,
+    pub status: Status,
     #[validate(email)]
     pub email: String,
 }
@@ -158,7 +159,8 @@ pub struct RegisterNewUser {
     pub ice_contact_phone: Option<String>,
     #[validate(length(max = 1000))]
     pub important_info: Option<String>,
-    pub status: MembershipStatus,
+    pub membership: Membership,
+    pub status: Status,
 }
 
 impl RegisterNewUser {

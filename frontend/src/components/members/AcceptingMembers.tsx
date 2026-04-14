@@ -1,13 +1,14 @@
-import {Collapse, IconButton, Tooltip} from '@mui/material';
+import {Chip, Collapse, IconButton, Tooltip} from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import TextCard from '../../components/TextCard';
-import { useLanguage } from '../../providers/LanguageProvider';
+import {useLanguage} from '../../providers/LanguageProvider';
 import UserDetails from '../UserDetails.tsx';
 import ContentCard from '../ContentCard.tsx';
 import {useUsers} from '../../hooks/useUsers.ts';
+import {getLabel} from '../../util.ts';
 
 interface AcceptingMembersProps {
   expanded: Record<string, boolean>;
@@ -18,8 +19,8 @@ export default function AcceptingMembers({
   expanded,
   toggleExpand
 }: AcceptingMembersProps) {
-  const { text } = useLanguage();
-  const { users, updateUser } = useUsers()
+  const {text} = useLanguage();
+  const {users, updateUser} = useUsers()
 
   const pendingUsers = users.filter((u) => u.status === 'pending');
 
@@ -38,25 +39,28 @@ export default function AcceptingMembers({
                   <p className="text-sm text-gray-500">{u.email}</p>
                 </div>
                 <div className="flex items-center gap-1">
-                  <Tooltip title={expanded[u.id] ? text('Less info', 'Minder info') : text('More info', 'Meer info')}>
+                  <Chip color="primary"
+                    label={`${text('Applying for:', 'Inschrijven als:')} ${text(getLabel(u.membership))}`}/>
+                  <Tooltip
+                    title={expanded[u.id] ? text('Less info', 'Minder info') : text('More info', 'Meer info')}>
                     <IconButton onClick={() => toggleExpand(u.id)}>
-                      {expanded[u.id] ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                      {expanded[u.id] ? <ExpandLessIcon/> : <ExpandMoreIcon/>}
                     </IconButton>
                   </Tooltip>
                   <Tooltip title={text('Accept', 'Accepteer')}>
                     <IconButton
                       color="success"
-                      onClick={() => updateUser(u.id, { ...u, status: 'member' })}
+                      onClick={() => updateUser(u.id, {...u, status: 'accepted'})}
                     >
-                      <CheckIcon />
+                      <CheckIcon/>
                     </IconButton>
                   </Tooltip>
-                  <Tooltip title={text('Deny', 'Wijs af')}>
+                  <Tooltip title={text('Reject', 'Wijs af')}>
                     <IconButton
                       color="error"
-                      onClick={() => updateUser(u.id, { ...u, status: 'pending' })}
+                      onClick={() => updateUser(u.id, {...u, status: 'rejected'})}
                     >
-                      <CloseIcon />
+                      <CloseIcon/>
                     </IconButton>
                   </Tooltip>
                 </div>

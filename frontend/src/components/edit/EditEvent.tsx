@@ -26,7 +26,7 @@ export default function EditEvent() {
       },
       dates: [{start: now.toISOString(), end: now.toISOString()}],
       isPublished: false,
-      requiredMembershipStatus: ['member'],
+      requiredMembership: ['member'],
       eventType: 'activity',
       questions: [],
       location: '',
@@ -102,7 +102,7 @@ export default function EditEvent() {
         />
 
         <EditRegistrations
-          requiredMembershipStatus={event.requiredMembershipStatus}
+          requiredMembership={event.requiredMembership}
           registrationMax={event.registrationMax}
           waitingListMax={event.waitingListMax}
           registrationPeriod={event.registrationPeriod}

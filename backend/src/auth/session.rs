@@ -2,7 +2,7 @@ use crate::{
     AppState,
     auth::{
         COOKIE_NAME,
-        role::{MembershipStatus, Roles},
+        role::{Membership, Roles, Status},
     },
     data_source::UserStore,
     error::{AppResult, Error},
@@ -25,7 +25,8 @@ pub struct Session {
     user_id: UserId,
     cookie_value: String,
     roles: Roles,
-    membership_status: MembershipStatus,
+    membership: Membership,
+    status: Status,
     expiration: OffsetDateTime,
 }
 
@@ -33,7 +34,8 @@ struct PgSession {
     user_id: Uuid,
     cookie_value: String,
     roles: serde_json::Value,
-    status: MembershipStatus,
+    membership: Membership,
+    status: Status,
     expiration: OffsetDateTime,
 }
 
@@ -45,7 +47,8 @@ impl TryFrom<PgSession> for Session {
             user_id: pg.user_id.into(),
             cookie_value: pg.cookie_value,
             roles: serde_json::from_value(pg.roles)?,
-            membership_status: pg.status,
+            membership: pg.membership,
+            status: pg.status,
             expiration: pg.expiration,
         })
     }
@@ -56,8 +59,16 @@ impl Session {
         &self.roles
     }
 
-    pub fn membership_status(&self) -> MembershipStatus {
-        self.membership_status
+    pub fn membership(&self) -> Membership {
+        self.membership
+    }
+
+    pub fn status(&self) -> Status {
+        self.status
+    }
+
+    pub fn is_member(&self) -> bool {
+        self.status == Status::Accepted && self.membership.is_member()
     }
 
     pub fn user_id(&self) -> &UserId {
@@ -79,7 +90,8 @@ impl Session {
             SELECT cookie_value,
                    u.id AS user_id,
                    roles,
-                   status AS "status: MembershipStatus",
+                   membership AS "membership: Membership",
+                   status AS "status: Status",
                    expiration
             FROM session
                 JOIN "user" u ON user_id = u.id
@@ -151,7 +163,8 @@ impl Session {
             SELECT cookie_value,
                    u.id AS user_id,
                    roles,
-                   status AS "status: MembershipStatus",
+                   membership AS "membership: Membership",
+                   status AS "status: Status",
                    expiration
             FROM new_session
                 JOIN "user" u ON user_id = u.id

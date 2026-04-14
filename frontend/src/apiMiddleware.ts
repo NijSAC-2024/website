@@ -70,7 +70,7 @@ export default async function apiMiddleware(
   }
 
   if (user) {
-    if ((user.status === 'member' || user.status === 'affiliated')) {
+    if (user.status === 'accepted' && (user.membership === 'member' || user.membership === 'affiliated')) {
       if ((!navState.state.userEventRegistrations || forceReload) && navState.to.name.startsWith('events')) {
         dispatch({
           type: 'set_user_event_registrations',
@@ -114,14 +114,16 @@ export default async function apiMiddleware(
         type: 'set_current_user',
         user: await get(`/api/user/${navState.to.params.user_id}`)
       });
-      dispatch({
-        type: 'set_current_committees',
-        committees: await get(`/api/user/${navState.to.params.user_id}/committees`)
-      });
-      dispatch({
-        type: 'set_my_committees',
-        committees: await get(`/api/user/${user.id}/committees`)
-      });
+      if (user.status == 'accepted') {
+        dispatch({
+          type: 'set_current_committees',
+          committees: await get(`/api/user/${navState.to.params.user_id}/committees`)
+        });
+        dispatch({
+          type: 'set_my_committees',
+          committees: await get(`/api/user/${user.id}/committees`)
+        });
+      }
     }
   }
 
@@ -130,8 +132,9 @@ export default async function apiMiddleware(
       const currentEvent = events?.find((e) => e.id === navState.to.params.event_id);
       if (currentEvent &&
                 ((user &&
-                        currentEvent.requiredMembershipStatus.includes(user.status))
-                    || currentEvent.requiredMembershipStatus.includes('nonMember'))) {
+                        user.status === 'accepted' &&
+                        currentEvent.requiredMembership.includes(user.membership))
+                    || currentEvent.requiredMembership.includes('nonMember'))) {
         dispatch({
           type: 'set_event_registrations',
           registrations: await get(`/api/event/${navState.to.params.event_id}/registration`)

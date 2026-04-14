@@ -5,12 +5,12 @@ import {Button, Chip, Collapse} from '@mui/material';
 import {useState} from 'react';
 import SignupOptions from '../components/signup/SingupOptions.tsx';
 import {useLanguage} from '../providers/LanguageProvider.tsx';
-import {MembershipStatus, UserContent} from '../types.ts';
+import {Membership, UserContent} from '../types.ts';
 import {useWebsite} from '../hooks/useState.ts';
 import {useUsers} from '../hooks/useUsers.ts';
 
 interface MembershipType {
-  id: MembershipStatus;
+  id: Membership;
   label: { en: string, nl: string };
 }
 
@@ -37,6 +37,7 @@ export default function Signup() {
     nkbvNumber: 0,
     sportcardNumber: 0,
     studentNumber: 0,
+    membership: 'member',
     status: 'pending'
   });
 
@@ -52,14 +53,17 @@ export default function Signup() {
 
   const handleExtraordinaryMember = () => {
     setMembership({id: 'affiliated', label: {en: 'Affiliated', nl: 'Aangeslotene'}});
+    setNewUser(prev => ({...prev, membership: 'affiliated'}));
     setSelectedMembership(true);
   };
   const handleMember = () => {
     setMembership({id: 'member', label: {en: 'Member', nl: 'Lid'}});
+    setNewUser(prev => ({...prev, membership: 'member'}));
     setSelectedMembership(true);
   };
   const handleDonor = () => {
     setMembership({id: 'donor', label: {en: 'Donor', nl: 'Donateur'}});
+    setNewUser(prev => ({...prev, membership: 'donor'}));
     setSelectedMembership(true);
   };
   const handleChangeMembership = () => {
@@ -98,7 +102,8 @@ export default function Signup() {
           </Collapse>
         </div>
         <Collapse in={selectedMembership} timeout="auto" unmountOnExit>
-          <div className="px-7 pt-5 pb-7 border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
+          <div
+            className="px-7 pt-5 pb-7 border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
             <SignupForm newUser={newUser} handleChange={handleChange} handleSubmit={handleSubmit}/>
           </div>
         </Collapse>

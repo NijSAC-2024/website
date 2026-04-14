@@ -62,7 +62,7 @@ export default function UserMenu({toggleDropdown}: UserMenuProps) {
           </ListItemIcon>
           {text('My account', 'Mijn account')}
         </MenuItem>
-        <MenuItem disabled={user.status === 'pending'} onClick={() => navigateSubmenu('members')}>
+        <MenuItem disabled={user.status !== 'accepted'} onClick={() => navigateSubmenu('members')}>
           <ListItemIcon>
             <GroupIcon fontSize="small" />
           </ListItemIcon>
