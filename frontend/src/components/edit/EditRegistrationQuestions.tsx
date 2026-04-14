@@ -1,4 +1,4 @@
-import { Checkbox, IconButton, TextField, Menu, MenuItem } from '@mui/material';
+import {Checkbox, IconButton, TextField, Menu, MenuItem} from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
@@ -9,8 +9,8 @@ import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import {EventContent, Language, Question, QuestionTypeType} from '../../types.ts';
-import { useLanguage } from '../../providers/LanguageProvider.tsx';
-import { useState } from 'react';
+import {useLanguage} from '../../providers/LanguageProvider.tsx';
+import {useState} from 'react';
 import {getLabel} from '../../util.ts';
 
 
@@ -23,17 +23,29 @@ export default function EditRegistrationQuestions({
   questions,
   handleEventChange
 }: EditRegistrationQuestionProps) {
-  const { text } = useLanguage();
+  const {text} = useLanguage();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [activeQuestionId, setActiveQuestionId] = useState<string | null>(null);
   const menuOpen = Boolean(anchorEl);
 
   const questionTypeMenuItems = [
-    { type: 'text', icon: <TextFieldsIcon fontSize="small" />, label: { en: 'Text Question', nl: 'Tekstvraag' } },
-    { type: 'multipleChoice', icon: <ListIcon fontSize="small" />, label: { en: 'Option Question', nl: 'Meerkeuzevraag' } },
-    { type: 'number', icon: <NumbersIcon fontSize="small" />, label: { en: 'Number Question', nl: 'Getalvraag' } },
-    { type: 'boolean', icon: <CheckBoxIcon fontSize="small" />, label: { en: 'Checkbox Question', nl: 'Checkboxvraag' } },
-    { type: 'date', icon: <DateRangeIcon fontSize="small" />, label: { en: 'Date & Time Question', nl: 'Datum- & Tijdvraag' } }
+    {type: 'text', icon: <TextFieldsIcon fontSize="small"/>, label: {en: 'Text Question', nl: 'Tekstvraag'}},
+    {
+      type: 'multipleChoice',
+      icon: <ListIcon fontSize="small"/>,
+      label: {en: 'Option Question', nl: 'Meerkeuzevraag'}
+    },
+    {type: 'number', icon: <NumbersIcon fontSize="small"/>, label: {en: 'Number Question', nl: 'Getalvraag'}},
+    {
+      type: 'boolean',
+      icon: <CheckBoxIcon fontSize="small"/>,
+      label: {en: 'Checkbox Question', nl: 'Checkboxvraag'}
+    },
+    {
+      type: 'date',
+      icon: <DateRangeIcon fontSize="small"/>,
+      label: {en: 'Date & Time Question', nl: 'Datum- & Tijdvraag'}
+    }
   ];
 
   const activeQuestion = activeQuestionId
@@ -47,7 +59,7 @@ export default function EditRegistrationQuestions({
   ) => {
     handleEventChange({
       questions: questions.map((question) =>
-        question.id === id ? { ...question, [name]: value } : question
+        question.id === id ? {...question, [name]: value} : question
       )
     });
   };
@@ -82,7 +94,7 @@ export default function EditRegistrationQuestions({
               type,
               options: type === 'multipleChoice' ? [] : undefined
             },
-            question: { en: '', nl: '' },
+            question: {en: '', nl: ''},
             required: false
           }
         ]
@@ -106,7 +118,7 @@ export default function EditRegistrationQuestions({
             questionType: {
               ...q.questionType,
               options: q.questionType.options?.map((opt, i) =>
-                i === index ? { ...opt, [lang]: value } : opt
+                i === index ? {...opt, [lang]: value} : opt
               ) ?? []
             }
           }
@@ -123,7 +135,7 @@ export default function EditRegistrationQuestions({
             ...q,
             questionType: {
               ...q.questionType,
-              options: [...(q.questionType.options ?? []), { en: '', nl: '' }]
+              options: [...(q.questionType.options ?? []), {en: '', nl: ''}]
             }
           }
           : q
@@ -210,7 +222,7 @@ export default function EditRegistrationQuestions({
                             color="error"
                             onClick={() => handleRemoveOption(question.id, i)}
                           >
-                            <DeleteIcon fontSize="small" />
+                            <DeleteIcon fontSize="small"/>
                           </IconButton>
                         </Tooltip>
                       </div>
@@ -222,7 +234,7 @@ export default function EditRegistrationQuestions({
                           color="primary"
                           onClick={() => handleAddOption(question.id)}
                         >
-                          <AddIcon fontSize="small" />
+                          <AddIcon fontSize="small"/>
                         </IconButton>
                       </Tooltip>
                     </div>
@@ -238,7 +250,7 @@ export default function EditRegistrationQuestions({
                       setActiveQuestionId(question.id);
                     }}
                   >
-                    <MoreVertIcon />
+                    <MoreVertIcon/>
                   </IconButton>
                 </Tooltip>
               </div>
@@ -253,7 +265,7 @@ export default function EditRegistrationQuestions({
             color="primary"
             onClick={(e) => setAnchorEl(e.currentTarget)}
           >
-            <AddIcon fontSize="large" />
+            <AddIcon fontSize="large"/>
           </IconButton>
         </Tooltip>
         <Menu
@@ -303,7 +315,7 @@ export default function EditRegistrationQuestions({
                   setActiveQuestionId(null);
                 }}
               >
-                <DeleteIcon color="error" fontSize="small" className="mr-2" />
+                <DeleteIcon color="error" fontSize="small" className="mr-2"/>
                 <p className="dark:text-[#f44336] text-[#d32f2f]">{text('Delete Question', 'Verwijder Vraag')}</p>
               </MenuItem>
             </>

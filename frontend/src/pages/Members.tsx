@@ -22,7 +22,7 @@ export default function Members() {
 
   return (
     <GenericPage>
-      {isAdminOrBoard(user) && (
+      {isAdminOrBoard(user.roles) && (
         <AcceptingMembers
           expanded={expanded}
           toggleExpand={toggleExpand}

@@ -1,25 +1,20 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT id, user_id, committee_id, role AS \"role: CommitteeRole\", joined, \"left\"\n            FROM user_committee\n            WHERE user_id = $1\n            ORDER BY joined DESC\n            ",
+  "query": "\n            SELECT user_id, committee_id, role AS \"role: CommitteeRole\", joined, \"left\"\n            FROM user_committee\n            WHERE user_id = $1\n            ORDER BY joined DESC\n            ",
   "describe": {
     "columns": [
       {
         "ordinal": 0,
-        "name": "id",
-        "type_info": "Uuid"
-      },
-      {
-        "ordinal": 1,
         "name": "user_id",
         "type_info": "Uuid"
       },
       {
-        "ordinal": 2,
+        "ordinal": 1,
         "name": "committee_id",
         "type_info": "Uuid"
       },
       {
-        "ordinal": 3,
+        "ordinal": 2,
         "name": "role: CommitteeRole",
         "type_info": {
           "Custom": {
@@ -34,12 +29,12 @@
         }
       },
       {
-        "ordinal": 4,
+        "ordinal": 3,
         "name": "joined",
         "type_info": "Timestamptz"
       },
       {
-        "ordinal": 5,
+        "ordinal": 4,
         "name": "left",
         "type_info": "Timestamptz"
       }
@@ -54,9 +49,8 @@
       false,
       false,
       false,
-      false,
       true
     ]
   },
-  "hash": "aaf95767ede4a72d5f4c105117f9eb65d524909b1071d181d25e1a9d7be6952e"
+  "hash": "a4a9e5a5deef523f5155f4df09ce637c5e981b1101f06a69b5cb19f17829c093"
 }

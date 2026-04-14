@@ -24,7 +24,7 @@ export default function ChangePassword() {
     return null;
   }
 
-  const canEdit = isAdminOrBoard(user) || params.user_id === user.id;
+  const canEdit = isAdminOrBoard(user.roles) || params.user_id === user.id;
   if (!canEdit) {
     return null;
   }

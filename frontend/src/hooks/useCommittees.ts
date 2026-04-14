@@ -1,6 +1,6 @@
 import {useSelector} from './useSelector.ts';
 import {WebsiteError} from '../error/error.ts';
-import {BasicUser, Committee, CommitteeContent} from '../types.ts';
+import {BasicUser, Committee, CommitteeContent, CommitteeRoleType} from '../types.ts';
 import {apiFetch, apiFetchVoid} from '../api.ts';
 import {enqueueSnackbar} from 'notistack';
 import {useLanguage} from '../providers/LanguageProvider.tsx';
@@ -12,6 +12,7 @@ export function useCommittees() {
   const routerState = useSelector((state) => state.routerState);
 
   const myCommittees = useSelector((state) => state.myCommittees || []);
+  const currentCommittees = useSelector((state) => state.currentCommittees || []);
   const committees = useSelector((state) => state.committees || []);
   const committeeMembers = useSelector((state) => state.committeeMembers || []);
 
@@ -31,7 +32,7 @@ export function useCommittees() {
       return;
     }
     dispatch({type: 'add_committee', committee});
-    enqueueSnackbar(text('Committee created', 'Committee aangemaakt'), {variant: 'success'});
+    enqueueSnackbar(text('Committee created', 'Commissie aangemaakt'), {variant: 'success'});
   };
 
   const updateCommittee = async (committeeId: string, content: CommitteeContent) => {
@@ -47,7 +48,7 @@ export function useCommittees() {
     }
     dispatch({type: 'delete_committee', committeeId});
     dispatch({type: 'add_committee', committee});
-    enqueueSnackbar(text('Committee updated', 'Committee bijgewerkt'), {variant: 'success'});
+    enqueueSnackbar(text('Committee updated', 'Commissie bijgewerkt'), {variant: 'success'});
   };
 
   const deleteCommittee = async (committeeId: string) => {
@@ -59,7 +60,7 @@ export function useCommittees() {
       return;
     }
     dispatch({type: 'delete_committee', committeeId});
-    enqueueSnackbar(text('Committee deleted', 'Committee verwijderd'), {variant: 'success'});
+    enqueueSnackbar(text('Committee deleted', 'Commissie verwijderd'), {variant: 'success'});
   };
 
   const addUserToCommittee = async (committeeId: string, userId: string): Promise<boolean> => {
@@ -70,8 +71,8 @@ export function useCommittees() {
       enqueueSnackbar(`${error.message}: ${error.reference}`, {variant: 'error'});
       return false;
     }
-    dispatch({type: 'add_committee_member', user: data, committeeId, role: 'member'});
-    enqueueSnackbar(text('User added to committee', 'Gebruiker an committee toevoegt'), {variant: 'success'});
+    dispatch({type: 'add_committee_member', user: data, committeeId});
+    enqueueSnackbar(text('User added to committee', 'Gebruiker aan commissie toegevoegd'), {variant: 'success'});
     return true;
   };
 
@@ -84,12 +85,55 @@ export function useCommittees() {
       return false;
     }
     dispatch({type: 'delete_committee_member', userId, committeeId});
-    enqueueSnackbar(text('User removed from committee', 'Gebruiker uit committee gehaald'), {variant: 'success'});
+    enqueueSnackbar(text('User removed from committee', 'Gebruiker uit committee verwijderd'), {variant: 'success'});
+    return true;
+  };
+
+  const makeChair = async (committeeId: string, userId: string): Promise<boolean> => {
+    const {error} = await apiFetchVoid(
+      `/committee/${committeeId}/user/${userId}/chair`,
+      {method: 'POST'}
+    );
+    if (error) {
+      enqueueSnackbar(`${error.message}: ${error.reference}`, {variant: 'error'});
+      return false;
+    }
+    const now = new Date().toISOString();
+    dispatch({
+      type: 'set_committee_members',
+      members: committeeMembers.map(m =>
+        m.role === 'chair'
+          ? {...m, role: 'member'}
+          : m.id === userId
+            ? {...m, role: 'chair'}
+            : m
+      ),
+    });
+    const oldChairId = committeeMembers.find(m => m.role === 'chair')?.id;
+    dispatch({
+      type: 'set_current_committees',
+      committees: [
+        ...(currentCommittees || []).map(c =>
+          c.committeeId === committeeId && c.left == null && (c.userId === userId || c.userId === oldChairId)
+            ? {...c, left: now}
+            : c
+        ),
+        {committeeId, userId, role: 'chair' as CommitteeRoleType, joined: now},
+        ...(oldChairId ? [{
+          committeeId,
+          userId: oldChairId,
+          role: 'member' as CommitteeRoleType,
+          joined: now
+        }] : []),
+      ],
+    });
+    enqueueSnackbar(text('Chair updated', 'Hoofd bijgewerkt'), {variant: 'success'});
     return true;
   };
 
   return {
     myCommittees,
+    currentCommittees,
     committees,
     committee,
     committeeMembers,
@@ -97,6 +141,7 @@ export function useCommittees() {
     updateCommittee,
     deleteCommittee,
     addUserToCommittee,
-    deleteUserFromCommittee
+    deleteUserFromCommittee,
+    makeChair
   };
 }

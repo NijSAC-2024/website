@@ -191,7 +191,7 @@ impl TryFrom<PgRegistration> for Registration {
 }
 
 impl EventStore {
-    pub(crate) async fn ensure_user_in_committee(
+    pub async fn ensure_user_in_committee(
         &self,
         session: &Session,
         committee_id: &Uuid,
@@ -223,13 +223,43 @@ impl EventStore {
         Ok(())
     }
 
+    pub async fn ensure_user_is_committee_chair(
+        &self,
+        session: &Session,
+        committee_id: &Uuid,
+    ) -> AppResult<()> {
+        if crate::api::is_admin_or_board(session).is_ok() {
+            return Ok(());
+        }
+
+        let is_chair = sqlx::query_scalar!(
+            r#"
+        SELECT EXISTS(
+            SELECT 1
+            FROM user_committee
+            WHERE user_id = $1
+              AND committee_id = $2
+              AND role = 'chair'
+              AND "left" IS NULL
+        )
+        "#,
+            **session.user_id(),
+            *committee_id
+        )
+        .fetch_one(&self.db)
+        .await?
+        .unwrap_or(false);
+
+        if !is_chair {
+            return Err(Error::Unauthorized);
+        }
+        Ok(())
+    }
+
     pub async fn create_event(
         &self,
         mut event: EventContent<LocationId>,
-        session: &Session,
     ) -> AppResult<Event<Location>> {
-        self.ensure_user_in_committee(session, &event.created_by)
-            .await?;
         let event_id = Uuid::now_v7();
 
         event.dates.sort_by_key(|date| date.start);
@@ -289,9 +319,7 @@ impl EventStore {
             event.created_by
         ).execute(&self.db).await?;
 
-        let event = self.get_event(&event_id.into(), true).await?;
-
-        Ok(event)
+        self.get_event(&event_id.into(), true).await
     }
 
     pub async fn get_event(
@@ -402,11 +430,7 @@ impl EventStore {
         &self,
         id: &EventId,
         mut updated: EventContent<LocationId>,
-        session: &Session,
     ) -> AppResult<Event<Location>> {
-        self.ensure_user_in_committee(session, &updated.created_by)
-            .await?;
-
         updated.dates.sort_by_key(|date| date.start);
         let (start_dates, end_dates) = updated.dates.into_iter().fold(
             (Vec::new(), Vec::new()),
@@ -467,16 +491,7 @@ impl EventStore {
         self.get_event(id, true).await
     }
 
-    pub async fn delete_event(&self, id: &EventId, session: &Session) -> AppResult<()> {
-        let committee_id =
-            sqlx::query_scalar!(r#"SELECT created_by FROM event WHERE id = $1"#, **id)
-                .fetch_optional(&self.db)
-                .await?
-                .ok_or_else(|| Error::Unauthorized)?;
-
-        self.ensure_user_in_committee(session, &committee_id)
-            .await?;
-
+    pub async fn delete_event(&self, id: &EventId) -> AppResult<()> {
         sqlx::query!(r#"DELETE FROM event WHERE id = $1"#, **id)
             .execute(&self.db)
             .await?;

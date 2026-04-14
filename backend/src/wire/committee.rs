@@ -1,4 +1,8 @@
-use crate::{Language, file::FileId, user::UserId};
+use crate::{
+    Language,
+    file::FileId,
+    user::{BasicUser, UserId},
+};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::ops::Deref;
 use time::OffsetDateTime;
@@ -86,4 +90,12 @@ pub struct UserCommittee {
         deserialize_with = "deserialize_option"
     )]
     pub left: Option<OffsetDateTime>,
+}
+
+#[derive(Serialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct CommitteeUser {
+    #[serde(flatten)]
+    pub user: BasicUser,
+    pub role: CommitteeRole,
 }

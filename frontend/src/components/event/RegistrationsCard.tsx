@@ -7,7 +7,7 @@ import AreYouSure from '../AreYouSure.tsx';
 import RegistrationTable from './RegistrationTable.tsx';
 import RegistrationDialog from './RegistrationDialog.tsx';
 import RegisterUserAutocomplete from './RegisterUserAutocomplete.tsx';
-import {inCommittee, isAdminOrBoard} from '../../util.ts';
+import {isAdminOrBoard, isChair} from '../../util.ts';
 import AccessAlarmIcon from '@mui/icons-material/AccessAlarm';
 import moment from 'moment';
 import {useUsers} from '../../hooks/useUsers.ts';
@@ -77,7 +77,7 @@ export default function RegistrationsCard({ questions }: RegistrationsCardProps)
             {moment(currentEvent.registrationPeriod.end).format('DD MMM HH:mm')}
           </p>
 
-          {user && (isAdminOrBoard(user) || inCommittee(myCommittees, currentEvent)) && (
+          {user && (isAdminOrBoard(user.roles) || isChair(myCommittees, currentEvent.createdBy)) && (
             <Box className="mt-2 grid" component="form" onSubmit={(e) => { e.preventDefault(); toggleRegisterDialog(); }}>
               <FormControl>
                 <RegisterUserAutocomplete

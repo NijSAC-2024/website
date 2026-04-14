@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT EXISTS(\n            SELECT 1\n            FROM user_committee\n            WHERE user_id = $1\n              AND committee_id = $2\n              AND role = 'chair'\n              AND \"left\" IS NULL\n        )\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "exists",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "3357623ee42ad14297ae11c172a1e321b129be3d062cdc92a5bfb84520e02caf"
+}

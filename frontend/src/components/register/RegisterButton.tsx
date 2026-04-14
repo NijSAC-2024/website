@@ -82,6 +82,8 @@ export default function RegisterButton({
       color = 'text-red-500';
     } else if (diffDays <= 7) {
       message = `Registration closes in ${diffDays === 1 ? '1 day' : `${diffDays} days!`}`;
+    } else {
+      return null;
     }
 
     return (
@@ -95,7 +97,7 @@ export default function RegisterButton({
 
   const renderRegistrationStatus = () => {
     if (registration) {
-      if (closeTime < now && user && !isAdminOrBoard(user)) {
+      if (closeTime < now && user && !isAdminOrBoard(user.roles)) {
         if (registration?.waitingListPosition !== undefined) {
           return <Button variant="contained" disabled>{text('In Queue', 'Op de wachtlijst')}</Button>;
         } else {
@@ -112,7 +114,7 @@ export default function RegisterButton({
       }
     }
 
-    if (event.registrationCount && event.registrationMax && event.registrationCount >= event.registrationMax && (user && !isAdminOrBoard(user))) {
+    if (event.registrationCount && event.registrationMax && event.registrationCount >= event.registrationMax && (user && !isAdminOrBoard(user.roles))) {
       if (event.waitingListCount !== undefined && event.waitingListMax !== undefined && event.waitingListCount >= event.waitingListMax) {
         return <Button variant="contained" disabled>{text('Full', 'Vol')}</Button>;
       }
@@ -133,7 +135,7 @@ export default function RegisterButton({
 
     if (closeTime > now) {
       if (canRegister) {
-        if (event.registrationCount && event.registrationMax && event.registrationCount >= event.registrationMax && (user && !isAdminOrBoard(user))) {
+        if (event.registrationCount && event.registrationMax && event.registrationCount >= event.registrationMax && (user && !isAdminOrBoard(user.roles))) {
           return <Button variant="contained"
             onClick={handleRegistrationClick}>{renderClock()}{text('Join Queue', 'Inschrijven wachtlijst')}</Button>;
         }
@@ -145,7 +147,7 @@ export default function RegisterButton({
       }
       //TODO: Open login dialog
       return <Button variant="contained">{text('Login to register', 'Login om in te schrijven')}</Button>;
-    } else if (user && isAdminOrBoard(user)) {
+    } else if (user && isAdminOrBoard(user.roles)) {
       return <Button variant="contained" onClick={handleRegistrationClick}>{text('Register', 'Inschrijven')}</Button>;
     }
 
@@ -174,7 +176,7 @@ export default function RegisterButton({
                 'Inschrijving voor ' + event.name.nl
               )}
             </h1>
-            {!registration && event.registrationMax && !!event.registrationCount && event.registrationCount >= event.registrationMax && (user && !isAdminOrBoard(user)) && (
+            {!registration && event.registrationMax && !!event.registrationCount && event.registrationCount >= event.registrationMax && (user && !isAdminOrBoard(user.roles)) && (
               <b>
                 {text('The event is currently full. By registering, you will be put in the waiting queue. If a spot becomes available, you will automatically be registered and notified.',
                   'Het evenement zit momenteel vol. Door je aan te melden kom je op de wachtlijst. Zodra er een plek vrijkomt, word je automatisch ingeschreven en ontvang je bericht.')}

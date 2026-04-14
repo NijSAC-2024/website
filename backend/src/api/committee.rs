@@ -2,7 +2,9 @@ use crate::{
     ValidatedJson,
     api::{ApiResult, is_admin_or_board},
     auth::session::Session,
-    committee::{Committee, CommitteeContent, CommitteeId, CommitteeRole, UserCommittee},
+    committee::{
+        Committee, CommitteeContent, CommitteeId, CommitteeRole, CommitteeUser, UserCommittee,
+    },
     data_source::committee::CommitteeStore,
     error::{AppResult, Error},
     user::{BasicUser, UserId},
@@ -97,7 +99,7 @@ pub async fn get_committee_members(
     store: CommitteeStore,
     Path(id): Path<CommitteeId>,
     session: Session,
-) -> ApiResult<Vec<BasicUser>> {
+) -> ApiResult<Vec<CommitteeUser>> {
     if session.membership_status().is_member() {
         Ok(Json(store.get_committee_members(&id).await?))
     } else {
@@ -115,4 +117,17 @@ pub async fn get_user_committees(
     } else {
         Err(Error::Unauthorized)
     }
+}
+
+pub async fn make_chair(
+    store: CommitteeStore,
+    session: Session,
+    Path((committee_id, user_id)): Path<(CommitteeId, UserId)>,
+) -> AppResult<()> {
+    committee_access(&session, &committee_id, &store).await?;
+    store
+        .ensure_user_in_committee(&user_id, &committee_id)
+        .await?;
+    store.make_chair(&committee_id, &user_id).await?;
+    Ok(())
 }

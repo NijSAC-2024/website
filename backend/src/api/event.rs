@@ -15,12 +15,28 @@ use time::OffsetDateTime;
 use tracing::{debug, info, trace, warn};
 use uuid::Uuid;
 
-fn has_registration_access(id: &UserId, session: &Session) -> AppResult<()> {
-    if is_admin_or_board(session).is_ok() || id == session.user_id() {
-        Ok(())
-    } else {
-        Err(Error::Unauthorized)
+async fn has_registration_access(
+    store: &EventStore,
+    user_id: &UserId,
+    session: &Session,
+    event_id: Option<&EventId>,
+) -> AppResult<()> {
+    if is_admin_or_board(session).is_ok() || user_id == session.user_id() {
+        return Ok(());
     }
+
+    if let Some(event_id) = event_id {
+        let event: Event<Location> = store.get_event(event_id, true).await?;
+        if store
+            .ensure_user_is_committee_chair(session, &event.content.created_by)
+            .await
+            .is_ok()
+        {
+            return Ok(());
+        }
+    }
+
+    Err(Error::Unauthorized)
 }
 
 pub async fn get_event_registrations(
@@ -93,11 +109,8 @@ pub async fn get_user_registrations(
     Path(id): Path<UserId>,
     session: Session,
 ) -> ApiResult<Vec<Registration>> {
-    if has_registration_access(&id, &session).is_ok() {
-        Ok(Json(store.get_user_registrations(session.user_id()).await?))
-    } else {
-        Err(Error::Unauthorized)
-    }
+    has_registration_access(&store, &id, &session, None).await?;
+    Ok(Json(store.get_user_registrations(session.user_id()).await?))
 }
 
 pub async fn get_user_events(
@@ -148,7 +161,10 @@ pub async fn create_event(
     session: Session,
     ValidatedJson(new): ValidatedJson<EventContent<LocationId>>,
 ) -> ApiResult<Event<Location>> {
-    Ok(Json(store.create_event(new, &session).await?))
+    store
+        .ensure_user_in_committee(&session, &new.created_by)
+        .await?;
+    Ok(Json(store.create_event(new).await?))
 }
 
 pub async fn update_event(
@@ -157,7 +173,10 @@ pub async fn update_event(
     Path(id): Path<EventId>,
     ValidatedJson(updated): ValidatedJson<EventContent<LocationId>>,
 ) -> ApiResult<Event<Location>> {
-    Ok(Json(store.update_event(&id, updated, &session).await?))
+    store
+        .ensure_user_in_committee(&session, &updated.created_by)
+        .await?;
+    Ok(Json(store.update_event(&id, updated).await?))
 }
 
 pub async fn delete_event(
@@ -165,18 +184,22 @@ pub async fn delete_event(
     session: Session,
     Path(id): Path<EventId>,
 ) -> AppResult<()> {
-    store.delete_event(&id, &session).await
+    let event: Event<Location> = store.get_event(&id, true).await?;
+    store
+        .ensure_user_in_committee(&session, &event.content.created_by)
+        .await?;
+    store.delete_event(&id).await
 }
 
 pub async fn get_registration(
     store: EventStore,
     session: Session,
-    Path((_event_id, registration_id)): Path<(EventId, RegistrationId)>,
+    Path((event_id, registration_id)): Path<(EventId, RegistrationId)>,
 ) -> ApiResult<Registration> {
     let registration = store.get_registration(&registration_id).await?;
 
     if let Some(ref user) = registration.user {
-        has_registration_access(&user.id, &session)?;
+        has_registration_access(&store, &user.id, &session, Some(&event_id)).await?;
     }
     Ok(Json(registration))
 }
@@ -198,14 +221,16 @@ pub async fn create_registration(
             );
             return Err(Error::Unauthorized);
         };
-        has_registration_access(user_id, session).inspect_err(|_| {
-            info!(
-                user_id = user_id.to_string(),
-                logged_in_user = session.user_id().to_string(),
-                event_id = event.id.to_string(),
-                "logged in user does not have permission to update this registration"
-            )
-        })?;
+        has_registration_access(&store, user_id, session, Some(&event_id))
+            .await
+            .inspect_err(|_| {
+                info!(
+                    user_id = user_id.to_string(),
+                    logged_in_user = session.user_id().to_string(),
+                    event_id = event.id.to_string(),
+                    "logged in user does not have permission to update this registration"
+                )
+            })?;
     } else if !event
         .content
         .required_membership_status
@@ -238,14 +263,19 @@ pub async fn create_registration(
     }
 
     if let Some(ref session) = session {
-        if is_admin_or_board(session).is_err() {
+        if !(is_admin_or_board(session).is_ok()
+            || store
+                .ensure_user_is_committee_chair(session, &event.content.created_by)
+                .await
+                .is_ok())
+        {
             ensure_signup_has_not_passed(&event)?;
         }
     } else {
         ensure_signup_has_not_passed(&event)?;
     };
 
-    ensure_correct_waiting_list_position(&event, &mut new, session.as_ref(), None)?;
+    ensure_correct_waiting_list_position(&store, &event, &mut new, session.as_ref(), None).await?;
     trace!(
         event_id = event.id.to_string(),
         "Calculated waiting list position {:?}", new.waiting_list_position
@@ -261,7 +291,7 @@ pub async fn create_registration(
 pub async fn update_registration(
     store: EventStore,
     session: Session,
-    Path((_event_id, registration_id)): Path<(EventId, RegistrationId)>,
+    Path((event_id, registration_id)): Path<(EventId, RegistrationId)>,
     ValidatedJson(mut updated): ValidatedJson<NewRegistration>,
 ) -> ApiResult<Registration> {
     let registration = store.get_registration(&registration_id).await?;
@@ -273,22 +303,30 @@ pub async fn update_registration(
             ));
         };
 
-        has_registration_access(&user_id, &session)?;
+        has_registration_access(&store, &user_id, &session, Some(&event_id)).await?;
     }
 
     let event = store.get_event(&registration.event_id, true).await?;
 
-    if is_admin_or_board(&session).is_err() {
+    if !(is_admin_or_board(&session).is_ok()
+        || store
+            .ensure_user_is_committee_chair(&session, &event.content.created_by)
+            .await
+            .is_ok())
+    {
         ensure_signup_has_not_passed(&event)?;
+        //ensure users cannot update attendance themselves
+        updated.attended = registration.attended;
     }
 
     ensure_correct_waiting_list_position(
+        &store,
         &event,
         &mut updated,
         Some(&session),
         Some(&registration),
-    )?;
-    ensure_attendance_update_full_access_only(&registration, &mut updated, &session);
+    )
+    .await?;
 
     Ok(Json(
         store.update_registration(&registration_id, updated).await?,
@@ -298,21 +336,27 @@ pub async fn update_registration(
 pub async fn delete_registration(
     store: EventStore,
     session: Session,
-    Path((_event_id, registration_id)): Path<(EventId, RegistrationId)>,
+    Path((event_id, registration_id)): Path<(EventId, RegistrationId)>,
 ) -> AppResult<()> {
     if is_admin_or_board(&session).is_ok() {
         store.delete_registration(&registration_id).await
     } else {
         let registration = store.get_registration(&registration_id).await?;
-        if let Some(user) = registration.user {
+        if let Some(user_id) = registration.user.as_ref().map(|u| u.id.clone()) {
             // Normal users can only delete their own registration
-            has_registration_access(&user.id, &session)?
+            has_registration_access(&store, &user_id, &session, Some(&event_id)).await?;
         } else {
             // Anonymous registrations can only be modified by admins
             return Err(Error::Unauthorized);
         };
         let event = store.get_event(&registration.event_id, true).await?;
-        ensure_signup_has_not_passed(&event)?;
+        if store
+            .ensure_user_is_committee_chair(&session, &event.content.created_by)
+            .await
+            .is_err()
+        {
+            ensure_signup_has_not_passed(&event)?;
+        }
         store.delete_registration(&registration_id).await
     }
 }
@@ -339,14 +383,19 @@ fn ensure_signup_has_not_passed(event: &Event<Location>) -> Result<(), Error> {
 
 /// Depending on access rights, it allows overwriting the waiting list position
 /// Additionally, it ensures that only valid positions are accepted.
-fn ensure_correct_waiting_list_position(
+async fn ensure_correct_waiting_list_position(
+    store: &EventStore,
     event: &Event<Location>,
     new_registration: &mut NewRegistration,
     session: Option<&Session>,
     current_registration: Option<&Registration>,
 ) -> Result<(), Error> {
     if let Some(session) = session
-        && is_admin_or_board(session).is_ok()
+        && (is_admin_or_board(session).is_ok()
+            || store
+                .ensure_user_is_committee_chair(session, &event.content.created_by)
+                .await
+                .is_ok())
     {
         trace!("logged in user has admin access to the waiting list");
         if new_registration.waiting_list_position.is_some() {
@@ -406,14 +455,4 @@ fn ensure_correct_waiting_list_position(
         new_registration.waiting_list_position = None
     };
     Ok(())
-}
-
-fn ensure_attendance_update_full_access_only(
-    current_registration: &Registration,
-    new_registration: &mut NewRegistration,
-    session: &Session,
-) {
-    if is_admin_or_board(session).is_err() {
-        new_registration.attended = current_registration.attended
-    }
 }

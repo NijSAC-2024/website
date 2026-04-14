@@ -2,7 +2,7 @@ import {Table, TableBody, TableCell, TableRow} from '@mui/material';
 import {Registration} from '../../types.ts';
 import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import RegistrationRow from './RegistrationRow.tsx';
-import {inCommittee, isAdminOrBoard, isWorga} from '../../util.ts';
+import {inCommittee, isAdminOrBoard, isChair, isWorga} from '../../util.ts';
 import {useEventRegistrations} from '../../hooks/useEventRegistrations.ts';
 import {useEvents} from '../../hooks/useEvents.ts';
 import {useUsers} from '../../hooks/useUsers.ts';
@@ -28,13 +28,13 @@ export default function RegistrationTable({onEditClick}: RegistrationTableProps)
       <div className="min-w-max">
         <Table>
           <TableBody>
-            {user && (isAdminOrBoard(user) || isWorga(currentEvent, user) || inCommittee(myCommittees, currentEvent)) && (
+            {user && (isAdminOrBoard(user.roles) || isWorga(currentEvent, user) || inCommittee(myCommittees, currentEvent.createdBy)) && (
               <TableRow>
                 <TableCell><b>{text('Name', 'Naam')}</b></TableCell>
                 {currentEvent.questions.map((q) => (
                   <TableCell key={q.id}><b>{`${text(q.question)} ${q.required ? '*' : ''}`}</b></TableCell>
                 ))}
-                {(isAdminOrBoard(user) || inCommittee(myCommittees, currentEvent)) && (
+                {(isAdminOrBoard(user.roles) || isChair(myCommittees, currentEvent.createdBy)) && (
                   <>
                     <TableCell><b>{text('Attended', 'Aanwezig')}</b>
                     </TableCell><TableCell><b>{text('Actions', 'Acties')}</b></TableCell>

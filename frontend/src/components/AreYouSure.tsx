@@ -1,5 +1,5 @@
-import { Button, Dialog, DialogContent, DialogTitle } from '@mui/material';
-import { useLanguage } from '../providers/LanguageProvider.tsx';
+import {Button, Dialog, DialogContent, DialogTitle} from '@mui/material';
+import {useLanguage} from '../providers/LanguageProvider.tsx';
 
 interface AreYouSureProps {
   open: boolean;
@@ -16,7 +16,7 @@ export default function AreYouSure({
   onConfirm,
   onCancel
 }: AreYouSureProps) {
-  const { text } = useLanguage();
+  const {text} = useLanguage();
 
   if (!title) {
     title = text('Are you sure?', 'Weet je het zeker?');
@@ -35,10 +35,10 @@ export default function AreYouSure({
         <p>{message}</p>
         <div className="flex justify-between mt-3">
           <Button onClick={onCancel} color="primary" variant="contained">
-            Cancel
+            {text('Cancel', 'Annuleer')}
           </Button>
           <Button onClick={onConfirm} color="error" variant="outlined">
-            Confirm
+            {text('Confirm', 'Bevestigen')}
           </Button>
         </div>
       </DialogContent>

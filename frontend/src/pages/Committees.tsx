@@ -17,7 +17,7 @@ export default function Committees() {
 
   return (
     <>
-      {user && isAdminOrBoard(user) && (
+      {user && isAdminOrBoard(user.roles) && (
         <div className="fixed bottom-5 right-5 z-10">
           <Fab
             variant="extended"
