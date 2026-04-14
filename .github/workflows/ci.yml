@@ -183,10 +183,11 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: EmbarkStudios/cargo-deny-action@f2ba7abc2abebaf185c833c3961145a3c275caad
+      - uses: EmbarkStudios/cargo-deny-action@v2
         with:
           manifest-path: backend/Cargo.toml
           arguments: --workspace --all-features
+          
 
   # Frontend
   lint-frontend:
