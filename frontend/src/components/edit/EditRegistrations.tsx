@@ -1,51 +1,34 @@
 import {Collapse, Switch, TextField} from '@mui/material';
-import {
-  DateType,
-  EventContent,
-  EventType,
-  memberOptions,
-  Membership,
-  Question,
-  WeekendType
-} from '../../types.ts';
 import {DateTimePicker} from '@mui/x-date-pickers';
 import moment from 'moment';
+import {memo, useEffect, useRef} from 'react';
+import {Controller, useFormContext, useWatch} from 'react-hook-form';
+import {EventContent, memberOptions, Membership, Question} from '../../types.ts';
 import OptionSelector from '../OptionSelector.tsx';
 import EditRegistrationQuestions from './EditRegistrationQuestions.tsx';
 import {useLanguage} from '../../providers/LanguageProvider.tsx';
-import {useEffect, useRef} from 'react';
 import {mpQuestions, spQuestions, weekendQuestions} from './questionTemplates.ts';
 
-interface EditRegistrationProps {
-  requiredMembership: Membership[];
-  dates: Array<DateType>;
-  registrationMax?: number;
-  waitingListMax?: number;
-  registrationPeriod?: DateType;
-  questions: Question[];
-  handleEventChange: (update: Partial<EventContent>) => void;
-  category: EventType;
-  type?: WeekendType[];
-}
-
-export default function EditRegistrations({
-  requiredMembership,
-  dates,
-  registrationMax,
-  waitingListMax,
-  registrationPeriod,
-  questions,
-  handleEventChange,
-  category,
-  type
-}: EditRegistrationProps) {
+function EditRegistrations() {
   const {text} = useLanguage();
+  const {control, setValue} = useFormContext<EventContent>();
+  const [requiredMembership, dates, registrationMax, waitingListMax, registrationPeriod, category, type] = useWatch({
+    control,
+    name: [
+      'requiredMembership',
+      'dates',
+      'registrationMax',
+      'waitingListMax',
+      'registrationPeriod',
+      'eventType',
+      'metadata.type'
+    ]
+  });
 
-  /** prevent repeated recomputation */
   const lastKeyRef = useRef<string | null>(null);
 
   useEffect(() => {
-    const key = `${category}:${type ?? ''}`;
+    const key = `${category}:${(type ?? []).join(',')}`;
     if (lastKeyRef.current === key) {
       return;
     }
@@ -62,23 +45,22 @@ export default function EditRegistrations({
       baseQuestions = weekendQuestions;
     }
 
-    handleEventChange({
-      questions: baseQuestions.map(q => ({...q, id: crypto.randomUUID()}))
-    });
-  }, [category, type, handleEventChange]);
+    setValue('questions', baseQuestions.map((q) => ({...q, id: crypto.randomUUID()})), {shouldDirty: true});
+  }, [category, setValue, type]);
 
   const handleToggleRegistrations = () => {
     if (registrationPeriod) {
-      handleEventChange({registrationPeriod: undefined});
-    } else {
-      const now = new Date();
-      handleEventChange({
-        registrationPeriod: {
-          start: now.toISOString(),
-          end: dates[0]?.start || now.toISOString()
-        }
-      });
+      setValue('registrationPeriod', undefined, {shouldDirty: true});
+      setValue('registrationMax', undefined, {shouldDirty: true});
+      setValue('waitingListMax', undefined, {shouldDirty: true});
+      return;
     }
+
+    const now = new Date().toISOString();
+    setValue('registrationPeriod', {
+      start: now,
+      end: dates[0]?.start || now
+    }, {shouldDirty: true});
   };
 
   return (
@@ -102,12 +84,12 @@ export default function EditRegistrations({
             <p>{text('Maximum registrations', 'Maximum inschrjvingen')}</p>
             <Switch
               checked={!!registrationMax}
-              onChange={(_, checked) =>
-                handleEventChange({
-                  waitingListMax: undefined,
-                  registrationMax: checked ? 10 : undefined
-                })
-              }
+              onChange={(_, checked) => {
+                setValue('registrationMax', checked ? 10 : undefined, {shouldDirty: true});
+                if (!checked) {
+                  setValue('waitingListMax', undefined, {shouldDirty: true});
+                }
+              }}
             />
           </div>
 
@@ -124,7 +106,7 @@ export default function EditRegistrations({
                 onChange={(e) => {
                   const value = parseInt(e.target.value);
                   if (!isNaN(value) && value > 0) {
-                    handleEventChange({registrationMax: value});
+                    setValue('registrationMax', value, {shouldDirty: true});
                   }
                 }}
               />
@@ -134,9 +116,7 @@ export default function EditRegistrations({
                 <Switch
                   checked={waitingListMax !== undefined}
                   onChange={(_, checked) =>
-                    handleEventChange({
-                      waitingListMax: checked ? 10 : undefined
-                    })
+                    setValue('waitingListMax', checked ? 10 : undefined, {shouldDirty: true})
                   }
                 />
               </div>
@@ -153,7 +133,7 @@ export default function EditRegistrations({
                   onChange={(e) => {
                     const value = parseInt(e.target.value);
                     if (!isNaN(value) && value >= 0) {
-                      handleEventChange({waitingListMax: value});
+                      setValue('waitingListMax', value, {shouldDirty: true});
                     }
                   }}
                 />
@@ -162,35 +142,49 @@ export default function EditRegistrations({
           </Collapse>
 
           <div className="grid grid-cols-2 gap-3">
-            <DateTimePicker
-              label={text(
-                'Start Date Registrations',
-                'Startdatum Inschrijvingen'
+            <Controller
+              name="registrationPeriod.start"
+              control={control}
+              render={({field}) => (
+                <DateTimePicker
+                  label={text(
+                    'Start Date Registrations',
+                    'Startdatum Inschrijvingen'
+                  )}
+                  value={field.value ? moment(field.value) : null}
+                  onChange={(date) => {
+                    if (!date || !registrationPeriod) {
+                      return;
+                    }
+                    setValue('registrationPeriod', {
+                      start: date.toISOString(),
+                      end: registrationPeriod.end
+                    }, {shouldDirty: true});
+                  }}
+                />
               )}
-              value={moment(registrationPeriod?.start)}
-              onChange={(date) =>
-                handleEventChange({
-                  registrationPeriod: {
-                    start: date!.toISOString(),
-                    end: registrationPeriod!.end
-                  }
-                })
-              }
             />
-            <DateTimePicker
-              label={text(
-                'End Date Registrations',
-                'Einddatum Inschrijvingen'
+            <Controller
+              name="registrationPeriod.end"
+              control={control}
+              render={({field}) => (
+                <DateTimePicker
+                  label={text(
+                    'End Date Registrations',
+                    'Einddatum Inschrijvingen'
+                  )}
+                  value={field.value ? moment(field.value) : null}
+                  onChange={(date) => {
+                    if (!date || !registrationPeriod) {
+                      return;
+                    }
+                    setValue('registrationPeriod', {
+                      start: registrationPeriod.start,
+                      end: date.toISOString()
+                    }, {shouldDirty: true});
+                  }}
+                />
               )}
-              value={moment(registrationPeriod?.end)}
-              onChange={(date) =>
-                handleEventChange({
-                  registrationPeriod: {
-                    start: registrationPeriod!.start,
-                    end: date!.toISOString()
-                  }
-                })
-              }
             />
           </div>
 
@@ -198,9 +192,7 @@ export default function EditRegistrations({
             options={memberOptions}
             selected={requiredMembership}
             onChange={(selected) =>
-              handleEventChange({
-                requiredMembership: selected as Membership[]
-              })
+              setValue('requiredMembership', selected as Membership[], {shouldDirty: true})
             }
             label={text(
               'Required Membership',
@@ -208,12 +200,11 @@ export default function EditRegistrations({
             )}
           />
 
-          <EditRegistrationQuestions
-            questions={questions}
-            handleEventChange={handleEventChange}
-          />
+          <EditRegistrationQuestions/>
         </div>
       </Collapse>
     </div>
   );
 }
+
+export default memo(EditRegistrations);

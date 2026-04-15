@@ -3,53 +3,48 @@ import moment from 'moment';
 import {IconButton, Tooltip} from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import {DateType, EventContent} from '../../types.ts';
+import {memo} from 'react';
+import {useFieldArray, useFormContext} from 'react-hook-form';
+import {EventContent} from '../../types.ts';
 import {useLanguage} from '../../providers/LanguageProvider.tsx';
 
-interface EditDatesProps {
-  dates: DateType[];
-  handleEventChange: (update: Partial<EventContent>) => void;
-}
-
-export default function EditDates({
-  dates,
-  handleEventChange
-}: EditDatesProps) {
+function EditDates() {
   const {text} = useLanguage();
+  const {control} = useFormContext<EventContent>();
+  const {fields, append, remove, update} = useFieldArray({
+    control,
+    name: 'dates'
+  });
 
   return (
     <>
       <hr/>
       Dates
       <div className="grid gap-3">
-        {dates.map((date, index) => (
+        {fields.map((date, index) => (
           <div key={index} className={`justify-between gap-3 ${index ? 'flex' : ''}`}>
             <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
               <DateTimePicker
                 label={`${text('Start Date', 'Startdatum')} ${index + 1}`}
                 value={moment(date.start)}
                 onChange={(date) => {
-                  dates[index] = {start: date!.toISOString(), end: dates[index].end};
-                  handleEventChange({
-                    dates
-                  });
+                  if (!date) {
+                    return;
+                  }
+                  update(index, {start: date.toISOString(), end: fields[index].end});
                 }}
               />
               <DateTimePicker
                 label={`${text('End Date', 'Einddatum')} ${index + 1}`}
                 value={moment(date.end)}
                 onChange={(date) => {
-                  handleEventChange({
-                    dates: [
-                      ...dates.slice(0, index), // Copy all elements *before* the index
-                      {
-                        ...dates[index], // Copy existing properties of the element at the index
-                        end: date!.toISOString(), // Apply the change
-                      },
-                      ...dates.slice(index + 1) // Copy all elements *after* the index
-                    ]
+                  if (!date) {
+                    return;
                   }
-                  );
+                  update(index, {
+                    start: fields[index].start,
+                    end: date.toISOString()
+                  });
                 }}
               />
             </div>
@@ -59,7 +54,7 @@ export default function EditDates({
                   <IconButton
                     size="small"
                     color="error"
-                    onClick={() => handleEventChange({dates: dates.filter((_, i) => i !== index)})}
+                    onClick={() => remove(index)}
                   >
                     <DeleteIcon fontSize="medium"/>
                   </IconButton>
@@ -72,7 +67,7 @@ export default function EditDates({
           <Tooltip title={text('Add Date', 'Voeg Datum Toe')}>
             <IconButton size="small" color="primary" onClick={() => {
               const now = new Date();
-              handleEventChange({dates: [...dates, {start: now.toISOString(), end: now.toISOString()}]});
+              append({start: now.toISOString(), end: now.toISOString()});
             }}
             >
               <AddIcon fontSize="large"/>
@@ -83,3 +78,5 @@ export default function EditDates({
     </>
   );
 }
+
+export default memo(EditDates);
