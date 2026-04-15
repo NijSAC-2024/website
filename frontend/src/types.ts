@@ -278,6 +278,9 @@ export type Action =
       type: 'set_locations';
       locations: Location[];
     } | {
+      type: 'add_location';
+      location: Location;
+    } | {
       type: 'set_event_registrations';
       registrations: Registration[] | null;
     } | {

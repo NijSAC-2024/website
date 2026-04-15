@@ -10,6 +10,7 @@ import User from './pages/User.tsx';
 import Members from './pages/Members.tsx';
 import Committees from './pages/Committees.tsx';
 import Committee from './pages/Committee.tsx';
+import Location from './pages/Location.tsx';
 import EditCommittee from './components/committee/EditCommittee.tsx';
 import {useWebsite} from './hooks/useState.ts';
 import {createTheme, ThemeProvider} from '@mui/material/styles';
@@ -40,7 +41,8 @@ const PageContent: { [key in RouteName]: JSX.Element | null } = {
   'committees.new': <EditCommittee/>,
   'committees.committee.edit': <EditCommittee/>,
   about: <h1>About</h1>,
-  material_rental: <h1>Material Rental</h1>
+  material_rental: <h1>Material Rental</h1>,
+  location: <Location/>
 };
 
 

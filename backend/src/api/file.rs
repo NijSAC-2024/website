@@ -1,8 +1,8 @@
 use crate::{
     Pagination, ValidatedQuery,
-    api::ApiResult,
+    api::{ApiResult, committee::active_committee_access},
     auth::session::Session,
-    data_source::FileStore,
+    data_source::{FileStore, committee::CommitteeStore},
     error::{AppResult, Error},
     file::{FileId, FileMetadata},
 };
@@ -23,9 +23,12 @@ use tracing::info;
 
 pub async fn upload(
     store: FileStore,
+    committee_store: CommitteeStore,
     session: Session,
     mut multipart: Multipart,
 ) -> ApiResult<Vec<FileMetadata>> {
+    active_committee_access(&session, &committee_store).await?;
+
     let mut result = vec![];
     while let Some(field) = multipart.next_field().await.unwrap() {
         let name = field.name().unwrap().to_string();

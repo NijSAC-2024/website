@@ -49,6 +49,10 @@ export const routes = [
     path: '/members',
   },
   {
+    name: 'location',
+    path: '/location/{location_id}',
+  },
+  {
     name: 'committees',
     path: '/committees',
     children: [

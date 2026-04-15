@@ -105,9 +105,9 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
                 />
               ))}
             </div>
-            <div className="flex items-center">
+            <div className="flex items-center hover:cursor-pointer" onClick={() => navigate('location', {location_id: event.location.id})}>
               <LocationOnIcon className="text-2xl" />
-              {event.location.name.en}
+              {text(event.location.name)}
             </div>
           </div>
           <h2>{text(event.name.en, event.name.nl)}</h2>

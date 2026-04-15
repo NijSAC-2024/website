@@ -1,8 +1,8 @@
 use crate::{
     Pagination, ValidatedJson,
-    api::ApiResult,
+    api::{ApiResult, committee::active_committee_access},
     auth::{role::Role, session::Session},
-    data_source::LocationStore,
+    data_source::{LocationStore, committee::CommitteeStore},
     error::{AppResult, Error},
     location::{Location, LocationContent, LocationId, UsedBy},
 };
@@ -67,10 +67,11 @@ pub async fn get_locations(
 
 pub async fn create_location(
     store: LocationStore,
+    committee_store: CommitteeStore,
     session: Session,
     ValidatedJson(new): ValidatedJson<LocationContent>,
 ) -> ApiResult<Location> {
-    update_access(&session)?;
+    active_committee_access(&session, &committee_store).await?;
 
     Ok(Json(store.create(new).await?))
 }

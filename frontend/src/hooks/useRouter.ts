@@ -1,5 +1,4 @@
 // TODO consider adding a loading bar
-// import { nprogress } from '@mantine/nprogress';
 import { Dispatch, useCallback, useEffect, useRef } from 'react';
 import { FullRouterState, RouteParams, Router, RouterState } from '../router';
 import { RouteName } from '../routes';

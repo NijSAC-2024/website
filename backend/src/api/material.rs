@@ -59,7 +59,7 @@ pub async fn update_user_material(
     session: Session,
     ValidatedJson(update_data): ValidatedJson<UserMaterial>,
 ) -> ApiResult<Option<UserMaterial>> {
-    update_access(&update_data.user_id.into(), &session)?;
+    update_access(&update_data.user_id.clone(), &session)?;
 
     let res = store
         .update_user_material(
