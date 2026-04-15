@@ -19,13 +19,14 @@ function QuestionOptions({questionIndex}: {questionIndex: number}) {
   const {control, register} = useFormContext<EventContent>();
   const {fields, append, remove} = useFieldArray({
     control,
-    name: `questions.${questionIndex}.questionType.options` as const
+    name: `questions.${questionIndex}.questionType.options` as const,
+    keyName: 'fieldId'
   });
 
   return (
     <div className="mt-2 space-y-3 xl:col-span-2">
       {fields.map((option, i) => (
-        <div key={option.id} className="flex items-center gap-2">
+        <div key={option.fieldId} className="flex items-center gap-2">
           <TextField
             size="small"
             label={`${text('Option', 'Optie')} ${i + 1} ${text('English', 'Engels')}`}
@@ -69,7 +70,8 @@ function EditRegistrationQuestions() {
   const {control, register, setValue} = useFormContext<EventContent>();
   const {fields, append, remove, update} = useFieldArray({
     control,
-    name: 'questions'
+    name: 'questions',
+    keyName: 'fieldId'
   });
   const questions = useWatch({
     control,
@@ -134,7 +136,7 @@ function EditRegistrationQuestions() {
       ) : (
         <div className="grid gap-4 xl:gap-3">
           {fields.map((question, index) => (
-            <div key={question.id} className="flex items-start z-0">
+            <div key={question.fieldId} className="flex items-start z-0">
               <div className="grid xl:grid-cols-2 w-full gap-2">
                 <TextField
                   multiline
@@ -158,7 +160,7 @@ function EditRegistrationQuestions() {
                     size="small"
                     onClick={(e) => {
                       setAnchorEl(e.currentTarget);
-                      setActiveQuestionId(question.id);
+                      setActiveQuestionId(questions[index]?.id ?? null);
                     }}
                   >
                     <MoreVertIcon/>
