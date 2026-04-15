@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
   Chip,
   FormControl,
@@ -21,18 +20,14 @@ interface OptionSelectorProps {
 
 export default function OptionSelector({
   options,
-  selected,
+  selected = [],
   onChange,
   label,
 }: OptionSelectorProps) {
   const { text } = useLanguage();
-  const [selectedOptions, setSelectedOptions] = useState<string[]>(
-    selected || [],
-  );
 
   const handleChange = (event: SelectChangeEvent<string[]>) => {
     const value = event.target.value as string[];
-    setSelectedOptions(value);
     onChange(value);
   };
 
@@ -44,7 +39,7 @@ export default function OptionSelector({
         labelId="checkbox-select-label"
         variant="outlined"
         multiple
-        value={selectedOptions}
+        value={selected}
         onChange={handleChange}
         input={<OutlinedInput id="select-multiple-chip" label={label} />}
         renderValue={(selected: string[]) => (
@@ -69,7 +64,7 @@ export default function OptionSelector({
       >
         {options.map((option) => (
           <MenuItem key={option.id as string} value={option.id as string}>
-            <Checkbox checked={selectedOptions.includes(option.id as string)} />
+            <Checkbox checked={selected.includes(option.id as string)} />
             {text(option.label.en, option.label.nl)}
           </MenuItem>
         ))}

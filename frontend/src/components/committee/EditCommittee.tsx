@@ -132,8 +132,8 @@ export default function EditCommittee() {
 
           <div>
             <MarkdownEditor
-              initialMarkdown={committeeContent.description}
-              handleMarkdown={(markdown) => handleCommitteeChange({description: markdown})}
+              value={committeeContent.description}
+              onChange={(markdown) => handleCommitteeChange({description: markdown})}
             />
           </div>
         </div>

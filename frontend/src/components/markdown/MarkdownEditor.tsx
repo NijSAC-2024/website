@@ -9,18 +9,18 @@ import { Language } from '../../types.ts';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 
 interface MarkdownEditorProps {
-  initialMarkdown?: Language;
-  handleMarkdown: (markdown: Language) => void;
+  value?: Language;
+  onChange?: (markdown: Language) => void;
 }
 
 export default function MarkdownEditor({
-  initialMarkdown = { en: '', nl: '' },
-  handleMarkdown
+  value = { en: '', nl: '' },
+  onChange,
 }: MarkdownEditorProps) {
   const { text } = useLanguage();
-  const [value, setValue] = useState('1');
-  const [markdownContent, setMarkdownContent] =
-    useState<Language>(initialMarkdown);
+  const [tabValue, setTabValue] = useState('1');
+  const markdownContent = value;
+  const emitChange = onChange ?? (() => undefined);
 
   const textareaRef = useRef<{
     en: HTMLTextAreaElement | null;
@@ -31,7 +31,7 @@ export default function MarkdownEditor({
   });
 
   const handleChange = (_event: SyntheticEvent, newValue: string) => {
-    setValue(newValue);
+    setTabValue(newValue);
   };
 
   const handleInputChange = (
@@ -42,8 +42,7 @@ export default function MarkdownEditor({
       ...markdownContent,
       [langCode]: event.target.value
     };
-    setMarkdownContent(updatedMarkdown);
-    handleMarkdown(updatedMarkdown);
+    emitChange(updatedMarkdown);
   };
 
   const insertMarkdown = (syntax: string, langCode: 'en' | 'nl') => {
@@ -102,8 +101,7 @@ export default function MarkdownEditor({
       ...markdownContent,
       [langCode]: newContent
     };
-    setMarkdownContent(updatedMarkdown);
-    handleMarkdown(updatedMarkdown);
+    emitChange(updatedMarkdown);
 
     setTimeout(() => {
       textarea.selectionStart = textarea.selectionEnd = newCursorPosition;
@@ -113,7 +111,7 @@ export default function MarkdownEditor({
 
   return (
     <>
-      <TabContext value={value}>
+      <TabContext value={tabValue}>
         <TabList onChange={handleChange}>
           <Tab label={text('Edit', 'Bewerken')} value="1" />
           <Tab label={text('Preview', 'Voorbeeld')} value="2" />

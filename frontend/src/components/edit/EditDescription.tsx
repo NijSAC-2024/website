@@ -1,44 +1,32 @@
 import MarkdownEditor from '../markdown/MarkdownEditor.tsx';
 import {FormControl, InputLabel, MenuItem, Select, TextField} from '@mui/material';
+import {memo} from 'react';
+import {Controller, useFormContext, useWatch} from 'react-hook-form';
 import OptionSelector from '../OptionSelector.tsx';
 import {
-  EventContent, EventType,
   experienceOptions,
   ExperienceType,
-  Language,
-  Metadata,
+  EventContent
 } from '../../types.ts';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import {useEventRegistrations} from '../../hooks/useEventRegistrations.ts';
 
-interface EditDescriptionProps {
-  description?: Language;
-  metadata?: Metadata;
-  handleEventChange: (change: Partial<EventContent>) => void;
-  category: EventType;
-}
-
-export default function EditDescription({
-  description,
-  metadata,
-  handleEventChange,
-  category
-}: EditDescriptionProps) {
+function EditDescription() {
   const { text } = useLanguage();
   const { eventRegistrations } = useEventRegistrations();
-
-
-  const handleMarkdown = (markdown: Language) => {
-    handleEventChange({ description: markdown });
-  };
+  const {control, setValue} = useFormContext<EventContent>();
+  const [description, metadata, category] = useWatch({
+    control,
+    name: ['description', 'metadata', 'eventType']
+  });
 
   return (
     <div className="xl:col-span-2 flex flex-col justify-between w-full rounded-2xl bg-[rgba(255,255,255,0.9)] dark:bg-[rgba(18,18,18,0.7)] border border-solid border-b-2 border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)] border-b-[#1976d2] dark:border-b-[#90caf9]">
       {/* Description */}
       <div>
         <MarkdownEditor
-          initialMarkdown={description}
-          handleMarkdown={handleMarkdown}
+          value={description}
+          onChange={(markdown) => setValue('description', markdown, {shouldDirty: true})}
         />
       </div>
 
@@ -58,15 +46,13 @@ export default function EditDescription({
             'Gescheiden door komma\'s'
           )}
           onChange={(e) =>
-            handleEventChange({
-              metadata: {
-                ...metadata,
-                gear: {
-                  nl: metadata?.gear?.nl || '',
-                  en: e.target.value
-                }
+            setValue('metadata', {
+              ...metadata,
+              gear: {
+                nl: metadata?.gear?.nl || '',
+                en: e.target.value
               }
-            })
+            }, {shouldDirty: true})
           }
         />
         <TextField
@@ -82,15 +68,13 @@ export default function EditDescription({
             'Gescheiden door komma\'s'
           )}
           onChange={(e) =>
-            handleEventChange({
-              metadata: {
-                ...metadata,
-                gear: {
-                  en: metadata?.gear?.en || '',
-                  nl: e.target.value
-                }
+            setValue('metadata', {
+              ...metadata,
+              gear: {
+                en: metadata?.gear?.en || '',
+                nl: e.target.value
               }
-            })
+            }, {shouldDirty: true})
           }
         />
         <div className="xl:col-span-2 grid">
@@ -98,12 +82,10 @@ export default function EditDescription({
             options={experienceOptions}
             selected={metadata?.experience}
             onChange={(selected) =>
-              handleEventChange({
-                metadata: {
-                  ...metadata,
-                  experience: selected as ExperienceType[]
-                }
-              })
+              setValue('metadata', {
+                ...metadata,
+                experience: selected as ExperienceType[]
+              }, {shouldDirty: true})
             }
             label={text('Necessary Experience', 'Benodigde Ervaring')}
           />
@@ -116,29 +98,28 @@ export default function EditDescription({
               <InputLabel id="worga-select-label">
                 {text('Weekend Organiser', 'Worga')}
               </InputLabel>
-              <Select
-                labelId="worga-select-label"
-                value={metadata?.worga}
-                label={text('Weekend Organiser', 'Worga')}
-                variant="outlined"
-                onChange={(e) =>
-                  handleEventChange({
-                    metadata: {
-                      ...metadata,
-                      worga: e.target.value
-                    }
-                  })
-                }
-              >
-                <MenuItem value={'nobody'}>
-                  {text('No one assigned', 'Niemand toegewezen')}
-                </MenuItem>
-                {eventRegistrations?.map((registration, index) => (
-                  <MenuItem key={index} value={registration.id}>
-                    {`${registration.firstName} ${registration.infix ?? ''} ${registration.lastName}`}
-                  </MenuItem>
-                ))}
-              </Select>
+              <Controller
+                name="metadata.worga"
+                control={control}
+                render={({field}) => (
+                  <Select
+                    labelId="worga-select-label"
+                    value={field.value ?? ''}
+                    label={text('Weekend Organiser', 'Worga')}
+                    variant="outlined"
+                    onChange={field.onChange}
+                  >
+                    <MenuItem value={'nobody'}>
+                      {text('No one assigned', 'Niemand toegewezen')}
+                    </MenuItem>
+                    {eventRegistrations?.map((registration, index) => (
+                      <MenuItem key={index} value={registration.id}>
+                        {`${registration.firstName} ${registration.infix ?? ''} ${registration.lastName}`}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                )}
+              />
             </FormControl>
 
           </div>
@@ -147,3 +128,5 @@ export default function EditDescription({
     </div>
   );
 }
+
+export default memo(EditDescription);

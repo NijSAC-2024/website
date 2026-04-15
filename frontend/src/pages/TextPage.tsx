@@ -10,7 +10,7 @@ export default function TextPage() {
   return (
     <GenericPage>
       <ContentCard className="p-7">
-        <MarkdownEditor handleMarkdown={handleMarkdown} />
+        <MarkdownEditor onChange={handleMarkdown} />
       </ContentCard>
     </GenericPage>
   );

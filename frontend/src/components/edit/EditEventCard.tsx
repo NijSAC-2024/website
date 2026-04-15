@@ -1,8 +1,9 @@
 import {Button, FormControl, InputLabel, MenuItem, Select, TextField} from '@mui/material';
-import {DateType, EventContent, EventType, Language, Metadata, typesOptions, WeekendType} from '../../types.ts';
+import {Controller, useFormContext, useWatch} from 'react-hook-form';
+import {EventContent, EventType, typesOptions, WeekendType} from '../../types.ts';
 import OptionSelector from '../OptionSelector.tsx';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
-import {ChangeEvent, useState} from 'react';
+import {ChangeEvent, memo, useState} from 'react';
 import EditDates from './EditDates.tsx';
 import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import {isAdminOrBoard} from '../../util.ts';
@@ -10,31 +11,17 @@ import {useUsers} from '../../hooks/useUsers.ts';
 import {useCommittees} from '../../hooks/useCommittees.ts';
 import EditLocation from './EditLocation.tsx';
 
-interface EditAgendaCardProps {
-  category: EventType;
-  image?: string;
-  metadata?: Metadata;
-  name: Language;
-  dates: DateType[];
-  location: string;
-  createdBy?: string;
-  handleEventChange: (changes: Partial<EventContent>) => void;
-}
-
-export default function EditEventCard({
-  category,
-  image,
-  metadata,
-  name,
-  dates,
-  location,
-  createdBy,
-  handleEventChange
-}: EditAgendaCardProps) {
+function EditEventCard() {
   const {text} = useLanguage();
   const {user} = useUsers();
   const {committees, myCommittees} = useCommittees();
+  const {control, setValue} = useFormContext<EventContent>();
   const [uploading, setUploading] = useState(false);
+  const [image, metadata, location] = useWatch({
+    control,
+    name: ['image', 'metadata', 'location']
+  });
+
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -45,7 +32,7 @@ export default function EditEventCard({
         method: 'POST',
         body: formData
       }).then((response) => response.json()).then((uploadInfo) => {
-        handleEventChange({image: uploadInfo[0].id});
+        setValue('image', uploadInfo[0].id, {shouldDirty: true});
         setUploading(false);
       });
     }
@@ -88,102 +75,107 @@ export default function EditEventCard({
               <InputLabel id="select-label">
                 {text('Category', 'Categorie')}
               </InputLabel>
-              <Select
-                labelId="select-label"
-                value={category}
-                label={text('Category*', 'Categorie*')}
-                variant="outlined"
-                onChange={(e) => {
-                  handleEventChange({eventType: e.target.value as EventType});
-                }}
-              >
-                <MenuItem value="activity">
-                  {text('Activity', 'Activiteit')}
-                </MenuItem>
-                <MenuItem value="course">
-                  {text('Course', 'Cursus')}
-                </MenuItem>
-                <MenuItem value="training">
-                  {text('Training', 'Training')}
-                </MenuItem>
-                <MenuItem value="weekend">
-                  {text('Weekend', 'Weekend')}
-                </MenuItem>
-              </Select>
+              <Controller
+                name="eventType"
+                control={control}
+                render={({field}) => (
+                  <Select
+                    labelId="select-label"
+                    value={field.value}
+                    label={text('Category*', 'Categorie*')}
+                    variant="outlined"
+                    onChange={(e) => field.onChange(e.target.value as EventType)}
+                  >
+                    <MenuItem value="activity">
+                      {text('Activity', 'Activiteit')}
+                    </MenuItem>
+                    <MenuItem value="course">
+                      {text('Course', 'Cursus')}
+                    </MenuItem>
+                    <MenuItem value="training">
+                      {text('Training', 'Training')}
+                    </MenuItem>
+                    <MenuItem value="weekend">
+                      {text('Weekend', 'Weekend')}
+                    </MenuItem>
+                  </Select>
+                )}
+              />
             </FormControl>
             <FormControl fullWidth required>
               <InputLabel id="committee-select-label">
                 {text('Committee', 'Commissie')}
               </InputLabel>
-              <Select
-                labelId="committee-select-label"
-                value={createdBy}
-                label={text('Committee*', 'Commissie*')}
-                variant="outlined"
-                onChange={(e) => handleEventChange({createdBy: e.target.value})}
-              >
-                {committees.filter(c => (myCommittees.some(uc => uc.committeeId == c.id && uc.left == null) || user && isAdminOrBoard(user.roles))).map((committee) => (
-                  <MenuItem key={committee.id} value={committee.id}>
-                    {text(committee.name)}
-                  </MenuItem>
-                ))}
-              </Select>
+              <Controller
+                name="createdBy"
+                control={control}
+                render={({field}) => (
+                  <Select
+                    labelId="committee-select-label"
+                    value={field.value}
+                    label={text('Committee*', 'Commissie*')}
+                    variant="outlined"
+                    onChange={(e) => field.onChange(e.target.value)}
+                  >
+                    {committees.filter(c => (myCommittees.some(uc => uc.committeeId == c.id && uc.left == null) || user && isAdminOrBoard(user.roles))).map((committee) => (
+                      <MenuItem key={committee.id} value={committee.id}>
+                        {text(committee.name)}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                )}
+              />
             </FormControl>
             <OptionSelector
               options={typesOptions}
               selected={metadata?.type}
               onChange={(selectedTypes) =>
-                handleEventChange({
-                  metadata: {
-                    ...metadata,
-                    type: selectedTypes as WeekendType[]
-                  }
-                })
+                setValue('metadata', {
+                  ...metadata,
+                  type: selectedTypes as WeekendType[]
+                }, {shouldDirty: true})
               }
               label={'Type'}
             />
           </div>
           {/* Title */}
           <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
-            <TextField
-              required
-              value={name.en}
-              label={text('Title English', 'Titel Engels')}
-              onChange={(e) =>
-                handleEventChange({
-                  name: {
-                    ...name,
-                    en: e.target.value
-                  }
-                })
-              }
+            <Controller
+              name="name.en"
+              control={control}
+              render={({field}) => (
+                <TextField
+                  required
+                  value={field.value}
+                  label={text('Title English', 'Titel Engels')}
+                  onChange={field.onChange}
+                />
+              )}
             />
-            <TextField
-              required
-              value={name.nl}
-              label={text('Title Dutch', 'Titel Nederlands')}
-              onChange={(e) =>
-                handleEventChange({
-                  name: {
-                    ...name,
-                    nl: e.target.value
-                  }
-                })
-              }
+            <Controller
+              name="name.nl"
+              control={control}
+              render={({field}) => (
+                <TextField
+                  required
+                  value={field.value}
+                  label={text('Title Dutch', 'Titel Nederlands')}
+                  onChange={field.onChange}
+                />
+              )}
             />
           </div>
           {/*Location*/}
           <EditLocation
             value={location}
-            onChange={(nextLocation) => handleEventChange({location: nextLocation})}
+            onChange={(nextLocation) => setValue('location', nextLocation, {shouldDirty: true})}
           />
           {/*Dates*/}
-          <EditDates
-            dates={dates}
-            handleEventChange={handleEventChange}
-          />
+          <EditDates/>
         </div>
       </div>
     </div>
   );
 }
+
+export default memo(EditEventCard);

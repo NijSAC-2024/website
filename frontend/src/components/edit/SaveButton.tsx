@@ -7,23 +7,37 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AreYouSure from '../AreYouSure.tsx';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
-import {EventContent} from '../../types.ts';
 import moment from 'moment';
 import {useWebsite} from '../../hooks/useState.ts';
 import {useEvents} from '../../hooks/useEvents.ts';
+import {EventContent} from '../../types.ts';
+import {useFormContext, useWatch} from 'react-hook-form';
 
 interface SaveButtonProps {
   id: string;
-  handleSave: (isPublished: boolean) => void;
-  event: EventContent;
+  handleSave: (event: EventContent, isPublished: boolean) => void;
 }
 
-export default function SaveButton({ id, handleSave, event }: SaveButtonProps) {
+export default function SaveButton({ id, handleSave }: SaveButtonProps) {
   const { text } = useLanguage();
   const {navigate} = useWebsite();
   const {deleteEvent} = useEvents();
+  const {handleSubmit, control} = useFormContext<EventContent>();
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+  const [location, name, eventType, dates, registrationPeriod] = useWatch({
+    control,
+    name: ['location', 'name', 'eventType', 'dates', 'registrationPeriod']
+  });
+
+  const publishDisabled =
+    !location ||
+    !name?.nl ||
+    !name?.en ||
+    !eventType ||
+    !dates?.[0] ||
+    moment(dates[0].end).isBefore(moment(dates[0].start)) ||
+    (!!registrationPeriod && moment(registrationPeriod.end).isBefore(moment(registrationPeriod.start)));
 
   const handleDelete = async () => {
     await deleteEvent(id);
@@ -39,7 +53,7 @@ export default function SaveButton({ id, handleSave, event }: SaveButtonProps) {
     <>
       <div
         className="fixed bottom-5 right-5 z-100 hover:dark:bg-[#42a5f5] hover:bg-[#1565c0] hover:shadow-2xl shadow-xl duration-300 dark:bg-[#90caf9] bg-[#1976d2] text-white rounded-3xl py-1 px-3 dark:text-black">
-        <Button color="inherit" disabled={!event.location || !event.name.nl || ! event.name.en || !event.eventType || moment(event.dates[0].end).isBefore(moment(event.dates[0].start)) || (!!event.registrationPeriod && moment(event.registrationPeriod.end).isBefore(moment(event.registrationPeriod.start)))} onClick={() => handleSave(true)}>
+        <Button color="inherit" disabled={publishDisabled} onClick={handleSubmit((event) => handleSave(event, true))}>
           <SaveIcon className="mr-2" />
           {id ? text('Update Event', 'Evenement bijwerken') : text('Publish Event', 'Evenement publiceren')}
         </Button>
@@ -58,7 +72,7 @@ export default function SaveButton({ id, handleSave, event }: SaveButtonProps) {
         <Collapse in={menuOpen} timeout="auto" unmountOnExit>
           <div className="grid">
             <div className="flex justify-self-start">
-              <Button color="inherit" onClick={() => handleSave(false)}>
+              <Button color="inherit" onClick={handleSubmit((event) => handleSave(event, false))}>
                 <SaveAsIcon className="mr-2" />
                 {text('Save As Draft', 'Opslaan als concept')}
               </Button>
