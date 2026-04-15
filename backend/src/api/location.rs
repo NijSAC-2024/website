@@ -1,6 +1,6 @@
 use crate::{
     Pagination, ValidatedJson,
-    api::{ApiResult, committee::active_committee_access},
+    api::{ApiResult, committee::active_committee_access, conditional_json_response},
     auth::{role::Role, session::Session},
     data_source::{LocationStore, committee::CommitteeStore},
     error::{AppResult, Error},
@@ -10,6 +10,7 @@ use axum::{
     Json,
     extract::{Path, Query},
     http::HeaderMap,
+    response::Response,
 };
 use serde::Deserialize;
 
@@ -51,7 +52,8 @@ pub async fn get_locations(
     store: LocationStore,
     Query(mut filter): Query<LocationFilter>,
     session: Option<Session>,
-) -> AppResult<(HeaderMap, Json<Vec<Location>>)> {
+    headers: HeaderMap,
+) -> AppResult<Response> {
     match session {
         None => filter.reusable = Some(true),
         Some(session) => {
@@ -61,8 +63,9 @@ pub async fn get_locations(
         }
     }
     let total = store.count(&filter).await?;
-
-    Ok((total.as_header(), Json(store.get_all(&filter).await?)))
+    let response_headers = total.as_header();
+    let locations = store.get_all(&filter).await?;
+    conditional_json_response(&headers, response_headers, &locations)
 }
 
 pub async fn create_location(

@@ -2,13 +2,13 @@ import GenericPage from './GenericPage.tsx';
 import ContentCard from '../components/ContentCard.tsx';
 import {useLocations} from '../hooks/useLocations.ts';
 import {useLanguage} from '../providers/LanguageProvider.tsx';
-import {useWebsite} from '../hooks/useState.ts';
+import {useParams} from 'react-router-dom';
 
 export default function Location() {
   const {locations} = useLocations()
   const {text} = useLanguage();
-  const { state } = useWebsite();
-  const id = state.routerState.params['location_id'];
+  const params = useParams();
+  const id = params.location_id
   const location = locations.find(loc => loc.id === id) ?? locations[0];
 
   return (

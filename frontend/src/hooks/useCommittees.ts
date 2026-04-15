@@ -1,25 +1,28 @@
-import {useSelector} from './useSelector.ts';
 import {WebsiteError} from '../error/error.ts';
 import {BasicUser, Committee, CommitteeContent, CommitteeRoleType} from '../types.ts';
 import {apiFetch, apiFetchVoid} from '../api.ts';
 import {enqueueSnackbar} from 'notistack';
 import {useLanguage} from '../providers/LanguageProvider.tsx';
-import {useWebsite} from './useState.ts';
+import {useQueryClient} from '@tanstack/react-query';
+import {queryKeys} from '../queries.ts';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../store.ts';
+import {useParams} from 'react-router-dom';
 
 export function useCommittees() {
   const {text} = useLanguage();
-  const {dispatch} = useWebsite();
-  const routerState = useSelector((state) => state.routerState);
+  const dispatch = useDispatch();
+  const queryClient = useQueryClient();
+  const params = useParams();
+  const myCommittees = useSelector((state: RootState) => state.myCommittees || []);
+  const currentCommittees = useSelector((state: RootState) => state.currentCommittees || []);
+  const committees = useSelector((state: RootState) => state.committees || []);
+  const committeeMembers = useSelector((state: RootState) => state.committeeMembers || []);
 
-  const myCommittees = useSelector((state) => state.myCommittees || []);
-  const currentCommittees = useSelector((state) => state.currentCommittees || []);
-  const committees = useSelector((state) => state.committees || []);
-  const committeeMembers = useSelector((state) => state.committeeMembers || []);
+  const committee = committees.find((c) => c.id === params.committee_id) || null;
 
-  const committee = committees.find((c) => c.id === routerState.params.committee_id) || null;
-
-  if (!committee && routerState.params.committee_id) {
-    throw new WebsiteError(`Could not find committee with ID ${routerState.params.committee_id}`, 404);
+  if (!committee && params.committee_id) {
+    throw new WebsiteError(`Could not find committee with ID ${params.committee_id}`, 404);
   }
 
   const createCommittee = async (content: CommitteeContent) => {
@@ -32,6 +35,7 @@ export function useCommittees() {
       return;
     }
     dispatch({type: 'add_committee', committee});
+    void queryClient.invalidateQueries({queryKey: queryKeys.committees.all()});
     enqueueSnackbar(text('Committee created', 'Commissie aangemaakt'), {variant: 'success'});
   };
 
@@ -48,6 +52,8 @@ export function useCommittees() {
     }
     dispatch({type: 'delete_committee', committeeId});
     dispatch({type: 'add_committee', committee});
+    void queryClient.invalidateQueries({queryKey: queryKeys.committees.all()});
+    void queryClient.invalidateQueries({queryKey: queryKeys.committees.detail(committeeId)});
     enqueueSnackbar(text('Committee updated', 'Commissie bijgewerkt'), {variant: 'success'});
   };
 
@@ -60,6 +66,9 @@ export function useCommittees() {
       return;
     }
     dispatch({type: 'delete_committee', committeeId});
+    void queryClient.invalidateQueries({queryKey: queryKeys.committees.all()});
+    void queryClient.removeQueries({queryKey: queryKeys.committees.detail(committeeId)});
+    void queryClient.removeQueries({queryKey: queryKeys.committees.members(committeeId)});
     enqueueSnackbar(text('Committee deleted', 'Commissie verwijderd'), {variant: 'success'});
   };
 
@@ -72,6 +81,10 @@ export function useCommittees() {
       return false;
     }
     dispatch({type: 'add_committee_member', user: data, committeeId});
+    void queryClient.invalidateQueries({queryKey: queryKeys.committees.members(committeeId)});
+    if (params.user_id) {
+      void queryClient.invalidateQueries({queryKey: queryKeys.users.committees(params.user_id)});
+    }
     enqueueSnackbar(text('User added to committee', 'Gebruiker aan commissie toegevoegd'), {variant: 'success'});
     return true;
   };
@@ -85,6 +98,8 @@ export function useCommittees() {
       return false;
     }
     dispatch({type: 'delete_committee_member', userId, committeeId});
+    void queryClient.invalidateQueries({queryKey: queryKeys.committees.members(committeeId)});
+    void queryClient.invalidateQueries({queryKey: queryKeys.users.committees(userId)});
     enqueueSnackbar(text('User removed from committee', 'Gebruiker uit committee verwijderd'), {variant: 'success'});
     return true;
   };
@@ -127,6 +142,10 @@ export function useCommittees() {
         }] : []),
       ],
     });
+    void queryClient.invalidateQueries({queryKey: queryKeys.committees.members(committeeId)});
+    if (userId) {
+      void queryClient.invalidateQueries({queryKey: queryKeys.users.committees(userId)});
+    }
     enqueueSnackbar(text('Chair updated', 'Hoofd bijgewerkt'), {variant: 'success'});
     return true;
   };

@@ -8,10 +8,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AreYouSure from '../AreYouSure.tsx';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import moment from 'moment';
-import {useWebsite} from '../../hooks/useState.ts';
 import {useEvents} from '../../hooks/useEvents.ts';
 import {EventContent} from '../../types.ts';
 import {useFormContext, useWatch} from 'react-hook-form';
+import {useNavigate} from 'react-router-dom';
 
 interface SaveButtonProps {
   id: string;
@@ -20,7 +20,6 @@ interface SaveButtonProps {
 
 export default function SaveButton({ id, handleSave }: SaveButtonProps) {
   const { text } = useLanguage();
-  const {navigate} = useWebsite();
   const {deleteEvent} = useEvents();
   const {handleSubmit, control} = useFormContext<EventContent>();
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
@@ -29,6 +28,7 @@ export default function SaveButton({ id, handleSave }: SaveButtonProps) {
     control,
     name: ['location', 'name', 'eventType', 'dates', 'registrationPeriod']
   });
+  const navigate = useNavigate();
 
   const publishDisabled =
     !location ||
@@ -42,7 +42,7 @@ export default function SaveButton({ id, handleSave }: SaveButtonProps) {
   const handleDelete = async () => {
     await deleteEvent(id);
     toggleDialog();
-    navigate('events');
+    navigate('/events');
   };
 
   const toggleDialog = () => setDialogOpen((prevState) => !prevState);

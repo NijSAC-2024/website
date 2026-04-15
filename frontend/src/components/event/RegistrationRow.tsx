@@ -3,11 +3,11 @@ import {Edit} from '@mui/icons-material';
 import moment from 'moment';
 import {Registration} from '../../types.ts';
 import {inCommittee, isAdminOrBoard, isChair, isWorga} from '../../util.ts';
-import {useWebsite} from '../../hooks/useState.ts';
 import {useEvents} from '../../hooks/useEvents.ts';
 import {useUsers} from '../../hooks/useUsers.ts';
 import {useEventRegistrations} from '../../hooks/useEventRegistrations.ts';
 import {useCommittees} from '../../hooks/useCommittees.ts';
+import {useNavigate} from 'react-router-dom';
 
 interface RegistrationRowProps {
   registration: Registration;
@@ -17,9 +17,9 @@ interface RegistrationRowProps {
 export default function RegistrationRow({registration, onEditClick}: RegistrationRowProps) {
   const {currentEvent} = useEvents();
   const {user} = useUsers();
-  const {navigate} = useWebsite();
   const {updateRegistration} = useEventRegistrations();
   const {myCommittees} = useCommittees();
+  const navigate = useNavigate();
 
   if (!currentEvent) {
     return null;
@@ -29,7 +29,7 @@ export default function RegistrationRow({registration, onEditClick}: Registratio
     <TableRow sx={{'&:last-child td, &:last-child th': {border: 0}}}>
       <TableCell>
         {<p className="hover:cursor-pointer hover:opacity-60 transition-all duration-100"
-          onClick={() => registration.id && navigate('user', {user_id: registration.id})}>
+          onClick={() => registration.id && navigate(`/user/${registration.id}`)}>
           {user && (isAdminOrBoard(user.roles) || isWorga(currentEvent, user) || inCommittee(myCommittees, currentEvent.createdBy)) && registration.waitingListPosition !== undefined ?
             <span
               className="text-[#1976d2] dark:text-[#90caf9]">{`${registration.firstName} ${registration.infix ?? ''} ${registration.lastName}`}</span>

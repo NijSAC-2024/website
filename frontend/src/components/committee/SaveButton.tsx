@@ -6,8 +6,8 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AreYouSure from '../AreYouSure.tsx';
 import {useLanguage} from '../../providers/LanguageProvider.tsx';
-import {useWebsite} from '../../hooks/useState.ts';
 import {useCommittees} from '../../hooks/useCommittees.ts';
+import {useNavigate} from 'react-router-dom';
 
 interface SaveButtonProps {
   id: string;
@@ -18,8 +18,8 @@ export default function SaveButton({id, handleSave}: SaveButtonProps) {
   const {text} = useLanguage();
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
-  const {navigate} = useWebsite();
   const {deleteCommittee} = useCommittees();
+  const navigate = useNavigate();
 
   const handleDelete = async () => {
     await deleteCommittee(id);

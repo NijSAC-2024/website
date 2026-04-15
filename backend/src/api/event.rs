@@ -1,5 +1,5 @@
 use crate::{
-    api::{ApiResult, ValidatedJson, is_admin_or_board},
+    api::{ApiResult, ValidatedJson, conditional_json_response, is_admin_or_board},
     auth::{
         role::{Membership, Status},
         session::Session,
@@ -13,7 +13,7 @@ use crate::{
     user::UserId,
     wire::event::EventId,
 };
-use axum::{Json, extract::Path};
+use axum::{Json, extract::Path, http::HeaderMap, response::Response};
 use time::OffsetDateTime;
 use tracing::{debug, info, trace, warn};
 use uuid::Uuid;
@@ -46,7 +46,8 @@ pub async fn get_event_registrations(
     store: EventStore,
     Path(id): Path<EventId>,
     session: Option<Session>,
-) -> ApiResult<serde_json::Value> {
+    headers: HeaderMap,
+) -> AppResult<Response> {
     let event: Event<Location> = store.get_event(&id, true).await?;
 
     // Admins/board → detailed
@@ -54,7 +55,7 @@ pub async fn get_event_registrations(
         && is_admin_or_board(session).is_ok()
     {
         let regs = store.get_registrations_detailed(&id).await?;
-        return Ok(Json(serde_json::to_value(regs)?));
+        return conditional_json_response(&headers, HeaderMap::new(), &regs);
     }
 
     let worga_user = event
@@ -69,7 +70,7 @@ pub async fn get_event_registrations(
         && **session.user_id() == worga_uuid
     {
         let regs = store.get_registrations_detailed(&id).await?;
-        return Ok(Json(serde_json::to_value(regs)?));
+        return conditional_json_response(&headers, HeaderMap::new(), &regs);
     }
 
     // Committee member → detailed
@@ -80,7 +81,7 @@ pub async fn get_event_registrations(
             .is_ok()
     {
         let regs = store.get_registrations_detailed(&id).await?;
-        return Ok(Json(serde_json::to_value(regs)?));
+        return conditional_json_response(&headers, HeaderMap::new(), &regs);
     }
 
     // Public if NonMember accepted
@@ -90,7 +91,7 @@ pub async fn get_event_registrations(
         .contains(&Membership::NonMember)
     {
         let regs = store.get_registered_users(&id).await?;
-        return Ok(Json(serde_json::to_value(regs)?));
+        return conditional_json_response(&headers, HeaderMap::new(), &regs);
     }
 
     // Summary for matching membership
@@ -102,7 +103,7 @@ pub async fn get_event_registrations(
         && session.status() == Status::Accepted
     {
         let regs = store.get_registered_users(&id).await?;
-        return Ok(Json(serde_json::to_value(regs)?));
+        return conditional_json_response(&headers, HeaderMap::new(), &regs);
     }
 
     Err(Error::Unauthorized)
@@ -112,9 +113,11 @@ pub async fn get_user_registrations(
     store: EventStore,
     Path(id): Path<UserId>,
     session: Session,
-) -> ApiResult<Vec<Registration>> {
+    headers: HeaderMap,
+) -> AppResult<Response> {
     has_registration_access(&store, &id, &session, None).await?;
-    Ok(Json(store.get_user_registrations(session.user_id()).await?))
+    let registrations = store.get_user_registrations(session.user_id()).await?;
+    conditional_json_response(&headers, HeaderMap::new(), &registrations)
 }
 
 pub async fn get_user_events(
@@ -150,13 +153,16 @@ pub async fn get_event(
 pub async fn get_activities(
     store: EventStore,
     session: Option<Session>,
-) -> ApiResult<Vec<Event<Location>>> {
+    headers: HeaderMap,
+) -> AppResult<Response> {
     if let Some(session) = session
         && is_admin_or_board(&session).is_ok()
     {
-        Ok(Json(store.get_events(true).await?))
+        let events = store.get_events(true).await?;
+        conditional_json_response(&headers, HeaderMap::new(), &events)
     } else {
-        Ok(Json(store.get_events(false).await?))
+        let events = store.get_events(false).await?;
+        conditional_json_response(&headers, HeaderMap::new(), &events)
     }
 }
 

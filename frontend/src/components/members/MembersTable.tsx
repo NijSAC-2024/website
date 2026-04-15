@@ -5,16 +5,16 @@ import {
 } from '@mui/material';
 import {useLanguage} from '../../providers/LanguageProvider';
 import ContentCard from '../ContentCard.tsx';
-import {useWebsite} from '../../hooks/useState.ts';
 import {useUsers} from '../../hooks/useUsers.ts';
+import {useNavigate} from 'react-router-dom';
 
 export default function MembersTable() {
   const {text} = useLanguage();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState('')
-  const {navigate} = useWebsite();
   const {users} = useUsers();
+  const navigate = useNavigate();
 
   const filteredUsers = useMemo(() => {
     const q = search.toLowerCase();
@@ -53,7 +53,7 @@ export default function MembersTable() {
               <TableCell>
                 <div className="flex items-center justify-between">
                   <span className="hover:cursor-pointer hover:opacity-60 transition-all duration-100"
-                    onClick={() => navigate('user', {user_id: u.id})}>{`${u.firstName} ${u.infix ?? ''} ${u.lastName}`}</span>
+                    onClick={() => navigate(`/user/${u.id}`)}>{`${u.firstName} ${u.infix ?? ''} ${u.lastName}`}</span>
                 </div>
               </TableCell>
             </TableRow>

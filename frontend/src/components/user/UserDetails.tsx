@@ -5,22 +5,22 @@ import {useLanguage} from '../../providers/LanguageProvider';
 import ContentCard from '../ContentCard.tsx';
 import TextCard from '../TextCard.tsx';
 import {getLabel, isAdminOrBoard} from '../../util.ts';
-import {useWebsite} from '../../hooks/useState.ts';
 import {useUsers} from '../../hooks/useUsers.ts';
 import {SubmitHandler, useForm} from 'react-hook-form';
 import {FormInputText} from '../form/FormInputText.tsx';
 import {ChangeCommittees} from './ChangeCommittees.tsx';
 import {ChangeRoles} from './ChangeRoles.tsx';
+import {useParams} from 'react-router-dom';
 
 type FormInputs = Omit<UserContent, 'membership' | 'status' | 'roles'>;
 
 export default function UserDetails() {
   const {text} = useLanguage();
   const {user, currentUser, updateUser} = useUsers();
-  const {state: {routerState: {params}}} = useWebsite();
   const {register, handleSubmit, control, reset, formState} = useForm<FormInputs>({
     defaultValues: currentUser!,
   });
+  const params = useParams();
 
   useEffect(() => {
     reset(currentUser!);

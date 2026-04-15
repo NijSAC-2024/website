@@ -6,14 +6,13 @@ import {passwordValidator, repeatPasswordValidator} from '../../validator.ts';
 import ContentCard from '../ContentCard.tsx';
 import PasswordField from '../PasswordField.tsx';
 import {isAdminOrBoard} from '../../util.ts';
-import {useWebsite} from '../../hooks/useState.ts';
 import {useUsers} from '../../hooks/useUsers.ts';
+import {useParams} from 'react-router-dom';
 
 export default function ChangePassword() {
   const {text} = useLanguage();
   const {user, updateUserPassword} = useUsers();
-  const {state: {routerState: {params}}} = useWebsite();
-
+  const params = useParams();
   const [password, setPassword] = useState({password: '', repeatPassword: ''});
   const [passwordErrors, setPasswordErrors] = useState<{ password: ErrorType; repeatPassword: ErrorType }>({
     password: false,

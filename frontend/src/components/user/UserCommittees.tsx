@@ -4,16 +4,17 @@ import moment from 'moment';
 import {getLabel} from '../../util.ts';
 import {useState} from 'react';
 import {Switch} from '@mui/material';
-import {useWebsite} from '../../hooks/useState.ts';
 import {useUsers} from '../../hooks/useUsers.ts';
 import {useCommittees} from '../../hooks/useCommittees.ts';
+import {useNavigate, useParams} from 'react-router-dom';
 
 export default function UserCommittees() {
   const {text} = useLanguage();
   const {user} = useUsers();
   const [filterLeftCommittees, setFilterLeftCommittees] = useState<boolean>(false);
-  const {navigate, state: {routerState: {params}}} = useWebsite();
   const {committees, currentCommittees} = useCommittees();
+  const params = useParams();
+  const navigate = useNavigate();
 
   if (!committees || !currentCommittees || !user || user.status != 'accepted') {
     return null;
@@ -48,7 +49,7 @@ export default function UserCommittees() {
           return (
             <div
               key={index}
-              onClick={() => navigate('committees.committee', {committee_id: committee.id})}
+              onClick={() => navigate(`/committees/${committee.id}`)}
               className="hover:cursor-pointer w-full rounded-2xl bg-[rgba(255,255,255,0.9)] dark:bg-[rgba(18,18,18,0.7)] border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] h-full"
             >
               <div className="p-5 grid gap-1">

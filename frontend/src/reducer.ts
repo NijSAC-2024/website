@@ -1,14 +1,24 @@
 import {Action, State, UserCommittee} from './types';
 
+export const initialState: State = {
+  currentUser: null,
+  committeeMembers: [],
+  committees: [],
+  myCommittees: [],
+  currentCommittees: [],
+  users: [],
+  locations: [],
+  userEventRegistrations: [],
+  user: null,
+  events: [],
+  registrations: [],
+  version: 'dev',
+  error: null
+};
+
 const actionHandler: {
   [action in Action['type']]: (state: State, action: Extract<Action, { type: action }>) => State;
 } = {
-  set_next_router_state: function (state, action) {
-    return {...state, nextRouterState: action.nextRouterState};
-  },
-  set_route: function (state, action) {
-    return {...state, routerState: action.routerState, nextRouterState: null};
-  },
   set_users: function (state, action) {
     return {...state, users: action.users};
   },
@@ -64,8 +74,8 @@ const actionHandler: {
     return {
       ...state,
       events,
-      userEventRegistrations: state.userEventRegistrations?.filter((r) => r.id === action.registrationId) || null,
-      registrations: state.registrations?.filter((r) => r.id === action.registrationId) || null
+      userEventRegistrations: state.userEventRegistrations?.filter((r) => r.id !== action.registrationId) || null,
+      registrations: state.registrations?.filter((r) => r.id !== action.registrationId) || null
     };
   },
   set_user_event_registrations(state: State, action) {
@@ -133,24 +143,35 @@ const actionHandler: {
     return {...state, locations: [...state.locations || [], action.location]};
   },
   logout: function (state, _action) {
-    return {...state, user: null, forceReload: true};
+    return {
+      ...state,
+      user: null,
+      currentUser: null,
+      users: [],
+      registrations: [],
+      userEventRegistrations: [],
+      myCommittees: [],
+      currentCommittees: [],
+      committeeMembers: [],
+      forceReload: false
+    };
   },
   login: function (state, action) {
-    return {...state, user: action.user, forceReload: true};
-  },
-  reset_force_reload: function (state, _action) {
-    return {...state, forceReload: false};
+    return {...state, user: action.user, forceReload: false};
   }
 };
 
 // helper function to make TypeScript recognize the proper types
 function getActionHandler<T extends Action['type']>(
   action: Extract<Action, { type: T }>
-): (state: State, action: Extract<Action, { type: T }>) => State {
+) {
   return actionHandler[action.type];
 }
 
-export function reducer(state: State, action: Action): State {
+export function reducer(state: State = initialState, action: Action): State {
   const handler = getActionHandler(action);
-  return handler(state, action);
+
+  if (!handler) {return state;}
+
+  return handler(state, action as never);
 }

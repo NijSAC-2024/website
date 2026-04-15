@@ -6,13 +6,12 @@ import {MouseEvent, useEffect, useState} from 'react';
 import SettingsIcon from '@mui/icons-material/Settings';
 import {useThemeMode} from '../../providers/ThemeProvider.tsx';
 import {MenuType} from './MainMenu.tsx';
-import {useWebsite} from '../../hooks/useState.ts';
-import {RouteName} from '../../routes.ts';
 import {useUsers} from '../../hooks/useUsers.ts';
+import {useNavigate} from 'react-router-dom';
 
 export default function DesktopMenu({setShowLogin}: { setShowLogin: (show: boolean) => void }) {
   const {text} = useLanguage();
-  const {navigate} = useWebsite();
+  const navigate = useNavigate();
   const {user} = useUsers();
   const {checkDarkMode} = useThemeMode();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | undefined>(undefined);
@@ -36,7 +35,7 @@ export default function DesktopMenu({setShowLogin}: { setShowLogin: (show: boole
     setOpenMenu(undefined);
   };
 
-  const navigateSubmenu = (page: RouteName) => {
+  const navigateSubmenu = (page: string) => {
     navigate(page);
     handleMenuClose();
   };
@@ -50,9 +49,9 @@ export default function DesktopMenu({setShowLogin}: { setShowLogin: (show: boole
             src={'/images/logo.svg'}
             alt="Logo"
             className={`hover:opacity-50 hover:cursor-pointer h-24 mr-4 ${offset !== 0 && !isDarkMode && 'invert'} transition-all duration-200 ease-in-out`}
-            onClick={() => navigate('index')}
+            onClick={() => navigate('/')}
           />
-          <Button color="inherit" onClick={() => navigate('events')}>
+          <Button color="inherit" onClick={() => navigate('/events')}>
             {text('Agenda', 'Agenda')}
           </Button>
 
@@ -75,7 +74,7 @@ export default function DesktopMenu({setShowLogin}: { setShowLogin: (show: boole
             <MenuItem onClick={handleMenuClose}>
               {text('Board', 'Bestuur')}
             </MenuItem>
-            <MenuItem onClick={() => navigateSubmenu('committees')}>
+            <MenuItem onClick={() => navigateSubmenu('/committees')}>
               {text('Committees', 'Commissies')}
             </MenuItem>
             <MenuItem onClick={handleMenuClose}>
@@ -105,7 +104,7 @@ export default function DesktopMenu({setShowLogin}: { setShowLogin: (show: boole
             <MenuItem onClick={handleMenuClose}>
               {text('Climbing Areas', 'Klimgebieden')}
             </MenuItem>
-            <MenuItem onClick={() => navigateSubmenu('material_rental')}>
+            <MenuItem onClick={() => navigateSubmenu('/material_rental')}>
               {text('Material Rental', 'Materiaalverhuur')}
             </MenuItem>
           </Menu>
@@ -163,7 +162,7 @@ export default function DesktopMenu({setShowLogin}: { setShowLogin: (show: boole
                 <Button
                   color="inherit"
                   className="flex items-center"
-                  onClick={() => navigate('settings')}
+                  onClick={() => navigate('/settings')}
                 >
                   <SettingsIcon/>
                 </Button>
@@ -172,7 +171,7 @@ export default function DesktopMenu({setShowLogin}: { setShowLogin: (show: boole
               <Button color="inherit" onClick={() => setShowLogin(true)}>
                 {text('Login', 'Inloggen')}
               </Button>
-              <Button variant="contained" onClick={() => navigate('register')}>
+              <Button variant="contained" onClick={() => navigate('/register')}>
                 {text('Become a member', 'Lid worden')}
               </Button>
             </>

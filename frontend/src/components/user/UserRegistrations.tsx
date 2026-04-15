@@ -7,8 +7,8 @@ import EventCard from '../event/EventCard';
 import {Event} from '../../types.ts';
 import {useEvents} from '../../hooks/useEvents.ts';
 import {useEventRegistrations} from '../../hooks/useEventRegistrations.ts';
-import {useWebsite} from '../../hooks/useState.ts';
 import {useUsers} from '../../hooks/useUsers.ts';
+import {useParams} from 'react-router-dom';
 
 export default function UserRegistrations() {
   const {text} = useLanguage();
@@ -17,7 +17,7 @@ export default function UserRegistrations() {
   const {currentEvent, events} = useEvents();
   const [filterPastEvents, setFilterPastEvents] = useState<boolean>(false);
   const now = new Date();
-  const {state: {routerState: {params}}} = useWebsite();
+  const params = useParams();
 
   if (!user || !userEventRegistrations || !currentEvent) {
     return null;

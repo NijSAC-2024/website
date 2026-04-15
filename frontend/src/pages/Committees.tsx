@@ -5,15 +5,15 @@ import {Fab} from '@mui/material';
 import {isAdminOrBoard, truncateMarkdown} from '../util.ts';
 import Markdown from 'react-markdown';
 import AddIcon from '@mui/icons-material/Add';
-import {useWebsite} from '../hooks/useState.ts';
 import {useUsers} from '../hooks/useUsers.ts';
 import {useCommittees} from '../hooks/useCommittees.ts';
+import {useNavigate} from 'react-router-dom';
 
 export default function Committees() {
   const {text} = useLanguage();
   const {committees} = useCommittees();
-  const {navigate} = useWebsite()
   const {user} = useUsers();
+  const navigate = useNavigate();
 
   return (
     <>
@@ -22,7 +22,7 @@ export default function Committees() {
           <Fab
             variant="extended"
             color="primary"
-            onClick={() => navigate('committees.new')}
+            onClick={() => navigate('/committees/new')}
           >
             <AddIcon className="mr-2"/>
             {text('Add committee', 'Voeg Commissie Toe')}
@@ -46,7 +46,7 @@ export default function Committees() {
             committees.map((committee) => (
               <div
                 key={committee.id}
-                onClick={() => navigate('committees.committee', {committee_id: committee.id})}
+                onClick={() => navigate(`/committees/${committee.id}`)}
                 className="hover:cursor-pointer h-full"
               >
                 <div

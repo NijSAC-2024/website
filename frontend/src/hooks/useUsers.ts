@@ -1,28 +1,30 @@
-import {useContext} from 'react';
-import {useWebsite, WebsiteContext} from './useState.ts';
 import {enqueueSnackbar} from 'notistack';
 import {useLanguage} from '../providers/LanguageProvider.tsx';
 import {apiFetch, apiFetchVoid} from '../api.ts';
 import {User, UserContent} from '../types.ts';
-import {useSelector} from './useSelector.ts';
+import {useQueryClient} from '@tanstack/react-query';
+import {queryKeys} from '../queries.ts';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../store.ts';
+import { useNavigate } from 'react-router-dom';
 
 export function useUsers() {
-  const {dispatch, state} = useContext(WebsiteContext);
+  const dispatch = useDispatch();
   const {text} = useLanguage();
-  const {navigate} = useWebsite();
-
-  const users = useSelector((state) => state.users || []);
-
-  const user = state.user;
-  const currentUser = state.currentUser;
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const users = useSelector((s: RootState) => s.users || []);
+  const user = useSelector((s: RootState) => s.user);
+  const currentUser = useSelector((s: RootState) => s.currentUser);
 
   const logout = () => {
     fetch('/api/logout')
       .then((response) => {
         if (response.ok) {
           dispatch({type: 'logout'});
+          void queryClient.invalidateQueries();
           enqueueSnackbar(text('You logged out', 'Je bent uitgelogd'), {variant: 'success'});
-          navigate('index');
+          navigate('');
         } else {
           enqueueSnackbar(text('error', 'error'), {variant: 'error'});
         }
@@ -46,6 +48,7 @@ export function useUsers() {
       return false;
     } else {
       dispatch({type: 'login', user});
+      void queryClient.invalidateQueries({queryKey: queryKeys.auth.user()});
       enqueueSnackbar(text('You logged in', 'Je bent ingelogd'), {variant: 'success'});
       return true;
     }
@@ -76,6 +79,7 @@ export function useUsers() {
       return false;
     } else {
       dispatch({type: 'login', user: data});
+      void queryClient.invalidateQueries({queryKey: queryKeys.auth.user()});
       enqueueSnackbar(`Created account: ${user.firstName} ${user.lastName}`, {variant: 'success'});
       return true;
     }
@@ -94,9 +98,11 @@ export function useUsers() {
     } else {
       dispatch({type: 'delete_user', userId: userId});
       dispatch({type: 'add_user', user: data});
-      if (state.currentUser && state.currentUser.id === userId){
+      if (currentUser && currentUser.id === userId){
         dispatch({type: 'set_current_user', user: data});
       }
+      void queryClient.invalidateQueries({queryKey: queryKeys.users.all()});
+      void queryClient.invalidateQueries({queryKey: queryKeys.users.detail(userId)});
       enqueueSnackbar(`Updated user: ${user.firstName} ${user.lastName}`, {variant: 'success'});
       return true;
     }

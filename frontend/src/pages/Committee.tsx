@@ -7,20 +7,20 @@ import remarkGfm from 'remark-gfm';
 import Markdown from 'react-markdown';
 import {CommitteeUser} from '../types.ts';
 import {getLabel, isAdminOrBoard, isChair} from '../util.ts';
-import {useWebsite} from '../hooks/useState.ts';
 import {useUsers} from '../hooks/useUsers.ts';
 import {useCommittees} from '../hooks/useCommittees.ts';
 import EventSeatIcon from '@mui/icons-material/EventSeat';
 import AreYouSure from '../components/AreYouSure.tsx';
 import {useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 
 export default function Committee() {
   const {text} = useLanguage();
-  const {navigate} = useWebsite();
   const {user} = useUsers();
   const {committee, committeeMembers, makeChair} = useCommittees();
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [selectedMember, setSelectedMember] = useState<CommitteeUser | null>(null);
+  const navigate = useNavigate();
 
   const toggleDialog = () => setDialogOpen((prevState) => !prevState);
 
@@ -45,7 +45,7 @@ export default function Committee() {
           <Fab
             variant="extended"
             color="primary"
-            onClick={() => navigate('committees.committee.edit', {committee_id: committee.id})}
+            onClick={() => navigate(`/committees/${committee.id}/edit`)}
           >
             <EditIcon className="mr-2"/>
             {text('Edit committee', 'Commissie bewerken')}
@@ -57,7 +57,7 @@ export default function Committee() {
         <div className="grid lg:grid-cols-2 xl:grid-cols-3 gap-5 mt-[-9.3rem]">
           <div className="lg:col-span-2 xl:col-span-3 mb-[-0.5rem] flex justify-between items-center">
             <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">
-              <Button color="inherit" onClick={() => navigate('committees')}>
+              <Button color="inherit" onClick={() => navigate('/committees')}>
                 {text('Back to Committees', 'Terug naar Commissies')}
               </Button>
             </div>
@@ -94,7 +94,7 @@ export default function Committee() {
                     >
                       <TableCell component="th" scope="row">
                         <div className="flex justify-between items-center">
-                          <div className="grid hover:cursor-pointer hover:opacity-60 transition-all duration-100" onClick={() => navigate('user', {user_id: member.id})}>
+                          <div className="grid hover:cursor-pointer hover:opacity-60 transition-all duration-100" onClick={() => navigate(`/user/${member.id}`)}>
                             <p>{`${member.firstName} ${member.infix ?? ''} ${member.lastName}`}</p>
                             {member.role === 'chair' && <i className="text-xs">{text(getLabel(member.role))}</i>}
                           </div>

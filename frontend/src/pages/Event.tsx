@@ -6,21 +6,21 @@ import RegistrationsCard from '../components/event/RegistrationsCard.tsx';
 import DescriptionCard from '../components/event/DescriptionCard.tsx';
 import {useLanguage} from '../providers/LanguageProvider.tsx';
 import {inCommittee, isAdminOrBoard} from '../util.ts';
-import {useWebsite} from '../hooks/useState.ts';
 import {useUsers} from '../hooks/useUsers.ts';
 import {useEvents} from '../hooks/useEvents.ts';
 import {useCommittees} from '../hooks/useCommittees.ts';
+import {useNavigate} from 'react-router-dom';
 
 export default function Event() {
   const {text} = useLanguage();
-  const {navigate} = useWebsite();
   const {currentEvent} = useEvents();
   const {myCommittees} = useCommittees();
   const {user} = useUsers();
+  const navigate = useNavigate();
 
 
   if (!currentEvent) {
-    return <></>;
+    return null;
   }
 
   return (
@@ -30,7 +30,7 @@ export default function Event() {
           <Fab
             variant="extended"
             color="primary"
-            onClick={() => navigate('events.event.edit', {event_id: currentEvent.id})}
+            onClick={() => navigate(`/events/${currentEvent.id}/edit`)}
           >
             <EditIcon className="mr-2"/>
             {text('Edit event', 'Evenement bewerken')}
@@ -43,7 +43,7 @@ export default function Event() {
             <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">
               <Button
                 color="inherit"
-                onClick={() => navigate('events')}
+                onClick={() => navigate('/events')}
               >
                 {text('Back to Events', 'Terug naar Events')}
               </Button>

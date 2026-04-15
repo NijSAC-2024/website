@@ -19,18 +19,17 @@ import UserMenu from './UserMenu.tsx';
 import SettingsIcon from '@mui/icons-material/Settings';
 import {useThemeMode} from '../../providers/ThemeProvider.tsx';
 import {MenuType} from './MainMenu.tsx';
-import {useWebsite} from '../../hooks/useState.ts';
-import {RouteName} from '../../routes.ts';
 import {useUsers} from '../../hooks/useUsers.ts';
+import {useNavigate} from 'react-router-dom';
 
 export default function MobileMenu({setShowLogin}: { setShowLogin: (show: boolean) => void }) {
   const {text} = useLanguage();
-  const {navigate} = useWebsite();
   const {checkDarkMode} = useThemeMode();
   const {user} = useUsers();
   const [openMenu, setOpenMenu] = useState<MenuType>(undefined);
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
   const isDarkMode = checkDarkMode();
+  const navigate = useNavigate();
 
   const toggleDropdown = () => {
     setDropdownOpen((prevState) => !prevState);
@@ -44,7 +43,7 @@ export default function MobileMenu({setShowLogin}: { setShowLogin: (show: boolea
     }
   };
 
-  const navigateSubmenu = (page: RouteName) => {
+  const navigateSubmenu = (page: string) => {
     toggleDropdown();
     setOpenMenu(undefined);
     navigate(page);
@@ -61,7 +60,7 @@ export default function MobileMenu({setShowLogin}: { setShowLogin: (show: boolea
             if (dropdownOpen) {
               toggleDropdown();
             }
-            navigate('index');
+            navigate('/');
           }}
         />
         <IconButton size="large" color="inherit" onClick={toggleDropdown}>
@@ -83,7 +82,7 @@ export default function MobileMenu({setShowLogin}: { setShowLogin: (show: boolea
           <ListItem disablePadding>
             <ListItemButton
               onClick={() => {
-                navigate('events');
+                navigate('/events');
                 toggleDropdown();
               }}>
               <ListItemText
@@ -136,7 +135,7 @@ export default function MobileMenu({setShowLogin}: { setShowLogin: (show: boolea
                 </ListItemButton>
               </ListItem>
               <ListItem disablePadding>
-                <ListItemButton onClick={() => navigateSubmenu('committees')}>
+                <ListItemButton onClick={() => navigateSubmenu('/committees')}>
                   <ListItemText
                     primary={
                       <p className="text-[#1976d2] dark:text-[#90caf9] px-14 text-sm">
@@ -209,7 +208,7 @@ export default function MobileMenu({setShowLogin}: { setShowLogin: (show: boolea
               </ListItem>
               <ListItem disablePadding>
                 <ListItemButton
-                  onClick={() => navigateSubmenu('material_rental')}
+                  onClick={() => navigateSubmenu('/material_rental')}
                 >
                   <ListItemText
                     primary={
@@ -333,7 +332,7 @@ export default function MobileMenu({setShowLogin}: { setShowLogin: (show: boolea
               {/* Settings */}
               <ListItem disablePadding>
                 <ListItemButton onClick={() => {
-                  navigate('settings');
+                  navigate('/settings');
                   toggleDropdown();
                 }}>
                   <ListItemText
@@ -361,7 +360,7 @@ export default function MobileMenu({setShowLogin}: { setShowLogin: (show: boolea
                 <Button
                   variant="contained"
                   onClick={() => {
-                    navigate('register');
+                    navigate('/register');
                     toggleDropdown();
                   }}
                 >

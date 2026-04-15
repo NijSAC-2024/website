@@ -1,6 +1,6 @@
 use crate::{
     Pagination,
-    api::{ApiResult, ValidatedJson, ValidatedQuery, is_admin_or_board},
+    api::{ApiResult, ValidatedJson, ValidatedQuery, conditional_json_response, is_admin_or_board},
     auth::{role::Status, session::Session},
     data_source::UserStore,
     error::{AppResult, Error},
@@ -9,7 +9,7 @@ use crate::{
 use axum::{
     Json,
     extract::Path,
-    http::StatusCode,
+    http::{HeaderMap, StatusCode},
     response::{IntoResponse, Response},
 };
 use axum_extra::extract::CookieJar;
@@ -84,9 +84,14 @@ pub async fn register(
     ))
 }
 
-pub async fn who_am_i(store: UserStore, session: Option<Session>) -> ApiResult<User> {
+pub async fn who_am_i(
+    store: UserStore,
+    session: Option<Session>,
+    headers: HeaderMap,
+) -> AppResult<Response> {
     if let Some(session) = session {
-        Ok(Json(store.get(session.user_id()).await?))
+        let user = store.get(session.user_id()).await?;
+        conditional_json_response(&headers, HeaderMap::new(), &user)
     } else {
         Err(Error::Unauthorized)
     }
@@ -96,13 +101,21 @@ pub async fn get_user(
     store: UserStore,
     Path(id): Path<UserId>,
     session: Session,
+    headers: HeaderMap,
 ) -> AppResult<Response> {
     if id == *session.user_id() {
-        return Ok(Json(store.get(&id).await?).into_response());
+        let user = store.get(&id).await?;
+        return conditional_json_response(&headers, HeaderMap::new(), &user);
     }
     match read_all_access(&session)? {
-        ReadAccess::Full => Ok(Json(store.get(&id).await?).into_response()),
-        ReadAccess::Limited => Ok(Json(store.get_basic_info(&id).await?).into_response()),
+        ReadAccess::Full => {
+            let user = store.get(&id).await?;
+            conditional_json_response(&headers, HeaderMap::new(), &user)
+        }
+        ReadAccess::Limited => {
+            let user = store.get_basic_info(&id).await?;
+            conditional_json_response(&headers, HeaderMap::new(), &user)
+        }
     }
 }
 
@@ -110,20 +123,20 @@ pub async fn get_all_users(
     store: UserStore,
     session: Session,
     ValidatedQuery(pagination): ValidatedQuery<Pagination>,
+    headers: HeaderMap,
 ) -> AppResult<Response> {
     let total = store.count().await?;
+    let response_headers = total.as_header();
 
     match read_all_access(&session)? {
-        ReadAccess::Full => Ok((
-            total.as_header(),
-            Json(store.get_all_detailed(&pagination).await?),
-        )
-            .into_response()),
-        ReadAccess::Limited => Ok((
-            total.as_header(),
-            Json(store.get_all_basic_info(&pagination).await?),
-        )
-            .into_response()),
+        ReadAccess::Full => {
+            let users = store.get_all_detailed(&pagination).await?;
+            conditional_json_response(&headers, response_headers, &users)
+        }
+        ReadAccess::Limited => {
+            let users = store.get_all_basic_info(&pagination).await?;
+            conditional_json_response(&headers, response_headers, &users)
+        }
     }
 }
 

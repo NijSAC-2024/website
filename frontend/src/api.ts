@@ -1,30 +1,58 @@
 /* global RequestInit */
 import { enqueueSnackbar } from 'notistack';
 
-interface errorType {
+export interface ApiError {
   message: string;
   status: number;
   reference: string;
 }
 
-type ApiResponse<T, E = errorType> =
+export type ApiResponse<T, E = ApiError> =
   | { data: T; error?: never }
   | { data?: never; error: E };
+
+interface CachedGetResponse {
+  etag: string;
+  body: string;
+}
+
+const etagCache = new Map<string, CachedGetResponse>();
 
 async function apiFetchResponse(
   url: string,
   options: RequestInit = {}
 ): Promise<ApiResponse<Response>> {
+  const method = options.method ?? 'GET';
+  const cacheKey = method === 'GET' ? url : null;
+  const cachedResponse = cacheKey ? etagCache.get(cacheKey) : undefined;
+
   try {
+    const headers = new Headers(options.headers);
+    headers.set('Content-Type', 'application/json');
+
+    if (cacheKey && cachedResponse) {
+      headers.set('If-None-Match', cachedResponse.etag);
+    }
+
     const response = await fetch('/api' + url, {
       credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       ...options
     });
 
+    if (response.status === 304 && cachedResponse) {
+      return {
+        data: new Response(cachedResponse.body, {
+          status: 200,
+          statusText: 'OK',
+          headers: response.headers
+        })
+      };
+    }
+
     if (!response.ok) {
       const errorText = await response.text();
-      let error: errorType;
+      let error: ApiError;
 
       try {
         error = JSON.parse(errorText);
@@ -39,9 +67,17 @@ async function apiFetchResponse(
       return { error };
     }
 
+    if (cacheKey) {
+      const etag = response.headers.get('ETag');
+      if (etag) {
+        const body = await response.clone().text();
+        etagCache.set(cacheKey, {etag, body});
+      }
+    }
+
     return { data: response };
   } catch (error) {
-    const networkError: errorType = {
+    const networkError: ApiError = {
       message: String(error),
       status: 0,
       reference: `URL: ${url}`
@@ -91,4 +127,17 @@ export async function apiFetchVoid(
     return { error };
   }
   return { data: undefined };
+}
+
+export function clearApiCache(urlPrefix?: string) {
+  if (!urlPrefix) {
+    etagCache.clear();
+    return;
+  }
+
+  for (const key of etagCache.keys()) {
+    if (key.startsWith(urlPrefix)) {
+      etagCache.delete(key);
+    }
+  }
 }

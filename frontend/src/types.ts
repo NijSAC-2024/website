@@ -1,5 +1,4 @@
 import {WebsiteError} from './error/error.ts';
-import {RouterState} from './router.ts';
 import {Control, FieldValues, Path} from 'react-hook-form';
 import {HTMLInputTypeAttribute} from 'react';
 
@@ -222,26 +221,22 @@ export interface ReservationItemType {
 
 export interface State {
   version: string;
-  events: Event[] | null;
-  registrations: Registration[] | null;
+  events: Event[];
+  registrations: Registration[];
   // Holds the registrations a logged-in user is registered for
-  userEventRegistrations: Registration[] | null;
+  userEventRegistrations: Registration[];
   // The committees of the logged-in user
-  myCommittees: UserCommittee[] | null;
+  myCommittees: UserCommittee[];
   // The committees of the user to display
-  currentCommittees: UserCommittee[] | null;
-  committees: Committee[] | null;
-  committeeMembers: CommitteeUser[] | null;
-  locations: Location[] | null;
+  currentCommittees: UserCommittee[];
+  committees: Committee[];
+  committeeMembers: CommitteeUser[];
+  locations: Location[];
   // The logged-in user
   user: User | null;
   // The user to display, e.g., as an admin
   currentUser: User | null;
-  users: User[] | null;
-  routerState: RouterState;
-  nextRouterState: RouterState | null;
-  // Set to true after log-in in or out to make sure all data is re-fetched
-  forceReload: boolean;
+  users: User[];
   error: WebsiteError | null;
 }
 
@@ -251,7 +246,7 @@ export type Action =
       user: User;
     } | {
       type: 'set_users';
-      users: User[] | null;
+      users: User[];
     } | {
       type: 'set_current_user';
       user: User | null;
@@ -264,10 +259,8 @@ export type Action =
     } | {
       type: 'logout';
     } | {
-      type: 'reset_force_reload';
-    } | {
       type: 'set_events';
-      events: Event[] | null;
+      events: Event[];
     } | {
       type: 'add_event';
       event: Event;
@@ -282,10 +275,10 @@ export type Action =
       location: Location;
     } | {
       type: 'set_event_registrations';
-      registrations: Registration[] | null;
+      registrations: Registration[];
     } | {
       type: 'set_user_event_registrations';
-      registrations: Registration[] | null;
+      registrations: Registration[];
     } | {
       type: 'add_event_registration';
       registration: Registration;
@@ -295,16 +288,16 @@ export type Action =
       eventId: string,
     } | {
       type: 'set_my_committees';
-      committees: UserCommittee[] | null;
+      committees: UserCommittee[];
     } | {
       type: 'set_current_committees';
-      committees: UserCommittee[] | null;
+      committees: UserCommittee[];
     } | {
       type: 'set_committees';
       committees: Committee[];
     } | {
       type: 'set_committee_members';
-      members: CommitteeUser[] | null;
+      members: CommitteeUser[];
     } | {
       type: 'add_committee_member';
       user: BasicUser;
@@ -321,14 +314,7 @@ export type Action =
       committeeId: string;
     } | {
       type: 'set_error';
-      error: WebsiteError;
-    } | {
-      type: 'set_next_router_state';
-      nextRouterState: RouterState | null;
-    }
-    | {
-      type: 'set_route';
-      routerState: RouterState;
+      error: WebsiteError | null;
     };
 
 export interface FormInputProps<T extends FieldValues> {

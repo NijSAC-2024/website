@@ -4,8 +4,8 @@ import { getLabel } from '../../util.ts';
 import { Chip } from '@mui/material';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import {EventType, Language, WeekendType} from '../../types.ts';
-import {useWebsite} from '../../hooks/useState.ts';
 import {useCommittees} from '../../hooks/useCommittees.ts';
+import {useNavigate} from 'react-router-dom';
 
 interface DescriptionCardProps {
   descriptionMarkdown: Language;
@@ -26,7 +26,7 @@ export default function DescriptionCard({
 }: DescriptionCardProps) {
   const { text, language } = useLanguage();
   const { committees } = useCommittees();
-  const {navigate} = useWebsite()
+  const navigate = useNavigate();
   return (
     <div className="xl:col-span-2 flex flex-col justify-between w-full rounded-2xl bg-[rgba(255,255,255,0.9)] dark:bg-[rgba(18,18,18,0.7)] border border-solid border-b-2 border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)] border-b-[#1976d2] dark:border-b-[#90caf9]">
       <div className="p-5 xl:p-7">
@@ -45,7 +45,7 @@ export default function DescriptionCard({
               label={text(committees.find(c => c.id === createdBy)?.name || {en: '', nl: ''})}
               className="uppercase font-semibold"
               size="small"
-              onClick={() => navigate('committees.committee', {committee_id: createdBy!})}
+              onClick={() => navigate(`committees/${createdBy!}`)}
             />
           </div>
         </div>

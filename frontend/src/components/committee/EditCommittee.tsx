@@ -6,20 +6,21 @@ import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import {CommitteeContent} from '../../types.ts';
 import SaveButton from './SaveButton.tsx';
 import MarkdownEditor from '../markdown/MarkdownEditor.tsx';
-import {useWebsite} from '../../hooks/useState.ts';
 import {useCommittees} from '../../hooks/useCommittees.ts';
+import {useLocation, useNavigate, useParams} from 'react-router-dom';
 
 export default function EditCommittee() {
   const {text} = useLanguage();
   const [uploading, setUploading] = useState(false);
-  const {navigate} = useWebsite();
   const {committee, createCommittee, updateCommittee} = useCommittees();
-  const {state: {routerState: {params, name: routeName}}} = useWebsite();
+  const params = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const committee_id = params.committee_id;
 
   let initialCommittee: CommitteeContent | null = committee;
-  if (routeName === 'committees.new') {
+  if (location.pathname === 'committees/new') {
     initialCommittee = {
       name: {en: 'New committee', nl: 'Nieuwe commissie'},
       description: {en: '', nl: ''},
@@ -56,10 +57,10 @@ export default function EditCommittee() {
   const handleSave = async () => {
     if (committee_id) {
       await updateCommittee(committee_id, committeeContent);
-      navigate('committees.committee', {committee_id});
+      navigate(`/committees/${committee_id}`);
     } else {
       await createCommittee(committeeContent);
-      navigate('committees');
+      navigate('/committees');
     }
   };
 
@@ -75,7 +76,7 @@ export default function EditCommittee() {
       <div className="grid xl:grid-cols-3 gap-5 mt-[-9.3rem]">
         <div className="xl:col-span-3 mb-[-0.5rem] flex justify-between">
           <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">
-            <Button color="inherit" onClick={() => navigate('committees')}>
+            <Button color="inherit" onClick={() => navigate('/committees')}>
               {text('Back to Committees', 'Terug naar Commissies')}
             </Button>
           </div>

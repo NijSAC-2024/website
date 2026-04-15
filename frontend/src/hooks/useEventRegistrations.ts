@@ -1,14 +1,20 @@
-import {useContext} from 'react';
-import {useWebsite, WebsiteContext} from './useState.ts';
 import {apiFetch, apiFetchVoid} from '../api.ts';
 import {Answer, Registration} from '../types.ts';
 import {enqueueSnackbar} from 'notistack';
 import {useLanguage} from '../providers/LanguageProvider.tsx';
+import {useQueryClient} from '@tanstack/react-query';
+import {queryKeys} from '../queries.ts';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../store.ts';
 
 export function useEventRegistrations() {
-  const {state} = useContext(WebsiteContext);
+  const dispatch = useDispatch();
   const {text} = useLanguage();
-  const {dispatch} = useWebsite();
+  const queryClient = useQueryClient();
+
+  const user = useSelector((s: RootState) => s.user);
+  const registrations = useSelector((s: RootState) => s.registrations);
+  const userEventRegistrations = useSelector((s: RootState) => s.userEventRegistrations);
 
   const createRegistration = async (eventId: string, userId: string | null, answers: Answer[]) => {
     const {data, error} = await apiFetch<Registration>(`/event/${eventId}/registration`, {
@@ -20,6 +26,10 @@ export function useEventRegistrations() {
       return;
     }
     dispatch({type: 'add_event_registration', registration: data});
+    void queryClient.invalidateQueries({queryKey: queryKeys.events.registrations(eventId)});
+    if (user?.id) {
+      void queryClient.invalidateQueries({queryKey: queryKeys.users.registrations(user.id)});
+    }
     enqueueSnackbar(text('Registered', 'Ingeschreven'), {variant: 'success'});
   };
 
@@ -34,6 +44,10 @@ export function useEventRegistrations() {
     }
     dispatch({type: 'delete_event_registration', registrationId: registrationId, eventId});
     dispatch({type: 'add_event_registration', registration: data});
+    void queryClient.invalidateQueries({queryKey: queryKeys.events.registrations(eventId)});
+    if (user?.id) {
+      void queryClient.invalidateQueries({queryKey: queryKeys.users.registrations(user.id)});
+    }
     enqueueSnackbar(text('Registration updated', 'Inschrijving bijgewerkt'), {variant: 'success'});
   };
 
@@ -46,12 +60,16 @@ export function useEventRegistrations() {
       return;
     }
     dispatch({type: 'delete_event_registration', registrationId: registrationId, eventId});
+    void queryClient.invalidateQueries({queryKey: queryKeys.events.registrations(eventId)});
+    if (user?.id) {
+      void queryClient.invalidateQueries({queryKey: queryKeys.users.registrations(user.id)});
+    }
     enqueueSnackbar(text('Deregistered', 'Uitgeschreven'), {variant: 'success'});
   };
 
   return {
-    eventRegistrations: state.registrations,
-    userEventRegistrations: state.userEventRegistrations,
+    eventRegistrations: registrations,
+    userEventRegistrations: userEventRegistrations,
     createRegistration,
     updateRegistration,
     deleteRegistration
