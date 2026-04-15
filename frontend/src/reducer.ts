@@ -47,35 +47,38 @@ const actionHandler: {
     return {...state, registrations: action.registrations};
   },
   add_event_registration(state: State, action) {
-    // Adopt registration count
-    let events = state.events;
-    const event = events?.find(e => e.id === action.registration.eventId);
-    if (event && events) {
-      event.registrationCount = (state.registrations?.length || 0) + 1;
-      events = [...events.filter(e => e.id !== action.registration.eventId), event];
-    }
-
     return {
       ...state,
-      events,
-      userEventRegistrations: state.user?.id === action.registration.id ? [...state.userEventRegistrations || [], action.registration] : state.userEventRegistrations,
-      registrations: [...state.registrations || [], action.registration]
+      events: state.events?.map(event =>
+        event.id === action.registration.eventId
+          ? {
+            ...event,
+            registrationCount: (state.registrations?.length || 0) + 1,
+          }
+          : event
+      ),
+      userEventRegistrations:
+        state.user?.id === action.registration.id
+          ? [...(state.userEventRegistrations || []), action.registration]
+          : state.userEventRegistrations,
+      registrations: [...(state.registrations || []), action.registration],
     };
   },
   delete_event_registration(state: State, action) {
-    // Adopt registration count
-    let events = state.events;
-    const event = events?.find(e => e.id === action.eventId);
-    if (event && events) {
-      event.registrationCount = (state.registrations?.length || 0) - 1;
-      events = [...events.filter(e => e.id !== action.eventId), event];
-    }
-
     return {
       ...state,
-      events,
-      userEventRegistrations: state.userEventRegistrations?.filter((r) => r.id !== action.registrationId) || null,
-      registrations: state.registrations?.filter((r) => r.id !== action.registrationId) || null
+      events: state.events?.map(event =>
+        event.id === action.eventId
+          ? {
+            ...event,
+            registrationCount: event.registrationCount - 1,
+          }
+          : event
+      ),
+      userEventRegistrations:
+        state.userEventRegistrations?.filter(r => r.id !== action.registrationId) || null,
+      registrations:
+        state.registrations?.filter(r => r.id !== action.registrationId) || null,
     };
   },
   set_user_event_registrations(state: State, action) {
