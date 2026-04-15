@@ -2,6 +2,7 @@ use crate::{
     AppState, Pagination,
     data_source::Count,
     error::{AppResult, Error},
+    material::MaterialId,
     user::UserId,
     wire::material::{Material, UserMaterial},
 };
@@ -29,14 +30,14 @@ impl FromRequestParts<AppState> for MaterialStore {
 
 #[derive(Debug)]
 pub struct PgMaterial {
-    pub material_id: Uuid,
+    pub material_id: MaterialId,
     pub name_en: String,
     pub name_nl: String,
 }
 
 pub struct PgUserMaterial {
-    pub user_id: Uuid,
-    pub material_id: Uuid,
+    pub user_id: UserId,
+    pub material_id: MaterialId,
     pub material_amount: i32,
 }
 

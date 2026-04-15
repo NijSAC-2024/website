@@ -129,6 +129,9 @@ const actionHandler: {
   set_locations: function (state, action) {
     return {...state, locations: action.locations};
   },
+  add_location: function (state, action) {
+    return {...state, locations: [...state.locations || [], action.location]};
+  },
   logout: function (state, _action) {
     return {...state, user: null, forceReload: true};
   },

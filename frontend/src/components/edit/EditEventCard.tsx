@@ -7,8 +7,8 @@ import EditDates from './EditDates.tsx';
 import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import {isAdminOrBoard} from '../../util.ts';
 import {useUsers} from '../../hooks/useUsers.ts';
-import {useLocations} from '../../hooks/useLocations.ts';
 import {useCommittees} from '../../hooks/useCommittees.ts';
+import EditLocation from './EditLocation.tsx';
 
 interface EditAgendaCardProps {
   category: EventType;
@@ -33,7 +33,6 @@ export default function EditEventCard({
 }: EditAgendaCardProps) {
   const {text} = useLanguage();
   const {user} = useUsers();
-  const {locations} = useLocations();
   const {committees, myCommittees} = useCommittees();
   const [uploading, setUploading] = useState(false);
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -85,9 +84,9 @@ export default function EditEventCard({
           </form>
           {/* Category, Committee and Type */}
           <div className="grid gap-3">
-            <FormControl fullWidth>
+            <FormControl fullWidth required>
               <InputLabel id="select-label">
-                {text('Category*', 'Categorie*')}
+                {text('Category', 'Categorie')}
               </InputLabel>
               <Select
                 labelId="select-label"
@@ -112,9 +111,9 @@ export default function EditEventCard({
                 </MenuItem>
               </Select>
             </FormControl>
-            <FormControl fullWidth>
+            <FormControl fullWidth required>
               <InputLabel id="committee-select-label">
-                {text('Committee*', 'Commissie*')}
+                {text('Committee', 'Commissie')}
               </InputLabel>
               <Select
                 labelId="committee-select-label"
@@ -147,8 +146,9 @@ export default function EditEventCard({
           {/* Title */}
           <div className="grid grid-cols-2 xl:grid-cols-1 gap-3">
             <TextField
+              required
               value={name.en}
-              label={text('Title English*', 'Titel Engels*')}
+              label={text('Title English', 'Titel Engels')}
               onChange={(e) =>
                 handleEventChange({
                   name: {
@@ -159,8 +159,9 @@ export default function EditEventCard({
               }
             />
             <TextField
+              required
               value={name.nl}
-              label={text('Title Dutch*', 'Titel Nederlands*')}
+              label={text('Title Dutch', 'Titel Nederlands')}
               onChange={(e) =>
                 handleEventChange({
                   name: {
@@ -172,27 +173,10 @@ export default function EditEventCard({
             />
           </div>
           {/*Location*/}
-          <FormControl fullWidth>
-            <InputLabel id="select-label">
-              {text('Location*', 'Locatie*')}
-            </InputLabel>
-            <Select
-              required
-              labelId="select-label"
-              value={location}
-              label={text('Location*', 'Locatie*')}
-              onChange={(e) =>
-                handleEventChange({location: e.target.value})
-              }
-              variant="outlined"
-            >
-              {locations?.map((l) => (
-                <MenuItem key={l.id} value={l.id}>
-                  {text(l.name)}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          <EditLocation
+            value={location}
+            onChange={(nextLocation) => handleEventChange({location: nextLocation})}
+          />
           {/*Dates*/}
           <EditDates
             dates={dates}

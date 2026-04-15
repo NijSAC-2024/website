@@ -84,7 +84,7 @@ export const weekendQuestions: Omit<Question, 'id'>[] = [
       en: 'Do you have dietary wishes?',
       nl: 'Heb je dieetwensen?'
     },
-    questionType: {type: 'boolean'},
+    questionType: {type: 'text'},
     required: false
   },
   {

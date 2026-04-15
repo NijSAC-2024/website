@@ -61,6 +61,12 @@ export default async function apiMiddleware(
     });
   }
 
+  if (!navState.state.locations && navState.to.name === 'location') {
+    dispatch({
+      type: 'set_locations',
+      locations: await get('/api/location')
+    });
+  }
 
   if (!navState.state.committees) {
     dispatch({
