@@ -5,7 +5,7 @@ import {useLanguage} from '../../providers/LanguageProvider';
 import ContentCard from '../ContentCard.tsx';
 import TextCard from '../TextCard.tsx';
 import {getLabel, isAdminOrBoard} from '../../util.ts';
-import {useUsers} from '../../hooks/useUsers.ts';
+import {useUserHook} from '../../hooks/useUserHook.ts';
 import {SubmitHandler, useForm} from 'react-hook-form';
 import {FormInputText} from '../form/FormInputText.tsx';
 import {ChangeCommittees} from './ChangeCommittees.tsx';
@@ -16,11 +16,13 @@ type FormInputs = Omit<UserContent, 'membership' | 'status' | 'roles'>;
 
 export default function UserDetails() {
   const {text} = useLanguage();
-  const {user, currentUser, updateUser} = useUsers();
+  const params = useParams();
+  const {useAuthUser, useUser, updateUser} = useUserHook();
+  const user = useAuthUser();
+  const currentUser = useUser(params.userId)
   const {register, handleSubmit, control, reset, formState} = useForm<FormInputs>({
     defaultValues: currentUser!,
   });
-  const params = useParams();
 
   useEffect(() => {
     reset(currentUser!);
@@ -30,7 +32,7 @@ export default function UserDetails() {
     return null;
   }
 
-  const isMe = params.user_id === user.id;
+  const isMe = params.userId === user.id;
   const canEdit = isAdminOrBoard(user.roles) || isMe;
 
 

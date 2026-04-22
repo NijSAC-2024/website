@@ -1,4 +1,4 @@
-import {useState, ChangeEvent} from 'react';
+import {ChangeEvent, useState} from 'react';
 import {Button, TextField} from '@mui/material';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import GenericPage from '../../pages/GenericPage.tsx';
@@ -6,20 +6,20 @@ import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import {CommitteeContent} from '../../types.ts';
 import SaveButton from './SaveButton.tsx';
 import MarkdownEditor from '../markdown/MarkdownEditor.tsx';
-import {useCommittees} from '../../hooks/useCommittees.ts';
+import {useCommitteeHook} from '../../hooks/useCommitteeHook.ts';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
 
 export default function EditCommittee() {
   const {text} = useLanguage();
   const [uploading, setUploading] = useState(false);
-  const {committee, createCommittee, updateCommittee} = useCommittees();
+  const {useCommittee, createCommittee, updateCommittee} = useCommitteeHook();
   const params = useParams();
   const location = useLocation();
   const navigate = useNavigate();
 
-  const committee_id = params.committee_id;
+  const committeeId = params.committeeId;
 
-  let initialCommittee: CommitteeContent | null = committee;
+  let initialCommittee: CommitteeContent | undefined = useCommittee(committeeId);
   if (location.pathname === 'committees/new') {
     initialCommittee = {
       name: {en: 'New committee', nl: 'Nieuwe commissie'},
@@ -28,10 +28,10 @@ export default function EditCommittee() {
     };
   }
 
-  const [committeeContent, setCommitteeContent] = useState<CommitteeContent | null>(initialCommittee);
+  const [committeeContent, setCommitteeContent] = useState<CommitteeContent | undefined>(initialCommittee);
 
   if (!committeeContent) {
-    return <></>;
+    return null;
   }
 
   const handleCommitteeChange = (changes: Partial<CommitteeContent>) => {
@@ -55,9 +55,9 @@ export default function EditCommittee() {
   };
 
   const handleSave = async () => {
-    if (committee_id) {
-      await updateCommittee(committee_id, committeeContent);
-      navigate(`/committees/${committee_id}`);
+    if (committeeId) {
+      await updateCommittee(committeeId, committeeContent);
+      navigate(`/committees/${committeeId}`);
     } else {
       await createCommittee(committeeContent);
       navigate('/committees');
@@ -72,7 +72,7 @@ export default function EditCommittee() {
 
   return (
     <GenericPage image={imageUrl}>
-      <SaveButton id={committee_id ?? ''} handleSave={handleSave}/>
+      <SaveButton id={committeeId ?? ''} handleSave={handleSave}/>
       <div className="grid xl:grid-cols-3 gap-5 mt-[-9.3rem]">
         <div className="xl:col-span-3 mb-[-0.5rem] flex justify-between">
           <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">

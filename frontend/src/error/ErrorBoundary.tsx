@@ -11,28 +11,38 @@ interface State {
 }
 
 export default class ErrorBoundary extends Component<Props, State> {
-  public state: State = {
-    error: undefined,
-  };
+  public state: State = { error: undefined };
 
-  public static getDerivedStateFromError(e: WebsiteError): State {
-    // Update state so the next render will show the fallback UI.
-    return { error: e };
+  // Allow external triggering
+  public static setError?: (error: unknown) => void;
+
+  constructor(props: Props) {
+    super(props);
+
+    ErrorBoundary.setError = (error: unknown) => {
+      this.setState({ error: ErrorBoundary.normalizeError(error) });
+    };
   }
 
-  public componentDidCatch(error: WebsiteError, errorInfo: ErrorInfo) {
+  public static getDerivedStateFromError(error: unknown): State {
+    return { error: ErrorBoundary.normalizeError(error) };
+  }
+
+  public componentDidCatch(error: unknown, errorInfo: ErrorInfo) {
     console.error('Uncaught error:', error, errorInfo);
+  }
+
+  private static normalizeError(error: unknown): WebsiteError {
+    if (error instanceof WebsiteError) {return error;}
+    if (error instanceof Error) {return new WebsiteError(error.message, 500);}
+    if (typeof error === 'string') {return new WebsiteError(error, 500);}
+    return new WebsiteError('Unexpected unknown error', 500);
   }
 
   public render() {
     if (this.state.error) {
-      if (this.state.error instanceof WebsiteError) {
-        return <ErrorPage error={this.state.error} />;
-      }
-
-      return <ErrorPage error={new WebsiteError(`Unexpected error: ${this.state.error}`, 500)} />;
+      return <ErrorPage error={this.state.error} />;
     }
-
     return this.props.children;
   }
 }

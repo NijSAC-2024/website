@@ -1,15 +1,20 @@
 import GenericPage from './GenericPage.tsx';
 import ContentCard from '../components/ContentCard.tsx';
-import {useLocations} from '../hooks/useLocations.ts';
+import {useLocationHook} from '../hooks/useLocationHook.ts';
 import {useLanguage} from '../providers/LanguageProvider.tsx';
 import {useParams} from 'react-router-dom';
 
 export default function Location() {
-  const {locations} = useLocations()
+  const {useLocations} = useLocationHook()
+  const locations = useLocations();
   const {text} = useLanguage();
   const params = useParams();
-  const id = params.location_id
-  const location = locations.find(loc => loc.id === id) ?? locations[0];
+  const id = params.locationId
+  const location = locations?.find(loc => loc.id === id);
+
+  if (!location) {
+    return null;
+  }
 
   return (
     <GenericPage>

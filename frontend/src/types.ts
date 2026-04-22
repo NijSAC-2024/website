@@ -1,4 +1,3 @@
-import {WebsiteError} from './error/error.ts';
 import {Control, FieldValues, Path} from 'react-hook-form';
 import {HTMLInputTypeAttribute} from 'react';
 
@@ -102,9 +101,9 @@ export interface Event extends Omit<EventContent, 'location'> {
 }
 
 export function toEventContent(event: Event): EventContent {
-  const location_id = event.location.id;
+  const locationId = event.location.id;
   const eventContent = {...event} as unknown as EventContent;
-  eventContent.location = location_id;
+  eventContent.location = locationId;
   return eventContent;
 }
 
@@ -218,104 +217,6 @@ export interface ReservationItemType {
   price: number;
   amount: number;
 }
-
-export interface State {
-  version: string;
-  events: Event[];
-  registrations: Registration[];
-  // Holds the registrations a logged-in user is registered for
-  userEventRegistrations: Registration[];
-  // The committees of the logged-in user
-  myCommittees: UserCommittee[];
-  // The committees of the user to display
-  currentCommittees: UserCommittee[];
-  committees: Committee[];
-  committeeMembers: CommitteeUser[];
-  locations: Location[];
-  // The logged-in user
-  user: User | null;
-  // The user to display, e.g., as an admin
-  currentUser: User | null;
-  users: User[];
-  error: WebsiteError | null;
-}
-
-export type Action =
-    | {
-      type: 'login';
-      user: User;
-    } | {
-      type: 'set_users';
-      users: User[];
-    } | {
-      type: 'set_current_user';
-      user: User | null;
-    } | {
-      type: 'delete_user';
-      userId: string;
-    } | {
-      type: 'add_user';
-      user: User;
-    } | {
-      type: 'logout';
-    } | {
-      type: 'set_events';
-      events: Event[];
-    } | {
-      type: 'add_event';
-      event: Event;
-    } | {
-      type: 'delete_event';
-      eventId: string;
-    } | {
-      type: 'set_locations';
-      locations: Location[];
-    } | {
-      type: 'add_location';
-      location: Location;
-    } | {
-      type: 'set_event_registrations';
-      registrations: Registration[];
-    } | {
-      type: 'set_user_event_registrations';
-      registrations: Registration[];
-    } | {
-      type: 'add_event_registration';
-      registration: Registration;
-    } | {
-      type: 'delete_event_registration';
-      registrationId: string;
-      eventId: string,
-    } | {
-      type: 'set_my_committees';
-      committees: UserCommittee[];
-    } | {
-      type: 'set_current_committees';
-      committees: UserCommittee[];
-    } | {
-      type: 'set_committees';
-      committees: Committee[];
-    } | {
-      type: 'set_committee_members';
-      members: CommitteeUser[];
-    } | {
-      type: 'add_committee_member';
-      user: BasicUser;
-      committeeId: string;
-    } | {
-      type: 'delete_committee_member';
-      userId: string;
-      committeeId: string;
-    } | {
-      type: 'add_committee';
-      committee: Committee;
-    } | {
-      type: 'delete_committee';
-      committeeId: string;
-    } | {
-      type: 'set_error';
-      error: WebsiteError | null;
-    };
 
 export interface FormInputProps<T extends FieldValues> {
   name: Path<T>;

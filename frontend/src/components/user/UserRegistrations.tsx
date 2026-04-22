@@ -5,27 +5,29 @@ import {useLanguage} from '../../providers/LanguageProvider';
 import ContentCard from '../ContentCard';
 import EventCard from '../event/EventCard';
 import {Event} from '../../types.ts';
-import {useEvents} from '../../hooks/useEvents.ts';
-import {useEventRegistrations} from '../../hooks/useEventRegistrations.ts';
-import {useUsers} from '../../hooks/useUsers.ts';
+import {useUserHook} from '../../hooks/useUserHook.ts';
 import {useParams} from 'react-router-dom';
 
 export default function UserRegistrations() {
   const {text} = useLanguage();
-  const {userEventRegistrations} = useEventRegistrations();
-  const {user} = useUsers();
-  const {currentEvent, events} = useEvents();
+  const params = useParams();
+  const {useAuthUser, useUserEventRegistrations, useUserEvents} = useUserHook();
+  const userEventRegistrations = useUserEventRegistrations(params.userId);
+  const userEvents = useUserEvents(params.userId)
+  const user = useAuthUser();
   const [filterPastEvents, setFilterPastEvents] = useState<boolean>(false);
   const now = new Date();
-  const params = useParams();
 
-  if (!user || !userEventRegistrations || !currentEvent) {
+  if (!user || !userEventRegistrations) {
     return null;
   }
-  const isMe = params.user_id === user.id;
-  
-  const filteredEvents = events.filter(event => userEventRegistrations.some(reg => reg.eventId === event.id &&
-    (filterPastEvents || moment(currentEvent.dates[0].start).isAfter(moment(now)))));
+  const isMe = params.userId === user.id;
+
+  const filteredEvents =
+    (userEvents as unknown as Event[])?.filter((event) =>
+      filterPastEvents ||
+      moment(event.dates[0].start).isAfter(moment(now))
+    ) ?? [];
 
   return (
     <>

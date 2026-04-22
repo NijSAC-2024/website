@@ -50,7 +50,6 @@
     "react-cookie": "^8.0.1",
     "react-hook-form": "^7.66.1",
     "react-markdown": "^10.1.0",
-    "react-redux": "^9.2.0",
     "react-router-dom": "^7.14.1",
     "remark-gfm": "^4.0.1"
   }

@@ -11,7 +11,7 @@ import TextField from '@mui/material/TextField';
 import {SyntheticEvent, useMemo, useState} from 'react';
 import {Location, LocationContent} from '../../types.ts';
 import {useLanguage} from '../../providers/LanguageProvider.tsx';
-import {useLocations} from '../../hooks/useLocations.ts';
+import {useLocationHook} from '../../hooks/useLocationHook.ts';
 import {IconButton, Tooltip} from '@mui/material';
 
 interface EditLocationProps {
@@ -38,13 +38,14 @@ const filterOptions = createFilterOptions<Location>({
 
 export default function EditLocation({value, onChange}: EditLocationProps) {
   const {text} = useLanguage();
-  const {locations, createLocation} = useLocations();
+  const {useLocations, createLocation} = useLocationHook();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newLocation, setNewLocation] = useState<LocationContent>(emptyLocationContent);
   const [saving, setSaving] = useState(false);
+  const locations = useLocations()
 
   const selectedLocation = useMemo(
-    () => locations.find((location) => location.id === value) || null,
+    () => locations?.find((location) => location.id === value) || null,
     [locations, value]
   );
 
@@ -80,7 +81,7 @@ export default function EditLocation({value, onChange}: EditLocationProps) {
         <div className="col-span-4">
           <Autocomplete<Location, false, false, false>
             fullWidth
-            options={locations}
+            options={locations ?? []}
             value={selectedLocation}
             filterOptions={filterOptions}
             onChange={handleAutocompleteChange}

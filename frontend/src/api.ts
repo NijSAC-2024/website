@@ -90,14 +90,14 @@ async function apiFetchResponse(
 export async function apiFetch<T>(
   url: string,
   options: RequestInit = {}
-): Promise<ApiResponse<T>> {
+): Promise<T> {
   const { data, error } = await apiFetchResponse(url, options);
 
   if (error) {
     if (error.status === 401 || error.status === 403) {
       await apiFetchVoid('/logout');
     }
-    return { error };
+    throw error;
   }
 
   if (data.status === 204 || data.headers.get('Content-Length') === '0') {
@@ -105,39 +105,27 @@ export async function apiFetch<T>(
   }
 
   try {
-    const content: T = await data.json();
-    return { data: content };
-  } catch (_parseError) {
-    return {
-      error: {
-        message: 'Failed to parse response',
-        reference: 'PARSE_ERROR',
-        status: data.status
-      }
+    return await data.json() as T;
+  } catch {
+    throw {
+      message: 'Failed to parse response',
+      reference: 'PARSE_ERROR',
+      status: data.status
     };
   }
 }
-
 export async function apiFetchVoid(
   url: string,
   options: RequestInit = {}
-): Promise<ApiResponse<void>> {
+): Promise<void> {
   const { data, error } = await apiFetchResponse(url, options);
-  if (error || !data) {
-    return { error };
+  if (error) {
+    throw error;
   }
-  return { data: undefined };
-}
-
-export function clearApiCache(urlPrefix?: string) {
-  if (!urlPrefix) {
-    etagCache.clear();
-    return;
+  if (!data) {
+    throw new Error('No response received');
   }
-
-  for (const key of etagCache.keys()) {
-    if (key.startsWith(urlPrefix)) {
-      etagCache.delete(key);
-    }
+  if (!data.ok) {
+    throw new Error(`Request failed with status ${data.status}`);
   }
 }

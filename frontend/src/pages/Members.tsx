@@ -3,10 +3,11 @@ import GenericPage from './GenericPage';
 import AcceptingMembers from '../components/members/AcceptingMembers.tsx';
 import MembersTable from '../components/members/MembersTable.tsx';
 import {isAdminOrBoard} from '../util.ts';
-import {useUsers} from '../hooks/useUsers.ts';
+import {useUserHook} from '../hooks/useUserHook.ts';
 
 export default function Members() {
-  const { user } = useUsers();
+  const { useAuthUser } = useUserHook();
+  const user = useAuthUser();
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
   const toggleExpand = (id: string) => {

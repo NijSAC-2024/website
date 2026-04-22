@@ -6,16 +6,18 @@ import RegistrationsCard from '../components/event/RegistrationsCard.tsx';
 import DescriptionCard from '../components/event/DescriptionCard.tsx';
 import {useLanguage} from '../providers/LanguageProvider.tsx';
 import {inCommittee, isAdminOrBoard} from '../util.ts';
-import {useUsers} from '../hooks/useUsers.ts';
-import {useEvents} from '../hooks/useEvents.ts';
-import {useCommittees} from '../hooks/useCommittees.ts';
-import {useNavigate} from 'react-router-dom';
+import {useUserHook} from '../hooks/useUserHook.ts';
+import {useEventHook} from '../hooks/useEventHook.ts';
+import {useNavigate, useParams} from 'react-router-dom';
 
 export default function Event() {
   const {text} = useLanguage();
-  const {currentEvent} = useEvents();
-  const {myCommittees} = useCommittees();
-  const {user} = useUsers();
+  const params = useParams();
+  const {useEvent} = useEventHook();
+  const currentEvent = useEvent(params.eventId)
+  const {useAuthUser, useUserCommittees} = useUserHook();
+  const user = useAuthUser();
+  const myCommittees = useUserCommittees(user?.id);
   const navigate = useNavigate();
 
 
@@ -25,7 +27,7 @@ export default function Event() {
 
   return (
     <>
-      {user && (isAdminOrBoard(user.roles) || inCommittee(myCommittees, currentEvent.createdBy)) && (
+      {user && (isAdminOrBoard(user.roles) || inCommittee(myCommittees ?? [], currentEvent.createdBy)) && (
         <div className="fixed bottom-5 right-5 z-10">
           <Fab
             variant="extended"

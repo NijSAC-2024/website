@@ -7,17 +7,21 @@ import remarkGfm from 'remark-gfm';
 import Markdown from 'react-markdown';
 import {CommitteeUser} from '../types.ts';
 import {getLabel, isAdminOrBoard, isChair} from '../util.ts';
-import {useUsers} from '../hooks/useUsers.ts';
-import {useCommittees} from '../hooks/useCommittees.ts';
+import {useUserHook} from '../hooks/useUserHook.ts';
+import {useCommitteeHook} from '../hooks/useCommitteeHook.ts';
 import EventSeatIcon from '@mui/icons-material/EventSeat';
 import AreYouSure from '../components/AreYouSure.tsx';
 import {useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate, useParams} from 'react-router-dom';
 
 export default function Committee() {
   const {text} = useLanguage();
-  const {user} = useUsers();
-  const {committee, committeeMembers, makeChair} = useCommittees();
+  const params = useParams();
+  const {useAuthUser} = useUserHook();
+  const user = useAuthUser();
+  const {useCommittee, useCommitteeMembers, makeChair} = useCommitteeHook();
+  const committee = useCommittee(params.committeeId);
+  const committeeMembers = useCommitteeMembers(params.committeeId)
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [selectedMember, setSelectedMember] = useState<CommitteeUser | null>(null);
   const navigate = useNavigate();
@@ -25,7 +29,7 @@ export default function Committee() {
   const toggleDialog = () => setDialogOpen((prevState) => !prevState);
 
   if (!committee) {
-    return <></>;
+    return null;
   }
 
   const handleMakeChair = async () => {
@@ -40,7 +44,7 @@ export default function Committee() {
 
   return (
     <>
-      {user && (isChair(committeeMembers, user.id)|| isAdminOrBoard(user.roles)) && (
+      {user && (isChair(committeeMembers ?? [], user.id)|| isAdminOrBoard(user.roles)) && (
         <div className="fixed bottom-5 right-5 z-10">
           <Fab
             variant="extended"
@@ -87,7 +91,7 @@ export default function Committee() {
               <h2>{text('Members', 'Leden')}</h2>
               <Table>
                 <TableBody>
-                  {committeeMembers.map((member: CommitteeUser) => (
+                  {committeeMembers?.map((member: CommitteeUser) => (
                     <TableRow
                       key={member.id}
                       sx={{'&:last-child td, &:last-child th': {border: 0}}}
@@ -98,7 +102,7 @@ export default function Committee() {
                             <p>{`${member.firstName} ${member.infix ?? ''} ${member.lastName}`}</p>
                             {member.role === 'chair' && <i className="text-xs">{text(getLabel(member.role))}</i>}
                           </div>
-                          {(isAdminOrBoard(user.roles) || isChair(committeeMembers, user.id)) && member.role !== 'chair' &&
+                          {(isAdminOrBoard(user.roles) || isChair(committeeMembers ?? [], user.id)) && member.role !== 'chair' &&
                               <Tooltip title={text('Make chair of committee', 'Maak commissiehoofd')}>
                                 <IconButton size="small" onClick={() => {setSelectedMember(member); toggleDialog()}}>
                                   <EventSeatIcon/>

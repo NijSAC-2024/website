@@ -8,16 +8,18 @@ import EditDescription from './EditDescription.tsx';
 import GenericPage from '../../pages/GenericPage.tsx';
 import SaveButton from './SaveButton.tsx';
 import {useLanguage} from '../../providers/LanguageProvider.tsx';
-import {useEvents} from '../../hooks/useEvents.ts';
+import {useEventHook} from '../../hooks/useEventHook.ts';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
 
 
 export default function EditEvent() {
   const {text} = useLanguage();
-  const {currentEvent, createEvent, updateEvent} = useEvents();
+  const {useEvent, createEvent, updateEvent} = useEventHook();
   const location = useLocation();
   const params = useParams();
   const navigate = useNavigate();
+
+  const currentEvent = useEvent(params.eventId)
 
   const initialEvent = useMemo<EventContent | null>(() => {
     if (location.pathname === '/events/new') {
@@ -41,7 +43,7 @@ export default function EditEvent() {
     return currentEvent ? toEventContent(currentEvent) : null;
   }, [currentEvent, location.pathname]);
 
-  const id = params.event_id;
+  const id = params.eventId;
   const form = useForm<EventContent>({
     defaultValues: initialEvent ?? undefined
   });

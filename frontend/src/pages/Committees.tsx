@@ -5,14 +5,16 @@ import {Fab} from '@mui/material';
 import {isAdminOrBoard, truncateMarkdown} from '../util.ts';
 import Markdown from 'react-markdown';
 import AddIcon from '@mui/icons-material/Add';
-import {useUsers} from '../hooks/useUsers.ts';
-import {useCommittees} from '../hooks/useCommittees.ts';
+import {useUserHook} from '../hooks/useUserHook.ts';
+import {useCommitteeHook} from '../hooks/useCommitteeHook.ts';
 import {useNavigate} from 'react-router-dom';
 
 export default function Committees() {
   const {text} = useLanguage();
-  const {committees} = useCommittees();
-  const {user} = useUsers();
+  const {useCommittees} = useCommitteeHook();
+  const committees = useCommittees();
+  const {useAuthUser} = useUserHook();
+  const user = useAuthUser();
   const navigate = useNavigate();
 
   return (
@@ -42,7 +44,7 @@ export default function Committees() {
         </ContentCard>
 
         <div className="grid xl:grid-cols-3 lg:grid-cols-2 gap-5 mt-4">
-          {committees?.length > 0 &&
+          {committees && committees?.length > 0 &&
             committees.map((committee) => (
               <div
                 key={committee.id}

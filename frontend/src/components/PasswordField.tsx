@@ -1,6 +1,7 @@
 import {ChangeEventHandler, MouseEvent, useState} from 'react';
 import { IconButton, InputAdornment, InputLabel, OutlinedInput } from '@mui/material';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 interface PasswordFieldProps {
   label: string;
@@ -34,7 +35,7 @@ export default function PasswordField({
               onMouseDown={handleMouseDownPassword}
               edge="end"
             >
-              {showPassword ? <VisibilityOff /> : <Visibility />}
+              {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
             </IconButton>
           </InputAdornment>
         }

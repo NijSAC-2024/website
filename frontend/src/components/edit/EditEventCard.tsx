@@ -7,20 +7,24 @@ import {ChangeEvent, memo, useState} from 'react';
 import EditDates from './EditDates.tsx';
 import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import {isAdminOrBoard} from '../../util.ts';
-import {useUsers} from '../../hooks/useUsers.ts';
-import {useCommittees} from '../../hooks/useCommittees.ts';
+import {useUserHook} from '../../hooks/useUserHook.ts';
+import {useCommitteeHook} from '../../hooks/useCommitteeHook.ts';
 import EditLocation from './EditLocation.tsx';
 
 function EditEventCard() {
   const {text} = useLanguage();
-  const {user} = useUsers();
-  const {committees, myCommittees} = useCommittees();
+  const {useAuthUser, useUserCommittees} = useUserHook();
+  const {useCommittees} = useCommitteeHook();
   const {control, setValue} = useFormContext<EventContent>();
   const [uploading, setUploading] = useState(false);
   const [image, metadata, location] = useWatch({
     control,
     name: ['image', 'metadata', 'location']
   });
+
+  const user = useAuthUser();
+  const committees = useCommittees()
+  const myCommittees = useUserCommittees(user?.id)
 
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -117,7 +121,7 @@ function EditEventCard() {
                     variant="outlined"
                     onChange={(e) => field.onChange(e.target.value)}
                   >
-                    {committees.filter(c => (myCommittees.some(uc => uc.committeeId == c.id && uc.left == null) || user && isAdminOrBoard(user.roles))).map((committee) => (
+                    {committees?.filter(c => (myCommittees?.some(uc => uc.committeeId == c.id && uc.left == null) || user && isAdminOrBoard(user.roles))).map((committee) => (
                       <MenuItem key={committee.id} value={committee.id}>
                         {text(committee.name)}
                       </MenuItem>

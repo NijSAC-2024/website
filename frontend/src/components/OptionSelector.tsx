@@ -44,15 +44,15 @@ export default function OptionSelector({
         input={<OutlinedInput id="select-multiple-chip" label={label} />}
         renderValue={(selected: string[]) => (
           <div className="flex flex-wrap gap-1">
-            {selected.map((selected_id) => {
-              const option = options.find((opt) => opt.id === selected_id);
+            {selected.map((selectedId) => {
+              const option = options.find((opt) => opt.id === selectedId);
               return (
                 <Chip
-                  key={selected_id}
+                  key={selectedId}
                   label={
                     option
                       ? text( option.label.en, option.label.nl)
-                      : selected_id
+                      : selectedId
                   }
                   className="uppercase font-semibold"
                   size="small"

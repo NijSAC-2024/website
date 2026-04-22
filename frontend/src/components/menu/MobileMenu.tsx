@@ -13,19 +13,21 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
 import {useState} from 'react';
-import {ExpandLess, ExpandMore} from '@mui/icons-material';
 import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import UserMenu from './UserMenu.tsx';
 import SettingsIcon from '@mui/icons-material/Settings';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {useThemeMode} from '../../providers/ThemeProvider.tsx';
-import {MenuType} from './MainMenu.tsx';
-import {useUsers} from '../../hooks/useUsers.ts';
+import {useUserHook} from '../../hooks/useUserHook.ts';
 import {useNavigate} from 'react-router-dom';
+import {MenuType} from '../../types.ts';
 
 export default function MobileMenu({setShowLogin}: { setShowLogin: (show: boolean) => void }) {
   const {text} = useLanguage();
   const {checkDarkMode} = useThemeMode();
-  const {user} = useUsers();
+  const {useAuthUser} = useUserHook();
+  const user = useAuthUser()
   const [openMenu, setOpenMenu] = useState<MenuType>(undefined);
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
   const isDarkMode = checkDarkMode();
@@ -102,7 +104,7 @@ export default function MobileMenu({setShowLogin}: { setShowLogin: (show: boolea
                 className="uppercase px-10"
               />
               <ListItemIcon>
-                {openMenu === 'association' ? <ExpandLess/> : <ExpandMore/>}
+                {openMenu === 'association' ? <ExpandLessIcon/> : <ExpandMoreIcon/>}
               </ListItemIcon>
             </ListItemButton>
           </ListItem>
@@ -167,7 +169,7 @@ export default function MobileMenu({setShowLogin}: { setShowLogin: (show: boolea
                 className="uppercase px-10"
               />
               <ListItemIcon>
-                {openMenu === 'climbing' ? <ExpandLess/> : <ExpandMore/>}
+                {openMenu === 'climbing' ? <ExpandLessIcon/> : <ExpandMoreIcon/>}
               </ListItemIcon>
             </ListItemButton>
           </ListItem>
@@ -230,7 +232,7 @@ export default function MobileMenu({setShowLogin}: { setShowLogin: (show: boolea
                 className="uppercase px-10"
               />
               <ListItemIcon>
-                {openMenu === 'alps' ? <ExpandLess/> : <ExpandMore/>}
+                {openMenu === 'alps' ? <ExpandLessIcon/> : <ExpandMoreIcon/>}
               </ListItemIcon>
             </ListItemButton>
           </ListItem>

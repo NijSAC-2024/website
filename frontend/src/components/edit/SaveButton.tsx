@@ -8,7 +8,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AreYouSure from '../AreYouSure.tsx';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import moment from 'moment';
-import {useEvents} from '../../hooks/useEvents.ts';
+import {useEventHook} from '../../hooks/useEventHook.ts';
 import {EventContent} from '../../types.ts';
 import {useFormContext, useWatch} from 'react-hook-form';
 import {useNavigate} from 'react-router-dom';
@@ -20,7 +20,7 @@ interface SaveButtonProps {
 
 export default function SaveButton({ id, handleSave }: SaveButtonProps) {
   const { text } = useLanguage();
-  const {deleteEvent} = useEvents();
+  const {deleteEvent} = useEventHook();
   const {handleSubmit, control} = useFormContext<EventContent>();
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);

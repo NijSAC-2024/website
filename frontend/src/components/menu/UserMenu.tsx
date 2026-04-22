@@ -5,7 +5,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import { MouseEvent, useState } from 'react';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import GroupIcon from '@mui/icons-material/Group';
-import {useUsers} from '../../hooks/useUsers.ts';
+import {useUserHook} from '../../hooks/useUserHook.ts';
 import {useNavigate} from 'react-router-dom';
 
 interface UserMenuProps {
@@ -14,7 +14,8 @@ interface UserMenuProps {
 
 export default function UserMenu({toggleDropdown}: UserMenuProps) {
   const { text } = useLanguage();
-  const { user, logout } = useUsers();
+  const { useAuthUser, logout } = useUserHook();
+  const user = useAuthUser();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const navigate = useNavigate();

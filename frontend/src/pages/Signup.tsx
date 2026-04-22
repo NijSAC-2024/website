@@ -6,7 +6,7 @@ import {useState} from 'react';
 import SignupOptions from '../components/signup/SingupOptions.tsx';
 import {useLanguage} from '../providers/LanguageProvider.tsx';
 import {Membership, UserContent} from '../types.ts';
-import {useUsers} from '../hooks/useUsers.ts';
+import {useUserHook} from '../hooks/useUserHook.ts';
 import {useNavigate} from 'react-router-dom';
 
 interface MembershipType {
@@ -17,7 +17,7 @@ interface MembershipType {
 export default function Signup() {
   const {text} = useLanguage();
   const navigate = useNavigate();
-  const {signup} = useUsers();
+  const {signup} = useUserHook();
   const [membership, setMembership] = useState<MembershipType>({
     id: 'member', label: {en: 'Member', nl: 'Lid'}
   });

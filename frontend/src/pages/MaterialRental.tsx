@@ -16,11 +16,12 @@ import { rentOptions, ReservationItemType, ReservationType } from '../types.ts';
 import { useState } from 'react';
 import RentalForm from '../components/rental/RentalForm.tsx';
 import { useLanguage } from '../providers/LanguageProvider.tsx';
-import {useUsers} from '../hooks/useUsers.ts';
+import {useUserHook} from '../hooks/useUserHook.ts';
 
 export default function MaterialRental({setShowLogin}: { setShowLogin: (show: boolean) => void }) {
   const { text } = useLanguage();
-  const {user} = useUsers();
+  const {useAuthUser} = useUserHook();
+  const user = useAuthUser();
   const [rentFormOpen, setRentFormOpen] = useState<boolean>(false);
   const now = new Date();
   const [reservation, setReservation] = useState<ReservationType>({

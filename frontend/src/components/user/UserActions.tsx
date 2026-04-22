@@ -11,22 +11,28 @@ import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import {RoleType, roleOptions} from '../../types.ts';
 import GroupIcon from '@mui/icons-material/Group';
 import {isAdminOrBoard, isChair} from '../../util.ts';
-import {useUsers} from '../../hooks/useUsers.ts';
-import {useCommittees} from '../../hooks/useCommittees.ts';
+import {useUserHook} from '../../hooks/useUserHook.ts';
+import {useCommitteeHook} from '../../hooks/useCommitteeHook.ts';
+import {useParams} from 'react-router-dom';
 
 
 export default function UserActions() {
   const {text} = useLanguage();
-  const {user} = useUsers();
-  const {myCommittees, currentCommittees, committees, addUserToCommittee, deleteUserFromCommittee} = useCommittees();
-  const {currentUser, updateUser} = useUsers();
+  const params = useParams();
+  const {useCommittees, addUserToCommittee, deleteUserFromCommittee} = useCommitteeHook();
+  const committees = useCommittees();
+  const {useUser, useAuthUser, updateUser, useUserCommittees} = useUserHook();
+  const user = useAuthUser();
+  const currentUser = useUser(params.userId);
+  const myCommittees = useUserCommittees(user?.id)
+  const currentCommittees = useUserCommittees(currentUser?.id)
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [committeeAnchor, setCommitteeAnchor] = useState<null | HTMLElement>(null);
 
   console.log(myCommittees)
 
-  if (!user || !(isAdminOrBoard(user.roles) || isChair(myCommittees, user.id))) {
+  if (!user || !(isAdminOrBoard(user.roles) || isChair(myCommittees ?? [], user.id))) {
     return null;
   }
 
@@ -60,7 +66,7 @@ export default function UserActions() {
     if (!currentUser) {
       return;
     }
-    const inCommittee = currentCommittees.some((c) => c.committeeId === committeeId && c.left == null);
+    const inCommittee = currentCommittees?.some((c) => c.committeeId === committeeId && c.left == null);
 
     if (inCommittee) {
       await deleteUserFromCommittee(committeeId, currentUser.id);
@@ -92,8 +98,8 @@ export default function UserActions() {
         open={Boolean(committeeAnchor)}
         onClose={handleClose}
       >
-        {committees.map((committee) => {
-          const inCommittee = currentCommittees.some((c) => c.committeeId === committee.id && c.left == null);
+        {committees?.map((committee) => {
+          const inCommittee = currentCommittees?.some((c) => c.committeeId === committee.id && c.left == null);
           return (
             <MenuItem
               key={committee.id}

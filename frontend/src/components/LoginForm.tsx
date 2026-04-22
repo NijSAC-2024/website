@@ -4,12 +4,12 @@ import {useLanguage} from '../providers/LanguageProvider.tsx';
 import PasswordField from './PasswordField.tsx';
 import {emailValidator, passwordValidator} from '../validator.ts';
 import {Language} from '../types.ts';
-import {useUsers} from '../hooks/useUsers.ts';
+import {useUserHook} from '../hooks/useUserHook.ts';
 
 
 export default function LoginForm({close}: { close: () => void }) {
   const {text} = useLanguage();
-  const {login} = useUsers();
+  const {login} = useUserHook();
 
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -20,7 +20,6 @@ export default function LoginForm({close}: { close: () => void }) {
     setEmailError(emailValidator(email));
     setPasswordError(passwordValidator(password));
   };
-
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();

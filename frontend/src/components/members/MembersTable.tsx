@@ -5,7 +5,7 @@ import {
 } from '@mui/material';
 import {useLanguage} from '../../providers/LanguageProvider';
 import ContentCard from '../ContentCard.tsx';
-import {useUsers} from '../../hooks/useUsers.ts';
+import {useUserHook} from '../../hooks/useUserHook.ts';
 import {useNavigate} from 'react-router-dom';
 
 export default function MembersTable() {
@@ -13,12 +13,13 @@ export default function MembersTable() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState('')
-  const {users} = useUsers();
+  const {useUsers} = useUserHook();
+  const users = useUsers();
   const navigate = useNavigate();
 
   const filteredUsers = useMemo(() => {
     const q = search.toLowerCase();
-    return users
+    return (users ?? [])
       .filter((u) =>
         `${u.firstName} ${u.infix ?? ''} ${u.lastName}`.toLowerCase().includes(q),
       )

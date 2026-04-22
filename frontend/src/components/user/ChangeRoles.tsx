@@ -3,12 +3,16 @@ import {IconButton, Tooltip, Menu, MenuItem, Checkbox} from '@mui/material';
 import SwitchAccountIcon from '@mui/icons-material/SwitchAccount';
 import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import {RoleType, roleOptions} from '../../types.ts';
-import {useUsers} from '../../hooks/useUsers.ts';
+import {useUserHook} from '../../hooks/useUserHook.ts';
 import {isAdminOrBoard} from '../../util.ts';
+import {useParams} from 'react-router-dom';
 
 export function ChangeRoles() {
   const {text} = useLanguage();
-  const {user, currentUser, updateUser} = useUsers();
+  const params = useParams();
+  const {useAuthUser, useUser, updateUser} = useUserHook();
+  const user = useAuthUser();
+  const currentUser = useUser(params.userId);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
   if (!user || !isAdminOrBoard(user.roles)) {

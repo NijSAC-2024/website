@@ -2,29 +2,34 @@ import {useState} from 'react';
 import {IconButton, Tooltip, Menu, MenuItem, Checkbox} from '@mui/material';
 import GroupIcon from '@mui/icons-material/Group';
 import {useLanguage} from '../../providers/LanguageProvider.tsx';
-import {useUsers} from '../../hooks/useUsers.ts';
-import {useCommittees} from '../../hooks/useCommittees.ts';
+import {useUserHook} from '../../hooks/useUserHook.ts';
+import {useCommitteeHook} from '../../hooks/useCommitteeHook.ts';
 import {isAdminOrBoard, isChair} from '../../util.ts';
 import AreYouSure from '../AreYouSure.tsx';
 import {Committee} from '../../types.ts';
+import {useParams} from 'react-router-dom';
 
 export function ChangeCommittees() {
   const {text} = useLanguage();
-  const {user, currentUser} = useUsers();
+  const params = useParams();
+  const {useAuthUser, useUser, useUserCommittees} = useUserHook();
+  const user = useAuthUser();
+  const currentUser = useUser(params.userId);
   const {
-    myCommittees,
-    currentCommittees,
-    committees,
+    useCommittees,
     addUserToCommittee,
     deleteUserFromCommittee,
-  } = useCommittees();
+  } = useCommitteeHook();
+  const myCommittees = useUserCommittees(user?.id)
+  const currentCommittees = useUserCommittees(params.userId)
+  const committees = useCommittees()
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [selectedCommittee, setSelectedCommittee] = useState<Committee | null>(null);
 
   const toggleDialog = () => setDialogOpen(prev => !prev);
 
-  if (!user || !(isAdminOrBoard(user.roles) || committees.some((c) => isChair(myCommittees, c.id)))) {
+  if (!user || !(isAdminOrBoard(user.roles) || committees?.some((c) => isChair(myCommittees ?? [], c.id)))) {
     return null;
   }
 
@@ -33,7 +38,7 @@ export function ChangeCommittees() {
       return;
     }
 
-    const inCommittee = currentCommittees.some(
+    const inCommittee = currentCommittees?.some(
       (c) => c.committeeId === committeeId && c.left == null,
     );
 
@@ -56,13 +61,13 @@ export function ChangeCommittees() {
       </Tooltip>
 
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
-        {committees.map((committee) => {
-          const inCommittee = currentCommittees.some(
+        {committees?.map((committee) => {
+          const inCommittee = currentCommittees?.some(
             (c) => c.committeeId === committee.id && c.left == null,
           );
 
           return (
-            (isAdminOrBoard(user.roles) || isChair(myCommittees, committee.id)) && (
+            (isAdminOrBoard(user.roles) || isChair(myCommittees ?? [], committee.id)) && (
               <MenuItem key={committee.id} onClick={() => {
                 setSelectedCommittee(committee);
                 toggleDialog()
@@ -77,7 +82,7 @@ export function ChangeCommittees() {
 
       <AreYouSure open={dialogOpen} onConfirm={() => toggleCommittee(selectedCommittee!.id)}
         onCancel={toggleDialog}
-        message={`${text('You are about to ', 'Je staat op het punt om deze gebruiker ')}${currentCommittees.some(
+        message={`${text('You are about to ', 'Je staat op het punt om deze gebruiker ')}${currentCommittees?.some(
           (c) => c.committeeId === selectedCommittee?.id && c.left == null) ? text('remove this user from the ', 'te verwijderen van ') : text('add this user to the ', 'toe te voegen aan ')}${selectedCommittee ? text(selectedCommittee.name) : ''}.`}/>
     </>
   );

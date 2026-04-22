@@ -4,16 +4,19 @@ import moment from 'moment';
 import {getLabel} from '../../util.ts';
 import {useState} from 'react';
 import {Switch} from '@mui/material';
-import {useUsers} from '../../hooks/useUsers.ts';
-import {useCommittees} from '../../hooks/useCommittees.ts';
+import {useUserHook} from '../../hooks/useUserHook.ts';
+import {useCommitteeHook} from '../../hooks/useCommitteeHook.ts';
 import {useNavigate, useParams} from 'react-router-dom';
 
 export default function UserCommittees() {
   const {text} = useLanguage();
-  const {user} = useUsers();
-  const [filterLeftCommittees, setFilterLeftCommittees] = useState<boolean>(false);
-  const {committees, currentCommittees} = useCommittees();
   const params = useParams();
+  const {useAuthUser, useUserCommittees} = useUserHook();
+  const user = useAuthUser();
+  const [filterLeftCommittees, setFilterLeftCommittees] = useState<boolean>(false);
+  const {useCommittees} = useCommitteeHook();
+  const committees = useCommittees()
+  const currentCommittees = useUserCommittees(params.userId)
   const navigate = useNavigate();
 
   if (!committees || !currentCommittees || !user || user.status != 'accepted') {
@@ -26,7 +29,7 @@ export default function UserCommittees() {
     <>
       <ContentCard className="mt-5">
         <div className="grid xl:grid-cols-2 justify-between">
-          <h1>{params.user_id === user.id ? text('My committees', 'Mijn commissies') : text('Committees', 'Commissies')}</h1>
+          <h1>{params.userId === user.id ? text('My committees', 'Mijn commissies') : text('Committees', 'Commissies')}</h1>
           <div className="flex items-center xl:justify-end">
             <p>{text('Include left committees', 'Uitgetreden commissies meenemen')}</p>
             <Switch

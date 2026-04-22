@@ -6,12 +6,13 @@ import {passwordValidator, repeatPasswordValidator} from '../../validator.ts';
 import ContentCard from '../ContentCard.tsx';
 import PasswordField from '../PasswordField.tsx';
 import {isAdminOrBoard} from '../../util.ts';
-import {useUsers} from '../../hooks/useUsers.ts';
+import {useUserHook} from '../../hooks/useUserHook.ts';
 import {useParams} from 'react-router-dom';
 
 export default function ChangePassword() {
   const {text} = useLanguage();
-  const {user, updateUserPassword} = useUsers();
+  const {useAuthUser, updateUserPassword} = useUserHook();
+  const user = useAuthUser();
   const params = useParams();
   const [password, setPassword] = useState({password: '', repeatPassword: ''});
   const [passwordErrors, setPasswordErrors] = useState<{ password: ErrorType; repeatPassword: ErrorType }>({
@@ -23,7 +24,7 @@ export default function ChangePassword() {
     return null;
   }
 
-  const canEdit = isAdminOrBoard(user.roles) || params.user_id === user.id;
+  const canEdit = isAdminOrBoard(user.roles) || params.userId === user.id;
   if (!canEdit) {
     return null;
   }
@@ -41,13 +42,13 @@ export default function ChangePassword() {
 
   const handleChangePassword = async (event: FormEvent) => {
     event.preventDefault();
-    if (!canEdit || !params.user_id) {
+    if (!canEdit || !params.userId) {
       return;
     }
     if (Object.values(passwordErrors).some((v) => v)) {
       return;
     }
-    if (await updateUserPassword(params.user_id, password.password)) {
+    if (await updateUserPassword(params.userId, password.password)) {
       setPassword({password: '', repeatPassword: ''});
     }
   };
