@@ -6,12 +6,13 @@ import {RoleType, roleOptions} from '../../types.ts';
 import {useUserHook} from '../../hooks/useUserHook.ts';
 import {isAdminOrBoard} from '../../util.ts';
 import {useParams} from 'react-router-dom';
+import {useAuth} from '../../providers/AuthProvider.tsx';
 
 export function ChangeRoles() {
   const {text} = useLanguage();
   const params = useParams();
-  const {useAuthUser, useUser, updateUser} = useUserHook();
-  const user = useAuthUser();
+  const {useUser, updateUser} = useUserHook();
+  const {user} = useAuth()
   const currentUser = useUser(params.userId);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 

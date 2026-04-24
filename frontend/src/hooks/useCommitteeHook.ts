@@ -1,13 +1,16 @@
 import {BasicUser, Committee, CommitteeContent, CommitteeUser,} from '../types.ts';
-import {ApiError, apiFetch, apiFetchVoid} from '../api.ts';
+import {apiFetch} from '../api.ts';
 import {enqueueSnackbar} from 'notistack';
 import {useLanguage} from '../providers/LanguageProvider.tsx';
 import {useMutation, useQuery, useQueryClient,} from '@tanstack/react-query';
 import {queryKeys} from '../queries.ts';
+import {ApiError} from '../error/error.ts';
+import {useAuth} from '../providers/AuthProvider.tsx';
 
 export function useCommitteeHook() {
   const {text} = useLanguage();
   const queryClient = useQueryClient();
+  const {user} = useAuth()
 
   function useCommittee(committeeId?: string) {
     const {data} = useQuery<Committee>({
@@ -31,7 +34,7 @@ export function useCommitteeHook() {
   function useCommitteeMembers(committeeId?: string) {
     const {data} = useQuery<CommitteeUser[]>({
       queryKey: queryKeys.committees.members(committeeId),
-      enabled: !!committeeId,
+      enabled: !!committeeId && !!user,
       queryFn: () =>
         apiFetch<CommitteeUser[]>(`/committee/${committeeId}/members`),
       staleTime: 60_000,
@@ -90,7 +93,7 @@ export function useCommitteeHook() {
     { committeeId: string }
   >({
     mutationFn: async ({committeeId}) => {
-      await apiFetchVoid(`/committee/${committeeId}`, {
+      await apiFetch<void>(`/committee/${committeeId}`, {
         method: 'DELETE',
       });
     },
@@ -134,7 +137,7 @@ export function useCommitteeHook() {
     {committeeId: string; userId: string}
   >({
     mutationFn: async ({committeeId, userId}) => {
-      await apiFetchVoid(
+      await apiFetch<void>(
         `/committee/${committeeId}/user/${userId}`,
         {method: 'DELETE'}
       );
@@ -161,7 +164,7 @@ export function useCommitteeHook() {
     {committeeId: string; userId: string}
   >({
     mutationFn: async ({committeeId, userId}) => {
-      await apiFetchVoid(
+      await apiFetch<void>(
         `/committee/${committeeId}/user/${userId}/chair`,
         {method: 'POST'}
       );

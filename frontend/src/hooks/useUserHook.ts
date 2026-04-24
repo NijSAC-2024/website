@@ -1,6 +1,6 @@
 import {enqueueSnackbar} from 'notistack';
 import {useLanguage} from '../providers/LanguageProvider.tsx';
-import {apiFetch, apiFetchVoid} from '../api.ts';
+import {apiFetch} from '../api.ts';
 import {Registration, User, UserCommittee, UserContent} from '../types.ts';
 import {
   useQuery,
@@ -8,29 +8,18 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 import {queryKeys} from '../queries.ts';
-
-type ApiError = {
-  message: string;
-  reference: string;
-};
+import {ApiError} from '../error/error.ts';
+import {useAuth} from '../providers/AuthProvider.tsx';
 
 export function useUserHook() {
   const {text} = useLanguage();
   const queryClient = useQueryClient();
-
-  function useAuthUser() {
-    const {data} = useQuery<User>({
-      queryKey: queryKeys.auth.user(),
-      queryFn: () =>
-        apiFetch<User>('/whoami'),
-      staleTime: Infinity,
-    });
-    return data;
-  }
+  const {user} = useAuth();
 
   function useUsers() {
     const {data} = useQuery<User[]>({
       queryKey: queryKeys.users.all(),
+      enabled: !!user,
       queryFn: () => apiFetch<User[]>('/user'),
       staleTime: 60_000,
     });
@@ -40,7 +29,7 @@ export function useUserHook() {
   function useUser(userId?: string) {
     const {data} = useQuery<User>({
       queryKey: queryKeys.users.detail(userId),
-      enabled: !!userId,
+      enabled: !!userId && !!user,
       queryFn: () =>
         apiFetch<User>(`/user/${userId}`),
       staleTime: 60_000,
@@ -51,7 +40,7 @@ export function useUserHook() {
   function useUserCommittees(userId?: string) {
     const {data} = useQuery<UserCommittee[]>({
       queryKey: queryKeys.users.committees(userId),
-      enabled: !!userId,
+      enabled: !!userId && !!user,
       queryFn: () =>
         apiFetch<UserCommittee[]>(`/user/${userId}/committees`),
       staleTime: 60_000,
@@ -62,7 +51,7 @@ export function useUserHook() {
   function useUserEvents(userId?: string) {
     const {data} = useQuery<Event[]>({
       queryKey: queryKeys.users.events(userId),
-      enabled: !!userId,
+      enabled: !!userId && !!user,
       queryFn: () =>
         apiFetch<Event[]>(`/user/${userId}/events`),
       staleTime: 60_000,
@@ -73,7 +62,7 @@ export function useUserHook() {
   function useUserEventRegistrations(userId?: string) {
     const {data} = useQuery<Registration[]>({
       queryKey: queryKeys.users.registrations(userId),
-      enabled: !!userId,
+      enabled: !!userId && !!user,
       queryFn: () =>
         apiFetch<Registration[]>(
           `/user/${userId}/event_registrations`
@@ -97,6 +86,7 @@ export function useUserHook() {
     },
     onSuccess: (user) => {
       queryClient.setQueryData(queryKeys.auth.user(), user);
+      queryClient.invalidateQueries();
       enqueueSnackbar(text('You logged in', 'Je bent ingelogd'), {variant: 'success'});
     },
     onError: (error) => {
@@ -118,7 +108,7 @@ export function useUserHook() {
 
   const logoutMutation = useMutation<void, ApiError, void>({
     mutationFn: async () => {
-      await apiFetchVoid('/logout');
+      await apiFetch<void>('/logout');
     },
     onSuccess: () => {
       queryClient.setQueryData(queryKeys.auth.user(), null);
@@ -224,7 +214,6 @@ export function useUserHook() {
     });
 
   return {
-    useAuthUser,
     useUser,
     useUsers,
     useUserCommittees,

@@ -7,18 +7,17 @@ import remarkGfm from 'remark-gfm';
 import Markdown from 'react-markdown';
 import {CommitteeUser} from '../types.ts';
 import {getLabel, isAdminOrBoard, isChair} from '../util.ts';
-import {useUserHook} from '../hooks/useUserHook.ts';
 import {useCommitteeHook} from '../hooks/useCommitteeHook.ts';
 import EventSeatIcon from '@mui/icons-material/EventSeat';
 import AreYouSure from '../components/AreYouSure.tsx';
 import {useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
+import {useAuth} from '../providers/AuthProvider.tsx';
 
 export default function Committee() {
   const {text} = useLanguage();
   const params = useParams();
-  const {useAuthUser} = useUserHook();
-  const user = useAuthUser();
+  const {user} = useAuth();
   const {useCommittee, useCommitteeMembers, makeChair} = useCommitteeHook();
   const committee = useCommittee(params.committeeId);
   const committeeMembers = useCommitteeMembers(params.committeeId)

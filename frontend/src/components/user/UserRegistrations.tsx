@@ -7,14 +7,15 @@ import EventCard from '../event/EventCard';
 import {Event} from '../../types.ts';
 import {useUserHook} from '../../hooks/useUserHook.ts';
 import {useParams} from 'react-router-dom';
+import {useAuth} from '../../providers/AuthProvider.tsx';
 
 export default function UserRegistrations() {
   const {text} = useLanguage();
   const params = useParams();
-  const {useAuthUser, useUserEventRegistrations, useUserEvents} = useUserHook();
+  const {useUserEventRegistrations, useUserEvents} = useUserHook();
   const userEventRegistrations = useUserEventRegistrations(params.userId);
   const userEvents = useUserEvents(params.userId)
-  const user = useAuthUser();
+  const {user}= useAuth()
   const [filterPastEvents, setFilterPastEvents] = useState<boolean>(false);
   const now = new Date();
 

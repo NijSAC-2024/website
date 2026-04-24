@@ -4,11 +4,12 @@ import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import {isAdminOrBoard} from '../../util.ts';
 import {useUserHook} from '../../hooks/useUserHook.ts';
 import {useNavigate} from 'react-router-dom';
+import {useAuth} from '../../providers/AuthProvider.tsx';
 
 export default function NewEventButton() {
   const {text} = useLanguage();
-  const {useAuthUser, useUserCommittees} = useUserHook();
-  const user = useAuthUser();
+  const {useUserCommittees} = useUserHook();
+  const {user} = useAuth()
   const myCommittees = useUserCommittees(user?.id)
   const navigate = useNavigate();
 

@@ -10,10 +10,11 @@ import {isAdminOrBoard} from '../../util.ts';
 import {useUserHook} from '../../hooks/useUserHook.ts';
 import {useCommitteeHook} from '../../hooks/useCommitteeHook.ts';
 import EditLocation from './EditLocation.tsx';
+import {useAuth} from '../../providers/AuthProvider.tsx';
 
 function EditEventCard() {
   const {text} = useLanguage();
-  const {useAuthUser, useUserCommittees} = useUserHook();
+  const {useUserCommittees} = useUserHook();
   const {useCommittees} = useCommitteeHook();
   const {control, setValue} = useFormContext<EventContent>();
   const [uploading, setUploading] = useState(false);
@@ -22,7 +23,7 @@ function EditEventCard() {
     name: ['image', 'metadata', 'location']
   });
 
-  const user = useAuthUser();
+  const {user} = useAuth();
   const committees = useCommittees()
   const myCommittees = useUserCommittees(user?.id)
 

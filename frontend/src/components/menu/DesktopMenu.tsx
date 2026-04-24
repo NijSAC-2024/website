@@ -5,15 +5,14 @@ import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import {MouseEvent, useEffect, useState} from 'react';
 import SettingsIcon from '@mui/icons-material/Settings';
 import {useThemeMode} from '../../providers/ThemeProvider.tsx';
-import {useUserHook} from '../../hooks/useUserHook.ts';
 import {useNavigate} from 'react-router-dom';
 import {MenuType} from '../../types.ts';
+import {useAuth} from '../../providers/AuthProvider.tsx';
 
 export default function DesktopMenu({setShowLogin}: { setShowLogin: (show: boolean) => void }) {
   const {text} = useLanguage();
   const navigate = useNavigate();
-  const {useAuthUser} = useUserHook();
-  const user = useAuthUser();
+  const {user} = useAuth()
   const {checkDarkMode} = useThemeMode();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | undefined>(undefined);
   const [openMenu, setOpenMenu] = useState<MenuType>(undefined);

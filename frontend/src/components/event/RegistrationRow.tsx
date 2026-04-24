@@ -7,6 +7,7 @@ import {useEventHook} from '../../hooks/useEventHook.ts';
 import {useUserHook} from '../../hooks/useUserHook.ts';
 import {useEventRegistrationHook} from '../../hooks/useEventRegistrationHook.ts';
 import {useNavigate, useParams} from 'react-router-dom';
+import {useAuth} from '../../providers/AuthProvider.tsx';
 
 interface RegistrationRowProps {
   registration: Registration;
@@ -17,8 +18,8 @@ export default function RegistrationRow({registration, onEditClick}: Registratio
   const params = useParams();
   const {useEvent} = useEventHook();
   const currentEvent = useEvent(params.eventId)
-  const {useAuthUser, useUserCommittees} = useUserHook();
-  const user = useAuthUser();
+  const {useUserCommittees} = useUserHook();
+  const {user} = useAuth()
   const myCommittees = useUserCommittees(user?.id)
   const {updateRegistration} = useEventRegistrationHook();
   const navigate = useNavigate();

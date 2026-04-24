@@ -1,26 +1,28 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
 import ErrorPage from './ErrorPage.tsx';
-import { WebsiteError } from './error';
+import {AppError, ApiError, UserError} from './error';
 
 interface Props {
   children?: ReactNode;
 }
 
 interface State {
-  error?: WebsiteError;
+  error?: AppError;
 }
 
 export default class ErrorBoundary extends Component<Props, State> {
   public state: State = { error: undefined };
-
-  // Allow external triggering
   public static setError?: (error: unknown) => void;
 
   constructor(props: Props) {
     super(props);
 
     ErrorBoundary.setError = (error: unknown) => {
-      this.setState({ error: ErrorBoundary.normalizeError(error) });
+      const normalized = ErrorBoundary.normalizeError(error);
+
+      if (!ErrorBoundary.isFatal(error)) {return;}
+
+      this.setState({ error: normalized });
     };
   }
 
@@ -32,17 +34,41 @@ export default class ErrorBoundary extends Component<Props, State> {
     console.error('Uncaught error:', error, errorInfo);
   }
 
-  private static normalizeError(error: unknown): WebsiteError {
-    if (error instanceof WebsiteError) {return error;}
-    if (error instanceof Error) {return new WebsiteError(error.message, 500);}
-    if (typeof error === 'string') {return new WebsiteError(error, 500);}
-    return new WebsiteError('Unexpected unknown error', 500);
+  private static isFatal(error: unknown): boolean {
+    if (error instanceof UserError) {return false;}
+    if (error instanceof ApiError || error instanceof AppError) {
+      return error.status >= 500;
+    }
+    return true;
+  }
+
+  private static normalizeError(error: unknown): AppError {
+    if (error instanceof AppError) {return error;}
+
+    if (error instanceof ApiError) {
+      return new AppError(error.message, error.status);
+    }
+
+    if (error instanceof UserError) {
+      return new AppError(error.message, error.status);
+    }
+
+    if (error instanceof Error) {
+      return new AppError(error.message, 500);
+    }
+
+    if (typeof error === 'string') {
+      return new AppError(error, 500);
+    }
+
+    return new AppError('Unexpected unknown error', 500);
   }
 
   public render() {
     if (this.state.error) {
       return <ErrorPage error={this.state.error} />;
     }
+
     return this.props.children;
   }
 }

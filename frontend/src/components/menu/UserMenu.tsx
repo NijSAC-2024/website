@@ -7,6 +7,7 @@ import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import GroupIcon from '@mui/icons-material/Group';
 import {useUserHook} from '../../hooks/useUserHook.ts';
 import {useNavigate} from 'react-router-dom';
+import {useAuth} from '../../providers/AuthProvider.tsx';
 
 interface UserMenuProps {
   toggleDropdown?: () => void;
@@ -14,8 +15,8 @@ interface UserMenuProps {
 
 export default function UserMenu({toggleDropdown}: UserMenuProps) {
   const { text } = useLanguage();
-  const { useAuthUser, logout } = useUserHook();
-  const user = useAuthUser();
+  const { logout } = useUserHook();
+  const {user} = useAuth()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const navigate = useNavigate();

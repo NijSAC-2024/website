@@ -5,16 +5,15 @@ import {Fab} from '@mui/material';
 import {isAdminOrBoard, truncateMarkdown} from '../util.ts';
 import Markdown from 'react-markdown';
 import AddIcon from '@mui/icons-material/Add';
-import {useUserHook} from '../hooks/useUserHook.ts';
 import {useCommitteeHook} from '../hooks/useCommitteeHook.ts';
 import {useNavigate} from 'react-router-dom';
+import {useAuth} from '../providers/AuthProvider.tsx';
 
 export default function Committees() {
   const {text} = useLanguage();
   const {useCommittees} = useCommitteeHook();
   const committees = useCommittees();
-  const {useAuthUser} = useUserHook();
-  const user = useAuthUser();
+  const {user} = useAuth();
   const navigate = useNavigate();
 
   return (

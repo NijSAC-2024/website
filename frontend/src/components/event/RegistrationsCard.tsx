@@ -1,7 +1,7 @@
 import ContentCard from '../ContentCard.tsx';
 import { Box, FormControl } from '@mui/material';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
-import {Answer, BasicUser, Question, Registration} from '../../types.ts';
+import {Answer, BasicUser, Registration} from '../../types.ts';
 import { useState } from 'react';
 import AreYouSure from '../AreYouSure.tsx';
 import RegistrationTable from './RegistrationTable.tsx';
@@ -14,15 +14,12 @@ import {useUserHook} from '../../hooks/useUserHook.ts';
 import {useEventHook} from '../../hooks/useEventHook.ts';
 import {useEventRegistrationHook} from '../../hooks/useEventRegistrationHook.ts';
 import {useParams} from 'react-router-dom';
+import {useAuth} from '../../providers/AuthProvider.tsx';
 
-interface RegistrationsCardProps {
-  questions: Question[];
-}
-
-export default function RegistrationsCard({ questions }: RegistrationsCardProps) {
+export default function RegistrationsCard() {
   const { text } = useLanguage();
-  const {useAuthUser, useUserCommittees} = useUserHook();
-  const user = useAuthUser();
+  const {useUserCommittees} = useUserHook();
+  const {user} = useAuth()
   const myCommittees = useUserCommittees(user?.id);
   const {useEventRegistrations, updateRegistration, deleteRegistration, createRegistration} = useEventRegistrationHook();
   const params = useParams();
@@ -109,7 +106,7 @@ export default function RegistrationsCard({ questions }: RegistrationsCardProps)
           open={registerDialogOpen}
           toggleDialog={toggleRegisterDialog}
           name={currentEvent.name}
-          questions={questions}
+          questions={currentEvent.questions}
           selectedRegistration={selectedRegistration}
           selectedUser={selectedUser}
           handleRegistration={handleRegistration}

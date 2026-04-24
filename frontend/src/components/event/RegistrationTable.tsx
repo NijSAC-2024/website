@@ -7,6 +7,7 @@ import {useEventRegistrationHook} from '../../hooks/useEventRegistrationHook.ts'
 import {useEventHook} from '../../hooks/useEventHook.ts';
 import {useUserHook} from '../../hooks/useUserHook.ts';
 import {useParams} from 'react-router-dom';
+import {useAuth} from '../../providers/AuthProvider.tsx';
 
 interface RegistrationTableProps {
   onEditClick: (registration: Registration) => void;
@@ -14,8 +15,8 @@ interface RegistrationTableProps {
 
 export default function RegistrationTable({onEditClick}: RegistrationTableProps) {
   const {text} = useLanguage();
-  const {useAuthUser, useUserCommittees} = useUserHook();
-  const user = useAuthUser();
+  const {useUserCommittees} = useUserHook();
+  const {user} = useAuth()
   const myCommittees = useUserCommittees(user?.id);
   const {useEventRegistrations} = useEventRegistrationHook();
   const params = useParams();

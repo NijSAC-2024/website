@@ -21,7 +21,6 @@ import Committee from './pages/Committee.tsx';
 import Location from './pages/Location.tsx';
 import EditCommittee from './components/committee/EditCommittee.tsx';
 import ErrorPage from './error/ErrorPage.tsx';
-import { WebsiteError } from './error/error.ts';
 
 import ThemeProvider, { useThemeMode } from './providers/ThemeProvider.tsx';
 import LanguageProvider, { useLanguage } from './providers/LanguageProvider.tsx';
@@ -37,6 +36,8 @@ import Warning from './components/alerts/Warning.tsx';
 import Info from './components/alerts/Info.tsx';
 import Error from './components/alerts/Error.tsx';
 import ErrorBoundary from './error/ErrorBoundary.tsx';
+import {AppError} from './error/error.ts';
+import AuthProvider from './providers/AuthProvider.tsx';
 
 
 const queryClient = new QueryClient({
@@ -44,7 +45,6 @@ const queryClient = new QueryClient({
     queries: {
       refetchOnWindowFocus: false,
       retry: 1,
-      throwOnError: true,
     },
   },
 });
@@ -148,69 +148,53 @@ function AppLayout() {
 }
 
 export function App() {
-  useEffect(() => {
-    const handleError = (event: ErrorEvent) => {
-      ErrorBoundary.setError?.(event.error || event.message);
-    };
-
-    const handleRejection = (event: PromiseRejectionEvent) => {
-      ErrorBoundary.setError?.(event.reason);
-    };
-
-    window.addEventListener('error', handleError);
-    window.addEventListener('unhandledrejection', handleRejection);
-
-    return () => {
-      window.removeEventListener('error', handleError);
-      window.removeEventListener('unhandledrejection', handleRejection);
-    };
-  }, []);
-
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <CookiesProvider>
           <ThemeProvider>
             <LanguageProvider>
-              <ErrorBoundary>
-                <Routes>
-                  <Route element={<AppLayout/>}>
-                    <Route path="/" element={<Home/>}/>
-                    <Route path="/register" element={<Signup/>}/>
+              <AuthProvider>
+                <ErrorBoundary>
+                  <Routes>
+                    <Route element={<AppLayout/>}>
+                      <Route path="/" element={<Home/>}/>
+                      <Route path="/register" element={<Signup/>}/>
 
-                    <Route path="/events" element={<Events/>}/>
-                    <Route path="/events/new" element={<EditEvent/>}/>
-                    <Route path="/events/:eventId" element={<Event/>}/>
-                    <Route path="/events/:eventId/edit" element={<EditEvent/>}/>
+                      <Route path="/events" element={<Events/>}/>
+                      <Route path="/events/new" element={<EditEvent/>}/>
+                      <Route path="/events/:eventId" element={<Event/>}/>
+                      <Route path="/events/:eventId/edit" element={<EditEvent/>}/>
 
-                    <Route path="/settings" element={<Settings/>}/>
+                      <Route path="/settings" element={<Settings/>}/>
 
-                    <Route path="/user/:userId" element={<User/>}/>
+                      <Route path="/user/:userId" element={<User/>}/>
 
-                    <Route path="/members" element={<Members/>}/>
+                      <Route path="/members" element={<Members/>}/>
 
-                    <Route path="/committees" element={<Committees/>}/>
-                    <Route path="/committees/new" element={<EditCommittee/>}/>
-                    <Route path="/committees/:committeeId" element={<Committee/>}/>
-                    <Route path="/committees/:committeeId/edit" element={<EditCommittee/>}/>
+                      <Route path="/committees" element={<Committees/>}/>
+                      <Route path="/committees/new" element={<EditCommittee/>}/>
+                      <Route path="/committees/:committeeId" element={<Committee/>}/>
+                      <Route path="/committees/:committeeId/edit" element={<EditCommittee/>}/>
 
-                    <Route path="/location" element={<Location/>}/>
+                      <Route path="/location" element={<Location/>}/>
 
-                    <Route path="/about" element={<h1>About</h1>}/>
-                    <Route path="/material_rental" element={<h1>Material Rental</h1>}/>
+                      <Route path="/about" element={<h1>About</h1>}/>
+                      <Route path="/material_rental" element={<h1>Material Rental</h1>}/>
 
-                    {/* 404 fallback */}
-                    <Route
-                      path="*"
-                      element={
-                        <ErrorPage
-                          error={new WebsiteError('Page not found.', 404)}
-                        />
-                      }
-                    />
-                  </Route>
-                </Routes>
-              </ErrorBoundary>
+                      {/* 404 fallback */}
+                      <Route
+                        path="*"
+                        element={
+                          <ErrorPage
+                            error={new AppError('Page not found.', 404)}
+                          />
+                        }
+                      />
+                    </Route>
+                  </Routes>
+                </ErrorBoundary>
+              </AuthProvider>
             </LanguageProvider>
           </ThemeProvider>
         </CookiesProvider>

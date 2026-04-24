@@ -11,14 +11,15 @@ import {FormInputText} from '../form/FormInputText.tsx';
 import {ChangeCommittees} from './ChangeCommittees.tsx';
 import {ChangeRoles} from './ChangeRoles.tsx';
 import {useParams} from 'react-router-dom';
+import {useAuth} from '../../providers/AuthProvider.tsx';
 
 type FormInputs = Omit<UserContent, 'membership' | 'status' | 'roles'>;
 
 export default function UserDetails() {
   const {text} = useLanguage();
   const params = useParams();
-  const {useAuthUser, useUser, updateUser} = useUserHook();
-  const user = useAuthUser();
+  const {useUser, updateUser} = useUserHook();
+  const {user} = useAuth()
   const currentUser = useUser(params.userId)
   const {register, handleSubmit, control, reset, formState} = useForm<FormInputs>({
     defaultValues: currentUser!,

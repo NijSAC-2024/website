@@ -1,5 +1,5 @@
 import {Event, EventContent} from '../types.ts';
-import {ApiError, apiFetch, apiFetchVoid} from '../api.ts';
+import {apiFetch} from '../api.ts';
 import {enqueueSnackbar} from 'notistack';
 import {useLanguage} from '../providers/LanguageProvider.tsx';
 import {
@@ -8,6 +8,7 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 import {queryKeys} from '../queries.ts';
+import {ApiError} from '../error/error.ts';
 
 export function useEventHook() {
   const {text} = useLanguage();
@@ -84,7 +85,7 @@ export function useEventHook() {
     {eventId: string}
   >({
     mutationFn: async ({eventId}) => {
-      await apiFetchVoid(`/event/${eventId}`, {
+      await apiFetch<void>(`/event/${eventId}`, {
         method: 'DELETE',
       });
     },

@@ -1,8 +1,8 @@
-import {WebsiteError} from './error';
+import {AppError} from './error';
 import GenericPage from '../pages/GenericPage.tsx';
 import ContentCard from '../components/ContentCard.tsx';
 
-export default function ErrorPage({error}: { error: WebsiteError }) {
+export default function ErrorPage({error}: { error: AppError }) {
   return (
     <>
       <GenericPage>

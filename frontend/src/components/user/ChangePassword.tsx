@@ -8,11 +8,12 @@ import PasswordField from '../PasswordField.tsx';
 import {isAdminOrBoard} from '../../util.ts';
 import {useUserHook} from '../../hooks/useUserHook.ts';
 import {useParams} from 'react-router-dom';
+import {useAuth} from '../../providers/AuthProvider.tsx';
 
 export default function ChangePassword() {
   const {text} = useLanguage();
-  const {useAuthUser, updateUserPassword} = useUserHook();
-  const user = useAuthUser();
+  const {updateUserPassword} = useUserHook();
+  const {user} = useAuth()
   const params = useParams();
   const [password, setPassword] = useState({password: '', repeatPassword: ''});
   const [passwordErrors, setPasswordErrors] = useState<{ password: ErrorType; repeatPassword: ErrorType }>({

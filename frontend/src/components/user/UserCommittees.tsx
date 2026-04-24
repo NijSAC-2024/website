@@ -7,12 +7,13 @@ import {Switch} from '@mui/material';
 import {useUserHook} from '../../hooks/useUserHook.ts';
 import {useCommitteeHook} from '../../hooks/useCommitteeHook.ts';
 import {useNavigate, useParams} from 'react-router-dom';
+import {useAuth} from '../../providers/AuthProvider.tsx';
 
 export default function UserCommittees() {
   const {text} = useLanguage();
   const params = useParams();
-  const {useAuthUser, useUserCommittees} = useUserHook();
-  const user = useAuthUser();
+  const {useUserCommittees} = useUserHook();
+  const {user} = useAuth()
   const [filterLeftCommittees, setFilterLeftCommittees] = useState<boolean>(false);
   const {useCommittees} = useCommitteeHook();
   const committees = useCommittees()

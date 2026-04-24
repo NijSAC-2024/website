@@ -19,15 +19,14 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {useThemeMode} from '../../providers/ThemeProvider.tsx';
-import {useUserHook} from '../../hooks/useUserHook.ts';
 import {useNavigate} from 'react-router-dom';
 import {MenuType} from '../../types.ts';
+import {useAuth} from '../../providers/AuthProvider.tsx';
 
 export default function MobileMenu({setShowLogin}: { setShowLogin: (show: boolean) => void }) {
   const {text} = useLanguage();
   const {checkDarkMode} = useThemeMode();
-  const {useAuthUser} = useUserHook();
-  const user = useAuthUser()
+  const {user} = useAuth()
   const [openMenu, setOpenMenu] = useState<MenuType>(undefined);
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
   const isDarkMode = checkDarkMode();

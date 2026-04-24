@@ -1,4 +1,4 @@
-import {apiFetch, apiFetchVoid} from '../api.ts';
+import {apiFetch} from '../api.ts';
 import {Answer, Registration} from '../types.ts';
 import {enqueueSnackbar} from 'notistack';
 import {useLanguage} from '../providers/LanguageProvider.tsx';
@@ -8,20 +8,18 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 import {queryKeys} from '../queries.ts';
-
-type ApiError = {
-  message: string;
-  reference: string;
-};
+import {ApiError} from '../error/error.ts';
+import {useAuth} from '../providers/AuthProvider.tsx';
 
 export function useEventRegistrationHook() {
   const {text} = useLanguage();
   const queryClient = useQueryClient();
+  const {user} = useAuth();
 
   function useEventRegistrations(eventId?: string) {
     const {data} = useQuery<Registration[]>({
       queryKey: queryKeys.events.registrations(eventId),
-      enabled: !!eventId,
+      enabled: !!eventId && !!user,
       queryFn: () =>
         apiFetch<Registration[]>(
           `/event/${eventId}/registration`
@@ -47,6 +45,7 @@ export function useEventRegistrationHook() {
     },
     onSuccess: (_, { eventId, userId }) => {
       queryClient.invalidateQueries({queryKey: queryKeys.events.registrations(eventId)});
+      queryClient.invalidateQueries({queryKey: queryKeys.events.detail(eventId)});
       if (userId) {
         queryClient.invalidateQueries({queryKey: queryKeys.users.registrations(userId)});
       }
@@ -64,7 +63,6 @@ export function useEventRegistrationHook() {
       userId,
       answers,
     });
-
 
   const updateRegistrationMutation = useMutation<
     Registration,
@@ -125,7 +123,7 @@ export function useEventRegistrationHook() {
     { eventId: string; userId?: string; registrationId: string }
   >({
     mutationFn: async ({ eventId, registrationId }) => {
-      await apiFetchVoid(
+      await apiFetch<void>(
         `/event/${eventId}/registration/${registrationId}`,
         {
           method: 'DELETE',
@@ -134,6 +132,7 @@ export function useEventRegistrationHook() {
     },
     onSuccess: (_, { eventId, userId, registrationId }) => {
       queryClient.invalidateQueries({queryKey: queryKeys.events.registrations(eventId)});
+      queryClient.invalidateQueries({queryKey: queryKeys.events.detail(eventId)});
       queryClient.invalidateQueries({queryKey: queryKeys.users.registrations(registrationId)});
       if (userId) {
         queryClient.invalidateQueries({queryKey: queryKeys.users.registrations(userId)});

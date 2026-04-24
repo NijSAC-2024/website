@@ -9,14 +9,15 @@ import {inCommittee, isAdminOrBoard} from '../util.ts';
 import {useUserHook} from '../hooks/useUserHook.ts';
 import {useEventHook} from '../hooks/useEventHook.ts';
 import {useNavigate, useParams} from 'react-router-dom';
+import {useAuth} from '../providers/AuthProvider.tsx';
 
 export default function Event() {
   const {text} = useLanguage();
   const params = useParams();
   const {useEvent} = useEventHook();
   const currentEvent = useEvent(params.eventId)
-  const {useAuthUser, useUserCommittees} = useUserHook();
-  const user = useAuthUser();
+  const {useUserCommittees} = useUserHook();
+  const {user} = useAuth()
   const myCommittees = useUserCommittees(user?.id);
   const navigate = useNavigate();
 
@@ -58,19 +59,7 @@ export default function Event() {
           </div>
 
           <EventCard event={currentEvent} agendaPage={false}/>
-          <DescriptionCard
-            descriptionMarkdown={currentEvent.description || {en: '', nl: ''}}
-            experience={currentEvent.metadata?.experience || []}
-            gear={
-              currentEvent?.metadata?.gear || {
-                en: '',
-                nl: ''
-              }
-            }
-            worga={currentEvent.metadata?.worga || ''}
-            category={currentEvent.eventType}
-            createdBy={currentEvent.createdBy}
-          />
+          <DescriptionCard />
           <RegistrationsCard questions={currentEvent.questions}/>
         </div>
       </GenericPage>

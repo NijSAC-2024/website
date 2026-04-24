@@ -14,6 +14,7 @@ import {isAdminOrBoard, isChair} from '../../util.ts';
 import {useUserHook} from '../../hooks/useUserHook.ts';
 import {useCommitteeHook} from '../../hooks/useCommitteeHook.ts';
 import {useParams} from 'react-router-dom';
+import {useAuth} from '../../providers/AuthProvider.tsx';
 
 
 export default function UserActions() {
@@ -21,8 +22,8 @@ export default function UserActions() {
   const params = useParams();
   const {useCommittees, addUserToCommittee, deleteUserFromCommittee} = useCommitteeHook();
   const committees = useCommittees();
-  const {useUser, useAuthUser, updateUser, useUserCommittees} = useUserHook();
-  const user = useAuthUser();
+  const {useUser, updateUser, useUserCommittees} = useUserHook();
+  const {user} = useAuth()
   const currentUser = useUser(params.userId);
   const myCommittees = useUserCommittees(user?.id)
   const currentCommittees = useUserCommittees(currentUser?.id)

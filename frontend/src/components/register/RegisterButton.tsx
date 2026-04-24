@@ -10,6 +10,7 @@ import {isAdminOrBoard} from '../../util.ts';
 import {useUserHook} from '../../hooks/useUserHook.ts';
 import {useEventRegistrationHook} from '../../hooks/useEventRegistrationHook.ts';
 import {useEventHook} from '../../hooks/useEventHook.ts';
+import {useAuth} from '../../providers/AuthProvider.tsx';
 
 interface RegisterButtonProps {
   eventId: string;
@@ -18,8 +19,8 @@ interface RegisterButtonProps {
 export default function RegisterButton({
   eventId,
 }: RegisterButtonProps) {
-  const {useAuthUser, useUserEventRegistrations} = useUserHook();
-  const user = useAuthUser();
+  const {useUserEventRegistrations} = useUserHook();
+  const {user} = useAuth()
   const {text, language} = useLanguage();
   moment.locale(language);
   const [registerDialogOpen, setRegisterDialogOpen] = useState<boolean>(false);

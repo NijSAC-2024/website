@@ -8,12 +8,13 @@ import {isAdminOrBoard, isChair} from '../../util.ts';
 import AreYouSure from '../AreYouSure.tsx';
 import {Committee} from '../../types.ts';
 import {useParams} from 'react-router-dom';
+import {useAuth} from '../../providers/AuthProvider.tsx';
 
 export function ChangeCommittees() {
   const {text} = useLanguage();
   const params = useParams();
-  const {useAuthUser, useUser, useUserCommittees} = useUserHook();
-  const user = useAuthUser();
+  const {useUser, useUserCommittees} = useUserHook();
+  const {user} = useAuth()
   const currentUser = useUser(params.userId);
   const {
     useCommittees,

@@ -8,11 +8,7 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 import {queryKeys} from '../queries.ts';
-
-type ApiError = {
-  message: string;
-  reference: string;
-};
+import {ApiError} from '../error/error.ts';
 
 export function useLocationHook() {
   const {text} = useLanguage();
