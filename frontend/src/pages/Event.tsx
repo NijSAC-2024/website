@@ -60,7 +60,7 @@ export default function Event() {
 
           <EventCard event={currentEvent} agendaPage={false}/>
           <DescriptionCard />
-          <RegistrationsCard questions={currentEvent.questions}/>
+          <RegistrationsCard/>
         </div>
       </GenericPage>
     </>
