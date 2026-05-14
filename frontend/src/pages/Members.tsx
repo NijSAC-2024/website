@@ -3,12 +3,10 @@ import GenericPage from './GenericPage';
 import AcceptingMembers from '../components/members/AcceptingMembers.tsx';
 import MembersTable from '../components/members/MembersTable.tsx';
 import {isAdminOrBoard} from '../util.ts';
-import {useUsers} from '../hooks/useUsers.ts';
-import {useWebsite} from '../hooks/useState.ts';
+import {useAuth} from '../providers/AuthProvider.tsx';
 
 export default function Members() {
-  const { user } = useUsers();
-  const {navigate} = useWebsite();
+  const {user} = useAuth();
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
   const toggleExpand = (id: string) => {
@@ -16,7 +14,6 @@ export default function Members() {
   };
 
   if (!user) {
-    navigate('index');
     return;
   }
 

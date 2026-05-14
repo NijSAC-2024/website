@@ -8,11 +8,12 @@ import NewEventButton from '../components/events/NewEventButton.tsx';
 import EventsFilter from '../components/events/EventsFilter.tsx';
 import moment from 'moment/moment';
 import {Switch} from '@mui/material';
-import {useEvents} from '../hooks/useEvents.ts';
+import {useEventHook} from '../hooks/useEventHook.ts';
 
 export default function Events() {
   const { text } = useLanguage();
-  const {events} = useEvents();
+  const {useEvents} = useEventHook();
+  const events = useEvents();
   const [category, setCategory] = useState<EventType | 'all'>(
     'all'
   );

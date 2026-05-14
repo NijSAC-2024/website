@@ -5,19 +5,22 @@ import {useLanguage} from '../../providers/LanguageProvider';
 import ContentCard from '../ContentCard.tsx';
 import TextCard from '../TextCard.tsx';
 import {getLabel, isAdminOrBoard} from '../../util.ts';
-import {useWebsite} from '../../hooks/useState.ts';
-import {useUsers} from '../../hooks/useUsers.ts';
+import {useUserHook} from '../../hooks/useUserHook.ts';
 import {SubmitHandler, useForm} from 'react-hook-form';
 import {FormInputText} from '../form/FormInputText.tsx';
 import {ChangeCommittees} from './ChangeCommittees.tsx';
 import {ChangeRoles} from './ChangeRoles.tsx';
+import {useParams} from 'react-router-dom';
+import {useAuth} from '../../providers/AuthProvider.tsx';
 
 type FormInputs = Omit<UserContent, 'membership' | 'status' | 'roles'>;
 
 export default function UserDetails() {
   const {text} = useLanguage();
-  const {user, currentUser, updateUser} = useUsers();
-  const {state: {routerState: {params}}} = useWebsite();
+  const params = useParams();
+  const {useUser, updateUser} = useUserHook();
+  const {user} = useAuth()
+  const currentUser = useUser(params.userId)
   const {register, handleSubmit, control, reset, formState} = useForm<FormInputs>({
     defaultValues: currentUser!,
   });
@@ -30,7 +33,7 @@ export default function UserDetails() {
     return null;
   }
 
-  const isMe = params.user_id === user.id;
+  const isMe = params.userId === user.id;
   const canEdit = isAdminOrBoard(user.roles) || isMe;
 
 

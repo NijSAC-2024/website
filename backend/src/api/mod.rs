@@ -15,7 +15,12 @@ use axum::{
         FromRequest, FromRequestParts, Query, Request,
         rejection::{JsonRejection, QueryRejection},
     },
-    http::request::Parts,
+    http::{
+        HeaderMap, HeaderValue, StatusCode,
+        header::{CONTENT_TYPE, ETAG, IF_NONE_MATCH},
+        request::Parts,
+    },
+    response::{IntoResponse, Response},
 };
 pub use committee::*;
 pub use event::*;
@@ -24,6 +29,10 @@ pub use location::*;
 pub use material::*;
 use serde::{Deserialize, de::DeserializeOwned};
 use serde_with::{DisplayFromStr, serde_as};
+use std::{
+    collections::hash_map::DefaultHasher,
+    hash::{Hash, Hasher},
+};
 pub use user::*;
 use validator::Validate;
 
@@ -98,4 +107,36 @@ pub(crate) fn is_admin_or_board(session: &Session) -> AppResult<()> {
     } else {
         Err(Error::Unauthorized)
     }
+}
+
+fn compute_etag(bytes: &[u8]) -> String {
+    let mut hasher = DefaultHasher::new();
+    bytes.hash(&mut hasher);
+    format!("W/\"{:016x}\"", hasher.finish())
+}
+
+pub(crate) fn conditional_json_response<T: serde::Serialize>(
+    request_headers: &HeaderMap,
+    mut response_headers: HeaderMap,
+    value: &T,
+) -> AppResult<Response> {
+    let body = serde_json::to_vec(value)?;
+    let etag = compute_etag(&body);
+    let etag_value =
+        HeaderValue::from_str(&etag).map_err(|err| Error::Internal(err.to_string()))?;
+
+    response_headers.insert(ETAG, etag_value.clone());
+
+    if request_headers
+        .get(IF_NONE_MATCH)
+        .is_some_and(|if_none_match| if_none_match.as_bytes() == etag_value.as_bytes())
+    {
+        return Ok((StatusCode::NOT_MODIFIED, response_headers).into_response());
+    }
+
+    let mut response = (StatusCode::OK, response_headers, body).into_response();
+    response
+        .headers_mut()
+        .insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
+    Ok(response)
 }

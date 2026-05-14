@@ -6,12 +6,6 @@ import MobileMenu from './MobileMenu.tsx';
 import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import {useState} from 'react';
 
-export type MenuType =
-  | 'association'
-  | 'climbing'
-  | 'alps'
-  | undefined;
-
 export default function MainMenu() {
   const {text} = useLanguage();
   const isMobile = useMediaQuery('(max-width: 992px)');

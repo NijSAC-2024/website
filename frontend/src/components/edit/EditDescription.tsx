@@ -9,16 +9,20 @@ import {
   EventContent
 } from '../../types.ts';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
-import {useEventRegistrations} from '../../hooks/useEventRegistrations.ts';
+import {useEventRegistrationHook} from '../../hooks/useEventRegistrationHook.ts';
+import {useParams} from 'react-router-dom';
 
 function EditDescription() {
   const { text } = useLanguage();
-  const { eventRegistrations } = useEventRegistrations();
+  const { useEventRegistrations } = useEventRegistrationHook();
+  const params = useParams();
   const {control, setValue} = useFormContext<EventContent>();
   const [description, metadata, category] = useWatch({
     control,
     name: ['description', 'metadata', 'eventType']
   });
+
+  const eventRegistrations = useEventRegistrations(params.eventId)
 
   return (
     <div className="xl:col-span-2 flex flex-col justify-between w-full rounded-2xl bg-[rgba(255,255,255,0.9)] dark:bg-[rgba(18,18,18,0.7)] border border-solid border-b-2 border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)] border-b-[#1976d2] dark:border-b-[#90caf9]">

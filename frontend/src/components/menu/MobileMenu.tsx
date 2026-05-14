@@ -13,24 +13,24 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
 import {useState} from 'react';
-import {ExpandLess, ExpandMore} from '@mui/icons-material';
 import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import UserMenu from './UserMenu.tsx';
 import SettingsIcon from '@mui/icons-material/Settings';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {useThemeMode} from '../../providers/ThemeProvider.tsx';
-import {MenuType} from './MainMenu.tsx';
-import {useWebsite} from '../../hooks/useState.ts';
-import {RouteName} from '../../routes.ts';
-import {useUsers} from '../../hooks/useUsers.ts';
+import {useNavigate} from 'react-router-dom';
+import {MenuType} from '../../types.ts';
+import {useAuth} from '../../providers/AuthProvider.tsx';
 
 export default function MobileMenu({setShowLogin}: { setShowLogin: (show: boolean) => void }) {
   const {text} = useLanguage();
-  const {navigate} = useWebsite();
   const {checkDarkMode} = useThemeMode();
-  const {user} = useUsers();
+  const {user} = useAuth()
   const [openMenu, setOpenMenu] = useState<MenuType>(undefined);
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
   const isDarkMode = checkDarkMode();
+  const navigate = useNavigate();
 
   const toggleDropdown = () => {
     setDropdownOpen((prevState) => !prevState);
@@ -44,7 +44,7 @@ export default function MobileMenu({setShowLogin}: { setShowLogin: (show: boolea
     }
   };
 
-  const navigateSubmenu = (page: RouteName) => {
+  const navigateSubmenu = (page: string) => {
     toggleDropdown();
     setOpenMenu(undefined);
     navigate(page);
@@ -61,7 +61,7 @@ export default function MobileMenu({setShowLogin}: { setShowLogin: (show: boolea
             if (dropdownOpen) {
               toggleDropdown();
             }
-            navigate('index');
+            navigate('/');
           }}
         />
         <IconButton size="large" color="inherit" onClick={toggleDropdown}>
@@ -83,7 +83,7 @@ export default function MobileMenu({setShowLogin}: { setShowLogin: (show: boolea
           <ListItem disablePadding>
             <ListItemButton
               onClick={() => {
-                navigate('events');
+                navigate('/events');
                 toggleDropdown();
               }}>
               <ListItemText
@@ -103,7 +103,7 @@ export default function MobileMenu({setShowLogin}: { setShowLogin: (show: boolea
                 className="uppercase px-10"
               />
               <ListItemIcon>
-                {openMenu === 'association' ? <ExpandLess/> : <ExpandMore/>}
+                {openMenu === 'association' ? <ExpandLessIcon/> : <ExpandMoreIcon/>}
               </ListItemIcon>
             </ListItemButton>
           </ListItem>
@@ -136,7 +136,7 @@ export default function MobileMenu({setShowLogin}: { setShowLogin: (show: boolea
                 </ListItemButton>
               </ListItem>
               <ListItem disablePadding>
-                <ListItemButton onClick={() => navigateSubmenu('committees')}>
+                <ListItemButton onClick={() => navigateSubmenu('/committees')}>
                   <ListItemText
                     primary={
                       <p className="text-[#1976d2] dark:text-[#90caf9] px-14 text-sm">
@@ -168,7 +168,7 @@ export default function MobileMenu({setShowLogin}: { setShowLogin: (show: boolea
                 className="uppercase px-10"
               />
               <ListItemIcon>
-                {openMenu === 'climbing' ? <ExpandLess/> : <ExpandMore/>}
+                {openMenu === 'climbing' ? <ExpandLessIcon/> : <ExpandMoreIcon/>}
               </ListItemIcon>
             </ListItemButton>
           </ListItem>
@@ -209,7 +209,7 @@ export default function MobileMenu({setShowLogin}: { setShowLogin: (show: boolea
               </ListItem>
               <ListItem disablePadding>
                 <ListItemButton
-                  onClick={() => navigateSubmenu('material_rental')}
+                  onClick={() => navigateSubmenu('/material_rental')}
                 >
                   <ListItemText
                     primary={
@@ -231,7 +231,7 @@ export default function MobileMenu({setShowLogin}: { setShowLogin: (show: boolea
                 className="uppercase px-10"
               />
               <ListItemIcon>
-                {openMenu === 'alps' ? <ExpandLess/> : <ExpandMore/>}
+                {openMenu === 'alps' ? <ExpandLessIcon/> : <ExpandMoreIcon/>}
               </ListItemIcon>
             </ListItemButton>
           </ListItem>
@@ -333,7 +333,7 @@ export default function MobileMenu({setShowLogin}: { setShowLogin: (show: boolea
               {/* Settings */}
               <ListItem disablePadding>
                 <ListItemButton onClick={() => {
-                  navigate('settings');
+                  navigate('/settings');
                   toggleDropdown();
                 }}>
                   <ListItemText
@@ -361,7 +361,7 @@ export default function MobileMenu({setShowLogin}: { setShowLogin: (show: boolea
                 <Button
                   variant="contained"
                   onClick={() => {
-                    navigate('register');
+                    navigate('/register');
                     toggleDropdown();
                   }}
                 >

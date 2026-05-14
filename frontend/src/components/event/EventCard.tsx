@@ -8,7 +8,7 @@ import 'moment/dist/locale/nl';
 import {DateType, Event} from '../../types.ts';
 import Markdown from 'react-markdown';
 import RegisterButton from '../register/RegisterButton.tsx';
-import {useWebsite} from '../../hooks/useState.ts';
+import {useNavigate} from 'react-router-dom';
 
 interface AgendaCardProps {
   event: Event;
@@ -16,7 +16,7 @@ interface AgendaCardProps {
 }
 
 export default function EventCard({ event, agendaPage }: AgendaCardProps) {
-  const {navigate} = useWebsite()
+  const navigate = useNavigate();
   const { text, language } = useLanguage();
 
   moment.locale(language);
@@ -67,7 +67,7 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
     <div
       className="w-full rounded-2xl bg-[rgba(255,255,255,0.9)] dark:bg-[rgba(18,18,18,0.7)] border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] flex flex-col relative justify-between">
       <div
-        onClick={() => navigate('events.event', { event_id: event.id })}
+        onClick={() => navigate(`/events/${event.id}`)}
         className={agendaPage ? 'hover:cursor-pointer' : ''}
       >
         <Chip
@@ -105,7 +105,7 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
                 />
               ))}
             </div>
-            <div className="flex items-center hover:cursor-pointer" onClick={() => navigate('location', {location_id: event.location.id})}>
+            <div className="flex items-center hover:cursor-pointer" onClick={() => navigate(`/location/${event.location.id}`)}>
               <LocationOnIcon className="text-2xl" />
               {text(event.location.name)}
             </div>

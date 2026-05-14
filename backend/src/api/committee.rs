@@ -1,15 +1,13 @@
 use crate::{
     ValidatedJson,
-    api::{ApiResult, is_admin_or_board},
+    api::{ApiResult, conditional_json_response, is_admin_or_board},
     auth::session::Session,
-    committee::{
-        Committee, CommitteeContent, CommitteeId, CommitteeRole, CommitteeUser, UserCommittee,
-    },
+    committee::{Committee, CommitteeContent, CommitteeId, CommitteeRole, UserCommittee},
     data_source::committee::CommitteeStore,
     error::{AppResult, Error},
     user::{BasicUser, UserId},
 };
-use axum::{Json, extract::Path};
+use axum::{Json, extract::Path, http::HeaderMap, response::Response};
 
 pub async fn committee_access(
     session: &Session,
@@ -56,8 +54,9 @@ pub async fn get_committee(
     store.get_one(&id).await.map(Into::into)
 }
 
-pub async fn get_committees(store: CommitteeStore) -> ApiResult<Vec<Committee>> {
-    store.get_all().await.map(Into::into)
+pub async fn get_committees(store: CommitteeStore, headers: HeaderMap) -> AppResult<Response> {
+    let committees: Vec<Committee> = store.get_all().await?;
+    conditional_json_response(&headers, HeaderMap::new(), &committees)
 }
 
 pub async fn create_committee(
@@ -112,9 +111,11 @@ pub async fn get_committee_members(
     store: CommitteeStore,
     Path(id): Path<CommitteeId>,
     session: Session,
-) -> ApiResult<Vec<CommitteeUser>> {
+    headers: HeaderMap,
+) -> AppResult<Response> {
     if session.is_member() {
-        Ok(Json(store.get_committee_members(&id).await?))
+        let members = store.get_committee_members(&id).await?;
+        conditional_json_response(&headers, HeaderMap::new(), &members)
     } else {
         Err(Error::Unauthorized)
     }
@@ -124,9 +125,11 @@ pub async fn get_user_committees(
     store: CommitteeStore,
     Path(id): Path<UserId>,
     session: Session,
-) -> ApiResult<Vec<UserCommittee>> {
+    headers: HeaderMap,
+) -> AppResult<Response> {
     if session.is_member() {
-        Ok(Json(store.get_committees_for_user(&id).await?))
+        let committees = store.get_committees_for_user(&id).await?;
+        conditional_json_response(&headers, HeaderMap::new(), &committees)
     } else {
         Err(Error::Unauthorized)
     }

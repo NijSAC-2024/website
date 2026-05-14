@@ -7,7 +7,7 @@ import TextCard from '../../components/TextCard';
 import {useLanguage} from '../../providers/LanguageProvider';
 import UserDetails from '../UserDetails.tsx';
 import ContentCard from '../ContentCard.tsx';
-import {useUsers} from '../../hooks/useUsers.ts';
+import {useUserHook} from '../../hooks/useUserHook.ts';
 import {getLabel} from '../../util.ts';
 
 interface AcceptingMembersProps {
@@ -20,18 +20,19 @@ export default function AcceptingMembers({
   toggleExpand
 }: AcceptingMembersProps) {
   const {text} = useLanguage();
-  const {users, updateUser} = useUsers()
+  const {useUsers, updateUser} = useUserHook()
+  const users = useUsers()
 
-  const pendingUsers = users.filter((u) => u.status === 'pending');
+  const pendingUsers = users?.filter((u) => u.status === 'pending');
 
   return (
     <ContentCard className="grid mb-5">
       <h1 className="text-2xl">{text('Pending members', 'Goed te keuren leden')}</h1>
-      {pendingUsers.length === 0 ? (
+      {!pendingUsers || pendingUsers.length == 0 ? (
         <p className="mt-2">{text('No pending members', 'Geen leden om goed te keuren')}</p>
       ) : (
         <div className="mt-2 grid gap-3"> {
-          pendingUsers.map((u) => (
+          pendingUsers?.map((u) => (
             <TextCard key={u.id} className="px-6 py-3">
               <div className="lg:flex items-center justify-between">
                 <div>

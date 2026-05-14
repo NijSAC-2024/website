@@ -7,9 +7,10 @@ import moment from 'moment/moment';
 import AreYouSure from '../AreYouSure.tsx';
 import AccessAlarmIcon from '@mui/icons-material/AccessAlarm';
 import {isAdminOrBoard} from '../../util.ts';
-import {useUsers} from '../../hooks/useUsers.ts';
-import {useEventRegistrations} from '../../hooks/useEventRegistrations.ts';
-import {useEvents} from '../../hooks/useEvents.ts';
+import {useUserHook} from '../../hooks/useUserHook.ts';
+import {useEventRegistrationHook} from '../../hooks/useEventRegistrationHook.ts';
+import {useEventHook} from '../../hooks/useEventHook.ts';
+import {useAuth} from '../../providers/AuthProvider.tsx';
 
 interface RegisterButtonProps {
   eventId: string;
@@ -18,19 +19,20 @@ interface RegisterButtonProps {
 export default function RegisterButton({
   eventId,
 }: RegisterButtonProps) {
-  const {user} = useUsers();
+  const {useUserEventRegistrations} = useUserHook();
+  const {user} = useAuth()
   const {text, language} = useLanguage();
   moment.locale(language);
   const [registerDialogOpen, setRegisterDialogOpen] = useState<boolean>(false);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const {
-    userEventRegistrations,
     updateRegistration,
     createRegistration,
     deleteRegistration
-  } = useEventRegistrations();
-  const {events} = useEvents();
-  const event = events.find(e => e.id === eventId);
+  } = useEventRegistrationHook();
+  const userEventRegistrations = useUserEventRegistrations(user?.id)
+  const {useEvent} = useEventHook();
+  const event = useEvent(eventId);
   if (!event || !event.registrationPeriod) {
     return null;
   }

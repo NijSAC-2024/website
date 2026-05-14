@@ -5,15 +5,16 @@ import {Fab} from '@mui/material';
 import {isAdminOrBoard, truncateMarkdown} from '../util.ts';
 import Markdown from 'react-markdown';
 import AddIcon from '@mui/icons-material/Add';
-import {useWebsite} from '../hooks/useState.ts';
-import {useUsers} from '../hooks/useUsers.ts';
-import {useCommittees} from '../hooks/useCommittees.ts';
+import {useCommitteeHook} from '../hooks/useCommitteeHook.ts';
+import {useNavigate} from 'react-router-dom';
+import {useAuth} from '../providers/AuthProvider.tsx';
 
 export default function Committees() {
   const {text} = useLanguage();
-  const {committees} = useCommittees();
-  const {navigate} = useWebsite()
-  const {user} = useUsers();
+  const {useCommittees} = useCommitteeHook();
+  const committees = useCommittees();
+  const {user} = useAuth();
+  const navigate = useNavigate();
 
   return (
     <>
@@ -22,7 +23,7 @@ export default function Committees() {
           <Fab
             variant="extended"
             color="primary"
-            onClick={() => navigate('committees.new')}
+            onClick={() => navigate('/committees/new')}
           >
             <AddIcon className="mr-2"/>
             {text('Add committee', 'Voeg Commissie Toe')}
@@ -42,11 +43,11 @@ export default function Committees() {
         </ContentCard>
 
         <div className="grid xl:grid-cols-3 lg:grid-cols-2 gap-5 mt-4">
-          {committees?.length > 0 &&
+          {committees && committees?.length > 0 &&
             committees.map((committee) => (
               <div
                 key={committee.id}
-                onClick={() => navigate('committees.committee', {committee_id: committee.id})}
+                onClick={() => navigate(`/committees/${committee.id}`)}
                 className="hover:cursor-pointer h-full"
               >
                 <div

@@ -6,31 +6,34 @@ import RegistrationsCard from '../components/event/RegistrationsCard.tsx';
 import DescriptionCard from '../components/event/DescriptionCard.tsx';
 import {useLanguage} from '../providers/LanguageProvider.tsx';
 import {inCommittee, isAdminOrBoard} from '../util.ts';
-import {useWebsite} from '../hooks/useState.ts';
-import {useUsers} from '../hooks/useUsers.ts';
-import {useEvents} from '../hooks/useEvents.ts';
-import {useCommittees} from '../hooks/useCommittees.ts';
+import {useUserHook} from '../hooks/useUserHook.ts';
+import {useEventHook} from '../hooks/useEventHook.ts';
+import {useNavigate, useParams} from 'react-router-dom';
+import {useAuth} from '../providers/AuthProvider.tsx';
 
 export default function Event() {
   const {text} = useLanguage();
-  const {navigate} = useWebsite();
-  const {currentEvent} = useEvents();
-  const {myCommittees} = useCommittees();
-  const {user} = useUsers();
+  const params = useParams();
+  const {useEvent} = useEventHook();
+  const currentEvent = useEvent(params.eventId)
+  const {useUserCommittees} = useUserHook();
+  const {user} = useAuth()
+  const myCommittees = useUserCommittees(user?.id);
+  const navigate = useNavigate();
 
 
   if (!currentEvent) {
-    return <></>;
+    return null;
   }
 
   return (
     <>
-      {user && (isAdminOrBoard(user.roles) || inCommittee(myCommittees, currentEvent.createdBy)) && (
+      {user && (isAdminOrBoard(user.roles) || inCommittee(myCommittees ?? [], currentEvent.createdBy)) && (
         <div className="fixed bottom-5 right-5 z-10">
           <Fab
             variant="extended"
             color="primary"
-            onClick={() => navigate('events.event.edit', {event_id: currentEvent.id})}
+            onClick={() => navigate(`/events/${currentEvent.id}/edit`)}
           >
             <EditIcon className="mr-2"/>
             {text('Edit event', 'Evenement bewerken')}
@@ -43,7 +46,7 @@ export default function Event() {
             <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">
               <Button
                 color="inherit"
-                onClick={() => navigate('events')}
+                onClick={() => navigate('/events')}
               >
                 {text('Back to Events', 'Terug naar Events')}
               </Button>
@@ -56,20 +59,8 @@ export default function Event() {
           </div>
 
           <EventCard event={currentEvent} agendaPage={false}/>
-          <DescriptionCard
-            descriptionMarkdown={currentEvent.description || {en: '', nl: ''}}
-            experience={currentEvent.metadata?.experience || []}
-            gear={
-              currentEvent?.metadata?.gear || {
-                en: '',
-                nl: ''
-              }
-            }
-            worga={currentEvent.metadata?.worga || ''}
-            category={currentEvent.eventType}
-            createdBy={currentEvent.createdBy}
-          />
-          <RegistrationsCard questions={currentEvent.questions}/>
+          <DescriptionCard />
+          <RegistrationsCard/>
         </div>
       </GenericPage>
     </>

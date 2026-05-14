@@ -1,7 +1,7 @@
 import ContentCard from '../ContentCard.tsx';
 import { Box, FormControl } from '@mui/material';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
-import {Answer, BasicUser, Question, Registration} from '../../types.ts';
+import {Answer, BasicUser, Registration} from '../../types.ts';
 import { useState } from 'react';
 import AreYouSure from '../AreYouSure.tsx';
 import RegistrationTable from './RegistrationTable.tsx';
@@ -10,22 +10,22 @@ import RegisterUserAutocomplete from './RegisterUserAutocomplete.tsx';
 import {isAdminOrBoard, isChair} from '../../util.ts';
 import AccessAlarmIcon from '@mui/icons-material/AccessAlarm';
 import moment from 'moment';
-import {useUsers} from '../../hooks/useUsers.ts';
-import {useEvents} from '../../hooks/useEvents.ts';
-import {useEventRegistrations} from '../../hooks/useEventRegistrations.ts';
-import {useCommittees} from '../../hooks/useCommittees.ts';
+import {useUserHook} from '../../hooks/useUserHook.ts';
+import {useEventHook} from '../../hooks/useEventHook.ts';
+import {useEventRegistrationHook} from '../../hooks/useEventRegistrationHook.ts';
+import {useParams} from 'react-router-dom';
+import {useAuth} from '../../providers/AuthProvider.tsx';
 
-interface RegistrationsCardProps {
-  questions: Question[];
-}
-
-export default function RegistrationsCard({ questions }: RegistrationsCardProps) {
+export default function RegistrationsCard() {
   const { text } = useLanguage();
-  const {currentEvent} = useEvents();
-  const {updateRegistration, createRegistration, deleteRegistration} = useEventRegistrations();
-  const {eventRegistrations} = useEventRegistrations();
-  const { user } = useUsers();
-  const {myCommittees} = useCommittees();
+  const {useUserCommittees} = useUserHook();
+  const {user} = useAuth()
+  const myCommittees = useUserCommittees(user?.id);
+  const {useEventRegistrations, updateRegistration, deleteRegistration, createRegistration} = useEventRegistrationHook();
+  const params = useParams();
+  const eventRegistrations = useEventRegistrations(params.eventId)
+  const {useEvent} = useEventHook();
+  const currentEvent = useEvent(params.eventId);
 
   const [registerDialogOpen, setRegisterDialogOpen] = useState(false);
   const [selectedRegistration, setSelectedRegistration] = useState<Registration | null>(null);
@@ -59,7 +59,7 @@ export default function RegistrationsCard({ questions }: RegistrationsCardProps)
 
   const handleConfirmDeregister = async () => {
     if (selectedRegistration) {
-      await deleteRegistration(currentEvent.id, selectedRegistration.registrationId);
+      await deleteRegistration(currentEvent.id, selectedRegistration.registrationId, user?.id);
     }
     setConfirmOpen(false);
     setRegisterDialogOpen(false);
@@ -77,7 +77,7 @@ export default function RegistrationsCard({ questions }: RegistrationsCardProps)
             {moment(currentEvent.registrationPeriod.end).format('DD MMM HH:mm')}
           </p>
 
-          {user && (isAdminOrBoard(user.roles) || isChair(myCommittees, currentEvent.createdBy)) && (
+          {user && (isAdminOrBoard(user.roles) || isChair(myCommittees ?? [], currentEvent.createdBy)) && (
             <Box className="mt-2 grid" component="form" onSubmit={(e) => { e.preventDefault(); toggleRegisterDialog(); }}>
               <FormControl>
                 <RegisterUserAutocomplete
@@ -106,7 +106,7 @@ export default function RegistrationsCard({ questions }: RegistrationsCardProps)
           open={registerDialogOpen}
           toggleDialog={toggleRegisterDialog}
           name={currentEvent.name}
-          questions={questions}
+          questions={currentEvent.questions}
           selectedRegistration={selectedRegistration}
           selectedUser={selectedUser}
           handleRegistration={handleRegistration}

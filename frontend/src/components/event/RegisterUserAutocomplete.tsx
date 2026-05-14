@@ -2,7 +2,7 @@ import { TextField } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import {BasicUser, Registration} from '../../types.ts';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
-import {useUsers} from '../../hooks/useUsers.ts';
+import {useUserHook} from '../../hooks/useUserHook.ts';
 
 interface Props {
   registrations?: Registration[];
@@ -14,7 +14,8 @@ interface Props {
 
 export default function RegisterUserAutocomplete({registrations, selectedUser, setSelectedUser, setSelectedRegistration, toggleRegisterDialog }: Props) {
   const { text } = useLanguage();
-  const { users } = useUsers();
+  const { useUsers } = useUserHook();
+  const users = useUsers()
 
   if (!users) {
     return null

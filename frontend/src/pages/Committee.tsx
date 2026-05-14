@@ -7,25 +7,28 @@ import remarkGfm from 'remark-gfm';
 import Markdown from 'react-markdown';
 import {CommitteeUser} from '../types.ts';
 import {getLabel, isAdminOrBoard, isChair} from '../util.ts';
-import {useWebsite} from '../hooks/useState.ts';
-import {useUsers} from '../hooks/useUsers.ts';
-import {useCommittees} from '../hooks/useCommittees.ts';
+import {useCommitteeHook} from '../hooks/useCommitteeHook.ts';
 import EventSeatIcon from '@mui/icons-material/EventSeat';
 import AreYouSure from '../components/AreYouSure.tsx';
 import {useState} from 'react';
+import {useNavigate, useParams} from 'react-router-dom';
+import {useAuth} from '../providers/AuthProvider.tsx';
 
 export default function Committee() {
   const {text} = useLanguage();
-  const {navigate} = useWebsite();
-  const {user} = useUsers();
-  const {committee, committeeMembers, makeChair} = useCommittees();
+  const params = useParams();
+  const {user} = useAuth();
+  const {useCommittee, useCommitteeMembers, makeChair} = useCommitteeHook();
+  const committee = useCommittee(params.committeeId);
+  const committeeMembers = useCommitteeMembers(params.committeeId)
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [selectedMember, setSelectedMember] = useState<CommitteeUser | null>(null);
+  const navigate = useNavigate();
 
   const toggleDialog = () => setDialogOpen((prevState) => !prevState);
 
   if (!committee) {
-    return <></>;
+    return null;
   }
 
   const handleMakeChair = async () => {
@@ -40,12 +43,12 @@ export default function Committee() {
 
   return (
     <>
-      {user && (isChair(committeeMembers, user.id)|| isAdminOrBoard(user.roles)) && (
+      {user && (isChair(committeeMembers ?? [], user.id)|| isAdminOrBoard(user.roles)) && (
         <div className="fixed bottom-5 right-5 z-10">
           <Fab
             variant="extended"
             color="primary"
-            onClick={() => navigate('committees.committee.edit', {committee_id: committee.id})}
+            onClick={() => navigate(`/committees/${committee.id}/edit`)}
           >
             <EditIcon className="mr-2"/>
             {text('Edit committee', 'Commissie bewerken')}
@@ -57,7 +60,7 @@ export default function Committee() {
         <div className="grid lg:grid-cols-2 xl:grid-cols-3 gap-5 mt-[-9.3rem]">
           <div className="lg:col-span-2 xl:col-span-3 mb-[-0.5rem] flex justify-between items-center">
             <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">
-              <Button color="inherit" onClick={() => navigate('committees')}>
+              <Button color="inherit" onClick={() => navigate('/committees')}>
                 {text('Back to Committees', 'Terug naar Commissies')}
               </Button>
             </div>
@@ -87,18 +90,18 @@ export default function Committee() {
               <h2>{text('Members', 'Leden')}</h2>
               <Table>
                 <TableBody>
-                  {committeeMembers.map((member: CommitteeUser) => (
+                  {committeeMembers?.map((member: CommitteeUser) => (
                     <TableRow
                       key={member.id}
                       sx={{'&:last-child td, &:last-child th': {border: 0}}}
                     >
                       <TableCell component="th" scope="row">
                         <div className="flex justify-between items-center">
-                          <div className="grid hover:cursor-pointer hover:opacity-60 transition-all duration-100" onClick={() => navigate('user', {user_id: member.id})}>
+                          <div className="grid hover:cursor-pointer hover:opacity-60 transition-all duration-100" onClick={() => navigate(`/user/${member.id}`)}>
                             <p>{`${member.firstName} ${member.infix ?? ''} ${member.lastName}`}</p>
                             {member.role === 'chair' && <i className="text-xs">{text(getLabel(member.role))}</i>}
                           </div>
-                          {(isAdminOrBoard(user.roles) || isChair(committeeMembers, user.id)) && member.role !== 'chair' &&
+                          {(isAdminOrBoard(user.roles) || isChair(committeeMembers ?? [], user.id)) && member.role !== 'chair' &&
                               <Tooltip title={text('Make chair of committee', 'Maak commissiehoofd')}>
                                 <IconButton size="small" onClick={() => {setSelectedMember(member); toggleDialog()}}>
                                   <EventSeatIcon/>

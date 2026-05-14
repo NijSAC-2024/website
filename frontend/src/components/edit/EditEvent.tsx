@@ -8,17 +8,21 @@ import EditDescription from './EditDescription.tsx';
 import GenericPage from '../../pages/GenericPage.tsx';
 import SaveButton from './SaveButton.tsx';
 import {useLanguage} from '../../providers/LanguageProvider.tsx';
-import {useWebsite} from '../../hooks/useState.ts';
-import {useEvents} from '../../hooks/useEvents.ts';
+import {useEventHook} from '../../hooks/useEventHook.ts';
+import {useLocation, useNavigate, useParams} from 'react-router-dom';
 
 
 export default function EditEvent() {
   const {text} = useLanguage();
-  const {navigate, state: {routerState: {params, name: routeName}}} = useWebsite();
-  const {currentEvent, createEvent, updateEvent} = useEvents();
+  const {useEvent, createEvent, updateEvent} = useEventHook();
+  const location = useLocation();
+  const params = useParams();
+  const navigate = useNavigate();
+
+  const currentEvent = useEvent(params.eventId)
 
   const initialEvent = useMemo<EventContent | null>(() => {
-    if (routeName === 'events.new') {
+    if (location.pathname === '/events/new') {
       const now = new Date().toISOString();
       return {
         name: {
@@ -37,9 +41,9 @@ export default function EditEvent() {
     }
 
     return currentEvent ? toEventContent(currentEvent) : null;
-  }, [currentEvent, routeName]);
+  }, [currentEvent, location.pathname]);
 
-  const id = params.event_id;
+  const id = params.eventId;
   const form = useForm<EventContent>({
     defaultValues: initialEvent ?? undefined
   });
@@ -60,11 +64,11 @@ export default function EditEvent() {
   const handleSave = async (event: EventContent, isPublishedNext: boolean) => {
     if (id) {
       if (await updateEvent(id, {...event, isPublished: isPublishedNext})) {
-        navigate('events.event', {event_id: id});
+        navigate(`/events/${id}`);
       }
     } else {
       if (await createEvent({...event, isPublished: isPublishedNext})) {
-        navigate('events');
+        navigate('/events');
       }
     }
   };
@@ -77,7 +81,7 @@ export default function EditEvent() {
         <div className="grid xl:grid-cols-3 gap-5 mt-[-9.3rem]">
           <div className="xl:col-span-3 mb-[-0.5rem] flex justify-between">
             <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">
-              <Button color="inherit" onClick={() => navigate('events')}>
+              <Button color="inherit" onClick={() => navigate('/events')}>
                 {text('Back to Events', 'Terug naar Events')}
               </Button>
             </div>

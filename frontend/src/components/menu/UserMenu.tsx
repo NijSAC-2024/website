@@ -5,9 +5,9 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import { MouseEvent, useState } from 'react';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 import GroupIcon from '@mui/icons-material/Group';
-import {useWebsite} from '../../hooks/useState.ts';
-import {RouteName} from '../../routes.ts';
-import {useUsers} from '../../hooks/useUsers.ts';
+import {useUserHook} from '../../hooks/useUserHook.ts';
+import {useNavigate} from 'react-router-dom';
+import {useAuth} from '../../providers/AuthProvider.tsx';
 
 interface UserMenuProps {
   toggleDropdown?: () => void;
@@ -15,10 +15,11 @@ interface UserMenuProps {
 
 export default function UserMenu({toggleDropdown}: UserMenuProps) {
   const { text } = useLanguage();
-  const { user, logout } = useUsers();
-  const {navigate} = useWebsite()
+  const { logout } = useUserHook();
+  const {user} = useAuth()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const navigate = useNavigate();
 
   if (!user) {
     return null
@@ -31,9 +32,9 @@ export default function UserMenu({toggleDropdown}: UserMenuProps) {
     setAnchorEl(null);
   };
 
-  const navigateSubmenu = (page: RouteName) => {
-    if (page === 'user' && user) {
-      navigate('user', { user_id: user.id });
+  const navigateSubmenu = (page: string) => {
+    if (page === '/user' && user) {
+      navigate(`/user/${user.id}`);
     } else {
       navigate(page);
     }
@@ -56,20 +57,20 @@ export default function UserMenu({toggleDropdown}: UserMenuProps) {
         onClick={handleMenuClose}
         className="shadow "
       >
-        <MenuItem onClick={() => navigateSubmenu('user')}>
+        <MenuItem onClick={() => navigateSubmenu('/user')}>
           <ListItemIcon>
             <AccountCircleIcon />
           </ListItemIcon>
           {text('My account', 'Mijn account')}
         </MenuItem>
-        <MenuItem disabled={user.status !== 'accepted'} onClick={() => navigateSubmenu('members')}>
+        <MenuItem disabled={user.status !== 'accepted'} onClick={() => navigateSubmenu('/members')}>
           <ListItemIcon>
             <GroupIcon fontSize="small" />
           </ListItemIcon>
           {text('Members', 'Leden')}
         </MenuItem>
         <Divider />
-        <MenuItem onClick={() => navigateSubmenu('settings')}>
+        <MenuItem onClick={() => navigateSubmenu('/settings')}>
           <ListItemIcon>
             <SettingsIcon fontSize="small" />
           </ListItemIcon>

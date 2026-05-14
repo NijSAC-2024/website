@@ -1,15 +1,13 @@
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import {
-  Code as CodeIcon,
-  FormatBold as BoldIcon,
-  FormatItalic as ItalicIcon,
-  FormatQuote as QuoteIcon,
-  Image as ImageIcon,
-  Link as LinkIcon,
-  StrikethroughS as StrikethroughIcon,
-  Title as TitleIcon
-} from '@mui/icons-material';
+import CodeIcon from '@mui/icons-material/Code';
+import FormatItalicIcon from '@mui/icons-material/FormatItalic';
+import FormatBoldIcon from '@mui/icons-material/FormatBold';
+import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
+import ImageIcon from '@mui/icons-material/Image';
+import LinkIcon from '@mui/icons-material/Link';
+import StrikethroughSIcon from '@mui/icons-material/StrikethroughS'
+import TitleIcon from '@mui/icons-material/Title';
 import { useLanguage } from '../../providers/LanguageProvider.tsx';
 
 interface MarkdownEditorToolbarProps {
@@ -29,17 +27,17 @@ export default function MarkdownEditorToolbar({
       </Tooltip>
       <Tooltip title={text('Bold Text', 'Vetgedrukte tekst')}>
         <IconButton onClick={() => insertMarkdown('**')}>
-          <BoldIcon fontSize="small" />
+          <FormatBoldIcon fontSize="small" />
         </IconButton>
       </Tooltip>
       <Tooltip title={text('Italic Text', 'Cursieve tekst')}>
         <IconButton onClick={() => insertMarkdown('_')}>
-          <ItalicIcon fontSize="small" />
+          <FormatItalicIcon fontSize="small" />
         </IconButton>
       </Tooltip>
       <Tooltip title={text('Strikethrough Text', 'Doorhalingen')}>
         <IconButton onClick={() => insertMarkdown('~~')}>
-          <StrikethroughIcon fontSize="small" />
+          <StrikethroughSIcon fontSize="small" />
         </IconButton>
       </Tooltip>
       <Tooltip title={text('Insert Link', 'Link toevoegen')}>
@@ -49,7 +47,7 @@ export default function MarkdownEditorToolbar({
       </Tooltip>
       <Tooltip title={text('Insert Quote', 'Citaat toevoegen')}>
         <IconButton onClick={() => insertMarkdown('> ')}>
-          <QuoteIcon fontSize="small" />
+          <FormatQuoteIcon fontSize="small" />
         </IconButton>
       </Tooltip>
       <Tooltip title={text('Inline Code', 'In-line code')}>

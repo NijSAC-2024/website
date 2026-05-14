@@ -1,13 +1,13 @@
 import {Checkbox, TableCell, TableRow, IconButton} from '@mui/material';
-import {Edit} from '@mui/icons-material';
+import EditIcon from '@mui/icons-material/Edit';
 import moment from 'moment';
 import {Registration} from '../../types.ts';
 import {inCommittee, isAdminOrBoard, isChair, isWorga} from '../../util.ts';
-import {useWebsite} from '../../hooks/useState.ts';
-import {useEvents} from '../../hooks/useEvents.ts';
-import {useUsers} from '../../hooks/useUsers.ts';
-import {useEventRegistrations} from '../../hooks/useEventRegistrations.ts';
-import {useCommittees} from '../../hooks/useCommittees.ts';
+import {useEventHook} from '../../hooks/useEventHook.ts';
+import {useUserHook} from '../../hooks/useUserHook.ts';
+import {useEventRegistrationHook} from '../../hooks/useEventRegistrationHook.ts';
+import {useNavigate, useParams} from 'react-router-dom';
+import {useAuth} from '../../providers/AuthProvider.tsx';
 
 interface RegistrationRowProps {
   registration: Registration;
@@ -15,11 +15,14 @@ interface RegistrationRowProps {
 }
 
 export default function RegistrationRow({registration, onEditClick}: RegistrationRowProps) {
-  const {currentEvent} = useEvents();
-  const {user} = useUsers();
-  const {navigate} = useWebsite();
-  const {updateRegistration} = useEventRegistrations();
-  const {myCommittees} = useCommittees();
+  const params = useParams();
+  const {useEvent} = useEventHook();
+  const currentEvent = useEvent(params.eventId)
+  const {useUserCommittees} = useUserHook();
+  const {user} = useAuth()
+  const myCommittees = useUserCommittees(user?.id)
+  const {updateRegistration} = useEventRegistrationHook();
+  const navigate = useNavigate();
 
   if (!currentEvent) {
     return null;
@@ -29,15 +32,15 @@ export default function RegistrationRow({registration, onEditClick}: Registratio
     <TableRow sx={{'&:last-child td, &:last-child th': {border: 0}}}>
       <TableCell>
         {<p className="hover:cursor-pointer hover:opacity-60 transition-all duration-100"
-          onClick={() => registration.id && navigate('user', {user_id: registration.id})}>
-          {user && (isAdminOrBoard(user.roles) || isWorga(currentEvent, user) || inCommittee(myCommittees, currentEvent.createdBy)) && registration.waitingListPosition !== undefined ?
+          onClick={() => registration.id && navigate(`/user/${registration.id}`)}>
+          {user && (isAdminOrBoard(user.roles) || isWorga(currentEvent, user) || inCommittee(myCommittees ?? [], currentEvent.createdBy)) && registration.waitingListPosition !== undefined ?
             <span
               className="text-[#1976d2] dark:text-[#90caf9]">{`${registration.firstName} ${registration.infix ?? ''} ${registration.lastName}`}</span>
             : `${registration.firstName} ${registration.infix ?? ''} ${registration.lastName}`}
         </p>}
       </TableCell>
 
-      {user && (isAdminOrBoard(user.roles) || isWorga(currentEvent, user) || inCommittee(myCommittees, currentEvent.createdBy)) && currentEvent?.questions.map((q) => {
+      {user && (isAdminOrBoard(user.roles) || isWorga(currentEvent, user) || inCommittee(myCommittees ?? [], currentEvent.createdBy)) && currentEvent?.questions.map((q) => {
         const answer = registration.answers?.find((a) => a.questionId === q.id)?.answer;
 
         if (q.questionType.type === 'boolean') {
@@ -50,7 +53,7 @@ export default function RegistrationRow({registration, onEditClick}: Registratio
         return <TableCell key={`${registration.registrationId}-${q.id}`}>{answer || ''}</TableCell>;
       })}
 
-      {user && (isAdminOrBoard(user.roles) || isChair(myCommittees, currentEvent.createdBy)) && (
+      {user && (isAdminOrBoard(user.roles) || isChair(myCommittees ?? [], currentEvent.createdBy)) && (
         <>
           <TableCell>
             <Checkbox
@@ -60,7 +63,7 @@ export default function RegistrationRow({registration, onEditClick}: Registratio
           </TableCell>
           <TableCell>
             <IconButton onClick={() => onEditClick(registration)}>
-              <Edit/>
+              <EditIcon/>
             </IconButton>
           </TableCell>
         </>
