@@ -8,6 +8,8 @@ import {useUserHook} from '../../hooks/useUserHook.ts';
 import {useEventRegistrationHook} from '../../hooks/useEventRegistrationHook.ts';
 import {useNavigate, useParams} from 'react-router-dom';
 import {useAuth} from '../../providers/AuthProvider.tsx';
+import {getRegistrationDisplayName} from './registration.ts';
+import {useLanguage} from '../../providers/LanguageProvider.tsx';
 
 interface RegistrationRowProps {
   registration: Registration;
@@ -23,28 +25,34 @@ export default function RegistrationRow({registration, onEditClick}: Registratio
   const myCommittees = useUserCommittees(user?.id)
   const {updateRegistration} = useEventRegistrationHook();
   const navigate = useNavigate();
+  const {text} = useLanguage();
 
   if (!currentEvent) {
     return null;
   }
+
+  const canViewDetailedRegistration = !!user && (isAdminOrBoard(user.roles) || isWorga(currentEvent, user) || inCommittee(myCommittees ?? [], currentEvent.createdBy));
+  const canManageRegistration = !!user && (isAdminOrBoard(user.roles) || (isChair(myCommittees ?? [], currentEvent.createdBy) && !!registration.id));
+  const displayName = text(getRegistrationDisplayName(registration));
 
   return (
     <TableRow sx={{'&:last-child td, &:last-child th': {border: 0}}}>
       <TableCell>
         {<p className="hover:cursor-pointer hover:opacity-60 transition-all duration-100"
           onClick={() => registration.id && navigate(`/user/${registration.id}`)}>
-          {user && (isAdminOrBoard(user.roles) || isWorga(currentEvent, user) || inCommittee(myCommittees ?? [], currentEvent.createdBy)) && registration.waitingListPosition !== undefined ?
+          {canViewDetailedRegistration && registration.waitingListPosition !== undefined ?
             <span
-              className="text-[#1976d2] dark:text-[#90caf9]">{`${registration.firstName} ${registration.infix ?? ''} ${registration.lastName}`}</span>
-            : `${registration.firstName} ${registration.infix ?? ''} ${registration.lastName}`}
+              className="text-[#1976d2] dark:text-[#90caf9]">{displayName}</span>
+            : displayName}
         </p>}
       </TableCell>
 
-      {user && (isAdminOrBoard(user.roles) || isWorga(currentEvent, user) || inCommittee(myCommittees ?? [], currentEvent.createdBy)) && currentEvent?.questions.map((q) => {
+      {canViewDetailedRegistration && currentEvent?.questions.map((q) => {
         const answer = registration.answers?.find((a) => a.questionId === q.id)?.answer;
 
         if (q.questionType.type === 'boolean') {
-          return <TableCell key={`${registration.registrationId}-${q.id}`}>{answer === 'true' ? '✔️' : '❌'}</TableCell>;
+          return <TableCell
+            key={`${registration.registrationId}-${q.id}`}>{answer === 'true' ? '✔️' : '❌'}</TableCell>;
         }
         if (q.questionType.type === 'date') {
           return <TableCell
@@ -53,16 +61,18 @@ export default function RegistrationRow({registration, onEditClick}: Registratio
         return <TableCell key={`${registration.registrationId}-${q.id}`}>{answer || ''}</TableCell>;
       })}
 
-      {user && (isAdminOrBoard(user.roles) || isChair(myCommittees ?? [], currentEvent.createdBy)) && (
+      {(canManageRegistration) && (
         <>
           <TableCell>
             <Checkbox
               checked={registration.attended || false}
               onChange={(_, checked) => updateRegistration(currentEvent.id, registration.registrationId, registration.answers, checked, registration.waitingListPosition)}
+              disabled={!canManageRegistration}
             />
           </TableCell>
           <TableCell>
-            <IconButton onClick={() => onEditClick(registration)}>
+            <IconButton onClick={() => onEditClick(registration)}
+              disabled={!canManageRegistration}>
               <EditIcon/>
             </IconButton>
           </TableCell>

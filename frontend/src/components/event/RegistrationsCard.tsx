@@ -1,12 +1,12 @@
 import ContentCard from '../ContentCard.tsx';
-import { Box, FormControl } from '@mui/material';
-import { useLanguage } from '../../providers/LanguageProvider.tsx';
+import {Box, FormControl} from '@mui/material';
+import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import {Answer, BasicUser, Registration} from '../../types.ts';
-import { useState } from 'react';
+import {useState} from 'react';
 import AreYouSure from '../AreYouSure.tsx';
-import RegistrationTable from './RegistrationTable.tsx';
-import RegistrationDialog from './RegistrationDialog.tsx';
-import RegisterUserAutocomplete from './RegisterUserAutocomplete.tsx';
+import RegistrationTable from '../register/RegistrationTable.tsx';
+import RegistrationDialog from '../register/RegistrationDialog.tsx';
+import RegisterUserAutocomplete from '../register/RegisterUserAutocomplete.tsx';
 import {isAdminOrBoard, isChair} from '../../util.ts';
 import AccessAlarmIcon from '@mui/icons-material/AccessAlarm';
 import moment from 'moment';
@@ -17,11 +17,16 @@ import {useParams} from 'react-router-dom';
 import {useAuth} from '../../providers/AuthProvider.tsx';
 
 export default function RegistrationsCard() {
-  const { text } = useLanguage();
+  const {text} = useLanguage();
   const {useUserCommittees} = useUserHook();
   const {user} = useAuth()
   const myCommittees = useUserCommittees(user?.id);
-  const {useEventRegistrations, updateRegistration, deleteRegistration, createRegistration} = useEventRegistrationHook();
+  const {
+    useEventRegistrations,
+    updateRegistration,
+    deleteRegistration,
+    createRegistration
+  } = useEventRegistrationHook();
   const params = useParams();
   const eventRegistrations = useEventRegistrations(params.eventId)
   const {useEvent} = useEventHook();
@@ -72,13 +77,16 @@ export default function RegistrationsCard() {
         <ContentCard className="xl:col-span-3">
           <h1>{text('Registrations', 'Inschrijvingen')}</h1>
           <p>
-            <AccessAlarmIcon className=" mr-2" />
+            <AccessAlarmIcon className=" mr-2"/>
             {text('Registrations close at ', 'Inschrijvingen sluiten op ')}
             {moment(currentEvent.registrationPeriod.end).format('DD MMM HH:mm')}
           </p>
 
           {user && (isAdminOrBoard(user.roles) || isChair(myCommittees ?? [], currentEvent.createdBy)) && (
-            <Box className="mt-2 grid" component="form" onSubmit={(e) => { e.preventDefault(); toggleRegisterDialog(); }}>
+            <Box className="mt-2 grid" component="form" onSubmit={(e) => {
+              e.preventDefault();
+              toggleRegisterDialog();
+            }}>
               <FormControl>
                 <RegisterUserAutocomplete
                   registrations={eventRegistrations}

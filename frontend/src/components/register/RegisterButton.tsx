@@ -203,6 +203,7 @@ export default function RegisterButton({
               registrationQuestions={event.questions}
               handleRegistration={(answers) => handleRegistration(answers, registration?.registrationId || null)}
               existingAnswers={registration?.answers}
+              requireNonMemberName={!user}
             />
           </div>
         </DialogContent>

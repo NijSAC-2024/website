@@ -8,38 +8,45 @@ import {
   MenuItem,
   TextField
 } from '@mui/material';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import { useLanguage } from '../../providers/LanguageProvider.tsx';
+import {DateTimePicker} from '@mui/x-date-pickers/DateTimePicker';
+import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import moment from 'moment';
 import {FormEvent, useState} from 'react';
+import {NON_MEMBER_NAME_QUESTION_ID} from './registration.ts';
 
 interface RegisterFormProps {
   registrationQuestions: Question[];
   handleRegistration: (answers: Answer[]) => void;
   existingAnswers?: Answer[];
+  requireNonMemberName?: boolean;
 }
 
 export default function RegisterForm({
   registrationQuestions,
   handleRegistration,
-  existingAnswers
+  existingAnswers,
+  requireNonMemberName = false
 }: RegisterFormProps) {
-  const { text, language } = useLanguage();
-  const now =  new Date()
+  const {text, language} = useLanguage();
+  const now = new Date()
   const [answers, setAnswers] = useState<Answer[]>(
     existingAnswers && existingAnswers.length > 0
       ? existingAnswers
       : registrationQuestions.map((q) => ({
         questionId: q.id,
         answer:
-          q.questionType.type === 'boolean' ? 'false' :
-            q.questionType.type === 'date' ? now.toISOString() :
-              ''
+                    q.questionType.type === 'boolean' ? 'false' :
+                      q.questionType.type === 'date' ? now.toISOString() :
+                        ''
       }))
   );
 
 
   const [errors, setErrors] = useState<ErrorType[]>(Array(registrationQuestions.length).fill(false));
+  const [nonMemberName, setNonMemberName] = useState<string>(() => (
+    existingAnswers?.find((answer) => answer.questionId === NON_MEMBER_NAME_QUESTION_ID)?.answer ?? ''
+  ));
+  const [nonMemberNameError, setNonMemberNameError] = useState<ErrorType>(false);
   moment.locale(language);
 
   const validateInputs = () => {
@@ -57,18 +64,54 @@ export default function RegisterForm({
     });
 
     setErrors(newErrors);
+    if (requireNonMemberName && nonMemberName.trim() === '') {
+      setNonMemberNameError({
+        en: 'This field is required',
+        nl: 'Dit veld is verplicht'
+      });
+    } else {
+      setNonMemberNameError(false);
+    }
   };
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
-    if (Object.values(errors).some((v)=> v)) {
+    if (Object.values(errors).some((v) => v) || !!nonMemberNameError) {
       return;
     }
-    handleRegistration(answers);
+    if (requireNonMemberName && nonMemberName.trim() === '') {
+      setNonMemberNameError({
+        en: 'This field is required',
+        nl: 'Dit veld is verplicht'
+      });
+      return;
+    }
+    const filteredAnswers = answers.filter((answer) => answer.questionId !== NON_MEMBER_NAME_QUESTION_ID);
+    const finalAnswers = requireNonMemberName
+      ? [...filteredAnswers, {questionId: NON_MEMBER_NAME_QUESTION_ID, answer: nonMemberName.trim()}]
+      : answers;
+    handleRegistration(finalAnswers);
   }
 
   return (
     <Box className="grid gap-3" component="form" onSubmit={handleSubmit}>
+      {requireNonMemberName && (
+        <FormControl fullWidth>
+          <TextField
+            label={`${text('Name', 'Naam')} *`}
+            value={nonMemberName}
+            onChange={(event) => {
+              setNonMemberName(event.target.value);
+              if (nonMemberNameError && event.target.value.trim() !== '') {
+                setNonMemberNameError(false);
+              }
+            }}
+            error={!!nonMemberNameError}
+            helperText={nonMemberNameError && text(nonMemberNameError as Language)}
+            fullWidth
+          />
+        </FormControl>
+      )}
       {registrationQuestions.map((question, index) => {
         const label = `${text(question.question.en, question.question.nl)}${question.required ? ' *' : ''}`;
         const error = errors[index];
@@ -159,7 +202,8 @@ export default function RegisterForm({
         case 'boolean':
           return (
             <FormControl key={question.id} fullWidth error={!!error}>
-              <div className="flex items-center justify-between border border-[#c4c4c4] dark:border-[#4c4c4c] rounded-xl pl-3 py-1.5">
+              <div
+                className="flex items-center justify-between border border-[#c4c4c4] dark:border-[#4c4c4c] rounded-xl pl-3 py-1.5">
                 {label}
                 <Checkbox
                   checked={answer.answer === 'true'}

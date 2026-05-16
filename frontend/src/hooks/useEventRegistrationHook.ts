@@ -95,9 +95,12 @@ export function useEventRegistrationHook() {
       );
     },
 
-    onSuccess: (_, { eventId, registrationId }) => {
+    onSuccess: (_, { eventId }) => {
       queryClient.invalidateQueries({queryKey: queryKeys.events.registrations(eventId)});
-      queryClient.invalidateQueries({queryKey: queryKeys.users.registrations(registrationId)});
+      queryClient.invalidateQueries({queryKey: queryKeys.events.detail(eventId)});
+      if (user?.id) {
+        queryClient.invalidateQueries({queryKey: queryKeys.users.registrations(user.id)});
+      }
       enqueueSnackbar(text('Registration updated', 'Inschrijving bijgewerkt'), { variant: 'success' });
     },
     onError: (error: ApiError) => enqueueSnackbar(`${error.message}: ${error.reference}`, {variant: 'error'})
@@ -130,12 +133,13 @@ export function useEventRegistrationHook() {
         }
       );
     },
-    onSuccess: (_, { eventId, userId, registrationId }) => {
+    onSuccess: (_, { eventId, userId }) => {
       queryClient.invalidateQueries({queryKey: queryKeys.events.registrations(eventId)});
       queryClient.invalidateQueries({queryKey: queryKeys.events.detail(eventId)});
-      queryClient.invalidateQueries({queryKey: queryKeys.users.registrations(registrationId)});
       if (userId) {
         queryClient.invalidateQueries({queryKey: queryKeys.users.registrations(userId)});
+      } else if (user?.id) {
+        queryClient.invalidateQueries({queryKey: queryKeys.users.registrations(user.id)});
       }
       enqueueSnackbar(text('Deregistered', 'Uitgeschreven'), {variant: 'success'});
     },
