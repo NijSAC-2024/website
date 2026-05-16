@@ -18,6 +18,8 @@ use time::OffsetDateTime;
 use tracing::{debug, info, trace, warn};
 use uuid::Uuid;
 
+const NON_MEMBER_NAME_QUESTION_ID: &str = "8d3d4e48-4e8f-4e15-a7d9-6ff5e4c8e8ad";
+
 async fn has_registration_access(
     store: &EventStore,
     user_id: &UserId,
@@ -251,6 +253,15 @@ pub async fn create_registration(
             "Cannot sign up for an event that does not accept NonMembers"
         );
         return Err(Error::Unauthorized);
+    } else {
+        let non_member_name_question_id = Uuid::parse_str(NON_MEMBER_NAME_QUESTION_ID)
+            .expect("NON_MEMBER_NAME_QUESTION_ID must be a valid UUID");
+        let has_non_member_name = new.answers.iter().any(|answer| {
+            answer.question_id == non_member_name_question_id && !answer.answer.trim().is_empty()
+        });
+        if !has_non_member_name {
+            return Err(Error::BadRequest("Missing non-member name"));
+        }
     }
 
     if event.content.registration_period.is_none() {

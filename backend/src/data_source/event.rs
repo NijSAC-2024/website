@@ -355,8 +355,8 @@ impl EventStore {
                    e.event_type,
                    e.questions,
                    e.metadata,
-                   count(r.user_id) FILTER ( WHERE r.waiting_list_position IS NULL ) as "registration_count!",
-                   count(r.user_id) FILTER ( WHERE r.waiting_list_position IS NOT NULL ) as "waiting_list_count!",
+                   count(r.registration_id) FILTER ( WHERE r.waiting_list_position IS NULL ) as "registration_count!",
+                   count(r.registration_id) FILTER ( WHERE r.waiting_list_position IS NOT NULL ) as "waiting_list_count!",
                    e.created_by,
                    e.created,
                    e.updated
@@ -405,8 +405,8 @@ impl EventStore {
                    e.event_type,
                    e.questions,
                    e.metadata,
-                   count(r.user_id) FILTER ( WHERE r.waiting_list_position IS NULL ) as "registration_count!",
-                   count(r.user_id) FILTER ( WHERE r.waiting_list_position IS NOT NULL ) as "waiting_list_count!",
+                   count(r.registration_id) FILTER ( WHERE r.waiting_list_position IS NULL ) as "registration_count!",
+                   count(r.registration_id) FILTER ( WHERE r.waiting_list_position IS NOT NULL ) as "waiting_list_count!",
                    e.created_by,
                    e.created,
                    e.updated
@@ -580,7 +580,7 @@ impl EventStore {
         } = sqlx::query_as!(
             Count,
             r#"
-            SELECT count(r.user_id) FILTER ( WHERE r.waiting_list_position IS NOT NULL ) as "count!"
+            SELECT count(r.registration_id) FILTER ( WHERE r.waiting_list_position IS NOT NULL ) as "count!"
             FROM event e
                 LEFT JOIN event_registration r ON r.event_id = e.id
             WHERE e.id = (SELECT event_id FROM event_registration WHERE registration_id = $1)
@@ -689,8 +689,8 @@ impl EventStore {
                e.event_type,
                e.questions,
                e.metadata,
-               count(r2.user_id) FILTER (WHERE r2.waiting_list_position IS NULL) as "registration_count!",
-               count(r2.user_id) FILTER (WHERE r2.waiting_list_position IS NOT NULL) as "waiting_list_count!",
+               count(r2.registration_id) FILTER (WHERE r2.waiting_list_position IS NULL) as "registration_count!",
+               count(r2.registration_id) FILTER (WHERE r2.waiting_list_position IS NOT NULL) as "waiting_list_count!",
                e.created_by,
                e.created,
                e.updated
@@ -720,16 +720,16 @@ impl EventStore {
             SELECT registration_id,
                    event_id,
                    user_id,
-                   u.first_name,
+                   u.first_name as "first_name?",
                    u.infix,
-                   u.last_name,
+                   u.last_name as "last_name?",
                    answers,
                    attended,
                    waiting_list_position,
-                   u.created,
-                   u.updated
+                   r.created,
+                   r.updated
             FROM event_registration r
-                JOIN "user" u ON r.user_id = u.id
+                LEFT JOIN "user" u ON r.user_id = u.id
             WHERE r.event_id = $1
             "#,
             **id

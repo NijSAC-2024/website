@@ -1,7 +1,8 @@
-import { Dialog, DialogContent, DialogActions, Button } from '@mui/material';
+import {Dialog, DialogContent, DialogActions, Button} from '@mui/material';
 import {Answer, BasicUser, Language, Question, Registration} from '../../types.ts';
-import RegisterForm from '../register/RegisterForm.tsx';
-import { useLanguage } from '../../providers/LanguageProvider.tsx';
+import RegisterForm from './RegisterForm.tsx';
+import {useLanguage} from '../../providers/LanguageProvider.tsx';
+import {getRegistrationDisplayName} from './registration.ts';
 
 interface RegistrationDialogProps {
   open: boolean;
@@ -24,11 +25,15 @@ export default function RegistrationDialog({
   handleRegistration,
   handleDeregisterClick,
 }: RegistrationDialogProps) {
-  const { text } = useLanguage();
+  const {text} = useLanguage();
 
   if (!selectedRegistration && !selectedUser) {
     return;
   }
+
+  const displayName = selectedRegistration
+    ? text(getRegistrationDisplayName(selectedRegistration))
+    : `${selectedUser?.firstName} ${selectedUser?.infix ?? ''} ${selectedUser?.lastName}`.trim();
 
   return (
     <Dialog open={open} onClose={toggleDialog} fullWidth>
@@ -36,7 +41,7 @@ export default function RegistrationDialog({
         <div className="grid gap-2">
           <h1>{`${text('Registration for', 'Inschrijving voor')} ${text(name)}`}</h1>
           <p className="mt-[-0.7em] mb-1">
-            {`${text('of', 'van')} ${selectedRegistration?.firstName || selectedUser?.firstName} ${(selectedRegistration?.infix || selectedUser?.infix) ?? ''} ${selectedRegistration?.lastName || selectedUser?.lastName}`}
+            {`${text('of', 'van')} ${displayName}`}
           </p>
           <RegisterForm
             registrationQuestions={questions}

@@ -37,7 +37,8 @@ export default function RegistrationTable({onEditClick}: RegistrationTableProps)
               <TableRow>
                 <TableCell><b>{text('Name', 'Naam')}</b></TableCell>
                 {currentEvent.questions.map((q) => (
-                  <TableCell key={q.id}><b>{`${text(q.question)} ${q.required ? '*' : ''}`}</b></TableCell>
+                  <TableCell
+                    key={q.id}><b>{`${text(q.question)} ${q.required ? '*' : ''}`}</b></TableCell>
                 ))}
                 {(isAdminOrBoard(user.roles) || isChair(myCommittees ?? [], currentEvent.createdBy)) && (
                   <>

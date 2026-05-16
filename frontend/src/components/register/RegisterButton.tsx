@@ -88,20 +88,22 @@ export default function RegisterButton({
     let color = 'inherit';
 
     if (diffHours <= 24) {
-      message = `Registration closes in ${diffHours === 1 ? '1 hour' : `${diffHours} hours!`}`;
+      message = `Registrations close in ${diffHours === 1 ? '1 hour' : `${diffHours} hours!`}`;
       color = 'text-red-500';
     } else if (diffDays <= 7) {
-      message = `Registration closes in ${diffDays === 1 ? '1 day' : `${diffDays} days!`}`;
+      message = `Registrations close in ${diffDays === 1 ? '1 day' : `${diffDays} days!`}`;
     } else {
       return null;
     }
 
     return (
-      <Tooltip title={message || ''}>
-        <p>
-          <AccessAlarmIcon className={`mr-2 ${color}`}/>
-        </p>
-      </Tooltip>
+      <div className="flex justify-center items-center">
+        <Tooltip title={message || ''}>
+          <p>
+            <AccessAlarmIcon className={`ml-2 ${color}`}/>
+          </p>
+        </Tooltip>
+      </div>
     );
   };
 
@@ -130,7 +132,7 @@ export default function RegisterButton({
       }
       if (canRegister) {
         return <Button variant="contained"
-          onClick={handleRegistrationClick}>{renderClock()}{text('Join Queue', 'Inschrijven wachtlijst')}</Button>;
+          onClick={handleRegistrationClick}>{text('Join Queue', 'Inschrijven wachtlijst')}{renderClock()}</Button>;
       }
     }
 
@@ -147,13 +149,13 @@ export default function RegisterButton({
       if (canRegister) {
         if (event.registrationCount && event.registrationMax && event.registrationCount >= event.registrationMax && (user && !isAdminOrBoard(user.roles))) {
           return <Button variant="contained"
-            onClick={handleRegistrationClick}>{renderClock()}{text('Join Queue', 'Inschrijven wachtlijst')}</Button>;
+            onClick={handleRegistrationClick}>{text('Join Queue', 'Inschrijven wachtlijst')}{renderClock()}</Button>;
         }
         return <Button variant="contained"
-          onClick={handleRegistrationClick}>{renderClock()}{text('Register', 'Inschrijven')}</Button>;
+          onClick={handleRegistrationClick}>{text('Register', 'Inschrijven')}{renderClock()}</Button>;
       }
       if (user && (!event.requiredMembership.includes(user.membership) || user.status !== 'accepted')) {
-        return <Button variant="contained" disabled>{renderClock()}{text('Register', 'Inschrijven')}</Button>;
+        return <Button variant="contained" disabled>{text('Register', 'Inschrijven')}{renderClock()}</Button>;
       }
       //TODO: Open login dialog
       return <Button variant="contained">{text('Login to register', 'Login om in te schrijven')}</Button>;
@@ -187,6 +189,11 @@ export default function RegisterButton({
                 'Inschrijving voor ' + event.name.nl
               )}
             </h1>
+            <p>
+              <AccessAlarmIcon className=" mr-2"/>
+              {text('Registrations close at ', 'Inschrijvingen sluiten op ')}
+              {moment(event.registrationPeriod.end).format('DD MMM HH:mm')}
+            </p>
             {!registration && event.registrationMax && !!event.registrationCount && event.registrationCount >= event.registrationMax && (user && !isAdminOrBoard(user.roles)) && (
               <b>
                 {text('The event is currently full. By registering, you will be put in the waiting queue. If a spot becomes available, you will automatically be registered and notified.',
@@ -203,6 +210,7 @@ export default function RegisterButton({
               registrationQuestions={event.questions}
               handleRegistration={(answers) => handleRegistration(answers, registration?.registrationId || null)}
               existingAnswers={registration?.answers}
+              requireNonMemberName={!user}
             />
           </div>
         </DialogContent>
