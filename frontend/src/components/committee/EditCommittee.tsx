@@ -8,19 +8,18 @@ import SaveButton from './SaveButton.tsx';
 import MarkdownEditor from '../markdown/MarkdownEditor.tsx';
 import {useCommitteeHook} from '../../hooks/useCommitteeHook.ts';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
+import {useFileHook} from '../../hooks/useFileHook.ts';
 
 export default function EditCommittee() {
   const {text} = useLanguage();
-  const [uploading, setUploading] = useState(false);
   const {useCommittee, createCommittee, updateCommittee} = useCommitteeHook();
-  const params = useParams();
+  const {committeeId} = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-
-  const committeeId = params.committeeId;
+  const {uploadFile, uploading} = useFileHook();
 
   let initialCommittee: CommitteeContent | undefined = useCommittee(committeeId);
-  if (location.pathname === 'committees/new') {
+  if (location.pathname === '/committees/new') {
     initialCommittee = {
       name: {en: 'New committee', nl: 'Nieuwe commissie'},
       description: {en: '', nl: ''},
@@ -31,6 +30,7 @@ export default function EditCommittee() {
   const [committeeContent, setCommitteeContent] = useState<CommitteeContent | undefined>(initialCommittee);
 
   if (!committeeContent) {
+    console.log('Could not find committee');
     return null;
   }
 
@@ -38,20 +38,17 @@ export default function EditCommittee() {
     setCommitteeContent({...committeeContent, ...changes});
   };
 
-  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (
+    event: ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
-    if (file) {
-      setUploading(true);
-      const formData = new FormData();
-      formData.append(file.name, file);
-      fetch('/api/file', {
-        method: 'POST',
-        body: formData
-      }).then((response) => response.json()).then((uploadInfo) => {
-        handleCommitteeChange({image: uploadInfo[0].id});
-        setUploading(false);
-      });
+    if (!file) {
+      return;
     }
+    const uploadInfo = await uploadFile(file);
+    handleCommitteeChange({
+      image: uploadInfo[0].id,
+    });
   };
 
   const handleSave = async () => {
@@ -76,8 +73,9 @@ export default function EditCommittee() {
       <div className="grid xl:grid-cols-3 gap-5 mt-[-9.3rem]">
         <div className="xl:col-span-3 mb-[-0.5rem] flex justify-between">
           <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">
-            <Button color="inherit" onClick={() => navigate('/committees')}>
-              {text('Back to Committees', 'Terug naar Commissies')}
+            <Button color="inherit"
+              onClick={() => navigate(`/committees${committeeId ? `/${committeeId}` : ''}`)}>
+              {text(`Back to Committee${!committeeId ? 's' : ''}`, `Terug naar Commissie${!committeeId ? 's' : ''}`)}
             </Button>
           </div>
         </div>

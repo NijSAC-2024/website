@@ -154,6 +154,31 @@ export interface Committee extends CommitteeContent {
   updated: string;
 }
 
+export interface Page extends PageContent {
+  pageId: string;
+  createdBy: string;
+  created: string;
+  updated: string;
+}
+
+export interface PageContent {
+  name: Language;
+  slug: string;
+  content: Language;
+  image?: string;
+  isPublic: boolean;
+}
+
+export interface FileMetadata {
+  id: string;
+  originalFilename: string;
+  mimeType?: string;
+  size: number;
+  isPublic: boolean;
+  createdBy: string;
+  created: string;
+}
+
 export interface CommitteeContent {
   name: Language;
   description?: Language;

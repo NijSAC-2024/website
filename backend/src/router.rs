@@ -4,11 +4,12 @@ use crate::{
         create_registration, delete_committee, delete_event, delete_location, delete_registration,
         delete_user, get_activities, get_all_users, get_committee, get_committee_members,
         get_committees, get_event, get_event_registrations, get_file_content, get_file_metadata,
-        get_files, get_location, get_locations, get_material_list, get_registration, get_user,
-        get_user_committees, get_user_events, get_user_materials, get_user_registrations,
-        location_used_by, make_chair, register, remove_user_from_committee, update_committee,
-        update_event, update_location, update_pwd, update_registration, update_user,
-        update_user_material, upload, who_am_i,
+        get_files, get_location, get_locations, get_material_list, get_page_by_slug, get_pages,
+        get_registration, get_user, get_user_committees, get_user_events, get_user_materials,
+        get_user_registrations, location_used_by, make_chair, register,
+        remove_user_from_committee, update_committee, update_event, update_location, update_page,
+        update_pwd, update_registration, update_user, update_user_material, upload, who_am_i,
+        create_page, delete_page,
     },
     auth::{login, logout},
     state::AppState,
@@ -102,6 +103,9 @@ fn api_router() -> Router<AppState> {
         )
         .route("/committee/{:id}/user/{:user_id}/chair", post(make_chair))
         .route("/committee/{:id}/members", get(get_committee_members))
+        .route("/page", get(get_pages).post(create_page))
+        .route("/page/{slug}", get(get_page_by_slug))
+        .route("/page/id/{:id}", put(update_page).delete(delete_page))
 }
 
 async fn version(State(state): State<AppState>) -> Json<String> {

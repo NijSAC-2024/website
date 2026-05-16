@@ -3,6 +3,7 @@ mod event;
 mod file;
 mod location;
 mod material;
+mod page;
 mod user;
 
 use crate::{
@@ -27,6 +28,7 @@ pub use event::*;
 pub use file::*;
 pub use location::*;
 pub use material::*;
+pub use page::*;
 use serde::{Deserialize, de::DeserializeOwned};
 use serde_with::{DisplayFromStr, serde_as};
 use std::{

@@ -1,21 +1,23 @@
-import { Avatar, Divider, IconButton, ListItemIcon, Menu, MenuItem, Tooltip } from '@mui/material';
+import {Avatar, Divider, IconButton, ListItemIcon, Menu, MenuItem, Tooltip} from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
-import { MouseEvent, useState } from 'react';
-import { useLanguage } from '../../providers/LanguageProvider.tsx';
+import {MouseEvent, useState} from 'react';
+import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import GroupIcon from '@mui/icons-material/Group';
+import FileCopyIcon from '@mui/icons-material/FileCopy';
 import {useUserHook} from '../../hooks/useUserHook.ts';
 import {useNavigate} from 'react-router-dom';
 import {useAuth} from '../../providers/AuthProvider.tsx';
+import {isAdminOrBoard} from '../../util.ts';
 
 interface UserMenuProps {
   toggleDropdown?: () => void;
 }
 
 export default function UserMenu({toggleDropdown}: UserMenuProps) {
-  const { text } = useLanguage();
-  const { logout } = useUserHook();
+  const {text} = useLanguage();
+  const {logout} = useUserHook();
   const {user} = useAuth()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -59,20 +61,28 @@ export default function UserMenu({toggleDropdown}: UserMenuProps) {
       >
         <MenuItem onClick={() => navigateSubmenu('/user')}>
           <ListItemIcon>
-            <AccountCircleIcon />
+            <AccountCircleIcon/>
           </ListItemIcon>
           {text('My account', 'Mijn account')}
         </MenuItem>
         <MenuItem disabled={user.status !== 'accepted'} onClick={() => navigateSubmenu('/members')}>
           <ListItemIcon>
-            <GroupIcon fontSize="small" />
+            <GroupIcon fontSize="small"/>
           </ListItemIcon>
           {text('Members', 'Leden')}
         </MenuItem>
-        <Divider />
+        {isAdminOrBoard(user.roles) && (
+          <MenuItem onClick={() => navigateSubmenu('/pages')}>
+            <ListItemIcon>
+              <FileCopyIcon fontSize="small"/>
+            </ListItemIcon>
+            {text('Pages', 'Pagina\'s')}
+          </MenuItem>
+        )}
+        <Divider/>
         <MenuItem onClick={() => navigateSubmenu('/settings')}>
           <ListItemIcon>
-            <SettingsIcon fontSize="small" />
+            <SettingsIcon fontSize="small"/>
           </ListItemIcon>
           {text('Settings', 'Instellingen')}
         </MenuItem>
@@ -83,7 +93,7 @@ export default function UserMenu({toggleDropdown}: UserMenuProps) {
           logout();
         }}>
           <ListItemIcon>
-            <LogoutIcon fontSize="small" />
+            <LogoutIcon fontSize="small"/>
           </ListItemIcon>
           {text('Logout', 'Uitloggen')}
         </MenuItem>

@@ -10,10 +10,10 @@ import {useAuth} from '../../providers/AuthProvider.tsx';
 
 export function ChangeRoles() {
   const {text} = useLanguage();
-  const params = useParams();
+  const {userId} = useParams();
   const {useUser, updateUser} = useUserHook();
   const {user} = useAuth()
-  const currentUser = useUser(params.userId);
+  const currentUser = useUser(userId);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
   if (!user || !isAdminOrBoard(user.roles)) {

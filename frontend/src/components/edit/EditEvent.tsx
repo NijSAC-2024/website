@@ -16,10 +16,10 @@ export default function EditEvent() {
   const {text} = useLanguage();
   const {useEvent, createEvent, updateEvent} = useEventHook();
   const location = useLocation();
-  const params = useParams();
+  const {eventId} = useParams();
   const navigate = useNavigate();
 
-  const currentEvent = useEvent(params.eventId)
+  const currentEvent = useEvent(eventId)
 
   const initialEvent = useMemo<EventContent | null>(() => {
     if (location.pathname === '/events/new') {
@@ -43,7 +43,6 @@ export default function EditEvent() {
     return currentEvent ? toEventContent(currentEvent) : null;
   }, [currentEvent, location.pathname]);
 
-  const id = params.eventId;
   const form = useForm<EventContent>({
     defaultValues: initialEvent ?? undefined
   });
@@ -62,9 +61,9 @@ export default function EditEvent() {
   }
 
   const handleSave = async (event: EventContent, isPublishedNext: boolean) => {
-    if (id) {
-      if (await updateEvent(id, {...event, isPublished: isPublishedNext})) {
-        navigate(`/events/${id}`);
+    if (eventId) {
+      if (await updateEvent(eventId, {...event, isPublished: isPublishedNext})) {
+        navigate(`/events/${eventId}`);
       }
     } else {
       if (await createEvent({...event, isPublished: isPublishedNext})) {
@@ -76,13 +75,13 @@ export default function EditEvent() {
   return (
     <FormProvider {...form}>
       <GenericPage image={image}>
-        <SaveButton id={id ?? ''} handleSave={handleSave}/>
+        <SaveButton id={eventId ?? ''} handleSave={handleSave}/>
 
         <div className="grid xl:grid-cols-3 gap-5 mt-[-9.3rem]">
           <div className="xl:col-span-3 mb-[-0.5rem] flex justify-between">
             <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">
-              <Button color="inherit" onClick={() => navigate('/events')}>
-                {text('Back to Events', 'Terug naar Events')}
+              <Button color="inherit" onClick={() => navigate(`/events${eventId ? `/${eventId}` : ''}`)}>
+                {text(`Back to Event${!eventId ? 's' : ''}`, `Terug naar Evenement${!eventId ? 'en' : ''}`)}
               </Button>
             </div>
             {!isPublished && (

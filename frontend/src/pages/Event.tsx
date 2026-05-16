@@ -13,9 +13,9 @@ import {useAuth} from '../providers/AuthProvider.tsx';
 
 export default function Event() {
   const {text} = useLanguage();
-  const params = useParams();
+  const {eventId} = useParams();
   const {useEvent} = useEventHook();
-  const currentEvent = useEvent(params.eventId)
+  const currentEvent = useEvent(eventId)
   const {useUserCommittees} = useUserHook();
   const {user} = useAuth()
   const myCommittees = useUserCommittees(user?.id);
@@ -48,7 +48,7 @@ export default function Event() {
                 color="inherit"
                 onClick={() => navigate('/events')}
               >
-                {text('Back to Events', 'Terug naar Events')}
+                {text('Back to Events', 'Terug naar Evenementen')}
               </Button>
             </div>
             {!currentEvent?.isPublished && (
@@ -59,7 +59,7 @@ export default function Event() {
           </div>
 
           <EventCard event={currentEvent} agendaPage={false}/>
-          <DescriptionCard />
+          <DescriptionCard/>
           <RegistrationsCard/>
         </div>
       </GenericPage>

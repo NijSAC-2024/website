@@ -3,7 +3,7 @@ import {Controller, useFormContext, useWatch} from 'react-hook-form';
 import {EventContent, EventType, typesOptions, WeekendType} from '../../types.ts';
 import OptionSelector from '../OptionSelector.tsx';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
-import {ChangeEvent, memo, useState} from 'react';
+import {ChangeEvent, memo} from 'react';
 import EditDates from './EditDates.tsx';
 import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import {isAdminOrBoard} from '../../util.ts';
@@ -11,13 +11,13 @@ import {useUserHook} from '../../hooks/useUserHook.ts';
 import {useCommitteeHook} from '../../hooks/useCommitteeHook.ts';
 import EditLocation from './EditLocation.tsx';
 import {useAuth} from '../../providers/AuthProvider.tsx';
+import {useFileHook} from '../../hooks/useFileHook.ts';
 
 function EditEventCard() {
   const {text} = useLanguage();
   const {useUserCommittees} = useUserHook();
   const {useCommittees} = useCommitteeHook();
   const {control, setValue} = useFormContext<EventContent>();
-  const [uploading, setUploading] = useState(false);
   const [image, metadata, location] = useWatch({
     control,
     name: ['image', 'metadata', 'location']
@@ -27,20 +27,19 @@ function EditEventCard() {
   const committees = useCommittees()
   const myCommittees = useUserCommittees(user?.id)
 
-  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const {uploadFile, uploading} = useFileHook();
+
+  const handleImageChange = async (
+    event: ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
-    if (file) {
-      setUploading(true);
-      const formData = new FormData();
-      formData.append(file.name, file);
-      fetch('/api/file', {
-        method: 'POST',
-        body: formData
-      }).then((response) => response.json()).then((uploadInfo) => {
-        setValue('image', uploadInfo[0].id, {shouldDirty: true});
-        setUploading(false);
-      });
+    if (!file) {
+      return;
     }
+    const uploadInfo = await uploadFile(file);
+    setValue('image', uploadInfo[0].id, {
+      shouldDirty: true,
+    });
   };
 
   return (

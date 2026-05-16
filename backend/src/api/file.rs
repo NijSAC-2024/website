@@ -30,8 +30,15 @@ pub async fn upload(
     active_committee_access(&session, &committee_store).await?;
 
     let mut result = vec![];
+    let mut is_public = false;
     while let Some(field) = multipart.next_field().await.unwrap() {
         let name = field.name().unwrap().to_string();
+        if name == "isPublic" || name == "is_public" {
+            if let Ok(value) = field.text().await {
+                is_public = value == "true" || value == "1";
+            }
+            continue;
+        }
         let mut content_type: Option<Mime> = field
             .content_type()
             .map(|s| s.parse())
@@ -48,7 +55,11 @@ pub async fn upload(
 
         let len = data.len();
 
-        result.push(store.create(&name, content_type, data, &session).await?);
+        result.push(
+            store
+                .create(&name, content_type, data, is_public, &session)
+                .await?,
+        );
         info!(
             "User {} Uploaded file '{}' with {} bytes",
             &session.user_id(),
@@ -94,8 +105,12 @@ fn reduce_image_size(bytes: &[u8]) -> AppResult<(Bytes, Mime)> {
 pub async fn get_file_content(
     store: FileStore,
     Path(id): Path<FileId>,
+    session: Option<Session>,
 ) -> AppResult<impl IntoResponse> {
     let meta = store.get_metadata(&id).await?;
+    if !meta.is_public && !session.is_some_and(|s| s.is_member()) {
+        return Err(Error::Unauthorized);
+    }
     let bytes = store.get_bytes(&id).await?;
 
     let mut headers = HeaderMap::new();
@@ -108,8 +123,13 @@ pub async fn get_file_content(
 pub async fn get_file_metadata(
     store: FileStore,
     Path(id): Path<FileId>,
+    session: Option<Session>,
 ) -> ApiResult<FileMetadata> {
-    Ok(Json(store.get_metadata(&id).await?))
+    let meta = store.get_metadata(&id).await?;
+    if !meta.is_public && !session.is_some_and(|s| s.is_member()) {
+        return Err(Error::Unauthorized);
+    }
+    Ok(Json(meta))
 }
 
 pub async fn get_files(

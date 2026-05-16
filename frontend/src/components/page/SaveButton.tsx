@@ -6,8 +6,8 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AreYouSure from '../AreYouSure.tsx';
 import {useLanguage} from '../../providers/LanguageProvider.tsx';
-import {useCommitteeHook} from '../../hooks/useCommitteeHook.ts';
-import {useNavigate} from 'react-router-dom';
+import {usePageHook} from '../../hooks/usePageHook.ts';
+import {useNavigate, useParams} from 'react-router-dom';
 
 interface SaveButtonProps {
   id: string;
@@ -18,13 +18,14 @@ export default function SaveButton({id, handleSave}: SaveButtonProps) {
   const {text} = useLanguage();
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
-  const {deleteCommittee} = useCommitteeHook();
+  const {deletePage} = usePageHook();
   const navigate = useNavigate();
+  const {slug} = useParams();
 
   const handleDelete = async () => {
-    await deleteCommittee(id);
+    await deletePage(id, slug ?? '');
     toggleDialog();
-    navigate('/committees');
+    navigate('/pages');
   };
 
   const toggleDialog = () => setDialogOpen((prevState) => !prevState);
@@ -37,7 +38,7 @@ export default function SaveButton({id, handleSave}: SaveButtonProps) {
         className="fixed bottom-5 right-5 z-100 hover:dark:bg-[#42a5f5] hover:bg-[#1565c0] hover:shadow-2xl shadow-xl duration-300 dark:bg-[#90caf9] bg-[#1976d2] text-white rounded-3xl py-1 px-3 dark:text-black">
         <Button color="inherit" onClick={handleSave}>
           <SaveIcon className="mr-2"/>
-          {id ? text('Update Committee', 'Committee bijwerken') : text('Save Committee', 'Commissie opslaan')}
+          {id ? text('Update Page', 'Pagina bijwerken') : text('Save Page', 'Pagina opslaan')}
         </Button>
         {id && <>
           <Tooltip
@@ -57,7 +58,7 @@ export default function SaveButton({id, handleSave}: SaveButtonProps) {
               <div className="flex justify-self-start">
                 <Button color="inherit" onClick={toggleDialog}>
                   <DeleteIcon className="mr-2"/>
-                  {text('Delete Committee', 'Commissie verwijderen')}
+                  {text('Delete Page', 'Pagina verwijderen')}
                 </Button>
               </div>
             </div>
@@ -69,8 +70,8 @@ export default function SaveButton({id, handleSave}: SaveButtonProps) {
         onCancel={toggleDialog}
         onConfirm={handleDelete}
         message={text(
-          'You are about to delete this committee.',
-          'Je staat op het punt deze commissie te verwijderen.'
+          'You are about to delete this page.',
+          'Je staat op het punt deze pagina te verwijderen.'
         )}
       />
     </>
