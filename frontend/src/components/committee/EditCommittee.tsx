@@ -9,6 +9,7 @@ import MarkdownEditor from '../markdown/MarkdownEditor.tsx';
 import {useCommitteeHook} from '../../hooks/useCommitteeHook.ts';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
 import {useFileHook} from '../../hooks/useFileHook.ts';
+import LoadingPage from '../loading/LoadingPage.tsx';
 
 export default function EditCommittee() {
   const {text} = useLanguage();
@@ -30,8 +31,7 @@ export default function EditCommittee() {
   const [committeeContent, setCommitteeContent] = useState<CommitteeContent | undefined>(initialCommittee);
 
   if (!committeeContent) {
-    console.log('Could not find committee');
-    return null;
+    return <LoadingPage/>;
   }
 
   const handleCommitteeChange = (changes: Partial<CommitteeContent>) => {
@@ -82,7 +82,7 @@ export default function EditCommittee() {
 
         <div
           className="w-full rounded-2xl bg-inherit xl:col-span-2 xl:row-span-2 border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] flex flex-col">
-          <img className="w-full aspect-[4/2] object-cover" src={imageUrl} alt="Committee"/>
+          <img className="w-full aspect-4/2 object-cover" src={imageUrl} alt="Committee"/>
           <div className="p-5 grid gap-5">
             {/* Image upload */}
             <form encType="multipart/form-data" action="/file" method="post">

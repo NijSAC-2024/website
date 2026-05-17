@@ -1,17 +1,18 @@
-import { useState } from 'react';
+import {useState} from 'react';
 import GenericPage from './GenericPage.tsx';
 import ContentCard from '../components/ContentCard.tsx';
-import { Event, EventType, WeekendType } from '../types.ts';
+import {Event, EventType, WeekendType} from '../types.ts';
 import EventCard from '../components/event/EventCard.tsx';
-import { useLanguage } from '../providers/LanguageProvider.tsx';
+import {useLanguage} from '../providers/LanguageProvider.tsx';
 import NewEventButton from '../components/events/NewEventButton.tsx';
 import EventsFilter from '../components/events/EventsFilter.tsx';
 import moment from 'moment/moment';
 import {Switch} from '@mui/material';
 import {useEventHook} from '../hooks/useEventHook.ts';
+import LoadingPage from '../components/loading/LoadingPage.tsx';
 
 export default function Events() {
-  const { text } = useLanguage();
+  const {text} = useLanguage();
   const {useEvents} = useEventHook();
   const events = useEvents();
   const [category, setCategory] = useState<EventType | 'all'>(
@@ -22,9 +23,13 @@ export default function Events() {
 
   const now = new Date();
 
+  if (!events) {
+    return <LoadingPage/>;
+  }
+
   return (
     <>
-      <NewEventButton />
+      <NewEventButton/>
       <GenericPage>
         <div className="grid xl:grid-cols-3 lg:grid-cols-2 grid-flow-row gap-5">
           <ContentCard className="lg:col-span-2">
@@ -52,36 +57,35 @@ export default function Events() {
             </p>
           </ContentCard>
           <EventsFilter category={category} setCategory={setCategory} type={type} setType={setType}/>
-          {events &&
-            events
-              .filter(
-                (event: Event) =>
-                  (category === 'all' || event.eventType === category) &&
-                  (type === 'all' || event.metadata?.type?.includes(type))
-              )
-              .flatMap((event: Event) =>
-                event.dates
-                  .map((date, originalIndex) => ({ date, originalIndex }))
-                  .filter(
-                    ({ date }) => filterPastEvents || moment(date.end).isAfter(moment(now))
-                  )
-                  .map(({ date, originalIndex }) => (
-                    <EventCard
-                      key={`${event.id}-${originalIndex}`}
-                      event={{
-                        ...event,
-                        dates: [date],
-                        ...(event.dates.length > 1 && {
-                          name: {
-                            en: `${event.name.en} ${originalIndex + 1}/${event.dates.length}`,
-                            nl: `${event.name.nl} ${originalIndex + 1}/${event.dates.length}`,
-                          },
-                        }),
-                      }}
-                      agendaPage={true}
-                    />
-                  ))
-              )}
+          {events
+            .filter(
+              (event: Event) =>
+                (category === 'all' || event.eventType === category) &&
+                                (type === 'all' || event.metadata?.type?.includes(type))
+            )
+            .flatMap((event: Event) =>
+              event.dates
+                .map((date, originalIndex) => ({date, originalIndex}))
+                .filter(
+                  ({date}) => filterPastEvents || moment(date.end).isAfter(moment(now))
+                )
+                .map(({date, originalIndex}) => (
+                  <EventCard
+                    key={`${event.id}-${originalIndex}`}
+                    event={{
+                      ...event,
+                      dates: [date],
+                      ...(event.dates.length > 1 && {
+                        name: {
+                          en: `${event.name.en} ${originalIndex + 1}/${event.dates.length}`,
+                          nl: `${event.name.nl} ${originalIndex + 1}/${event.dates.length}`,
+                        },
+                      }),
+                    }}
+                    agendaPage={true}
+                  />
+                ))
+            )}
 
         </div>
       </GenericPage>

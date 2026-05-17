@@ -9,6 +9,7 @@ import ContentCard from '../components/ContentCard.tsx';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import {isAdminOrBoard} from '../util.ts';
+import LoadingPage from '../components/loading/LoadingPage.tsx';
 
 export default function MarkdownPage() {
   const {slug} = useParams();
@@ -19,7 +20,7 @@ export default function MarkdownPage() {
   const page = usePage(slug);
 
   if (!page) {
-    return null;
+    return <LoadingPage/>;
   }
 
   return (

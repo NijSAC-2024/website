@@ -10,6 +10,7 @@ import SaveButton from './SaveButton.tsx';
 import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import {useEventHook} from '../../hooks/useEventHook.ts';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
+import LoadingPage from '../loading/LoadingPage.tsx';
 
 
 export default function EditEvent() {
@@ -57,7 +58,7 @@ export default function EditEvent() {
   const isPublished = useWatch({control: form.control, name: 'isPublished'});
 
   if (!initialEvent) {
-    return null;
+    return <LoadingPage/>;
   }
 
   const handleSave = async (event: EventContent, isPublishedNext: boolean) => {

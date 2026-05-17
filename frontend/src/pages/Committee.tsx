@@ -13,6 +13,7 @@ import AreYouSure from '../components/AreYouSure.tsx';
 import {useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import {useAuth} from '../providers/AuthProvider.tsx';
+import LoadingPage from '../components/loading/LoadingPage.tsx';
 
 export default function Committee() {
   const {text} = useLanguage();
@@ -28,7 +29,7 @@ export default function Committee() {
   const toggleDialog = () => setDialogOpen((prevState) => !prevState);
 
   if (!committee) {
-    return null;
+    return <LoadingPage/>;
   }
 
   const handleMakeChair = async () => {
@@ -70,7 +71,7 @@ export default function Committee() {
           <div
             className="w-full rounded-2xl bg-[rgba(255,255,255,0.9)] dark:bg-[rgba(18,18,18,0.7)] xl:col-span-2 xl:row-span-2 border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] h-full">
             <img
-              className="w-full aspect-[4/2] object-cover"
+              className="w-full aspect-4/2 object-cover"
               src={imageUrl}
               alt="not available"
             />

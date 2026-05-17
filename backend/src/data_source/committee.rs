@@ -43,7 +43,7 @@ impl TryFrom<PgCommittee> for Committee {
     type Error = Error;
 
     fn try_from(pg: PgCommittee) -> Result<Self, Self::Error> {
-        Ok(Self {
+        Ok(Committee {
             id: pg.id,
             created: pg.created,
             updated: pg.updated,
@@ -74,7 +74,7 @@ impl TryFrom<PgCommitteeUser> for CommitteeUser {
     type Error = Error;
 
     fn try_from(pg: PgCommitteeUser) -> Result<Self, Self::Error> {
-        Ok(Self {
+        Ok(CommitteeUser {
             user: BasicUser {
                 id: pg.id,
                 first_name: pg.first_name,

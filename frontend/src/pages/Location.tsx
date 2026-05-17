@@ -3,6 +3,7 @@ import ContentCard from '../components/ContentCard.tsx';
 import {useLocationHook} from '../hooks/useLocationHook.ts';
 import {useLanguage} from '../providers/LanguageProvider.tsx';
 import {useParams} from 'react-router-dom';
+import LoadingPage from '../components/loading/LoadingPage.tsx';
 
 export default function Location() {
   const {useLocations} = useLocationHook()
@@ -13,7 +14,7 @@ export default function Location() {
   const location = locations?.find(loc => loc.id === id);
 
   if (!location) {
-    return null;
+    return <LoadingPage/>;
   }
 
   return (

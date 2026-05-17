@@ -7,6 +7,7 @@ import UploadIcon from '@mui/icons-material/Upload';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import {useAuth} from '../providers/AuthProvider.tsx';
 import {useFileHook} from '../hooks/useFileHook.ts';
+import {enqueueSnackbar} from 'notistack';
 
 export default function Upload() {
   const {text} = useLanguage();
@@ -39,6 +40,14 @@ export default function Upload() {
       )
     );
   };
+
+  const handleClick = (link: string) => {
+    enqueueSnackbar(
+      text('Link copied', 'Link gekopieerd'),
+      {variant: 'success'}
+    );
+    navigator.clipboard.writeText(link)
+  }
 
   return (
     <GenericPage>
@@ -78,7 +87,7 @@ export default function Upload() {
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton
-                      onClick={() => navigator.clipboard.writeText(link)}
+                      onClick={() => handleClick(link)}
                       edge="end"
                     >
                       <ContentCopyIcon/>

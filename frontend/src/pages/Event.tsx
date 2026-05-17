@@ -10,6 +10,7 @@ import {useUserHook} from '../hooks/useUserHook.ts';
 import {useEventHook} from '../hooks/useEventHook.ts';
 import {useNavigate, useParams} from 'react-router-dom';
 import {useAuth} from '../providers/AuthProvider.tsx';
+import LoadingPage from '../components/loading/LoadingPage.tsx';
 
 export default function Event() {
   const {text} = useLanguage();
@@ -23,7 +24,7 @@ export default function Event() {
 
 
   if (!currentEvent) {
-    return null;
+    return <LoadingPage/>;
   }
 
   return (

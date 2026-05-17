@@ -1,8 +1,9 @@
-import { TextField } from '@mui/material';
+import {TextField} from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import {BasicUser, Registration} from '../../types.ts';
-import { useLanguage } from '../../providers/LanguageProvider.tsx';
+import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import {useUserHook} from '../../hooks/useUserHook.ts';
+import LoadingComponent from '../loading/LoadingComponent.tsx';
 
 interface Props {
   registrations?: Registration[];
@@ -12,13 +13,19 @@ interface Props {
   toggleRegisterDialog: () => void;
 }
 
-export default function RegisterUserAutocomplete({registrations, selectedUser, setSelectedUser, setSelectedRegistration, toggleRegisterDialog }: Props) {
-  const { text } = useLanguage();
-  const { useUsers } = useUserHook();
+export default function RegisterUserAutocomplete({
+  registrations,
+  selectedUser,
+  setSelectedUser,
+  setSelectedRegistration,
+  toggleRegisterDialog
+}: Props) {
+  const {text} = useLanguage();
+  const {useUsers} = useUserHook();
   const users = useUsers()
 
   if (!users) {
-    return null
+    return <LoadingComponent/>
   }
 
   return (
@@ -34,7 +41,7 @@ export default function RegisterUserAutocomplete({registrations, selectedUser, s
         }
       }}
       renderInput={(params) => (
-        <TextField {...params} label={text('Register user', 'Schrijf gebruiker in')} />
+        <TextField {...params} label={text('Register user', 'Schrijf gebruiker in')}/>
       )}
     />
   );

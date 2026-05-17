@@ -146,7 +146,7 @@ impl FileStore {
             SELECT id, original_filename, mime_type, size, is_public, created_by, created
             FROM file
             WHERE id = $1
-            "#
+            "#,
         )
         .bind(**id)
         .fetch_one(&self.db)
@@ -169,7 +169,7 @@ impl FileStore {
             SELECT * FROM file
             ORDER BY created
             LIMIT $1 OFFSET $2
-            "#
+            "#,
         )
         .bind(pagination.limit)
         .bind(pagination.offset)

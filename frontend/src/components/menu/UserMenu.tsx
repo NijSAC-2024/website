@@ -6,6 +6,7 @@ import {MouseEvent, useState} from 'react';
 import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import GroupIcon from '@mui/icons-material/Group';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
+import ArticleIcon from '@mui/icons-material/Article';
 import {useUserHook} from '../../hooks/useUserHook.ts';
 import {useNavigate} from 'react-router-dom';
 import {useAuth} from '../../providers/AuthProvider.tsx';
@@ -71,10 +72,16 @@ export default function UserMenu({toggleDropdown}: UserMenuProps) {
           </ListItemIcon>
           {text('Members', 'Leden')}
         </MenuItem>
+        <MenuItem onClick={() => navigateSubmenu('/documents')}>
+          <ListItemIcon>
+            <FileCopyIcon fontSize="small"/>
+          </ListItemIcon>
+          {text('Documents', 'Documenten')}
+        </MenuItem>
         {isAdminOrBoard(user.roles) && (
           <MenuItem onClick={() => navigateSubmenu('/pages')}>
             <ListItemIcon>
-              <FileCopyIcon fontSize="small"/>
+              <ArticleIcon fontSize="small"/>
             </ListItemIcon>
             {text('Pages', 'Pagina\'s')}
           </MenuItem>

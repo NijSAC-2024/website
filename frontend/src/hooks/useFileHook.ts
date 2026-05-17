@@ -24,7 +24,6 @@ export function useFileHook() {
       return await apiFetch<FileMetadata[]>('/file', {
         method: 'POST',
         body: formData,
-        headers: {},
       });
     },
 

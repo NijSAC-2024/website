@@ -18,7 +18,9 @@ pub async fn get_pages(
     session: Option<Session>,
     headers: HeaderMap,
 ) -> AppResult<Response> {
-    let pages = store.get_all(include_private_for_session(session.as_ref())).await?;
+    let pages = store
+        .get_all(include_private_for_session(session.as_ref()))
+        .await?;
     conditional_json_response(&headers, HeaderMap::new(), &pages)
 }
 
@@ -50,7 +52,7 @@ pub async fn update_page(
     ValidatedJson(content): ValidatedJson<PageContent>,
 ) -> ApiResult<Page> {
     is_admin_or_board(&session)?;
-    Ok(Json(store.update(&page_id.into(), content).await?))
+    Ok(Json(store.update(&page_id, content).await?))
 }
 
 pub async fn delete_page(
@@ -59,5 +61,5 @@ pub async fn delete_page(
     Path(page_id): Path<Uuid>,
 ) -> AppResult<()> {
     is_admin_or_board(&session)?;
-    store.delete(&page_id.into()).await
+    store.delete(&page_id).await
 }

@@ -1,7 +1,7 @@
 import GenericPage from './GenericPage.tsx';
 import ContentCard from '../components/ContentCard.tsx';
 import {useLanguage} from '../providers/LanguageProvider.tsx';
-import {Fab, TextField} from '@mui/material';
+import {Fab, IconButton, TextField, Tooltip} from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import Markdown from 'react-markdown';
 import {isAdminOrBoard, truncateMarkdown} from '../util.ts';
@@ -9,6 +9,8 @@ import {useAuth} from '../providers/AuthProvider.tsx';
 import {useNavigate} from 'react-router-dom';
 import {usePageHook} from '../hooks/usePageHook.ts';
 import {useMemo, useState} from 'react';
+import UploadIcon from '@mui/icons-material/Upload';
+import LoadingPage from '../components/loading/LoadingPage.tsx';
 
 export default function Pages() {
   const {text} = useLanguage();
@@ -28,6 +30,10 @@ export default function Pages() {
     );
   }, [pages, search]);
 
+  if (!pages) {
+    return <LoadingPage/>
+  }
+
   return (
     <>
       {user && isAdminOrBoard(user.roles) && (
@@ -40,7 +46,16 @@ export default function Pages() {
       )}
       <GenericPage>
         <ContentCard className="grid gap-4">
-          <h1>{text('Pages', 'Pagina\'s')}</h1>
+          <div className="flex justify-between">
+            <h1>{text('Pages', 'Pagina\'s')}</h1>
+            {isAdminOrBoard(user?.roles ?? []) && (
+              <Tooltip title={text('Upload image/document', 'Upload afbeelding/document')}>
+                <IconButton onClick={() => navigate('/upload')}>
+                  <UploadIcon/>
+                </IconButton>
+              </Tooltip>
+            )}
+          </div>
           <TextField
             label={text('Search', 'Zoeken')}
             fullWidth
@@ -56,7 +71,7 @@ export default function Pages() {
               <div
                 className="w-full h-full rounded-2xl bg-[rgba(255,255,255,0.9)] dark:bg-[rgba(18,18,18,0.7)] border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)]">
                 <img
-                  className="w-full aspect-[4/2] object-cover"
+                  className="w-full aspect-4/2 object-cover"
                   src={page.image ? `/api/file/${page.image}` : '/images/test-header-image.jpg'}
                   alt="not available"
                 />

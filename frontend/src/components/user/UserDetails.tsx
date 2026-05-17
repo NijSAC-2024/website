@@ -12,6 +12,7 @@ import {ChangeCommittees} from './ChangeCommittees.tsx';
 import {ChangeRoles} from './ChangeRoles.tsx';
 import {useParams} from 'react-router-dom';
 import {useAuth} from '../../providers/AuthProvider.tsx';
+import LoadingComponent from '../loading/LoadingComponent.tsx';
 
 type FormInputs = Omit<UserContent, 'membership' | 'status' | 'roles'>;
 
@@ -30,7 +31,7 @@ export default function UserDetails() {
   }, [currentUser, reset]);
 
   if (!user || !currentUser) {
-    return null;
+    return <LoadingComponent/>;
   }
 
   const isMe = userId === user.id;
