@@ -36,7 +36,7 @@ function EditEventCard() {
     if (!file) {
       return;
     }
-    const uploadInfo = await uploadFile(file);
+    const uploadInfo = await uploadFile(file, true);
     setValue('image', uploadInfo[0].id, {
       shouldDirty: true,
     });

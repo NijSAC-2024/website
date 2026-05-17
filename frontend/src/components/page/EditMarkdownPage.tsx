@@ -41,7 +41,7 @@ export default function EditMarkdownPage() {
     }
     const uploaded = await uploadFile(
       file,
-      content.isPublic
+      true
     );
     setContent({
       ...content,
@@ -73,7 +73,7 @@ export default function EditMarkdownPage() {
         </div>
         <div
           className="w-full rounded-2xl bg-[rgba(255,255,255,0.9)] dark:bg-[rgba(18,18,18,0.7)] border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)]">
-          <img className="w-full aspect-[4/2] object-cover"
+          <img className="w-full aspect-4/2 object-cover"
             src={content.image ? `/api/file/${content.image}` : '/images/test-header-image.jpg'}
             alt="Page"/>
           <div className="p-5 grid gap-3">

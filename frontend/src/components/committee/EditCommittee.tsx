@@ -45,7 +45,7 @@ export default function EditCommittee() {
     if (!file) {
       return;
     }
-    const uploadInfo = await uploadFile(file);
+    const uploadInfo = await uploadFile(file, true);
     handleCommitteeChange({
       image: uploadInfo[0].id,
     });

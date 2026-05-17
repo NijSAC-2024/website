@@ -24,6 +24,7 @@ export function useFileHook() {
       return await apiFetch<FileMetadata[]>('/file', {
         method: 'POST',
         body: formData,
+        headers: {},
       });
     },
 
@@ -44,7 +45,7 @@ export function useFileHook() {
 
   const uploadFile = (
     file: File,
-    isPublic = true
+    isPublic = false
   ) => uploadFileMutation.mutateAsync({file, isPublic});
 
   const uploadFilesMutation = useMutation<
@@ -57,7 +58,7 @@ export function useFileHook() {
   >({
     mutationFn: async ({
       files,
-      isPublic = true,
+      isPublic = false,
     }) => {
       const formData = new FormData();
 

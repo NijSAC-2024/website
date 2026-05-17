@@ -75,7 +75,7 @@ export function useUserHook() {
   const loginMutation = useMutation<
     User,
     ApiError,
-    {email: string; password: string}
+    { email: string; password: string }
   >({
     mutationFn: async ({email, password}) => {
       return await apiFetch<User>('/login', {
@@ -104,7 +104,7 @@ export function useUserHook() {
     },
   });
   const login = (email: string, password: string) =>
-    loginMutation.mutateAsync({ email, password });
+    loginMutation.mutateAsync({email, password});
 
   const logoutMutation = useMutation<void, ApiError, void>({
     mutationFn: async () => {
@@ -115,7 +115,9 @@ export function useUserHook() {
       queryClient.clear();
       enqueueSnackbar(text('You logged out', 'Je bent uitgelogd'), {variant: 'success'});
     },
-    onError: (error) => {enqueueSnackbar(`${error.message}: ${error.reference}`, {variant: 'error'})},
+    onError: (error) => {
+      enqueueSnackbar(`${error.message}: ${error.reference}`, {variant: 'error'})
+    },
   });
   const logout = () => logoutMutation.mutateAsync();
 
@@ -155,7 +157,7 @@ export function useUserHook() {
   const updateUserMutation = useMutation<
     User,
     ApiError,
-    {userId: string; user: Omit<UserContent, 'password'>}
+    { userId: string; user: Omit<UserContent, 'password'> }
   >({
     mutationFn: async ({userId, user}) => {
       return await apiFetch<User>(`/user/${userId}`, {
@@ -182,12 +184,12 @@ export function useUserHook() {
     onError: (error: ApiError) => enqueueSnackbar(`${error.message}: ${error.reference}`, {variant: 'error'})
   });
   const updateUser = (userId: string, user: Omit<UserContent, 'password'>) =>
-    updateUserMutation.mutateAsync({ userId, user });
+    updateUserMutation.mutateAsync({userId, user});
 
   const updateUserPasswordMutation = useMutation<
     User,
     ApiError,
-    {userId: string; password: string}
+    { userId: string; password: string }
   >({
     mutationFn: async ({userId, password}) => {
       return await apiFetch<User>(

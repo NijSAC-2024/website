@@ -1,7 +1,7 @@
 use crate::{
     AppState, Language,
     error::{AppResult, Error},
-    page::{Page, PageContent},
+    page::{Page, PageContent, PageId},
     user::UserId,
 };
 use axum::{extract::FromRequestParts, http::request::Parts};
@@ -45,7 +45,7 @@ impl TryFrom<PgPage> for Page {
     type Error = Error;
     fn try_from(pg: PgPage) -> Result<Self, Self::Error> {
         Ok(Page {
-            page_id: pg.page_id,
+            page_id: pg.page_id.into(),
             content: PageContent {
                 name: Language {
                     en: pg.name_en,
@@ -121,7 +121,7 @@ impl PageStore {
             .try_into()
     }
 
-    pub async fn update(&self, page_id: &Uuid, content: PageContent) -> AppResult<Page> {
+    pub async fn update(&self, page_id: &PageId, content: PageContent) -> AppResult<Page> {
         sqlx::query_as::<_, PgPage>(
             r#"
             UPDATE pages
@@ -130,7 +130,7 @@ impl PageStore {
             RETURNING page_id, name_nl, name_en, image, slug, content_nl, content_en, is_public, created_by, created, updated
             "#,
         )
-            .bind(*page_id)
+            .bind(**page_id)
             .bind(content.name.nl)
             .bind(content.name.en)
             .bind(content.image.map(|x| *x))
@@ -143,9 +143,9 @@ impl PageStore {
             .try_into()
     }
 
-    pub async fn delete(&self, page_id: &Uuid) -> AppResult<()> {
+    pub async fn delete(&self, page_id: &PageId) -> AppResult<()> {
         sqlx::query("DELETE FROM pages WHERE page_id = $1")
-            .bind(*page_id)
+            .bind(**page_id)
             .execute(&self.db)
             .await?;
         Ok(())

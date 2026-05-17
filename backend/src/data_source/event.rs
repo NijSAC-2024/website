@@ -657,11 +657,11 @@ impl EventStore {
         .await?
         .into_iter()
         .map(TryInto::try_into)
-        .collect::<Result<Vec<Registration>, Error>>()
+        .collect()
     }
 
     pub async fn get_user_events(&self, user_id: &UserId) -> AppResult<Vec<Event<Location>>> {
-        let events = sqlx::query_as!(
+        sqlx::query_as!(
         PgEvent,
         r#"
         SELECT e.id,
@@ -705,12 +705,10 @@ impl EventStore {
         **user_id
     )
             .fetch_all(&self.db)
-            .await?;
-
-        events
+            .await?
             .into_iter()
-            .map(|e| e.try_into())
-            .collect::<Result<Vec<_>, _>>()
+            .map(TryInto::try_into)
+            .collect()
     }
 
     pub async fn get_registrations_detailed(&self, id: &EventId) -> AppResult<Vec<Registration>> {
@@ -738,7 +736,7 @@ impl EventStore {
         .await?
         .into_iter()
         .map(TryInto::try_into)
-        .collect::<Result<Vec<Registration>, Error>>()
+        .collect()
     }
 
     pub async fn get_registration(

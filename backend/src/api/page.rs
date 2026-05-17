@@ -4,10 +4,9 @@ use crate::{
     auth::session::Session,
     data_source::PageStore,
     error::AppResult,
-    page::{Page, PageContent},
+    page::{Page, PageContent, PageId},
 };
 use axum::{Json, extract::Path, http::HeaderMap, response::Response};
-use uuid::Uuid;
 
 fn include_private_for_session(session: Option<&Session>) -> bool {
     session.is_some_and(|s| s.is_member())
@@ -48,7 +47,7 @@ pub async fn create_page(
 pub async fn update_page(
     store: PageStore,
     session: Session,
-    Path(page_id): Path<Uuid>,
+    Path(page_id): Path<PageId>,
     ValidatedJson(content): ValidatedJson<PageContent>,
 ) -> ApiResult<Page> {
     is_admin_or_board(&session)?;
@@ -58,7 +57,7 @@ pub async fn update_page(
 pub async fn delete_page(
     store: PageStore,
     session: Session,
-    Path(page_id): Path<Uuid>,
+    Path(page_id): Path<PageId>,
 ) -> AppResult<()> {
     is_admin_or_board(&session)?;
     store.delete(&page_id).await

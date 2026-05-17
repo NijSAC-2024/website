@@ -12,14 +12,13 @@ import {useAuth} from '../../providers/AuthProvider.tsx';
 export default function UserRegistrations() {
   const {text} = useLanguage();
   const {userId} = useParams();
-  const {useUserEventRegistrations, useUserEvents} = useUserHook();
-  const userEventRegistrations = useUserEventRegistrations(userId);
+  const {useUserEvents} = useUserHook();
   const userEvents = useUserEvents(userId)
   const {user} = useAuth()
   const [filterPastEvents, setFilterPastEvents] = useState<boolean>(false);
   const now = new Date();
 
-  if (!user || !userEventRegistrations) {
+  if (!user) {
     return null;
   }
   const isMe = userId === user.id;
