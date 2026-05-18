@@ -1,12 +1,12 @@
-import { useEffect } from 'react';
+import {useEffect} from 'react';
 import {
   BrowserRouter,
   Routes,
   Route,
   Outlet,
 } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { CookiesProvider } from 'react-cookie';
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
+import {CookiesProvider} from 'react-cookie';
 
 import Home from './pages/Home.tsx';
 import Signup from './pages/Signup.tsx';
@@ -21,16 +21,20 @@ import Committee from './pages/Committee.tsx';
 import Location from './pages/Location.tsx';
 import EditCommittee from './components/committee/EditCommittee.tsx';
 import ErrorPage from './error/ErrorPage.tsx';
+import Pages from './pages/Pages.tsx';
+import MarkdownPage from './pages/MarkdownPage.tsx';
+import EditMarkdownPage from './components/page/EditMarkdownPage.tsx';
+import Upload from './pages/Upload.tsx';
 
-import ThemeProvider, { useThemeMode } from './providers/ThemeProvider.tsx';
-import LanguageProvider, { useLanguage } from './providers/LanguageProvider.tsx';
+import ThemeProvider, {useThemeMode} from './providers/ThemeProvider.tsx';
+import LanguageProvider, {useLanguage} from './providers/LanguageProvider.tsx';
 
-import { createTheme, ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
+import {createTheme, ThemeProvider as MuiThemeProvider} from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
 import MainMenu from './components/menu/MainMenu.tsx';
 
-import { SnackbarProvider } from 'notistack';
+import {SnackbarProvider} from 'notistack';
 import Success from './components/alerts/Success.tsx';
 import Warning from './components/alerts/Warning.tsx';
 import Info from './components/alerts/Info.tsx';
@@ -50,7 +54,7 @@ const queryClient = new QueryClient({
 });
 
 function AppLayout() {
-  const { themeMode, checkDarkMode, setTheme } = useThemeMode();
+  const {themeMode, checkDarkMode, setTheme} = useThemeMode();
   const isDarkMode = checkDarkMode();
   const language = useLanguage();
 
@@ -129,7 +133,7 @@ function AppLayout() {
 
   return (
     <MuiThemeProvider theme={theme}>
-      <CssBaseline />
+      <CssBaseline/>
       <SnackbarProvider
         maxSnack={3}
         autoHideDuration={5000}
@@ -141,8 +145,8 @@ function AppLayout() {
           info: Info,
         }}
       />
-      <MainMenu />
-      <Outlet />
+      <MainMenu/>
+      <Outlet/>
     </MuiThemeProvider>
   );
 }
@@ -176,11 +180,13 @@ export function App() {
                       <Route path="/committees/new" element={<EditCommittee/>}/>
                       <Route path="/committees/:committeeId" element={<Committee/>}/>
                       <Route path="/committees/:committeeId/edit" element={<EditCommittee/>}/>
-
+                      <Route path="/pages" element={<Pages/>}/>
+                      <Route path="/pages/new" element={<EditMarkdownPage/>}/>
+                      <Route path="/upload" element={<Upload/>}/>
                       <Route path="/location" element={<Location/>}/>
-
-                      <Route path="/about" element={<h1>About</h1>}/>
                       <Route path="/material_rental" element={<h1>Material Rental</h1>}/>
+                      <Route path="/:slug/edit" element={<EditMarkdownPage/>}/>
+                      <Route path="/:slug" element={<MarkdownPage/>}/>
 
                       {/* 404 fallback */}
                       <Route

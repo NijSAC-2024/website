@@ -15,6 +15,7 @@ import {useEventHook} from '../../hooks/useEventHook.ts';
 import {useEventRegistrationHook} from '../../hooks/useEventRegistrationHook.ts';
 import {useParams} from 'react-router-dom';
 import {useAuth} from '../../providers/AuthProvider.tsx';
+import LoadingComponent from '../loading/LoadingComponent.tsx';
 
 export default function RegistrationsCard() {
   const {text} = useLanguage();
@@ -38,7 +39,7 @@ export default function RegistrationsCard() {
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   if (!currentEvent) {
-    return null
+    return <LoadingComponent/>
   }
 
   const toggleRegisterDialog = () => setRegisterDialogOpen((prev) => !prev);

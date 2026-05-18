@@ -42,6 +42,7 @@ pub struct FileMetadata {
     #[serde(serialize_with = "serialize_mime")]
     pub mime_type: Option<Mime>,
     pub size: i32,
+    pub is_public: bool,
     pub created_by: UserId,
     #[serde(with = "time::serde::rfc3339")]
     pub created: OffsetDateTime,

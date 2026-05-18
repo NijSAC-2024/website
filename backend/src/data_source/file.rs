@@ -10,7 +10,7 @@ use axum::{extract::FromRequestParts, http::request::Parts};
 use bytes::Bytes;
 use mime::Mime;
 use object_store::{ObjectStore, PutPayload};
-use sqlx::PgPool;
+use sqlx::{FromRow, PgPool};
 use std::sync::Arc;
 use time::OffsetDateTime;
 use uuid::Uuid;
@@ -34,11 +34,13 @@ impl FromRequestParts<AppState> for FileStore {
     }
 }
 
+#[derive(FromRow)]
 struct PgFileMetadata {
     pub id: Uuid,
     pub original_filename: String,
     pub mime_type: Option<String>,
     pub size: i32,
+    pub is_public: bool,
     pub created_by: UserId,
     pub created: OffsetDateTime,
 }
@@ -56,6 +58,7 @@ impl TryFrom<PgFileMetadata> for FileMetadata {
                 .transpose()
                 .map_err(|_| Error::Internal("Failed to parse MIME string".to_string()))?,
             size: pg.size,
+            is_public: pg.is_public,
             created_by: pg.created_by,
             created: pg.created,
         })
@@ -108,6 +111,7 @@ impl FileStore {
         original_filename: &str,
         mime_type: Option<Mime>,
         payload: Bytes,
+        is_public: bool,
         session: &Session,
     ) -> AppResult<FileMetadata> {
         self.upload_access(session).await?;
@@ -118,32 +122,33 @@ impl FileStore {
             .put(&(&file_id).into(), PutPayload::from_bytes(payload))
             .await?;
 
-        sqlx::query_as!(
-            PgFileMetadata,
+        sqlx::query_as::<_, PgFileMetadata>(
             r#"
-            INSERT INTO file (id, original_filename, mime_type, size, created_by, created)
-            VALUES ($1, $2, $3, $4, $5, now())
-            RETURNING id, original_filename, mime_type, size, created_by, created
-            "#,
-            *file_id,
-            original_filename,
-            mime_type.map(|mime| mime.to_string()),
-            size as i32,
-            **session.user_id(),
+            INSERT INTO file (id, original_filename, mime_type, size, is_public, created_by, created)
+            VALUES ($1, $2, $3, $4, $5, $6, now())
+            RETURNING id, original_filename, mime_type, size, is_public, created_by, created
+            "#
         )
+        .bind(*file_id)
+        .bind(original_filename)
+        .bind(mime_type.map(|mime| mime.to_string()))
+        .bind(size as i32)
+        .bind(is_public)
+        .bind(**session.user_id())
         .fetch_one(&self.db)
         .await?
         .try_into()
     }
 
     pub async fn get_metadata(&self, id: &FileId) -> AppResult<FileMetadata> {
-        sqlx::query_as!(
-            PgFileMetadata,
+        sqlx::query_as::<_, PgFileMetadata>(
             r#"
-            SELECT * FROM file WHERE id = $1
+            SELECT id, original_filename, mime_type, size, is_public, created_by, created
+            FROM file
+            WHERE id = $1
             "#,
-            **id,
         )
+        .bind(**id)
         .fetch_one(&self.db)
         .await?
         .try_into()
@@ -159,16 +164,15 @@ impl FileStore {
         session: &Session,
     ) -> AppResult<Vec<FileMetadata>> {
         self.upload_access(session).await?;
-        sqlx::query_as!(
-            PgFileMetadata,
+        sqlx::query_as::<_, PgFileMetadata>(
             r#"
             SELECT * FROM file
             ORDER BY created
             LIMIT $1 OFFSET $2
             "#,
-            pagination.limit,
-            pagination.offset
         )
+        .bind(pagination.limit)
+        .bind(pagination.offset)
         .fetch_all(&self.db)
         .await?
         .into_iter()

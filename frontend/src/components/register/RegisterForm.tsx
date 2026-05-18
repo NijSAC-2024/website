@@ -123,7 +123,7 @@ export default function RegisterForm({
             <FormControl key={question.id} fullWidth>
               <TextField
                 label={label}
-                value={answer.answer}
+                value={answer?.answer}
                 onChange={(e) => {
                   const updated = [...answers];
                   updated[index].answer = e.target.value;
@@ -142,7 +142,7 @@ export default function RegisterForm({
               <TextField
                 label={label}
                 type="number"
-                value={answer.answer}
+                value={answer?.answer}
                 onChange={(e) => {
                   const updated = [...answers];
                   updated[index].answer = e.target.value;
@@ -159,7 +159,7 @@ export default function RegisterForm({
           return (
             <FormControl key={question.id} fullWidth>
               <Select
-                value={answer.answer}
+                value={answer?.answer}
                 displayEmpty
                 onChange={(e) => {
                   const updated = [...answers];
@@ -190,7 +190,7 @@ export default function RegisterForm({
             <DateTimePicker
               key={question.id}
               label={`${text(question.question.en, question.question.nl)} ${question.required ? '*' : ''}`}
-              value={moment(answer.answer)}
+              value={moment(answer?.answer)}
               onChange={(date) => {
                 const updated = [...answers];
                 updated[index].answer = date ? date.toISOString() : '';
@@ -206,7 +206,7 @@ export default function RegisterForm({
                 className="flex items-center justify-between border border-[#c4c4c4] dark:border-[#4c4c4c] rounded-xl pl-3 py-1.5">
                 {label}
                 <Checkbox
-                  checked={answer.answer === 'true'}
+                  checked={answer?.answer === 'true'}
                   onChange={(e) => {
                     const updated = [...answers];
                     updated[index].answer = e.target.checked ? 'true' : 'false';

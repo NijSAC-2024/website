@@ -42,6 +42,7 @@ create table file
     original_filename text        not null,
     mime_type         text,
     size              integer     not null,
+    is_public         boolean     not null DEFAULT false,
     created_by        uuid        not null references "user" (id),
     created           timestamptz not null
 );
@@ -188,4 +189,19 @@ create table "user_material"
         foreign key (material_id) references "material" (material_id) on delete cascade,
     constraint fk_user
         foreign key (user_id) references "user" (id) on delete cascade
+);
+
+create table pages
+(
+    page_id    uuid primary key,
+    name_nl    text        not null,
+    name_en    text        not null,
+    image      uuid references file (id),
+    slug       text unique not null,
+    content_nl text        not null default '',
+    content_en text        not null default '',
+    is_public  boolean     not null default false,
+    created_by uuid        not null references "user" (id),
+    created    timestamptz not null,
+    updated    timestamptz not null
 );

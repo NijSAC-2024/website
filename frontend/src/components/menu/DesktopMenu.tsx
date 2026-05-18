@@ -68,16 +68,16 @@ export default function DesktopMenu({setShowLogin}: { setShowLogin: (show: boole
             open={openMenu === 'association'}
             onClose={handleMenuClose}
           >
-            <MenuItem onClick={handleMenuClose}>
+            <MenuItem onClick={() => navigateSubmenu('/nijsac')}>
               {text('About the NijSAC', 'Over de NijSAC')}
             </MenuItem>
-            <MenuItem onClick={handleMenuClose}>
+            <MenuItem onClick={() => navigateSubmenu('/board')}>
               {text('Board', 'Bestuur')}
             </MenuItem>
             <MenuItem onClick={() => navigateSubmenu('/committees')}>
               {text('Committees', 'Commissies')}
             </MenuItem>
-            <MenuItem onClick={handleMenuClose}>
+            <MenuItem onClick={() => navigateSubmenu('/introduction')}>
               {text('Introduction', 'Introductie')}
             </MenuItem>
           </Menu>
@@ -95,16 +95,16 @@ export default function DesktopMenu({setShowLogin}: { setShowLogin: (show: boole
             open={openMenu === 'climbing'}
             onClose={handleMenuClose}
           >
-            <MenuItem onClick={handleMenuClose}>
+            <MenuItem onClick={() => navigateSubmenu('/indoor-climbing')}>
               {text('Indoor Climbing', 'Indoor Klimmen')}
             </MenuItem>
-            <MenuItem onClick={handleMenuClose}>
+            <MenuItem onClick={() => navigateSubmenu('/outdoor-climbing')}>
               {text('Outdoor Climbing', 'Buiten Klimmen')}
             </MenuItem>
-            <MenuItem onClick={handleMenuClose}>
+            <MenuItem onClick={() => navigateSubmenu('/climbing-areas')}>
               {text('Climbing Areas', 'Klimgebieden')}
             </MenuItem>
-            <MenuItem onClick={() => navigateSubmenu('/material_rental')}>
+            <MenuItem onClick={() => navigateSubmenu('/material-rental')}>
               {text('Material Rental', 'Materiaalverhuur')}
             </MenuItem>
           </Menu>
@@ -126,35 +126,34 @@ export default function DesktopMenu({setShowLogin}: { setShowLogin: (show: boole
             <p className="px-3 py-1 text-gray-500">
               {text('Summer', 'Zomer')}
             </p>
-            <MenuItem onClick={handleMenuClose}>
+            <MenuItem onClick={() => navigateSubmenu('/moutaineering')}>
               {text('Mountaineering', 'Bergbeklimmen')}
             </MenuItem>
-            <MenuItem onClick={handleMenuClose}>
+            <MenuItem onClick={() => navigateSubmenu('/canyoning')}>
               {text('Canyoning', 'Canyoning')}
             </MenuItem>
-            <MenuItem onClick={handleMenuClose}>
+            <MenuItem onClick={() => navigateSubmenu('/via-ferrata')}>
               {text('Via Ferrata', 'Via Ferrata')}
             </MenuItem>
-            <MenuItem onClick={handleMenuClose}>
+            <MenuItem onClick={() => navigateSubmenu('/hiking')}>
               {text('Hiking', 'Wandelen')}
             </MenuItem>
             {/* Winter */}
             <p className="px-3 py-1 mt-2 text-gray-500">
               {text('Winter', 'Winter')}
             </p>
-            <MenuItem onClick={handleMenuClose}>
+            <MenuItem onClick={() => navigateSubmenu('/ice-climbing')}>
               {text('Ice Climbing', 'Ijsklimmen')}
             </MenuItem>
-            <MenuItem onClick={handleMenuClose}>
+            <MenuItem onClick={() => navigateSubmenu('/off-piste-skiing')}>
               {text('Off Piste Skiing', 'Off Piste Skiën')}
             </MenuItem>
-            <MenuItem onClick={handleMenuClose}>
+            <MenuItem onClick={() => navigateSubmenu('/tour-skiing')}>
               {text('Tour Skiing', 'Toerskiën')}
             </MenuItem>
           </Menu>
         </div>
         <div className="flex items-center">
-          {/* Login+Become Member / Logout */}
           {!user ? (
             <>
               {/* Settings Dropdown */}
@@ -168,6 +167,7 @@ export default function DesktopMenu({setShowLogin}: { setShowLogin: (show: boole
                 </Button>
               </Tooltip>
 
+              {/* Login+Become Member / Logout */}
               <Button color="inherit" onClick={() => setShowLogin(true)}>
                 {text('Login', 'Inloggen')}
               </Button>

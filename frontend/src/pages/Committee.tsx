@@ -13,14 +13,15 @@ import AreYouSure from '../components/AreYouSure.tsx';
 import {useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import {useAuth} from '../providers/AuthProvider.tsx';
+import LoadingPage from '../components/loading/LoadingPage.tsx';
 
 export default function Committee() {
   const {text} = useLanguage();
-  const params = useParams();
+  const {committeeId} = useParams();
   const {user} = useAuth();
   const {useCommittee, useCommitteeMembers, makeChair} = useCommitteeHook();
-  const committee = useCommittee(params.committeeId);
-  const committeeMembers = useCommitteeMembers(params.committeeId)
+  const committee = useCommittee(committeeId);
+  const committeeMembers = useCommitteeMembers(committeeId)
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [selectedMember, setSelectedMember] = useState<CommitteeUser | null>(null);
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ export default function Committee() {
   const toggleDialog = () => setDialogOpen((prevState) => !prevState);
 
   if (!committee) {
-    return null;
+    return <LoadingPage/>;
   }
 
   const handleMakeChair = async () => {
@@ -43,7 +44,7 @@ export default function Committee() {
 
   return (
     <>
-      {user && (isChair(committeeMembers ?? [], user.id)|| isAdminOrBoard(user.roles)) && (
+      {user && (isChair(committeeMembers ?? [], user.id) || isAdminOrBoard(user.roles)) && (
         <div className="fixed bottom-5 right-5 z-10">
           <Fab
             variant="extended"
@@ -70,7 +71,7 @@ export default function Committee() {
           <div
             className="w-full rounded-2xl bg-[rgba(255,255,255,0.9)] dark:bg-[rgba(18,18,18,0.7)] xl:col-span-2 xl:row-span-2 border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] h-full">
             <img
-              className="w-full aspect-[4/2] object-cover"
+              className="w-full aspect-4/2 object-cover"
               src={imageUrl}
               alt="not available"
             />
@@ -97,16 +98,23 @@ export default function Committee() {
                     >
                       <TableCell component="th" scope="row">
                         <div className="flex justify-between items-center">
-                          <div className="grid hover:cursor-pointer hover:opacity-60 transition-all duration-100" onClick={() => navigate(`/user/${member.id}`)}>
+                          <div
+                            className="grid hover:cursor-pointer hover:opacity-60 transition-all duration-100"
+                            onClick={() => navigate(`/user/${member.id}`)}>
                             <p>{`${member.firstName} ${member.infix ?? ''} ${member.lastName}`}</p>
-                            {member.role === 'chair' && <i className="text-xs">{text(getLabel(member.role))}</i>}
+                            {member.role === 'chair' &&
+                                                            <i className="text-xs">{text(getLabel(member.role))}</i>}
                           </div>
                           {(isAdminOrBoard(user.roles) || isChair(committeeMembers ?? [], user.id)) && member.role !== 'chair' &&
-                              <Tooltip title={text('Make chair of committee', 'Maak commissiehoofd')}>
-                                <IconButton size="small" onClick={() => {setSelectedMember(member); toggleDialog()}}>
-                                  <EventSeatIcon/>
-                                </IconButton>
-                              </Tooltip>
+                                                        <Tooltip
+                                                          title={text('Make chair of committee', 'Maak commissiehoofd')}>
+                                                          <IconButton size="small" onClick={() => {
+                                                            setSelectedMember(member);
+                                                            toggleDialog()
+                                                          }}>
+                                                            <EventSeatIcon/>
+                                                          </IconButton>
+                                                        </Tooltip>
                           }
                         </div>
                       </TableCell>

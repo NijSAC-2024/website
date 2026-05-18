@@ -8,6 +8,7 @@ import AddIcon from '@mui/icons-material/Add';
 import {useCommitteeHook} from '../hooks/useCommitteeHook.ts';
 import {useNavigate} from 'react-router-dom';
 import {useAuth} from '../providers/AuthProvider.tsx';
+import LoadingPage from '../components/loading/LoadingPage.tsx';
 
 export default function Committees() {
   const {text} = useLanguage();
@@ -15,6 +16,10 @@ export default function Committees() {
   const committees = useCommittees();
   const {user} = useAuth();
   const navigate = useNavigate();
+
+  if (!committees) {
+    return <LoadingPage/>
+  }
 
   return (
     <>
@@ -43,40 +48,40 @@ export default function Committees() {
         </ContentCard>
 
         <div className="grid xl:grid-cols-3 lg:grid-cols-2 gap-5 mt-4">
-          {committees && committees?.length > 0 &&
-            committees.map((committee) => (
-              <div
-                key={committee.id}
-                onClick={() => navigate(`/committees/${committee.id}`)}
-                className="hover:cursor-pointer h-full"
-              >
-                <div
-                  className="w-full h-full rounded-2xl bg-[rgba(255,255,255,0.9)] dark:bg-[rgba(18,18,18,0.7)] border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)]">
-                  <img
-                    className="w-full aspect-[4/2] object-cover"
-                    src={
-                      committee.image
-                        ? committee.image.startsWith('https://')
-                          ? committee.image
-                          : `/api/file/${committee.image}`
-                        : '/images/test-header-image.jpg'
-                    }
-                    alt="not available"
-                  />
-                  <div className="p-5 grid gap-1">
-                    <h1 className="text-3xl font-bold">
-                      {text(committee.name?.en, committee.name.nl)}
-                    </h1>
-                    <Markdown>
-                      {text(
-                        truncateMarkdown(committee.description?.en || '', 120),
-                        truncateMarkdown(committee.description?.nl || '', 120)
-                      )}
-                    </Markdown>
-                  </div>
-                </div>
-              </div>
-            ))}
+          {committees?.length > 0 &&
+                        committees.map((committee) => (
+                          <div
+                            key={committee.id}
+                            onClick={() => navigate(`/committees/${committee.id}`)}
+                            className="hover:cursor-pointer h-full"
+                          >
+                            <div
+                              className="w-full h-full rounded-2xl bg-[rgba(255,255,255,0.9)] dark:bg-[rgba(18,18,18,0.7)] border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)]">
+                              <img
+                                className="w-full aspect-4/2 object-cover"
+                                src={
+                                  committee.image
+                                    ? committee.image.startsWith('https://')
+                                      ? committee.image
+                                      : `/api/file/${committee.image}`
+                                    : '/images/test-header-image.jpg'
+                                }
+                                alt="not available"
+                              />
+                              <div className="p-5 grid gap-1">
+                                <h1 className="text-3xl font-bold">
+                                  {text(committee.name?.en, committee.name.nl)}
+                                </h1>
+                                <Markdown>
+                                  {text(
+                                    truncateMarkdown(committee.description?.en || '', 120),
+                                    truncateMarkdown(committee.description?.nl || '', 120)
+                                  )}
+                                </Markdown>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
         </div>
 
 

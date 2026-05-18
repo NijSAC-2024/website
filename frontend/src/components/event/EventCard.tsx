@@ -1,8 +1,8 @@
-import { useLanguage } from '../../providers/LanguageProvider.tsx';
+import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import GroupIcon from '@mui/icons-material/Group';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import moment from 'moment';
-import { Chip } from '@mui/material';
+import {Chip} from '@mui/material';
 import {getLabel, truncateMarkdown} from '../../util.ts';
 import 'moment/dist/locale/nl';
 import {DateType, Event} from '../../types.ts';
@@ -15,9 +15,9 @@ interface AgendaCardProps {
   agendaPage: boolean;
 }
 
-export default function EventCard({ event, agendaPage }: AgendaCardProps) {
+export default function EventCard({event, agendaPage}: AgendaCardProps) {
   const navigate = useNavigate();
-  const { text, language } = useLanguage();
+  const {text, language} = useLanguage();
 
   moment.locale(language);
 
@@ -36,14 +36,14 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
     } else if (startDay === endDay) {
       return (
         moment(start).format('DD MMM HH:mm') +
-        ' - ' +
-        moment(end).format('HH:mm')
+                ' - ' +
+                moment(end).format('HH:mm')
       );
     } else if (!agendaPage) {
       return (
         moment(start).format('DD MMM HH:mm') +
-        ' - ' +
-        moment(end).format('DD MMM HH:mm')
+                ' - ' +
+                moment(end).format('DD MMM HH:mm')
       );
     } else {
       if (startMonth === endMonth) {
@@ -74,7 +74,7 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
           label={formatDate(event.dates[0])}
           className="absolute uppercase font-semibold top-5 right-5"
           color="primary"
-          sx={{ fontSize: 16 }}
+          sx={{fontSize: 16}}
         />
         {agendaPage && !event.isPublished && (
           <Chip
@@ -84,7 +84,7 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
           />
         )}
         <img
-          className="w-full aspect-[4/2] object-cover"
+          className="w-full aspect-4/2 object-cover"
           src={imageUrl}
           alt="not available"
         />
@@ -105,8 +105,9 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
                 />
               ))}
             </div>
-            <div className="flex items-center hover:cursor-pointer" onClick={() => navigate(`/location/${event.location.id}`)}>
-              <LocationOnIcon className="text-2xl" />
+            <div className="flex items-center hover:cursor-pointer"
+              onClick={() => navigate(`/location/${event.location.id}`)}>
+              <LocationOnIcon className="text-2xl"/>
               {text(event.location.name)}
             </div>
           </div>
@@ -123,7 +124,7 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
               <>
                 <b>
                   {text(getLabel(event.eventType)) +
-                    text(' dates:', ' datums:')}
+                                        text(' dates:', ' datums:')}
                 </b>
                 {event.dates.map((date, index) => (
                   <p key={date.start + index}>{formatDate(date)}</p>
@@ -137,7 +138,7 @@ export default function EventCard({ event, agendaPage }: AgendaCardProps) {
         <div
           className="p-5 flex justify-between items-center border-t border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)]">
           <div className="flex items-center">
-            <GroupIcon className="mr-2" />
+            <GroupIcon className="mr-2"/>
             <p>
               {event.registrationCount}
               {event.registrationMax && '/' + event.registrationMax}

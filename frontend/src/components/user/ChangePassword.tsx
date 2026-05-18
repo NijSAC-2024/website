@@ -9,6 +9,7 @@ import {isAdminOrBoard} from '../../util.ts';
 import {useUserHook} from '../../hooks/useUserHook.ts';
 import {useParams} from 'react-router-dom';
 import {useAuth} from '../../providers/AuthProvider.tsx';
+import LoadingComponent from '../loading/LoadingComponent.tsx';
 
 export default function ChangePassword() {
   const {text} = useLanguage();
@@ -22,7 +23,7 @@ export default function ChangePassword() {
   });
 
   if (!user) {
-    return null;
+    return <LoadingComponent/>;
   }
 
   const canEdit = isAdminOrBoard(user.roles) || params.userId === user.id;

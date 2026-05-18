@@ -11,23 +11,22 @@ import {useAuth} from '../../providers/AuthProvider.tsx';
 
 export default function UserRegistrations() {
   const {text} = useLanguage();
-  const params = useParams();
-  const {useUserEventRegistrations, useUserEvents} = useUserHook();
-  const userEventRegistrations = useUserEventRegistrations(params.userId);
-  const userEvents = useUserEvents(params.userId)
-  const {user}= useAuth()
+  const {userId} = useParams();
+  const {useUserEvents} = useUserHook();
+  const userEvents = useUserEvents(userId)
+  const {user} = useAuth()
   const [filterPastEvents, setFilterPastEvents] = useState<boolean>(false);
   const now = new Date();
 
-  if (!user || !userEventRegistrations) {
+  if (!user) {
     return null;
   }
-  const isMe = params.userId === user.id;
+  const isMe = userId === user.id;
 
   const filteredEvents =
     (userEvents as unknown as Event[])?.filter((event) =>
       filterPastEvents ||
-      moment(event.dates[0].start).isAfter(moment(now))
+            moment(event.dates[0].start).isAfter(moment(now))
     ) ?? [];
 
   return (
@@ -49,7 +48,7 @@ export default function UserRegistrations() {
         <div className="grid xl:grid-cols-3 gap-5 mt-5">
           {
             filteredEvents.map((event: Event) => (
-              <EventCard 
+              <EventCard
                 key={event.id}
                 event={event}
                 agendaPage={true}

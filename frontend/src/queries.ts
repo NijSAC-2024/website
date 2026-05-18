@@ -62,4 +62,9 @@ export const queryKeys = {
     members: (id?: string) =>
       ['committee', id, 'members'] as const,
   },
+
+  pages: {
+    all: () => ['page'] as const,
+    detail: (slug?: string) => ['page', slug] as const,
+  },
 };

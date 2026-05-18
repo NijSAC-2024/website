@@ -3,12 +3,14 @@ pub(crate) mod event;
 mod file;
 mod location;
 mod material;
+mod page;
 mod user;
 
 use axum::http::HeaderMap;
 pub use file::*;
 pub use location::*;
 pub use material::*;
+pub use page::*;
 pub use user::*;
 
 pub struct Count {
