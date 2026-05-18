@@ -120,7 +120,7 @@ export default function EditLocation({value, onChange}: EditLocationProps) {
 
       <Dialog open={dialogOpen} onClose={handleDialogClose} fullWidth maxWidth="sm">
         <DialogTitle>{text('Add Location', 'Locatie toevoegen')}</DialogTitle>
-        <DialogContent>RSC
+        <DialogContent>
           <div className="grid gap-3">
             <TextField
               required
