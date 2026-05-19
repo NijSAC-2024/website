@@ -28,10 +28,10 @@ export default function RegistrationsCard() {
     deleteRegistration,
     createRegistration
   } = useEventRegistrationHook();
-  const params = useParams();
-  const eventRegistrations = useEventRegistrations(params.eventId)
+  const {eventId} = useParams();
+  const eventRegistrations = useEventRegistrations(eventId)
   const {useEvent} = useEventHook();
-  const currentEvent = useEvent(params.eventId);
+  const currentEvent = useEvent(eventId);
 
   const [registerDialogOpen, setRegisterDialogOpen] = useState(false);
   const [selectedRegistration, setSelectedRegistration] = useState<Registration | null>(null);
@@ -79,8 +79,7 @@ export default function RegistrationsCard() {
           <h1>{text('Registrations', 'Inschrijvingen')}</h1>
           <p>
             <AccessAlarmIcon className=" mr-2"/>
-            {text('Registrations close at ', 'Inschrijvingen sluiten op ')}
-            {moment(currentEvent.registrationPeriod.end).format('DD MMM HH:mm')}
+            {`${text('Registrations close at ', 'Inschrijvingen sluiten op ')} ${moment(currentEvent.registrationPeriod.end).format('DD MMM HH:mm')}.`}
           </p>
 
           {user && (isAdminOrBoard(user.roles) || isChair(myCommittees ?? [], currentEvent.createdBy)) && (
@@ -105,7 +104,7 @@ export default function RegistrationsCard() {
               onEditClick={handleEditClick}
             />
           ) : (
-            <p className="mt-2">{text('No registrations yet', 'Nog geen deelnemers')}</p>
+            <p className="mt-2">{text('No registrations yet.', 'Nog geen deelnemers.')}</p>
           )}
         </ContentCard>
       )}

@@ -13,10 +13,16 @@ import {useFieldArray, useFormContext, useWatch} from 'react-hook-form';
 import {EventContent, QuestionTypeType} from '../../types.ts';
 import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import {getLabel} from '../../util.ts';
+import {useParams} from 'react-router-dom';
+import {useEventRegistrationHook} from '../../hooks/useEventRegistrationHook.ts';
 
 function QuestionOptions({questionIndex}: {questionIndex: number}) {
   const {text} = useLanguage();
   const {control, register} = useFormContext<EventContent>();
+  const {eventId} = useParams();
+  const {useEventRegistrations} = useEventRegistrationHook();
+  const eventRegistrations = useEventRegistrations(eventId) ?? []
+  const disableEdit = eventRegistrations.length > 0;
   const {fields, append, remove} = useFieldArray({
     control,
     name: `questions.${questionIndex}.questionType.options` as const,
@@ -28,12 +34,14 @@ function QuestionOptions({questionIndex}: {questionIndex: number}) {
       {fields.map((option, i) => (
         <div key={option.fieldId} className="flex items-center gap-2">
           <TextField
+            disabled={disableEdit}
             size="small"
             label={`${text('Option', 'Optie')} ${i + 1} ${text('English', 'Engels')}`}
             {...register(`questions.${questionIndex}.questionType.options.${i}.en` as const)}
             fullWidth
           />
           <TextField
+            disabled={disableEdit}
             size="small"
             label={`${text('Option', 'Optie')} ${i + 1} ${text('Dutch', 'Nederlands')}`}
             {...register(`questions.${questionIndex}.questionType.options.${i}.nl` as const)}
@@ -44,6 +52,7 @@ function QuestionOptions({questionIndex}: {questionIndex: number}) {
               size="small"
               color="error"
               onClick={() => remove(i)}
+              disabled={disableEdit}
             >
               <DeleteIcon fontSize="small"/>
             </IconButton>
@@ -56,6 +65,7 @@ function QuestionOptions({questionIndex}: {questionIndex: number}) {
             size="small"
             color="primary"
             onClick={() => append({en: '', nl: ''})}
+            disabled={disableEdit}
           >
             <AddIcon fontSize="small"/>
           </IconButton>
@@ -68,6 +78,10 @@ function QuestionOptions({questionIndex}: {questionIndex: number}) {
 function EditRegistrationQuestions() {
   const {text} = useLanguage();
   const {control, register, setValue} = useFormContext<EventContent>();
+  const {eventId} = useParams();
+  const {useEventRegistrations} = useEventRegistrationHook();
+  const eventRegistrations = useEventRegistrations(eventId) ?? []
+  const disableEdit = eventRegistrations.length > 0;
   const {fields, append, remove, update} = useFieldArray({
     control,
     name: 'questions',
@@ -131,8 +145,11 @@ function EditRegistrationQuestions() {
   return (
     <>
       <h3>{text('Registration Questions', 'Inschrijfvragen')}</h3>
+      {disableEdit && (
+        <p className="mt-[-0.7rem] mb-2">{text('Some settings have been disabled because there already are registrations.', 'Sommige instellingen zijn uitgeschakeld omdat er al registraties zijn.')}</p>
+      )}
       {fields.length === 0 ? (
-        <p>{text('No questions yet.', 'Nog geen vragen.')}</p>
+        <p className="mt-[-0.7rem]">{text('No questions yet.', 'Nog geen vragen.')}</p>
       ) : (
         <div className="grid gap-4 xl:gap-3">
           {fields.map((question, index) => (
@@ -158,6 +175,7 @@ function EditRegistrationQuestions() {
                 <Tooltip title={text('Options', 'Opties')}>
                   <IconButton
                     size="small"
+                    disabled={disableEdit}
                     onClick={(e) => {
                       setAnchorEl(e.currentTarget);
                       setActiveQuestionId(questions[index]?.id ?? null);
@@ -177,6 +195,7 @@ function EditRegistrationQuestions() {
             size="small"
             color="primary"
             onClick={(e) => setAnchorEl(e.currentTarget)}
+            disabled={disableEdit}
           >
             <AddIcon fontSize="large"/>
           </IconButton>

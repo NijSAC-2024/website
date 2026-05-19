@@ -191,8 +191,7 @@ export default function RegisterButton({
             </h1>
             <p>
               <AccessAlarmIcon className=" mr-2"/>
-              {text('Registrations close at ', 'Inschrijvingen sluiten op ')}
-              {moment(event.registrationPeriod.end).format('DD MMM HH:mm')}
+              {`${text('Registrations close at ', 'Inschrijvingen sluiten op ')} ${moment(event.registrationPeriod.end).format('DD MMM HH:mm')}.`}
             </p>
             {!registration && event.registrationMax && !!event.registrationCount && event.registrationCount >= event.registrationMax && (user && !isAdminOrBoard(user.roles)) && (
               <b>
