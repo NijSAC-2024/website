@@ -29,7 +29,7 @@ export default function Event() {
 
   return (
     <>
-      {user && (isAdminOrBoard(user.roles) || inCommittee(myCommittees ?? [], currentEvent.createdBy)) && (
+      {user && (isAdminOrBoard(user.roles) || inCommittee(myCommittees, currentEvent.createdBy)) && (
         <div className="fixed bottom-5 right-5 z-10">
           <Fab
             variant="extended"

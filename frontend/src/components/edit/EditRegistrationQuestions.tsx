@@ -21,8 +21,8 @@ function QuestionOptions({questionIndex}: {questionIndex: number}) {
   const {control, register} = useFormContext<EventContent>();
   const {eventId} = useParams();
   const {useEventRegistrations} = useEventRegistrationHook();
-  const eventRegistrations = useEventRegistrations(eventId) ?? []
-  const disableEdit = eventRegistrations.length > 0;
+  const eventRegistrations = useEventRegistrations(eventId)
+  const disableEdit = (eventRegistrations ?? []).length > 0;
   const {fields, append, remove} = useFieldArray({
     control,
     name: `questions.${questionIndex}.questionType.options` as const,
@@ -80,8 +80,8 @@ function EditRegistrationQuestions() {
   const {control, register, setValue} = useFormContext<EventContent>();
   const {eventId} = useParams();
   const {useEventRegistrations} = useEventRegistrationHook();
-  const eventRegistrations = useEventRegistrations(eventId) ?? []
-  const disableEdit = eventRegistrations.length > 0;
+  const eventRegistrations = useEventRegistrations(eventId);
+  const disableEdit = (eventRegistrations ?? []).length > 0;
   const {fields, append, remove, update} = useFieldArray({
     control,
     name: 'questions',

@@ -24,10 +24,10 @@ export default function UserRegistrations() {
   const isMe = userId === user.id;
 
   const filteredEvents =
-    (userEvents as unknown as Event[])?.filter((event) =>
+    ((userEvents ?? []) as unknown as Event[]).filter((event) =>
       filterPastEvents ||
             moment(event.dates[0].start).isAfter(moment(now))
-    ) ?? [];
+    );
 
   return (
     <>

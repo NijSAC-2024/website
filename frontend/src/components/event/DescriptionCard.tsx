@@ -11,9 +11,9 @@ import {useUserHook} from '../../hooks/useUserHook.ts';
 export default function DescriptionCard() {
   const {text, language} = useLanguage();
   const {useCommittees} = useCommitteeHook();
-  const params = useParams();
+  const {eventId} = useParams();
   const {useEvent} = useEventHook();
-  const currentEvent = useEvent(params.eventId)
+  const currentEvent = useEvent(eventId)
   const committees = useCommittees()
   const navigate = useNavigate();
   const {useUser} = useUserHook()

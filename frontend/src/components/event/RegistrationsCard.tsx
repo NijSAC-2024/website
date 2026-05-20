@@ -82,7 +82,7 @@ export default function RegistrationsCard() {
             {`${text('Registrations close at ', 'Inschrijvingen sluiten op ')} ${moment(currentEvent.registrationPeriod.end).format('DD MMM HH:mm')}.`}
           </p>
 
-          {user && (isAdminOrBoard(user.roles) || isChair(myCommittees ?? [], currentEvent.createdBy)) && (
+          {user && (isAdminOrBoard(user.roles) || isChair(myCommittees, currentEvent.createdBy)) && (
             <Box className="mt-2 grid" component="form" onSubmit={(e) => {
               e.preventDefault();
               toggleRegisterDialog();

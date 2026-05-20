@@ -42,6 +42,7 @@ import Error from './components/alerts/Error.tsx';
 import ErrorBoundary from './error/ErrorBoundary.tsx';
 import {AppError} from './error/error.ts';
 import AuthProvider from './providers/AuthProvider.tsx';
+import MemberStatus from './components/user/MemberStatus.tsx';
 
 
 const queryClient = new QueryClient({
@@ -90,6 +91,13 @@ function AppLayout() {
       MuiAutocomplete: {
         styleOverrides: {
           paper: {
+            borderRadius: 12,
+          },
+        },
+      },
+      MuiAlert: {
+        styleOverrides: {
+          root: {
             borderRadius: 12,
           },
         },
@@ -146,6 +154,7 @@ function AppLayout() {
         }}
       />
       <MainMenu/>
+      <MemberStatus/>
       <Outlet/>
     </MuiThemeProvider>
   );

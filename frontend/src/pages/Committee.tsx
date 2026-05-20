@@ -44,7 +44,7 @@ export default function Committee() {
 
   return (
     <>
-      {user && (isChair(committeeMembers ?? [], user.id) || isAdminOrBoard(user.roles)) && (
+      {user && (isChair(committeeMembers, user.id) || isAdminOrBoard(user.roles)) && (
         <div className="fixed bottom-5 right-5 z-10">
           <Fab
             variant="extended"
@@ -105,7 +105,7 @@ export default function Committee() {
                             {member.role === 'chair' &&
                                                             <i className="text-xs">{text(getLabel(member.role))}</i>}
                           </div>
-                          {(isAdminOrBoard(user.roles) || isChair(committeeMembers ?? [], user.id)) && member.role !== 'chair' &&
+                          {(isAdminOrBoard(user.roles) || isChair(committeeMembers, user.id)) && member.role !== 'chair' &&
                                                         <Tooltip
                                                           title={text('Make chair of committee', 'Maak commissiehoofd')}>
                                                           <IconButton size="small" onClick={() => {

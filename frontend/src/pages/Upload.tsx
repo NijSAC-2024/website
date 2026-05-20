@@ -5,20 +5,17 @@ import {ChangeEvent, useState} from 'react';
 import {useLanguage} from '../providers/LanguageProvider.tsx';
 import UploadIcon from '@mui/icons-material/Upload';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import {useAuth} from '../providers/AuthProvider.tsx';
 import {useFileHook} from '../hooks/useFileHook.ts';
 import {enqueueSnackbar} from 'notistack';
+import {useLoggedIn} from '../util.ts';
 
 export default function Upload() {
   const {text} = useLanguage();
-  const {user} = useAuth()
   const [isPublic, setIsPublic] = useState(false);
   const [links, setLinks] = useState<string[]>([]);
   const {uploadFiles, uploading} = useFileHook();
 
-  if (!user) {
-    return null;
-  }
+  useLoggedIn();
 
   const handleFilesUpload = async (
     e: ChangeEvent<HTMLInputElement>

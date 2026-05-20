@@ -9,7 +9,11 @@ import {useNavigate} from 'react-router-dom';
 import {MenuType} from '../../types.ts';
 import {useAuth} from '../../providers/AuthProvider.tsx';
 
-export default function DesktopMenu({setShowLogin}: { setShowLogin: (show: boolean) => void }) {
+interface DesktopMenuProps {
+  setShowLogin: (show: boolean) => void;
+}
+
+export default function DesktopMenu({setShowLogin}: DesktopMenuProps) {
   const {text} = useLanguage();
   const navigate = useNavigate();
   const {user} = useAuth()

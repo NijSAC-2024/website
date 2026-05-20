@@ -17,9 +17,9 @@ interface RegistrationRowProps {
 }
 
 export default function RegistrationRow({registration, onEditClick}: RegistrationRowProps) {
-  const params = useParams();
+  const {eventId} = useParams();
   const {useEvent} = useEventHook();
-  const currentEvent = useEvent(params.eventId)
+  const currentEvent = useEvent(eventId)
   const {useUserCommittees} = useUserHook();
   const {user} = useAuth()
   const myCommittees = useUserCommittees(user?.id)
@@ -31,15 +31,15 @@ export default function RegistrationRow({registration, onEditClick}: Registratio
     return null;
   }
 
-  const canViewDetailedRegistration = !!user && (isAdminOrBoard(user.roles) || isWorga(currentEvent, user) || inCommittee(myCommittees ?? [], currentEvent.createdBy));
-  const canManageRegistration = !!user && (isAdminOrBoard(user.roles) || (isChair(myCommittees ?? [], currentEvent.createdBy) && !!registration.id));
+  const canViewDetailedRegistration = !!user && (isAdminOrBoard(user.roles) || isWorga(currentEvent, user) || inCommittee(myCommittees, currentEvent.createdBy));
+  const canManageRegistration = !!user && (isAdminOrBoard(user.roles) || (isChair(myCommittees, currentEvent.createdBy) && !!registration.id));
   const displayName = text(getRegistrationDisplayName(registration));
 
   return (
     <TableRow sx={{'&:last-child td, &:last-child th': {border: 0}}}>
       <TableCell>
         {<p className="hover:cursor-pointer hover:opacity-60 transition-all duration-100"
-          onClick={() => registration.id && navigate(`/user/${registration.id}`)}>
+          onClick={() => registration.id && user && navigate(`/user/${registration.id}`)}>
           {canViewDetailedRegistration && registration.waitingListPosition !== undefined ?
             <span
               className="text-[#1976d2] dark:text-[#90caf9]">{displayName}</span>

@@ -12,17 +12,17 @@ import {useAuth} from '../../providers/AuthProvider.tsx';
 
 export function ChangeCommittees() {
   const {text} = useLanguage();
-  const params = useParams();
+  const {userId} = useParams();
   const {useUser, useUserCommittees} = useUserHook();
   const {user} = useAuth()
-  const currentUser = useUser(params.userId);
+  const currentUser = useUser(userId);
   const {
     useCommittees,
     addUserToCommittee,
     deleteUserFromCommittee,
   } = useCommitteeHook();
   const myCommittees = useUserCommittees(user?.id)
-  const currentCommittees = useUserCommittees(params.userId)
+  const currentCommittees = useUserCommittees(userId)
   const committees = useCommittees()
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -30,7 +30,7 @@ export function ChangeCommittees() {
 
   const toggleDialog = () => setDialogOpen(prev => !prev);
 
-  if (!user || !(isAdminOrBoard(user.roles) || committees?.some((c) => isChair(myCommittees ?? [], c.id)))) {
+  if (!user || !(isAdminOrBoard(user.roles) || committees?.some((c) => isChair(myCommittees, c.id)))) {
     return null;
   }
 
@@ -68,7 +68,7 @@ export function ChangeCommittees() {
           );
 
           return (
-            (isAdminOrBoard(user.roles) || isChair(myCommittees ?? [], committee.id)) && (
+            (isAdminOrBoard(user.roles) || isChair(myCommittees, committee.id)) && (
               <MenuItem key={committee.id} onClick={() => {
                 setSelectedCommittee(committee);
                 toggleDialog()
