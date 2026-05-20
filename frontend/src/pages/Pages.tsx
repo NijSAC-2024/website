@@ -36,7 +36,7 @@ export default function Pages() {
 
   return (
     <>
-      {user && isAdminOrBoard(user.roles) && (
+      {isAdminOrBoard(user?.roles) && (
         <div className="fixed bottom-5 right-5 z-10">
           <Fab variant="extended" color="primary" onClick={() => navigate('/pages/new')}>
             <AddIcon className="mr-2"/>
@@ -48,7 +48,7 @@ export default function Pages() {
         <ContentCard className="grid gap-4">
           <div className="flex justify-between">
             <h1>{text('Pages', 'Pagina\'s')}</h1>
-            {isAdminOrBoard(user?.roles ?? []) && (
+            {isAdminOrBoard(user?.roles) && (
               <Tooltip title={text('Upload image/document', 'Upload afbeelding/document')}>
                 <IconButton onClick={() => navigate('/upload')}>
                   <UploadIcon/>

@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                UPDATE event\n                SET metadata = metadata - 'worga'\n                WHERE id = $1\n                  AND metadata->>'worga' = $2\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "9042e0f5e026e2d7c5eaecdab020beb41cf2cfe1041755d24bf7e8ecbaceaec0"
+}

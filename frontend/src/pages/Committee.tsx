@@ -1,41 +1,45 @@
 import {useLanguage} from '../providers/LanguageProvider.tsx';
-import {Button, Fab, IconButton, Table, TableBody, TableCell, TableRow, Tooltip} from '@mui/material';
+import {Button, Fab, Switch} from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import GenericPage from './GenericPage.tsx';
-import ContentCard from '../components/ContentCard.tsx';
 import remarkGfm from 'remark-gfm';
 import Markdown from 'react-markdown';
-import {CommitteeUser} from '../types.ts';
-import {getLabel, isAdminOrBoard, isChair} from '../util.ts';
+import {isAdminOrBoard, isChair} from '../util.ts';
 import {useCommitteeHook} from '../hooks/useCommitteeHook.ts';
-import EventSeatIcon from '@mui/icons-material/EventSeat';
-import AreYouSure from '../components/AreYouSure.tsx';
-import {useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import {useAuth} from '../providers/AuthProvider.tsx';
 import LoadingPage from '../components/loading/LoadingPage.tsx';
+import CommitteeMembers from '../components/committee/CommitteeMembers.tsx';
+import ContentCard from '../components/ContentCard.tsx';
+import {useState} from 'react';
+import {useEventHook} from '../hooks/useEventHook.ts';
+import {Event} from '../types.ts';
+import moment from 'moment/moment';
+import EventCard from '../components/event/EventCard.tsx';
 
 export default function Committee() {
   const {text} = useLanguage();
   const {committeeId} = useParams();
   const {user} = useAuth();
-  const {useCommittee, useCommitteeMembers, makeChair} = useCommitteeHook();
+  const {useCommittee, useCommitteeMembers} = useCommitteeHook();
   const committee = useCommittee(committeeId);
   const committeeMembers = useCommitteeMembers(committeeId)
-  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
-  const [selectedMember, setSelectedMember] = useState<CommitteeUser | null>(null);
+  const [filterPastEvents, setFilterPastEvents] = useState<boolean>(false);
   const navigate = useNavigate();
-
-  const toggleDialog = () => setDialogOpen((prevState) => !prevState);
+  const {useEvents} = useEventHook();
+  const events = useEvents();
+  const now = new Date();
 
   if (!committee) {
     return <LoadingPage/>;
   }
 
-  const handleMakeChair = async () => {
-    await makeChair(committee.id, selectedMember!.id);
-    toggleDialog();
-  }
+  const filteredEvents =
+    ((events ?? []) as unknown as Event[]).filter((event) =>
+      (filterPastEvents ||
+        moment(event.dates[0].start).isAfter(moment(now))) && event.createdBy === committeeId
+    );
+
 
   let imageUrl = '/images/test-header-image.jpg';
   if (committee.image) {
@@ -44,7 +48,7 @@ export default function Committee() {
 
   return (
     <>
-      {user && (isChair(committeeMembers ?? [], user.id) || isAdminOrBoard(user.roles)) && (
+      {user && (isChair(committeeMembers, user.id) || isAdminOrBoard(user.roles)) && (
         <div className="fixed bottom-5 right-5 z-10">
           <Fab
             variant="extended"
@@ -58,8 +62,8 @@ export default function Committee() {
       )}
 
       <GenericPage image={imageUrl}>
-        <div className="grid lg:grid-cols-2 xl:grid-cols-3 gap-5 mt-[-9.3rem]">
-          <div className="lg:col-span-2 xl:col-span-3 mb-[-0.5rem] flex justify-between items-center">
+        <div className="grid lg:grid-cols-2 xl:grid-cols-3 gap-5">
+          <div className="xl:absolute xl:z-50 xl:-mt-[3.3rem] -mb-2 lg:col-span-2 xl:col-span-3">
             <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">
               <Button color="inherit" onClick={() => navigate('/committees')}>
                 {text('Back to Committees', 'Terug naar Commissies')}
@@ -69,7 +73,7 @@ export default function Committee() {
 
           {/* Committee Info */}
           <div
-            className="w-full rounded-2xl bg-[rgba(255,255,255,0.9)] dark:bg-[rgba(18,18,18,0.7)] xl:col-span-2 xl:row-span-2 border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] h-full">
+            className="w-full rounded-2xl bg-[rgba(255,255,255,0.9)] dark:bg-[rgba(18,18,18,0.7)] xl:col-span-2 border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] h-full">
             <img
               className="w-full aspect-4/2 object-cover"
               src={imageUrl}
@@ -86,55 +90,30 @@ export default function Committee() {
           </div>
 
           {/* Committee Members */}
-          {user && (
-            <ContentCard className="xl:col-span-1 h-full grid">
-              <h2>{text('Members', 'Leden')}</h2>
-              <Table>
-                <TableBody>
-                  {committeeMembers?.map((member: CommitteeUser) => (
-                    <TableRow
-                      key={member.id}
-                      sx={{'&:last-child td, &:last-child th': {border: 0}}}
-                    >
-                      <TableCell component="th" scope="row">
-                        <div className="flex justify-between items-center">
-                          <div
-                            className="grid hover:cursor-pointer hover:opacity-60 transition-all duration-100"
-                            onClick={() => navigate(`/user/${member.id}`)}>
-                            <p>{`${member.firstName} ${member.infix ?? ''} ${member.lastName}`}</p>
-                            {member.role === 'chair' &&
-                                                            <i className="text-xs">{text(getLabel(member.role))}</i>}
-                          </div>
-                          {(isAdminOrBoard(user.roles) || isChair(committeeMembers ?? [], user.id)) && member.role !== 'chair' &&
-                                                        <Tooltip
-                                                          title={text('Make chair of committee', 'Maak commissiehoofd')}>
-                                                          <IconButton size="small" onClick={() => {
-                                                            setSelectedMember(member);
-                                                            toggleDialog()
-                                                          }}>
-                                                            <EventSeatIcon/>
-                                                          </IconButton>
-                                                        </Tooltip>
-                          }
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </ContentCard>
-          )}
+          <CommitteeMembers/>
+
+          {/* Committee Events */}
+          <ContentCard className="xl:col-span-3 flex justify-between">
+            <div className="grid xl:grid-cols-2 justify-between w-full">
+              <h1>{text('Organised events', 'Geörganiseerde evenementen')}</h1>
+              <div className="flex items-center xl:justify-end">
+                <p>{text('Include past events', 'Plaatsgevonden evenementen meenemen')}</p>
+                <Switch
+                  checked={filterPastEvents}
+                  onChange={(_, checked) => setFilterPastEvents(checked)}
+                />
+              </div>
+            </div>
+          </ContentCard>
+          {filteredEvents.map((event: Event) => (
+            <EventCard
+              key={event.id}
+              event={event}
+              agendaPage={true}
+            />
+          ))}
         </div>
       </GenericPage>
-      <AreYouSure
-        open={dialogOpen}
-        onCancel={toggleDialog}
-        onConfirm={handleMakeChair}
-        message={text(
-          'You are about to make this user the chair of the committee.',
-          'Je staat op het punt deze gebruiker hoofd te maken van de commissie.'
-        )}
-      />
     </>
   );
 }

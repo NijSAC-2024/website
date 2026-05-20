@@ -15,14 +15,14 @@ import {useParams} from 'react-router-dom';
 function EditDescription() {
   const { text } = useLanguage();
   const { useEventRegistrations } = useEventRegistrationHook();
-  const params = useParams();
+  const {eventId} = useParams();
   const {control, setValue} = useFormContext<EventContent>();
   const [description, metadata, category] = useWatch({
     control,
     name: ['description', 'metadata', 'eventType']
   });
 
-  const eventRegistrations = useEventRegistrations(params.eventId)
+  const eventRegistrations = useEventRegistrations(eventId)
 
   return (
     <div className="xl:col-span-2 flex flex-col justify-between w-full rounded-2xl bg-[rgba(255,255,255,0.9)] dark:bg-[rgba(18,18,18,0.7)] border border-solid border-b-2 border-[rgba(1,1,1,0.1)] dark:border-[rgba(255,255,255,0.1)] border-b-[#1976d2] dark:border-b-[#90caf9]">
@@ -113,9 +113,6 @@ function EditDescription() {
                     variant="outlined"
                     onChange={field.onChange}
                   >
-                    <MenuItem value={'nobody'}>
-                      {text('No one assigned', 'Niemand toegewezen')}
-                    </MenuItem>
                     {eventRegistrations?.map((registration, index) => (
                       <MenuItem key={index} value={registration.id}>
                         {`${registration.firstName} ${registration.infix ?? ''} ${registration.lastName}`}

@@ -1,0 +1,41 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            COALESCE(u.id, er.registration_id) AS \"id!: UserId\",\n            COALESCE(\n                (\n                    SELECT answer->>'answer'\n                    FROM jsonb_array_elements(er.answers) AS answer\n                    WHERE answer->>'questionId' = $2\n                    LIMIT 1\n                ),\n                u.first_name\n            ) AS \"first_name!\",\n            CASE\n                WHEN u.id IS NULL THEN NULL\n                ELSE u.infix\n            END AS \"infix?\",\n            CASE\n                WHEN u.id IS NULL THEN ''\n                ELSE u.last_name\n            END AS \"last_name!\"\n        FROM event_registration er\n            LEFT JOIN \"user\" u ON er.user_id = u.id\n        WHERE er.event_id = $1\n          AND er.waiting_list_position IS NULL\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id!: UserId",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "first_name!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "infix?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "last_name!",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": [
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "hash": "0a9e08b28dd6eff542e7660d27646f2eabd333f1b72e0e5854b02c32c83c7dfa"
+}

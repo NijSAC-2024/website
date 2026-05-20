@@ -15,7 +15,7 @@ export default function ChangePassword() {
   const {text} = useLanguage();
   const {updateUserPassword} = useUserHook();
   const {user} = useAuth()
-  const params = useParams();
+  const {userId} = useParams();
   const [password, setPassword] = useState({password: '', repeatPassword: ''});
   const [passwordErrors, setPasswordErrors] = useState<{ password: ErrorType; repeatPassword: ErrorType }>({
     password: false,
@@ -26,7 +26,7 @@ export default function ChangePassword() {
     return <LoadingComponent/>;
   }
 
-  const canEdit = isAdminOrBoard(user.roles) || params.userId === user.id;
+  const canEdit = isAdminOrBoard(user.roles) || userId === user.id;
   if (!canEdit) {
     return null;
   }
@@ -44,13 +44,13 @@ export default function ChangePassword() {
 
   const handleChangePassword = async (event: FormEvent) => {
     event.preventDefault();
-    if (!canEdit || !params.userId) {
+    if (!canEdit || !userId) {
       return;
     }
     if (Object.values(passwordErrors).some((v) => v)) {
       return;
     }
-    if (await updateUserPassword(params.userId, password.password)) {
+    if (await updateUserPassword(userId, password.password)) {
       setPassword({password: '', repeatPassword: ''});
     }
   };

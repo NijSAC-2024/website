@@ -19,7 +19,7 @@ export function useEventRegistrationHook() {
   function useEventRegistrations(eventId?: string) {
     const {data} = useQuery<Registration[]>({
       queryKey: queryKeys.events.registrations(eventId),
-      enabled: !!eventId && !!user,
+      enabled: !!eventId,
       queryFn: () =>
         apiFetch<Registration[]>(
           `/event/${eventId}/registration`

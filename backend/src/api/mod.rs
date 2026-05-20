@@ -142,3 +142,6 @@ pub(crate) fn conditional_json_response<T: serde::Serialize>(
         .insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
     Ok(response)
 }
+
+pub(crate) const NON_MEMBER_NAME_QUESTION_ID: &str = "8d3d4e48-4e8f-4e15-a7d9-6ff5e4c8e8ad";
+pub(crate) const NON_MEMBER_EMAIL_QUESTION_ID: &str = "b7f1b7d2-6d8c-4d83-9b7a-3f4d8e2a91c6";

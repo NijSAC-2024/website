@@ -19,45 +19,55 @@ export default function RegistrationTable({onEditClick}: RegistrationTableProps)
   const {user} = useAuth()
   const myCommittees = useUserCommittees(user?.id);
   const {useEventRegistrations} = useEventRegistrationHook();
-  const params = useParams();
-  const eventRegistrations = useEventRegistrations(params.eventId)
+  const {eventId} = useParams();
+  const eventRegistrations = useEventRegistrations(eventId)
   const {useEvent} = useEventHook();
-  const currentEvent = useEvent(params.eventId);
+  const currentEvent = useEvent(eventId);
 
   if (!currentEvent) {
     return null;
   }
 
   return (
-    <div className="overflow-x-auto">
-      <div className="min-w-max">
-        <Table>
-          <TableBody>
-            {user && (isAdminOrBoard(user.roles) || isWorga(currentEvent, user) || inCommittee(myCommittees ?? [], currentEvent.createdBy)) && (
-              <TableRow>
-                <TableCell><b>{text('Name', 'Naam')}</b></TableCell>
-                {currentEvent.questions.map((q) => (
+    <div className="w-full overflow-x-auto">
+      <Table className="min-w-max">
+        <TableBody>
+          {user && (isAdminOrBoard(user.roles) || isWorga(currentEvent, user) || inCommittee(myCommittees, currentEvent.createdBy)) && (
+            <TableRow>
+              <TableCell><b>{text('Name', 'Naam')}</b></TableCell>
+              {currentEvent.questions.map((q) => (
+                <TableCell
+                  key={q.id}><b>{`${text(q.question)} ${q.required ? '*' : ''}`}</b></TableCell>
+              ))}
+              {(isAdminOrBoard(user.roles) || isChair(myCommittees, currentEvent.createdBy)) && (
+                <>
                   <TableCell
-                    key={q.id}><b>{`${text(q.question)} ${q.required ? '*' : ''}`}</b></TableCell>
-                ))}
-                {(isAdminOrBoard(user.roles) || isChair(myCommittees ?? [], currentEvent.createdBy)) && (
-                  <>
-                    <TableCell><b>{text('Attended', 'Aanwezig')}</b>
-                    </TableCell><TableCell><b>{text('Actions', 'Acties')}</b></TableCell>
-                  </>
-                )}
-              </TableRow>
-            )}
-            {eventRegistrations?.map((r) => (
-              <RegistrationRow
-                key={r.id}
-                registration={r}
-                onEditClick={onEditClick}
-              />
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+                    sx={{
+                      position: 'sticky',
+                      right: 80,
+                      backgroundColor: 'background.paper',
+                    }}
+                  ><b>{text('Attended', 'Aanwezig')}</b></TableCell>
+                  <TableCell
+                    sx={{
+                      position: 'sticky',
+                      right: 0,
+                      backgroundColor: 'background.paper',
+                    }}
+                  ><b>{text('Actions', 'Acties')}</b></TableCell>
+                </>
+              )}
+            </TableRow>
+          )}
+          {eventRegistrations?.map((r) => (
+            <RegistrationRow
+              key={r.id}
+              registration={r}
+              onEditClick={onEditClick}
+            />
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 }

@@ -19,21 +19,19 @@ import {useAuth} from '../../providers/AuthProvider.tsx';
 
 export default function UserActions() {
   const {text} = useLanguage();
-  const params = useParams();
+  const {userId} = useParams();
   const {useCommittees, addUserToCommittee, deleteUserFromCommittee} = useCommitteeHook();
   const committees = useCommittees();
   const {useUser, updateUser, useUserCommittees} = useUserHook();
   const {user} = useAuth()
-  const currentUser = useUser(params.userId);
+  const currentUser = useUser(userId);
   const myCommittees = useUserCommittees(user?.id)
   const currentCommittees = useUserCommittees(currentUser?.id)
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [committeeAnchor, setCommitteeAnchor] = useState<null | HTMLElement>(null);
 
-  console.log(myCommittees)
-
-  if (!user || !(isAdminOrBoard(user.roles) || isChair(myCommittees ?? [], user.id))) {
+  if (!user || !(isAdminOrBoard(user.roles) || isChair(myCommittees, user.id))) {
     return null;
   }
 
