@@ -12,33 +12,41 @@ import {DateTimePicker} from '@mui/x-date-pickers/DateTimePicker';
 import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import moment from 'moment';
 import {FormEvent, useState} from 'react';
-import {NON_MEMBER_NAME_QUESTION_ID} from './registration.ts';
+import {NON_MEMBER_EMAIL_QUESTION_ID, NON_MEMBER_NAME_QUESTION_ID} from './registration.ts';
+import {emailValidator} from '../../validator.ts';
 
 interface RegisterFormProps {
   registrationQuestions: Question[];
   handleRegistration: (answers: Answer[]) => void;
   existingAnswers?: Answer[];
-  requireNonMemberName?: boolean;
+  requireNonMemberName: boolean;
 }
 
 export default function RegisterForm({
   registrationQuestions,
   handleRegistration,
   existingAnswers,
-  requireNonMemberName = false
+  requireNonMemberName,
 }: RegisterFormProps) {
   const {text, language} = useLanguage();
   const now = new Date()
   const [answers, setAnswers] = useState<Answer[]>(
-    existingAnswers && existingAnswers.length > 0
-      ? existingAnswers
-      : registrationQuestions.map((q) => ({
-        questionId: q.id,
-        answer:
-                    q.questionType.type === 'boolean' ? 'false' :
-                      q.questionType.type === 'date' ? now.toISOString() :
-                        ''
-      }))
+    registrationQuestions.map((q) => {
+      const existingAnswer = existingAnswers?.find(
+        (a) => a.questionId === q.id
+      );
+      return (
+        existingAnswer ?? {
+          questionId: q.id,
+          answer:
+            q.questionType.type === 'boolean'
+              ? 'false'
+              : q.questionType.type === 'date'
+                ? now.toISOString()
+                : ''
+        }
+      );
+    })
   );
 
 
@@ -46,20 +54,22 @@ export default function RegisterForm({
   const [nonMemberName, setNonMemberName] = useState<string>(() => (
     existingAnswers?.find((answer) => answer.questionId === NON_MEMBER_NAME_QUESTION_ID)?.answer ?? ''
   ));
+  const [nonMemberEmail, setNonMemberEmail] = useState<string>(() => (
+    existingAnswers?.find((answer) => answer.questionId === NON_MEMBER_EMAIL_QUESTION_ID)?.answer ?? ''
+  ));
   const [nonMemberNameError, setNonMemberNameError] = useState<ErrorType>(false);
+  const [nonMemberEmailError, setNonMemberEmailError] = useState<ErrorType>(false);
   moment.locale(language);
 
   const validateInputs = () => {
     const newErrors: ErrorType[] = registrationQuestions.map((question, index) => {
       const answer = answers[index];
-
       if (question.required && (!answer || answer.answer.trim() === '')) {
         return {
           en: 'This field is required',
           nl: 'Dit veld is verplicht'
         };
       }
-
       return false;
     });
 
@@ -72,50 +82,64 @@ export default function RegisterForm({
     } else {
       setNonMemberNameError(false);
     }
+    if (requireNonMemberName && nonMemberEmail.trim() === '') {
+      setNonMemberEmailError({
+        en: 'This field is required',
+        nl: 'Dit veld is verplicht'
+      });
+    } else if (requireNonMemberName) {
+      setNonMemberEmailError(emailValidator(nonMemberEmail));
+    } else {
+      setNonMemberEmailError(false);
+    }
   };
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
-    if (Object.values(errors).some((v) => v) || !!nonMemberNameError) {
+    if (Object.values(errors).some((v) => v) || !!nonMemberNameError || !!nonMemberEmailError) {
       return;
     }
-    if (requireNonMemberName && nonMemberName.trim() === '') {
-      setNonMemberNameError({
-        en: 'This field is required',
-        nl: 'Dit veld is verplicht'
-      });
-      return;
-    }
-    const filteredAnswers = answers.filter((answer) => answer.questionId !== NON_MEMBER_NAME_QUESTION_ID);
+    const filteredAnswers = answers.filter((answer) => answer.questionId !== NON_MEMBER_NAME_QUESTION_ID && answer.questionId !== NON_MEMBER_EMAIL_QUESTION_ID && answer.answer.trim() !== '');
     const finalAnswers = requireNonMemberName
-      ? [...filteredAnswers, {questionId: NON_MEMBER_NAME_QUESTION_ID, answer: nonMemberName.trim()}]
-      : answers;
+      ? [...filteredAnswers, {questionId: NON_MEMBER_NAME_QUESTION_ID, answer: nonMemberName.trim()}, {questionId: NON_MEMBER_EMAIL_QUESTION_ID, answer: nonMemberEmail.trim()}]
+      : filteredAnswers;
     handleRegistration(finalAnswers);
   }
 
   return (
     <Box className="grid gap-3" component="form" onSubmit={handleSubmit}>
       {requireNonMemberName && (
-        <FormControl fullWidth>
-          <TextField
-            label={`${text('Name', 'Naam')} *`}
-            value={nonMemberName}
-            onChange={(event) => {
-              setNonMemberName(event.target.value);
-              if (nonMemberNameError && event.target.value.trim() !== '') {
-                setNonMemberNameError(false);
-              }
-            }}
-            error={!!nonMemberNameError}
-            helperText={nonMemberNameError && text(nonMemberNameError as Language)}
-            fullWidth
-          />
-        </FormControl>
+        <>
+          <FormControl fullWidth>
+            <TextField
+              label={`${text('Name', 'Naam')} *`}
+              value={nonMemberName}
+              onChange={(event) => {
+                setNonMemberName(event.target.value);
+              }}
+              error={!!nonMemberNameError}
+              helperText={nonMemberNameError && text(nonMemberNameError as Language)}
+              fullWidth
+            />
+          </FormControl>
+          <FormControl fullWidth>
+            <TextField
+              label={`${text('Email', 'Email')} *`}
+              value={nonMemberEmail}
+              onChange={(event) => {
+                setNonMemberEmail(event.target.value);
+              }}
+              error={!!nonMemberEmailError}
+              helperText={nonMemberEmailError && text(nonMemberEmailError as Language)}
+              fullWidth
+            />
+          </FormControl>
+        </>
       )}
       {registrationQuestions.map((question, index) => {
         const label = `${text(question.question.en, question.question.nl)}${question.required ? ' *' : ''}`;
         const error = errors[index];
-        const answer = answers[index];
+        const answer = answers[index]
 
         switch (question.questionType.type) {
         case 'text':
@@ -189,7 +213,7 @@ export default function RegisterForm({
           return (
             <DateTimePicker
               key={question.id}
-              label={`${text(question.question.en, question.question.nl)} ${question.required ? '*' : ''}`}
+              label={label}
               value={moment(answer?.answer)}
               onChange={(date) => {
                 const updated = [...answers];

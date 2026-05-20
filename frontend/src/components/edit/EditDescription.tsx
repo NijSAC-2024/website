@@ -113,9 +113,6 @@ function EditDescription() {
                     variant="outlined"
                     onChange={field.onChange}
                   >
-                    <MenuItem value={'nobody'}>
-                      {text('No one assigned', 'Niemand toegewezen')}
-                    </MenuItem>
                     {eventRegistrations?.map((registration, index) => (
                       <MenuItem key={index} value={registration.id}>
                         {`${registration.firstName} ${registration.infix ?? ''} ${registration.lastName}`}

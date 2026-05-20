@@ -2,7 +2,6 @@ import {Dialog, DialogContent, DialogActions, Button} from '@mui/material';
 import {Answer, BasicUser, Language, Question, Registration} from '../../types.ts';
 import RegisterForm from './RegisterForm.tsx';
 import {useLanguage} from '../../providers/LanguageProvider.tsx';
-import {getRegistrationDisplayName} from './registration.ts';
 
 interface RegistrationDialogProps {
   open: boolean;
@@ -28,11 +27,11 @@ export default function RegistrationDialog({
   const {text} = useLanguage();
 
   if (!selectedRegistration && !selectedUser) {
-    return;
+    return null;
   }
 
   const displayName = selectedRegistration
-    ? text(getRegistrationDisplayName(selectedRegistration))
+    ? `${selectedRegistration?.firstName} ${selectedRegistration?.infix ?? ''} ${selectedRegistration?.lastName}`
     : `${selectedUser?.firstName} ${selectedUser?.infix ?? ''} ${selectedUser?.lastName}`.trim();
 
   return (
@@ -49,6 +48,7 @@ export default function RegistrationDialog({
               handleRegistration(answers, selectedRegistration?.registrationId, selectedUser?.id, selectedRegistration?.waitingListPosition)
             }
             existingAnswers={selectedRegistration?.answers}
+            requireNonMemberName={selectedRegistration?.lastName === ''}
           />
         </div>
       </DialogContent>

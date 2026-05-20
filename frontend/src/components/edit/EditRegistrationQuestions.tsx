@@ -48,27 +48,31 @@ function QuestionOptions({questionIndex}: {questionIndex: number}) {
             fullWidth
           />
           <Tooltip title={text('Delete Option', 'Verwijder Optie')}>
-            <IconButton
-              size="small"
-              color="error"
-              onClick={() => remove(i)}
-              disabled={disableEdit}
-            >
-              <DeleteIcon fontSize="small"/>
-            </IconButton>
+            <span>
+              <IconButton
+                size="small"
+                color="error"
+                onClick={() => remove(i)}
+                disabled={disableEdit}
+              >
+                <DeleteIcon fontSize="small"/>
+              </IconButton>
+            </span>
           </Tooltip>
         </div>
       ))}
       <div className="flex justify-center">
         <Tooltip title={text('Add Option', 'Voeg Optie Toe')}>
-          <IconButton
-            size="small"
-            color="primary"
-            onClick={() => append({en: '', nl: ''})}
-            disabled={disableEdit}
-          >
-            <AddIcon fontSize="small"/>
-          </IconButton>
+          <span>
+            <IconButton
+              size="small"
+              color="primary"
+              onClick={() => append({en: '', nl: ''})}
+              disabled={disableEdit}
+            >
+              <AddIcon fontSize="small"/>
+            </IconButton>
+          </span>
         </Tooltip>
       </div>
     </div>
@@ -175,7 +179,6 @@ function EditRegistrationQuestions() {
                 <Tooltip title={text('Options', 'Opties')}>
                   <IconButton
                     size="small"
-                    disabled={disableEdit}
                     onClick={(e) => {
                       setAnchorEl(e.currentTarget);
                       setActiveQuestionId(questions[index]?.id ?? null);
@@ -195,7 +198,6 @@ function EditRegistrationQuestions() {
             size="small"
             color="primary"
             onClick={(e) => setAnchorEl(e.currentTarget)}
-            disabled={disableEdit}
           >
             <AddIcon fontSize="large"/>
           </IconButton>
@@ -216,6 +218,7 @@ function EditRegistrationQuestions() {
                   key={item.type}
                   selected={activeQuestion.questionType.type === item.type}
                   onClick={() => handleSelectQuestionType(item.type as QuestionTypeType)}
+                  disabled={disableEdit}
                 >
                   {item.icon}
                   <span className="ml-1">{text(item.label)}</span>

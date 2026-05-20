@@ -6,15 +6,15 @@ import {useLanguage} from '../providers/LanguageProvider.tsx';
 import UploadIcon from '@mui/icons-material/Upload';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import {useFileHook} from '../hooks/useFileHook.ts';
-import {enqueueSnackbar} from 'notistack';
 import {useLoggedIn} from '../util.ts';
+import CheckIcon from '@mui/icons-material/Check';
 
 export default function Upload() {
   const {text} = useLanguage();
   const [isPublic, setIsPublic] = useState(false);
   const [links, setLinks] = useState<string[]>([]);
   const {uploadFiles, uploading} = useFileHook();
-
+  const [copied, setCopied] = useState(false);
   useLoggedIn();
 
   const handleFilesUpload = async (
@@ -38,12 +38,12 @@ export default function Upload() {
     );
   };
 
-  const handleClick = (link: string) => {
-    enqueueSnackbar(
-      text('Link copied', 'Link gekopieerd'),
-      {variant: 'success'}
-    );
-    navigator.clipboard.writeText(link)
+  const handleClick = async (link: string) => {
+    setCopied(true);
+    setTimeout(() => {
+      setCopied(false);
+    }, 3000);
+    await navigator.clipboard.writeText(link)
   }
 
   return (
@@ -83,11 +83,8 @@ export default function Upload() {
               input: {
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton
-                      onClick={() => handleClick(link)}
-                      edge="end"
-                    >
-                      <ContentCopyIcon/>
+                    <IconButton onClick={() => handleClick(link)}>
+                      {copied ? <CheckIcon /> : <ContentCopyIcon />}
                     </IconButton>
                   </InputAdornment>
                 ),

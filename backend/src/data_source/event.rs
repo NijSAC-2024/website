@@ -5,6 +5,7 @@ use crate::{
 };
 
 use crate::{
+    api::NON_MEMBER_NAME_QUESTION_ID,
     auth::{role::Membership, session::Session},
     error::AppResult,
     event::{Date, NewRegistration, Registration, RegistrationId},
@@ -153,9 +154,9 @@ struct PgRegistration {
     registration_id: Uuid,
     event_id: EventId,
     user_id: Option<Uuid>,
-    first_name: Option<String>,
+    first_name: String,
     infix: Option<String>,
-    last_name: Option<String>,
+    last_name: String,
     attended: Option<bool>,
     waiting_list_position: Option<i32>,
     answers: serde_json::Value,
@@ -167,16 +168,12 @@ impl TryFrom<PgRegistration> for Registration {
     type Error = Error;
 
     fn try_from(pg: PgRegistration) -> AppResult<Self> {
-        let user = if let Some(user_id) = pg.user_id {
-            Some(BasicUser {
-                id: user_id.into(),
-                first_name: pg.first_name.unwrap_or_default(),
-                infix: pg.infix,
-                last_name: pg.last_name.unwrap_or_default(),
-            })
-        } else {
-            None
-        };
+        let user = Some(BasicUser {
+            id: pg.user_id.map(Into::into).unwrap_or_default(),
+            first_name: pg.first_name,
+            infix: pg.infix,
+            last_name: pg.last_name,
+        });
         Ok(Self {
             registration_id: pg.registration_id.into(),
             event_id: pg.event_id,
@@ -620,13 +617,32 @@ impl EventStore {
         Ok(sqlx::query_as!(
             BasicUser,
             r#"
-            SELECT u.id, u.first_name, u.infix, u.last_name
-            FROM event_registration ar
-                JOIN "user" u ON ar.user_id = u.id
-            WHERE ar.event_id = $1
-              AND ar.waiting_list_position IS NULL
-            "#,
-            **id
+        SELECT
+            COALESCE(u.id, er.registration_id) AS "id!: UserId",
+            COALESCE(
+                (
+                    SELECT answer->>'answer'
+                    FROM jsonb_array_elements(er.answers) AS answer
+                    WHERE answer->>'questionId' = $2
+                    LIMIT 1
+                ),
+                u.first_name
+            ) AS "first_name!",
+            CASE
+                WHEN u.id IS NULL THEN NULL
+                ELSE u.infix
+            END AS "infix?",
+            CASE
+                WHEN u.id IS NULL THEN ''
+                ELSE u.last_name
+            END AS "last_name!"
+        FROM event_registration er
+            LEFT JOIN "user" u ON er.user_id = u.id
+        WHERE er.event_id = $1
+          AND er.waiting_list_position IS NULL
+        "#,
+            **id,
+            NON_MEMBER_NAME_QUESTION_ID,
         )
         .fetch_all(&self.db)
         .await?)
@@ -710,27 +726,43 @@ impl EventStore {
             .map(TryInto::try_into)
             .collect()
     }
-
     pub async fn get_registrations_detailed(&self, id: &EventId) -> AppResult<Vec<Registration>> {
         sqlx::query_as!(
             PgRegistration,
             r#"
-            SELECT registration_id,
-                   event_id,
-                   user_id,
-                   u.first_name as "first_name?",
-                   u.infix,
-                   u.last_name as "last_name?",
-                   answers,
-                   attended,
-                   waiting_list_position,
-                   r.created,
-                   r.updated
-            FROM event_registration r
-                LEFT JOIN "user" u ON r.user_id = u.id
-            WHERE r.event_id = $1
-            "#,
-            **id
+        SELECT
+            er.registration_id,
+            er.event_id,
+            er.user_id,
+            COALESCE(
+                (
+                    SELECT a->>'answer'
+                    FROM jsonb_array_elements(er.answers) AS a
+                    WHERE a->>'questionId' = $2
+                    LIMIT 1
+                ),
+                u.first_name,
+                ''
+            ) AS "first_name!",
+            CASE
+                WHEN u.id IS NULL THEN NULL
+                ELSE u.infix
+            END AS infix,
+            CASE
+                WHEN u.id IS NULL THEN ''
+                ELSE u.last_name
+            END AS "last_name!",
+            er.answers,
+            er.attended,
+            er.waiting_list_position,
+            er.created,
+            er.updated
+        FROM event_registration er
+            LEFT JOIN "user" u ON er.user_id = u.id
+        WHERE er.event_id = $1
+        "#,
+            **id,
+            NON_MEMBER_NAME_QUESTION_ID,
         )
         .fetch_all(&self.db)
         .await?
@@ -738,7 +770,6 @@ impl EventStore {
         .map(TryInto::try_into)
         .collect()
     }
-
     pub async fn get_registration(
         &self,
         registration_id: &RegistrationId,
@@ -746,25 +777,39 @@ impl EventStore {
         sqlx::query_as!(
             PgRegistration,
             r#"
-            SELECT registration_id,
-                   event_id,
-                   user_id,
-                   -- the `first_name` and `last_name` must be explicitly marked optional
-                   -- due to the LEFT JOIN, as otherwise sqlx infers that they are NOT NULL from
-                   -- the schema
-                   u.first_name as "first_name?",
-                   u.infix,
-                   u.last_name as "last_name?",
-                   answers,
-                   attended,
-                   waiting_list_position,
-                   r.created,
-                   r.updated
-            FROM event_registration r
-                LEFT JOIN "user" u ON r.user_id = u.id
-            WHERE registration_id = $1
-            "#,
+        SELECT
+            er.registration_id,
+            er.event_id,
+            er.user_id,
+            COALESCE(
+                (
+                    SELECT answer->>'answer'
+                    FROM jsonb_array_elements(er.answers) AS answer
+                    WHERE answer->>'questionId' = $2
+                    LIMIT 1
+                ),
+                u.first_name,
+                ''
+            ) AS "first_name!",
+            CASE
+                WHEN u.id IS NULL THEN NULL
+                ELSE u.infix
+            END AS "infix?",
+            CASE
+                WHEN u.id IS NULL THEN ''
+                ELSE u.last_name
+            END AS "last_name!",
+            er.answers,
+            er.attended,
+            er.waiting_list_position,
+            er.created,
+            er.updated
+        FROM event_registration er
+            LEFT JOIN "user" u ON er.user_id = u.id
+        WHERE er.registration_id = $1
+        "#,
             **registration_id,
+            NON_MEMBER_NAME_QUESTION_ID,
         )
         .fetch_one(&self.db)
         .await
@@ -823,7 +868,6 @@ impl EventStore {
 
         self.get_registration(registration_id).await
     }
-
     pub async fn delete_registration(&self, registration_id: &RegistrationId) -> AppResult<()> {
         let mut tx = self.db.begin().await?;
 
@@ -838,13 +882,27 @@ impl EventStore {
             .fetch_one(&mut *tx)
             .await?;
 
+            //TODO: make this work
             sqlx::query!(
                 r#"
-                UPDATE event_registration
-                SET waiting_list_position = null
-                WHERE event_id = $1
-                  AND waiting_list_position = 0
+                UPDATE event
+                SET metadata = metadata - 'worga'
+                WHERE id = $1
+                  AND metadata->>'worga' = $2
                 "#,
+                event_id,
+                registration_id.to_string(),
+            )
+            .execute(&mut *tx)
+            .await?;
+
+            sqlx::query!(
+                r#"
+            UPDATE event_registration
+            SET waiting_list_position = null
+            WHERE event_id = $1
+              AND waiting_list_position = 0
+            "#,
                 event_id
             )
             .execute(&mut *tx)
@@ -852,10 +910,10 @@ impl EventStore {
 
             sqlx::query!(
                 r#"
-                UPDATE event_registration
-                SET waiting_list_position = waiting_list_position - 1
-                WHERE event_id = $1
-                "#,
+            UPDATE event_registration
+            SET waiting_list_position = waiting_list_position - 1
+            WHERE event_id = $1
+            "#,
                 event_id
             )
             .execute(&mut *tx)
@@ -864,8 +922,8 @@ impl EventStore {
 
         sqlx::query!(
             r#"
-            DELETE FROM event_registration WHERE registration_id = $1
-            "#,
+        DELETE FROM event_registration WHERE registration_id = $1
+        "#,
             **registration_id
         )
         .execute(&mut *tx)

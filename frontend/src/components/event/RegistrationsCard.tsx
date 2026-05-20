@@ -1,5 +1,5 @@
 import ContentCard from '../ContentCard.tsx';
-import {Box, FormControl} from '@mui/material';
+import {Box, FormControl, IconButton, Tooltip} from '@mui/material';
 import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import {Answer, BasicUser, Registration} from '../../types.ts';
 import {useState} from 'react';
@@ -7,7 +7,7 @@ import AreYouSure from '../AreYouSure.tsx';
 import RegistrationTable from '../register/RegistrationTable.tsx';
 import RegistrationDialog from '../register/RegistrationDialog.tsx';
 import RegisterUserAutocomplete from '../register/RegisterUserAutocomplete.tsx';
-import {isAdminOrBoard, isChair} from '../../util.ts';
+import {inCommittee, isAdminOrBoard, isChair, isWorga} from '../../util.ts';
 import AccessAlarmIcon from '@mui/icons-material/AccessAlarm';
 import moment from 'moment';
 import {useUserHook} from '../../hooks/useUserHook.ts';
@@ -16,6 +16,8 @@ import {useEventRegistrationHook} from '../../hooks/useEventRegistrationHook.ts'
 import {useParams} from 'react-router-dom';
 import {useAuth} from '../../providers/AuthProvider.tsx';
 import LoadingComponent from '../loading/LoadingComponent.tsx';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import CheckIcon from '@mui/icons-material/Check';
 
 export default function RegistrationsCard() {
   const {text} = useLanguage();
@@ -37,6 +39,7 @@ export default function RegistrationsCard() {
   const [selectedRegistration, setSelectedRegistration] = useState<Registration | null>(null);
   const [selectedUser, setSelectedUser] = useState<BasicUser | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   if (!currentEvent) {
     return <LoadingComponent/>
@@ -72,11 +75,53 @@ export default function RegistrationsCard() {
     setSelectedRegistration(null);
   };
 
+  const copyTableToClipboard = async () => {
+    const headers = [
+      text('Name', 'Naam'),
+      ...currentEvent.questions.map((q) => text(q.question)),
+    ];
+
+    const rows = eventRegistrations?.map((registration) => {
+      const answers = currentEvent.questions.map((question) => {
+        const answer = registration.answers.find(
+          (a) => a.questionId === question.id
+        )?.answer;
+        return answer ?? '';
+      });
+      return [
+        `${registration.firstName} ${registration?.infix ?? ''} ${registration?.lastName}`,
+        ...answers,
+      ];
+    });
+
+    const tableText = [
+      headers.join('\t'),
+      ...(rows ?? []).map((row) => row.join('\t')),
+    ].join('\n');
+
+    setCopied(true);
+
+    setTimeout(() => {
+      setCopied(false);
+    }, 3000);
+
+    await navigator.clipboard.writeText(tableText);
+  };
+
   return (
     <>
       {eventRegistrations && currentEvent.registrationPeriod && (
-        <ContentCard className="xl:col-span-3">
-          <h1>{text('Registrations', 'Inschrijvingen')}</h1>
+        <ContentCard className="xl:col-span-3 min-w-0">
+          <div className="flex justify-between items-center">
+            <h1>{text('Registrations', 'Inschrijvingen')}</h1>
+            {user && (isAdminOrBoard(user.roles) || isWorga(currentEvent, user) || inCommittee(myCommittees, currentEvent.createdBy)) && (
+              <Tooltip title={text('Copy Table', 'Kopieer Tabel')}>
+                <IconButton onClick={copyTableToClipboard}>
+                  {copied ? <CheckIcon /> : <ContentCopyIcon />}
+                </IconButton>
+              </Tooltip>
+            )}
+          </div>
           <p>
             <AccessAlarmIcon className=" mr-2"/>
             {`${text('Registrations close at ', 'Inschrijvingen sluiten op ')} ${moment(currentEvent.registrationPeriod.end).format('DD MMM HH:mm')}.`}

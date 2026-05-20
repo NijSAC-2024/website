@@ -35,6 +35,12 @@ impl Deref for UserId {
     }
 }
 
+impl Default for UserId {
+    fn default() -> Self {
+        Self(Uuid::nil())
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct User {

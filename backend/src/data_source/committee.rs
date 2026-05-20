@@ -8,6 +8,7 @@ use crate::{
 };
 use axum::{extract::FromRequestParts, http::request::Parts};
 use sqlx::PgPool;
+use std::ops::Deref;
 use time::OffsetDateTime;
 use uuid::Uuid;
 
@@ -241,7 +242,7 @@ impl CommitteeStore {
         Ok(())
     }
 
-    pub async fn add_user(&self, committee_id: &Uuid, user_id: &Uuid) -> AppResult<BasicUser> {
+    pub async fn add_user(&self, committee_id: &Uuid, user_id: &UserId) -> AppResult<BasicUser> {
         Ok(sqlx::query_as!(
             BasicUser,
             r#"
@@ -253,7 +254,7 @@ impl CommitteeStore {
             FROM t JOIN "user" u ON u.id = t.user_id
             "#,
             Uuid::now_v7(),
-            user_id,
+            user_id.deref(),
             committee_id
         )
         .fetch_one(&self.db)

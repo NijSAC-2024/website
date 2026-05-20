@@ -94,7 +94,7 @@ export default function Committee() {
 
           {/* Committee Events */}
           <ContentCard className="xl:col-span-3 flex justify-between">
-            <div className="grid xl:grid-cols-2 justify-between">
+            <div className="grid xl:grid-cols-2 justify-between w-full">
               <h1>{text('Organised events', 'Geörganiseerde evenementen')}</h1>
               <div className="flex items-center xl:justify-end">
                 <p>{text('Include past events', 'Plaatsgevonden evenementen meenemen')}</p>

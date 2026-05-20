@@ -1,5 +1,8 @@
 use crate::{
-    api::{ApiResult, ValidatedJson, conditional_json_response, is_admin_or_board},
+    api::{
+        ApiResult, NON_MEMBER_EMAIL_QUESTION_ID, NON_MEMBER_NAME_QUESTION_ID, ValidatedJson,
+        conditional_json_response, is_admin_or_board,
+    },
     auth::{
         role::{Membership, Status},
         session::Session,
@@ -17,8 +20,6 @@ use axum::{Json, extract::Path, http::HeaderMap, response::Response};
 use time::OffsetDateTime;
 use tracing::{debug, info, trace, warn};
 use uuid::Uuid;
-
-const NON_MEMBER_NAME_QUESTION_ID: &str = "8d3d4e48-4e8f-4e15-a7d9-6ff5e4c8e8ad";
 
 async fn has_registration_access(
     store: &EventStore,
@@ -256,11 +257,23 @@ pub async fn create_registration(
     } else {
         let non_member_name_question_id = Uuid::parse_str(NON_MEMBER_NAME_QUESTION_ID)
             .expect("NON_MEMBER_NAME_QUESTION_ID must be a valid UUID");
+        let non_member_email_question_id = Uuid::parse_str(NON_MEMBER_EMAIL_QUESTION_ID)
+            .expect("NON_MEMBER_EMAIL_QUESTION_ID must be a valid UUID");
+
         let has_non_member_name = new.answers.iter().any(|answer| {
             answer.question_id == non_member_name_question_id && !answer.answer.trim().is_empty()
         });
+
         if !has_non_member_name {
             return Err(Error::BadRequest("Missing non-member name"));
+        }
+
+        let has_non_member_email = new.answers.iter().any(|answer| {
+            answer.question_id == non_member_email_question_id && !answer.answer.trim().is_empty()
+        });
+
+        if !has_non_member_email {
+            return Err(Error::BadRequest("Missing non-member email"));
         }
     }
 
