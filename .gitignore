@@ -124,5 +124,3 @@ dist
 *.tsbuildinfo
 
 .idea
-
-**/.env

@@ -34,7 +34,7 @@ export default function RegistrationRow({registration, onEditClick}: Registratio
   const canViewDetailedRegistration = !!user && (isAdminOrBoard(user.roles) || isWorga(currentEvent, user) || inCommittee(myCommittees, currentEvent.createdBy));
   const canManageRegistration = !!user && (isAdminOrBoard(user.roles) || (isChair(myCommittees, currentEvent.createdBy) && !!registration.id));
   const nonMember = registration.lastName === '';
-  const displayName = `${registration.firstName} ${registration.infix ?? ''} ${registration.lastName} ${nonMember ? text('(Non Member)', '(Niet lid)') : ''}`;
+  const displayName = `${registration.firstName} ${registration.infix ?? ''} ${registration.lastName} ${nonMember && canViewDetailedRegistration? text('(Non Member)', '(Niet lid)') : ''}`;
 
   return (
     <TableRow sx={{'&:last-child td, &:last-child th': {border: 0}}}>

@@ -1,0 +1,83 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            er.registration_id,\n            er.event_id,\n            er.user_id,\n            COALESCE(\n                (\n                    SELECT a->>'answer'\n                    FROM jsonb_array_elements(er.answers) AS a\n                    WHERE a->>'questionId' = $2\n                    LIMIT 1\n                ),\n                u.first_name,\n                ''\n            ) AS \"first_name!\",\n            CASE\n                WHEN u.id IS NULL THEN NULL\n                ELSE u.infix\n            END AS infix,\n            CASE\n                WHEN u.id IS NULL THEN ''\n                ELSE u.last_name\n            END AS \"last_name!\",\n            er.answers,\n            er.attended,\n            er.waiting_list_position,\n            er.created,\n            er.updated\n        FROM event_registration er\n            LEFT JOIN \"user\" u ON er.user_id = u.id\n        WHERE er.event_id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "registration_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "event_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "user_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "first_name!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "infix",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "last_name!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "answers",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 7,
+        "name": "attended",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 8,
+        "name": "waiting_list_position",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 9,
+        "name": "created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 10,
+        "name": "updated",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      null,
+      null,
+      null,
+      false,
+      true,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "a26c60b0540a9784d7500bf12c7a1a36f540c3cc8a3ac804903214ae149a722c"
+}
