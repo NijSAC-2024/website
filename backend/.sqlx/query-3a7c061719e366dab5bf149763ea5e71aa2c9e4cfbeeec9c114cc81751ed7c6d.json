@@ -1,0 +1,94 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            er.id,\n            er.event_id,\n            er.user_id as \"user_id?\",\n            er.guest_name as \"guest_name?\",\n            er.guest_email as \"guest_email?\",\n            u.first_name as \"first_name?\",\n            u.infix as \"infix?\",\n            u.last_name as \"last_name?\",\n            er.attended,\n            er.waiting_list_position,\n            er.answers,\n            er.created,\n            er.updated\n        FROM event_registration er\n            LEFT JOIN \"user\" u ON er.user_id = u.id\n        WHERE er.id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "event_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "user_id?",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 3,
+        "name": "guest_name?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "guest_email?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "first_name?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "infix?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "last_name?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "attended",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 9,
+        "name": "waiting_list_position",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 10,
+        "name": "answers",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 11,
+        "name": "created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 12,
+        "name": "updated",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      true,
+      false,
+      true,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "3a7c061719e366dab5bf149763ea5e71aa2c9e4cfbeeec9c114cc81751ed7c6d"
+}
