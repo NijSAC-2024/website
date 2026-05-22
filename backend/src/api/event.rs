@@ -209,7 +209,7 @@ pub async fn get_registration(
     let registration = store.get_registration(&registration_id).await?;
 
     if let Some(ref user_id) = registration.user.user_id {
-        has_registration_access(&store, &user_id, &session, Some(&event_id)).await?;
+        has_registration_access(&store, user_id, &session, Some(&event_id)).await?;
     }
     Ok(Json(registration))
 }
@@ -307,13 +307,13 @@ pub async fn update_registration(
     let registration = store.get_registration(&registration_id).await?;
 
     if is_admin_or_board(&session).is_err() {
-        let Some(user_id) = registration.user.user_id.clone() else {
+        let Some(ref user_id) = registration.user.user_id else {
             return Err(Error::BadRequest(
                 "Only admins can update anonymous sign-ups",
             ));
         };
 
-        has_registration_access(&store, &user_id, &session, Some(&event_id)).await?;
+        has_registration_access(&store, user_id, &session, Some(&event_id)).await?;
     }
 
     let event = store.get_event(&registration.event_id, true).await?;
