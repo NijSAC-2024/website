@@ -36,8 +36,8 @@ export default function RegistrationsCard() {
   const currentEvent = useEvent(eventId);
 
   const [registerDialogOpen, setRegisterDialogOpen] = useState(false);
-  const [selectedRegistration, setSelectedRegistration] = useState<Registration | null>(null);
-  const [selectedUser, setSelectedUser] = useState<BasicUser | null>(null);
+  const [selectedRegistration, setSelectedRegistration] = useState<Registration | undefined>(undefined);
+  const [selectedUser, setSelectedUser] = useState<BasicUser | undefined>(undefined);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -48,31 +48,31 @@ export default function RegistrationsCard() {
   const toggleRegisterDialog = () => setRegisterDialogOpen((prev) => !prev);
 
   const handleEditClick = (registration: Registration) => {
-    setSelectedUser(null);
+    setSelectedUser(undefined);
     setSelectedRegistration(registration);
     setRegisterDialogOpen(true);
   };
 
-  const handleRegistration = async (answers: Answer[], registrationId?: string, userId?: string, waitingListPosition?: number) => {
+  const handleRegistration = async (answers: Answer[], registrationId?: string, userId?: string, waitingListPosition?: number, guestName?: string, guestEmail?: string) => {
     if (registrationId) {
-      await updateRegistration(currentEvent.id, registrationId, answers, undefined, waitingListPosition);
+      await updateRegistration(currentEvent.id, registrationId, answers, undefined, waitingListPosition, guestName, guestEmail);
     } else {
-      await createRegistration(currentEvent.id, userId || null, answers);
+      await createRegistration(currentEvent.id, answers, userId, guestName, guestEmail);
     }
     setRegisterDialogOpen(false);
-    setSelectedRegistration(null);
-    setSelectedUser(null);
+    setSelectedRegistration(undefined);
+    setSelectedUser(undefined);
   };
 
   const handleDeregisterClick = () => setConfirmOpen(true);
 
   const handleConfirmDeregister = async () => {
     if (selectedRegistration) {
-      await deleteRegistration(currentEvent.id, selectedRegistration.registrationId, user?.id);
+      await deleteRegistration(currentEvent.id, selectedRegistration.id, user?.id);
     }
     setConfirmOpen(false);
     setRegisterDialogOpen(false);
-    setSelectedRegistration(null);
+    setSelectedRegistration(undefined);
   };
 
   const copyTableToClipboard = async () => {
@@ -83,7 +83,7 @@ export default function RegistrationsCard() {
 
     const rows = eventRegistrations?.map((registration) => {
       const answers = currentEvent.questions.map((question) => {
-        const answer = registration.answers.find(
+        const answer = registration.answers?.find(
           (a) => a.questionId === question.id
         )?.answer;
         return answer ?? '';

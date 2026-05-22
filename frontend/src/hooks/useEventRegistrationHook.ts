@@ -32,14 +32,19 @@ export function useEventRegistrationHook() {
   const createRegistrationMutation = useMutation<
     Registration,
     ApiError,
-    { eventId: string; userId: string | null; answers: Answer[] }
+    { eventId: string;
+      answers: Answer[];
+      userId?: string;
+      guestName?: string,
+      guestEmail?: string
+    }
   >({
-    mutationFn: async ({ eventId, userId, answers }) => {
+    mutationFn: async ({ eventId, answers, userId, guestName, guestEmail }) => {
       return apiFetch<Registration>(
         `/event/${eventId}/registration`,
         {
           method: 'POST',
-          body: JSON.stringify({ userId, answers }),
+          body: JSON.stringify({ guestName, guestEmail, userId, answers }),
         }
       );
     },
@@ -55,13 +60,17 @@ export function useEventRegistrationHook() {
   });
   const createRegistration = (
     eventId: string,
-    userId: string | null,
-    answers: Answer[]
+    answers: Answer[],
+    userId?: string,
+    guestName?: string,
+    guestEmail?: string
   ) =>
     createRegistrationMutation.mutateAsync({
       eventId,
-      userId,
       answers,
+      userId,
+      guestName,
+      guestEmail,
     });
 
   const updateRegistrationMutation = useMutation<
@@ -70,6 +79,8 @@ export function useEventRegistrationHook() {
     {
       eventId: string;
       registrationId: string;
+      guestName?: string;
+      guestEmail?: string;
       answers: Answer[];
       attended?: boolean;
       waitingListPosition?: number;
@@ -78,6 +89,8 @@ export function useEventRegistrationHook() {
     mutationFn: async ({
       eventId,
       registrationId,
+      guestName,
+      guestEmail,
       answers,
       attended,
       waitingListPosition,
@@ -87,6 +100,8 @@ export function useEventRegistrationHook() {
         {
           method: 'PUT',
           body: JSON.stringify({
+            guestName,
+            guestEmail,
             answers,
             attended,
             waitingListPosition,
@@ -110,11 +125,15 @@ export function useEventRegistrationHook() {
     registrationId: string,
     answers: Answer[],
     attended?: boolean,
-    waitingListPosition?: number
+    waitingListPosition?: number,
+    guestName?: string,
+    guestEmail?: string
   ) =>
     updateRegistrationMutation.mutateAsync({
       eventId,
       registrationId,
+      guestName,
+      guestEmail,
       answers,
       attended,
       waitingListPosition,

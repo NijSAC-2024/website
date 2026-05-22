@@ -1,8 +1,5 @@
 use crate::{
-    api::{
-        ApiResult, NON_MEMBER_EMAIL_QUESTION_ID, NON_MEMBER_NAME_QUESTION_ID, ValidatedJson,
-        conditional_json_response, is_admin_or_board,
-    },
+    api::{ApiResult, ValidatedJson, conditional_json_response, is_admin_or_board},
     auth::{
         role::{Membership, Status},
         session::Session,
@@ -211,8 +208,8 @@ pub async fn get_registration(
 ) -> ApiResult<Registration> {
     let registration = store.get_registration(&registration_id).await?;
 
-    if let Some(ref user) = registration.user {
-        has_registration_access(&store, &user.id, &session, Some(&event_id)).await?;
+    if let Some(ref user_id) = registration.user.user_id {
+        has_registration_access(&store, &user_id, &session, Some(&event_id)).await?;
     }
     Ok(Json(registration))
 }
@@ -254,27 +251,6 @@ pub async fn create_registration(
             "Cannot sign up for an event that does not accept NonMembers"
         );
         return Err(Error::Unauthorized);
-    } else {
-        let non_member_name_question_id = Uuid::parse_str(NON_MEMBER_NAME_QUESTION_ID)
-            .expect("NON_MEMBER_NAME_QUESTION_ID must be a valid UUID");
-        let non_member_email_question_id = Uuid::parse_str(NON_MEMBER_EMAIL_QUESTION_ID)
-            .expect("NON_MEMBER_EMAIL_QUESTION_ID must be a valid UUID");
-
-        let has_non_member_name = new.answers.iter().any(|answer| {
-            answer.question_id == non_member_name_question_id && !answer.answer.trim().is_empty()
-        });
-
-        if !has_non_member_name {
-            return Err(Error::BadRequest("Missing non-member name"));
-        }
-
-        let has_non_member_email = new.answers.iter().any(|answer| {
-            answer.question_id == non_member_email_question_id && !answer.answer.trim().is_empty()
-        });
-
-        if !has_non_member_email {
-            return Err(Error::BadRequest("Missing non-member email"));
-        }
     }
 
     if event.content.registration_period.is_none() {
@@ -331,7 +307,7 @@ pub async fn update_registration(
     let registration = store.get_registration(&registration_id).await?;
 
     if is_admin_or_board(&session).is_err() {
-        let Some(user_id) = registration.user.as_ref().map(|u| u.id.clone()) else {
+        let Some(user_id) = registration.user.user_id.clone() else {
             return Err(Error::BadRequest(
                 "Only admins can update anonymous sign-ups",
             ));
@@ -376,7 +352,7 @@ pub async fn delete_registration(
         store.delete_registration(&registration_id).await
     } else {
         let registration = store.get_registration(&registration_id).await?;
-        if let Some(user_id) = registration.user.as_ref().map(|u| u.id.clone()) {
+        if let Some(user_id) = registration.user.user_id {
             // Normal users can only delete their own registration
             has_registration_access(&store, &user_id, &session, Some(&event_id)).await?;
         } else {

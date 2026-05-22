@@ -1,4 +1,4 @@
-import {Answer, ErrorType, Language, Question} from '../../types.ts';
+import {Answer, ErrorType, Language, Question, Registration} from '../../types.ts';
 import {
   Box,
   Button,
@@ -12,27 +12,28 @@ import {DateTimePicker} from '@mui/x-date-pickers/DateTimePicker';
 import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import moment from 'moment';
 import {FormEvent, useState} from 'react';
-import {NON_MEMBER_EMAIL_QUESTION_ID, NON_MEMBER_NAME_QUESTION_ID} from './registration.ts';
 import {emailValidator} from '../../validator.ts';
+import {useAuth} from '../../providers/AuthProvider.tsx';
 
 interface RegisterFormProps {
   registrationQuestions: Question[];
-  handleRegistration: (answers: Answer[]) => void;
-  existingAnswers?: Answer[];
-  requireNonMemberName: boolean;
+  handleRegistration: (answers: Answer[], guestName?: string, guestEmail?: string) => void;
+  registration?: Registration;
 }
 
 export default function RegisterForm({
   registrationQuestions,
   handleRegistration,
-  existingAnswers,
-  requireNonMemberName,
+  registration
 }: RegisterFormProps) {
   const {text, language} = useLanguage();
+  const {user} = useAuth();
+  const requireGuestName = !user || !!registration?.guestEmail
+
   const now = new Date()
   const [answers, setAnswers] = useState<Answer[]>(
     registrationQuestions.map((q) => {
-      const existingAnswer = existingAnswers?.find(
+      const existingAnswer = registration?.answers?.find(
         (a) => a.questionId === q.id
       );
       return (
@@ -51,14 +52,10 @@ export default function RegisterForm({
 
 
   const [errors, setErrors] = useState<ErrorType[]>(Array(registrationQuestions.length).fill(false));
-  const [nonMemberName, setNonMemberName] = useState<string>(() => (
-    existingAnswers?.find((answer) => answer.questionId === NON_MEMBER_NAME_QUESTION_ID)?.answer ?? ''
-  ));
-  const [nonMemberEmail, setNonMemberEmail] = useState<string>(() => (
-    existingAnswers?.find((answer) => answer.questionId === NON_MEMBER_EMAIL_QUESTION_ID)?.answer ?? ''
-  ));
-  const [nonMemberNameError, setNonMemberNameError] = useState<ErrorType>(false);
-  const [nonMemberEmailError, setNonMemberEmailError] = useState<ErrorType>(false);
+  const [guestName, setGuestName] = useState<string | undefined>(registration?.firstName);
+  const [guestEmail, setGuestEmail] = useState<string | undefined>(registration?.guestEmail);
+  const [guestNameError, setGuestNameError] = useState<ErrorType>(false);
+  const [guestEmailError, setGuestEmailError] = useState<ErrorType>(false);
   moment.locale(language);
 
   const validateInputs = () => {
@@ -74,63 +71,59 @@ export default function RegisterForm({
     });
 
     setErrors(newErrors);
-    if (requireNonMemberName && nonMemberName.trim() === '') {
-      setNonMemberNameError({
+    if (requireGuestName && guestName?.trim() === '') {
+      setGuestNameError({
         en: 'This field is required',
         nl: 'Dit veld is verplicht'
       });
     } else {
-      setNonMemberNameError(false);
+      setGuestNameError(false);
     }
-    if (requireNonMemberName && nonMemberEmail.trim() === '') {
-      setNonMemberEmailError({
+    if (requireGuestName && guestEmail?.trim() === '') {
+      setGuestEmailError({
         en: 'This field is required',
         nl: 'Dit veld is verplicht'
       });
-    } else if (requireNonMemberName) {
-      setNonMemberEmailError(emailValidator(nonMemberEmail));
+    } else if (requireGuestName && guestEmail) {
+      setGuestEmailError(emailValidator(guestEmail));
     } else {
-      setNonMemberEmailError(false);
+      setGuestEmailError(false);
     }
   };
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
-    if (Object.values(errors).some((v) => v) || !!nonMemberNameError || !!nonMemberEmailError) {
+    if (Object.values(errors).some((v) => v) || !!guestNameError || !!guestEmailError) {
       return;
     }
-    const filteredAnswers = answers.filter((answer) => answer.questionId !== NON_MEMBER_NAME_QUESTION_ID && answer.questionId !== NON_MEMBER_EMAIL_QUESTION_ID && answer.answer.trim() !== '');
-    const finalAnswers = requireNonMemberName
-      ? [...filteredAnswers, {questionId: NON_MEMBER_NAME_QUESTION_ID, answer: nonMemberName.trim()}, {questionId: NON_MEMBER_EMAIL_QUESTION_ID, answer: nonMemberEmail.trim()}]
-      : filteredAnswers;
-    handleRegistration(finalAnswers);
+    handleRegistration(answers.filter(answer => answer.answer.trim() !== ''), guestName, guestEmail);
   }
 
   return (
     <Box className="grid gap-3" component="form" onSubmit={handleSubmit}>
-      {requireNonMemberName && (
+      {requireGuestName && (
         <>
           <FormControl fullWidth>
             <TextField
               label={`${text('Name', 'Naam')} *`}
-              value={nonMemberName}
+              value={guestName}
               onChange={(event) => {
-                setNonMemberName(event.target.value);
+                setGuestName(event.target.value);
               }}
-              error={!!nonMemberNameError}
-              helperText={nonMemberNameError && text(nonMemberNameError as Language)}
+              error={!!guestNameError}
+              helperText={guestNameError && text(guestNameError as Language)}
               fullWidth
             />
           </FormControl>
           <FormControl fullWidth>
             <TextField
               label={`${text('Email', 'Email')} *`}
-              value={nonMemberEmail}
+              value={guestEmail}
               onChange={(event) => {
-                setNonMemberEmail(event.target.value);
+                setGuestEmail(event.target.value);
               }}
-              error={!!nonMemberEmailError}
-              helperText={nonMemberEmailError && text(nonMemberEmailError as Language)}
+              error={!!guestEmailError}
+              helperText={guestEmailError && text(guestEmailError as Language)}
               fullWidth
             />
           </FormControl>
@@ -253,8 +246,8 @@ export default function RegisterForm({
         onClick={validateInputs}
       >
         {text(
-          existingAnswers ? 'Update Registration' : 'Register',
-          existingAnswers ? 'Inschrijving bijwerken' : 'Inschrijven'
+          registration ? 'Update Registration' : 'Register',
+          registration ? 'Inschrijving bijwerken' : 'Inschrijven'
         )}
       </Button>
     </Box>

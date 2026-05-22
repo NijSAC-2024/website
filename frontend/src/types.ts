@@ -62,14 +62,19 @@ export interface DateType {
   end: string;
 }
 
-export interface Registration extends Partial<BasicUser> {
-  registrationId: string;
+export interface Registration extends RegistrationUser{
+  id: string;
   eventId: string;
+  guestEmail?: string;
   attended?: boolean;
   waitingListPosition?: number;
-  answers: Array<Answer>;
-  created: string;
-  updated: string;
+  answers?: Answer[];
+  created?: string;
+  updated?: string;
+}
+
+export interface RegistrationUser extends Omit<BasicUser, 'id'>{
+  userId?: string;
 }
 
 export interface Answer {

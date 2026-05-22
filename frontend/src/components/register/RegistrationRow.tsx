@@ -8,7 +8,6 @@ import {useUserHook} from '../../hooks/useUserHook.ts';
 import {useEventRegistrationHook} from '../../hooks/useEventRegistrationHook.ts';
 import {useNavigate, useParams} from 'react-router-dom';
 import {useAuth} from '../../providers/AuthProvider.tsx';
-import {NON_MEMBER_EMAIL_QUESTION_ID} from './registration.ts';
 import {useLanguage} from '../../providers/LanguageProvider.tsx';
 
 interface RegistrationRowProps {
@@ -32,20 +31,19 @@ export default function RegistrationRow({registration, onEditClick}: Registratio
   }
 
   const canViewDetailedRegistration = !!user && (isAdminOrBoard(user.roles) || isWorga(currentEvent, user) || inCommittee(myCommittees, currentEvent.createdBy));
-  const canManageRegistration = !!user && (isAdminOrBoard(user.roles) || (isChair(myCommittees, currentEvent.createdBy) && !!registration.id));
-  const nonMember = registration.lastName === '';
-  const displayName = `${registration.firstName} ${registration.infix ?? ''} ${registration.lastName} ${nonMember && canViewDetailedRegistration? text('(Non Member)', '(Niet lid)') : ''}`;
+  const canManageRegistration = !!user && (isAdminOrBoard(user.roles) || (isChair(myCommittees, currentEvent.createdBy)));
+  const displayName = `${registration.firstName} ${registration.infix ?? ''} ${registration.lastName} ${canViewDetailedRegistration && !!registration.guestEmail? `(${registration.guestEmail})` : ''}`;
 
   return (
-    <TableRow sx={{'&:last-child td, &:last-child th': {border: 0}}}>
+    <TableRow sx={{'&:last-child td, &:last-child th': {border: 0}}} key={registration.id}>
       <TableCell>
         {<p className="hover:cursor-pointer hover:opacity-60 transition-all duration-100"
-          onClick={() => registration.id && user && navigate(`/user/${registration.id}`)}>
-          <Tooltip title={canViewDetailedRegistration && nonMember ? registration.answers.find(answer => answer.questionId === NON_MEMBER_EMAIL_QUESTION_ID)?.answer ?? '' : ''}>
+          onClick={() => registration.userId && user && navigate(`/user/${registration.userId}`)}>
+          <Tooltip title={canViewDetailedRegistration && registration.waitingListPosition !== null ? `${text('Queue position: ', 'Wachtlijst positie:')} ${registration.waitingListPosition}` : ''}>
             <span>
-              {canViewDetailedRegistration && registration.waitingListPosition !== undefined ? (
+              {canViewDetailedRegistration && registration.waitingListPosition !== null ? (
                 <span className="text-[#1976d2] dark:text-[#90caf9]">
-                  {displayName}
+                  {`${displayName}`}
                 </span>
               ) : (
                 displayName
@@ -60,13 +58,13 @@ export default function RegistrationRow({registration, onEditClick}: Registratio
 
         if (q.questionType.type === 'boolean') {
           return <TableCell
-            key={`${registration.registrationId}-${q.id}`}>{answer === 'true' ? '✔️' : '❌'}</TableCell>;
+            key={`${registration.id}-${q.id}`}>{answer === 'true' ? '✔️' : '❌'}</TableCell>;
         }
         if (q.questionType.type === 'date') {
           return <TableCell
-            key={`${registration.registrationId}-${q.id}`}>{moment(answer).format('DD MMM HH:mm')}</TableCell>;
+            key={`${registration.id}-${q.id}`}>{moment(answer).format('DD MMM HH:mm')}</TableCell>;
         }
-        return <TableCell key={`${registration.registrationId}-${q.id}`}>{answer || ''}</TableCell>;
+        return <TableCell key={`${registration.id}-${q.id}`}>{answer || ''}</TableCell>;
       })}
 
       {(canManageRegistration) && (
@@ -80,7 +78,7 @@ export default function RegistrationRow({registration, onEditClick}: Registratio
           >
             <Checkbox
               checked={registration.attended || false}
-              onChange={(_, checked) => updateRegistration(currentEvent.id, registration.registrationId, registration.answers, checked, registration.waitingListPosition)}
+              onChange={(_, checked) => updateRegistration(currentEvent.id, registration.id, registration.answers ?? [], checked, registration.waitingListPosition)}
               disabled={!canManageRegistration}
             />
           </TableCell>

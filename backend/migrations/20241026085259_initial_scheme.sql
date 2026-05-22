@@ -138,10 +138,11 @@ create table event --event base
 
 create table event_registration
 (
-    registration_id       uuid        not null primary key,
+    id                    uuid        not null primary key,
     event_id              uuid        not null references event (id) on delete cascade,
     user_id               uuid        references "user" (id) on delete SET NULL,
-
+    guest_name            text,
+    guest_email           text,
     -- Answers to the questions. Example scheme:
     -- [
     --   {
@@ -158,8 +159,12 @@ create table event_registration
     updated               timestamptz not null,
     constraint user_can_register_only_once
         unique (event_id, user_id),
+    constraint guest_can_register_only_once
+        unique (event_id, guest_email),
     constraint consistent_waiting_list
-        unique (event_id, waiting_list_position)
+        unique (event_id, waiting_list_position),
+    constraint guest_info_required
+        check ((user_id is not null) or (guest_name is not null and guest_email is not null))
 );
 
 create type basic_user as

@@ -8,9 +8,9 @@ interface RegistrationDialogProps {
   toggleDialog: () => void;
   name: Language;
   questions: Question[];
-  selectedRegistration: Registration | null;
-  selectedUser: BasicUser | null;
-  handleRegistration: (answers: Answer[], registrationId?: string, userId?: string, waitingListPosition?: number) => void;
+  selectedRegistration: Registration | undefined;
+  selectedUser: BasicUser | undefined;
+  handleRegistration: (answers: Answer[], registrationId?: string, userId?: string, waitingListPosition?: number, guestName?: string, guestEmail?: string) => void;
   handleDeregisterClick: () => void;
 }
 
@@ -44,11 +44,10 @@ export default function RegistrationDialog({
           </p>
           <RegisterForm
             registrationQuestions={questions}
-            handleRegistration={(answers: Answer[]) =>
-              handleRegistration(answers, selectedRegistration?.registrationId, selectedUser?.id, selectedRegistration?.waitingListPosition)
+            handleRegistration={(answers: Answer[], guestName, guestEmail) =>
+              handleRegistration(answers, selectedRegistration?.id, selectedUser?.id, selectedRegistration?.waitingListPosition, guestName, guestEmail)
             }
-            existingAnswers={selectedRegistration?.answers}
-            requireNonMemberName={selectedRegistration?.lastName === ''}
+            registration={selectedRegistration}
           />
         </div>
       </DialogContent>

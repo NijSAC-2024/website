@@ -36,7 +36,7 @@ export default function RegisterButton({
   if (!event || !event.registrationPeriod) {
     return null;
   }
-  const registration = userEventRegistrations?.find((r) => r.eventId === eventId) || null;
+  const registration = userEventRegistrations?.find((r) => r.eventId === eventId) || undefined;
 
   const toggleDialog = () => setDialogOpen((prevState) => !prevState);
 
@@ -46,21 +46,21 @@ export default function RegisterButton({
   const openTime = new Date(event.registrationPeriod.start);
   const closeTime = new Date(event.registrationPeriod.end);
 
-  const handleRegistration = async (answers: Answer[], registrationId: string | null) => {
-    if (registrationId) {
-      await updateRegistration(eventId, registrationId, answers);
+  const handleRegistration = async (answers: Answer[], guestName?: string, guestEmail?: string) => {
+    if (registration?.id) {
+      await updateRegistration(eventId, registration.id, answers, registration?.attended, registration?.waitingListPosition, guestName, guestEmail);
     } else {
-      await createRegistration(eventId, user?.id || null, answers);
+      await createRegistration(eventId, answers, user?.id, guestName, guestEmail);
     }
     toggleRegisterDialog();
   };
 
   const handleRegistrationClick = async () => {
-    if (event.questions.length === 0) {
+    if (!!user && event.questions.length === 0) {
       if (registration) {
         toggleDialog();
       } else {
-        await createRegistration(eventId, user?.id || null, []);
+        await createRegistration(eventId, [], user?.id);
       }
     } else {
       toggleRegisterDialog();
@@ -110,13 +110,13 @@ export default function RegisterButton({
   const renderRegistrationStatus = () => {
     if (registration) {
       if (closeTime < now && user && !isAdminOrBoard(user.roles)) {
-        if (registration?.waitingListPosition !== undefined) {
+        if (registration?.waitingListPosition !== null) {
           return <Button variant="contained" disabled>{text('In Queue', 'Op de wachtlijst')}</Button>;
         } else {
           return <Button variant="contained" disabled>{text('Registered', 'Ingeschreven')}</Button>;
         }
       } else {
-        if (registration?.waitingListPosition !== undefined) {
+        if (registration?.waitingListPosition !== null) {
           return <Button variant="contained"
             onClick={handleRegistrationClick}>{text('In Queue', 'Op de wachtlijst')}</Button>;
         } else {
@@ -200,16 +200,15 @@ export default function RegisterButton({
                 {` ${text('There are', 'Er staan')} ${event.waitingListCount} ${text('people in the queue.', 'mensen op de wachtlijst')}`}
               </b>
             )}
-            {registration && registration?.waitingListPosition != undefined && (
+            {registration && registration?.waitingListPosition !== null && registration?.waitingListPosition !== undefined && (
               <b>
                 {`${text('You are at position', 'Je staat op positie')} ${registration?.waitingListPosition + 1} ${text('in the waiting queue.', 'op de wachtlijst.')}`}
               </b>
             )}
             <RegisterForm
               registrationQuestions={event.questions}
-              handleRegistration={(answers) => handleRegistration(answers, registration?.registrationId || null)}
-              existingAnswers={registration?.answers}
-              requireNonMemberName={!user}
+              handleRegistration={(answers, guestName, guestEmail) => handleRegistration(answers, guestName, guestEmail)}
+              registration={registration}
             />
           </div>
         </DialogContent>
@@ -217,7 +216,7 @@ export default function RegisterButton({
           {registration ? (
             <div className="flex justify-between w-full">
               <Button color="error" variant="outlined"
-                onClick={toggleDialog}>{registration.waitingListPosition != undefined ? text('Deregister from queue', 'Uitschrijven van wachtlijst') : text('Deregister', 'Uitschrijven')}</Button>
+                onClick={toggleDialog}>{registration.waitingListPosition !== null ? text('Deregister from queue', 'Uitschrijven van wachtlijst') : text('Deregister', 'Uitschrijven')}</Button>
               <Button onClick={toggleRegisterDialog}>{text('Close', 'Sluit')}</Button>
             </div>
           ) : (
@@ -228,7 +227,7 @@ export default function RegisterButton({
       <AreYouSure
         open={dialogOpen}
         onCancel={toggleDialog}
-        onConfirm={() => handleDeleteRegistration(registration!.registrationId)}
+        onConfirm={() => handleDeleteRegistration(registration!.id)}
         message={text(
           'You are about to deregister for this event.',
           'Je staat op het punt je uit te schrijven voor dit evenement.'
