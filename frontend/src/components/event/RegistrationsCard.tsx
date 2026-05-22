@@ -1,5 +1,5 @@
 import ContentCard from '../ContentCard.tsx';
-import {Box, FormControl} from '@mui/material';
+import {Box, FormControl, IconButton, Tooltip} from '@mui/material';
 import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import {Answer, BasicUser, Registration} from '../../types.ts';
 import {useState} from 'react';
@@ -7,7 +7,7 @@ import AreYouSure from '../AreYouSure.tsx';
 import RegistrationTable from '../register/RegistrationTable.tsx';
 import RegistrationDialog from '../register/RegistrationDialog.tsx';
 import RegisterUserAutocomplete from '../register/RegisterUserAutocomplete.tsx';
-import {isAdminOrBoard, isChair} from '../../util.ts';
+import {inCommittee, isAdminOrBoard, isChair, isWorga} from '../../util.ts';
 import AccessAlarmIcon from '@mui/icons-material/AccessAlarm';
 import moment from 'moment';
 import {useUserHook} from '../../hooks/useUserHook.ts';
@@ -16,6 +16,8 @@ import {useEventRegistrationHook} from '../../hooks/useEventRegistrationHook.ts'
 import {useParams} from 'react-router-dom';
 import {useAuth} from '../../providers/AuthProvider.tsx';
 import LoadingComponent from '../loading/LoadingComponent.tsx';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import CheckIcon from '@mui/icons-material/Check';
 
 export default function RegistrationsCard() {
   const {text} = useLanguage();
@@ -28,15 +30,16 @@ export default function RegistrationsCard() {
     deleteRegistration,
     createRegistration
   } = useEventRegistrationHook();
-  const params = useParams();
-  const eventRegistrations = useEventRegistrations(params.eventId)
+  const {eventId} = useParams();
+  const eventRegistrations = useEventRegistrations(eventId)
   const {useEvent} = useEventHook();
-  const currentEvent = useEvent(params.eventId);
+  const currentEvent = useEvent(eventId);
 
   const [registerDialogOpen, setRegisterDialogOpen] = useState(false);
-  const [selectedRegistration, setSelectedRegistration] = useState<Registration | null>(null);
-  const [selectedUser, setSelectedUser] = useState<BasicUser | null>(null);
+  const [selectedRegistration, setSelectedRegistration] = useState<Registration | undefined>(undefined);
+  const [selectedUser, setSelectedUser] = useState<BasicUser | undefined>(undefined);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   if (!currentEvent) {
     return <LoadingComponent/>
@@ -45,45 +48,86 @@ export default function RegistrationsCard() {
   const toggleRegisterDialog = () => setRegisterDialogOpen((prev) => !prev);
 
   const handleEditClick = (registration: Registration) => {
-    setSelectedUser(null);
+    setSelectedUser(undefined);
     setSelectedRegistration(registration);
     setRegisterDialogOpen(true);
   };
 
-  const handleRegistration = async (answers: Answer[], registrationId?: string, userId?: string, waitingListPosition?: number) => {
+  const handleRegistration = async (answers: Answer[], registrationId?: string, userId?: string, waitingListPosition?: number, guestName?: string, guestEmail?: string) => {
     if (registrationId) {
-      await updateRegistration(currentEvent.id, registrationId, answers, undefined, waitingListPosition);
+      await updateRegistration(currentEvent.id, registrationId, answers, undefined, waitingListPosition, guestName, guestEmail);
     } else {
-      await createRegistration(currentEvent.id, userId || null, answers);
+      await createRegistration(currentEvent.id, answers, userId, guestName, guestEmail);
     }
     setRegisterDialogOpen(false);
-    setSelectedRegistration(null);
-    setSelectedUser(null);
+    setSelectedRegistration(undefined);
+    setSelectedUser(undefined);
   };
 
   const handleDeregisterClick = () => setConfirmOpen(true);
 
   const handleConfirmDeregister = async () => {
     if (selectedRegistration) {
-      await deleteRegistration(currentEvent.id, selectedRegistration.registrationId, user?.id);
+      await deleteRegistration(currentEvent.id, selectedRegistration.id, user?.id);
     }
     setConfirmOpen(false);
     setRegisterDialogOpen(false);
-    setSelectedRegistration(null);
+    setSelectedRegistration(undefined);
+  };
+
+  const copyTableToClipboard = async () => {
+    const headers = [
+      text('Name', 'Naam'),
+      ...currentEvent.questions.map((q) => text(q.question)),
+    ];
+
+    const rows = eventRegistrations?.map((registration) => {
+      const answers = currentEvent.questions.map((question) => {
+        const answer = registration.answers?.find(
+          (a) => a.questionId === question.id
+        )?.answer;
+        return answer ?? '';
+      });
+      return [
+        `${registration.firstName} ${registration?.infix ?? ''} ${registration?.lastName}`,
+        ...answers,
+      ];
+    });
+
+    const tableText = [
+      headers.join('\t'),
+      ...(rows ?? []).map((row) => row.join('\t')),
+    ].join('\n');
+
+    setCopied(true);
+
+    setTimeout(() => {
+      setCopied(false);
+    }, 3000);
+
+    await navigator.clipboard.writeText(tableText);
   };
 
   return (
     <>
       {eventRegistrations && currentEvent.registrationPeriod && (
-        <ContentCard className="xl:col-span-3">
-          <h1>{text('Registrations', 'Inschrijvingen')}</h1>
+        <ContentCard className="xl:col-span-3 min-w-0">
+          <div className="flex justify-between items-center">
+            <h1>{text('Registrations', 'Inschrijvingen')}</h1>
+            {user && (isAdminOrBoard(user.roles) || isWorga(currentEvent, user) || inCommittee(myCommittees, currentEvent.createdBy)) && (
+              <Tooltip title={text('Copy Table', 'Kopieer Tabel')}>
+                <IconButton onClick={copyTableToClipboard}>
+                  {copied ? <CheckIcon /> : <ContentCopyIcon />}
+                </IconButton>
+              </Tooltip>
+            )}
+          </div>
           <p>
             <AccessAlarmIcon className=" mr-2"/>
-            {text('Registrations close at ', 'Inschrijvingen sluiten op ')}
-            {moment(currentEvent.registrationPeriod.end).format('DD MMM HH:mm')}
+            {`${text('Registrations close at ', 'Inschrijvingen sluiten op ')} ${moment(currentEvent.registrationPeriod.end).format('DD MMM HH:mm')}.`}
           </p>
 
-          {user && (isAdminOrBoard(user.roles) || isChair(myCommittees ?? [], currentEvent.createdBy)) && (
+          {user && (isAdminOrBoard(user.roles) || isChair(myCommittees, currentEvent.createdBy)) && (
             <Box className="mt-2 grid" component="form" onSubmit={(e) => {
               e.preventDefault();
               toggleRegisterDialog();
@@ -105,7 +149,7 @@ export default function RegistrationsCard() {
               onEditClick={handleEditClick}
             />
           ) : (
-            <p className="mt-2">{text('No registrations yet', 'Nog geen deelnemers')}</p>
+            <p className="mt-2">{text('No registrations yet.', 'Nog geen deelnemers.')}</p>
           )}
         </ContentCard>
       )}

@@ -11,13 +11,13 @@ import {useAuth} from '../../providers/AuthProvider.tsx';
 
 export default function UserCommittees() {
   const {text} = useLanguage();
-  const params = useParams();
+  const {userId} = useParams();
   const {useUserCommittees} = useUserHook();
   const {user} = useAuth()
   const [filterLeftCommittees, setFilterLeftCommittees] = useState<boolean>(false);
   const {useCommittees} = useCommitteeHook();
   const committees = useCommittees()
-  const currentCommittees = useUserCommittees(params.userId)
+  const currentCommittees = useUserCommittees(userId)
   const navigate = useNavigate();
 
   if (!committees || !currentCommittees || !user || user.status != 'accepted') {
@@ -30,7 +30,7 @@ export default function UserCommittees() {
     <>
       <ContentCard className="mt-5">
         <div className="grid xl:grid-cols-2 justify-between">
-          <h1>{params.userId === user.id ? text('My committees', 'Mijn commissies') : text('Committees', 'Commissies')}</h1>
+          <h1>{userId === user.id ? text('My committees', 'Mijn commissies') : text('Committees', 'Commissies')}</h1>
           <div className="flex items-center xl:justify-end">
             <p>{text('Include left committees', 'Uitgetreden commissies meenemen')}</p>
             <Switch

@@ -18,8 +18,6 @@ use time::OffsetDateTime;
 use tracing::{debug, info, trace, warn};
 use uuid::Uuid;
 
-const NON_MEMBER_NAME_QUESTION_ID: &str = "8d3d4e48-4e8f-4e15-a7d9-6ff5e4c8e8ad";
-
 async fn has_registration_access(
     store: &EventStore,
     user_id: &UserId,
@@ -210,8 +208,8 @@ pub async fn get_registration(
 ) -> ApiResult<Registration> {
     let registration = store.get_registration(&registration_id).await?;
 
-    if let Some(ref user) = registration.user {
-        has_registration_access(&store, &user.id, &session, Some(&event_id)).await?;
+    if let Some(ref user_id) = registration.user.user_id {
+        has_registration_access(&store, user_id, &session, Some(&event_id)).await?;
     }
     Ok(Json(registration))
 }
@@ -253,15 +251,6 @@ pub async fn create_registration(
             "Cannot sign up for an event that does not accept NonMembers"
         );
         return Err(Error::Unauthorized);
-    } else {
-        let non_member_name_question_id = Uuid::parse_str(NON_MEMBER_NAME_QUESTION_ID)
-            .expect("NON_MEMBER_NAME_QUESTION_ID must be a valid UUID");
-        let has_non_member_name = new.answers.iter().any(|answer| {
-            answer.question_id == non_member_name_question_id && !answer.answer.trim().is_empty()
-        });
-        if !has_non_member_name {
-            return Err(Error::BadRequest("Missing non-member name"));
-        }
     }
 
     if event.content.registration_period.is_none() {
@@ -318,13 +307,13 @@ pub async fn update_registration(
     let registration = store.get_registration(&registration_id).await?;
 
     if is_admin_or_board(&session).is_err() {
-        let Some(user_id) = registration.user.as_ref().map(|u| u.id.clone()) else {
+        let Some(ref user_id) = registration.user.user_id else {
             return Err(Error::BadRequest(
                 "Only admins can update anonymous sign-ups",
             ));
         };
 
-        has_registration_access(&store, &user_id, &session, Some(&event_id)).await?;
+        has_registration_access(&store, user_id, &session, Some(&event_id)).await?;
     }
 
     let event = store.get_event(&registration.event_id, true).await?;
@@ -363,7 +352,7 @@ pub async fn delete_registration(
         store.delete_registration(&registration_id).await
     } else {
         let registration = store.get_registration(&registration_id).await?;
-        if let Some(user_id) = registration.user.as_ref().map(|u| u.id.clone()) {
+        if let Some(user_id) = registration.user.user_id {
             // Normal users can only delete their own registration
             has_registration_access(&store, &user_id, &session, Some(&event_id)).await?;
         } else {

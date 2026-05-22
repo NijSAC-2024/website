@@ -7,7 +7,6 @@ import {queryKeys} from '../queries.ts';
 
 interface AuthContextType {
   user: User | null | undefined;
-  isLoading: boolean;
 }
 
 interface AuthProviderProps {
@@ -35,7 +34,6 @@ export default function AuthProvider({ children }: AuthProviderProps) {
 
   const value: AuthContextType = {
     user: isLoading ? undefined : data ?? null,
-    isLoading,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

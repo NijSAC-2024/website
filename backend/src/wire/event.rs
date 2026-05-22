@@ -1,10 +1,4 @@
-use crate::{
-    Language,
-    auth::role::Membership,
-    error::Error,
-    file::FileId,
-    user::{BasicUser, UserId},
-};
+use crate::{Language, auth::role::Membership, error::Error, file::FileId, user::UserId};
 use derive_more::{Display, From, Into};
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
@@ -131,14 +125,14 @@ fn validate_date(event: &Date) -> Result<(), ValidationError> {
     }
 }
 
-#[skip_serializing_none]
 #[derive(Serialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Registration {
-    pub registration_id: RegistrationId,
+    pub id: RegistrationId,
     pub event_id: EventId,
+    pub guest_email: Option<String>,
     #[serde(flatten)]
-    pub user: Option<BasicUser>,
+    pub user: RegistrationUser,
     pub attended: Option<bool>,
     pub waiting_list_position: Option<i32>,
     pub answers: Vec<Answer>,
@@ -148,10 +142,21 @@ pub struct Registration {
     pub updated: OffsetDateTime,
 }
 
+#[derive(Serialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct RegistrationUser {
+    pub user_id: Option<UserId>,
+    pub first_name: String,
+    pub infix: Option<String>,
+    pub last_name: String,
+}
+
 #[derive(Deserialize, Debug, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct NewRegistration {
     pub user_id: Option<UserId>,
+    pub guest_name: Option<String>,
+    pub guest_email: Option<String>,
     pub answers: Vec<Answer>,
     pub attended: Option<bool>,
     pub waiting_list_position: Option<i32>,

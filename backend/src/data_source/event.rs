@@ -7,9 +7,9 @@ use crate::{
 use crate::{
     auth::{role::Membership, session::Session},
     error::AppResult,
-    event::{Date, NewRegistration, Registration, RegistrationId},
+    event::{Date, NewRegistration, Registration, RegistrationId, RegistrationUser},
     location::{Location, LocationContent, LocationId},
-    user::{BasicUser, UserId},
+    user::UserId,
 };
 use axum::{extract::FromRequestParts, http::request::Parts};
 use sqlx::{PgConnection, PgPool};
@@ -150,9 +150,11 @@ where
 }
 
 struct PgRegistration {
-    registration_id: Uuid,
+    id: Uuid,
     event_id: EventId,
     user_id: Option<Uuid>,
+    guest_name: Option<String>,
+    guest_email: Option<String>,
     first_name: Option<String>,
     infix: Option<String>,
     last_name: Option<String>,
@@ -166,26 +168,44 @@ struct PgRegistration {
 impl TryFrom<PgRegistration> for Registration {
     type Error = Error;
 
-    fn try_from(pg: PgRegistration) -> AppResult<Self> {
-        let user = if let Some(user_id) = pg.user_id {
-            Some(BasicUser {
-                id: user_id.into(),
-                first_name: pg.first_name.unwrap_or_default(),
-                infix: pg.infix,
-                last_name: pg.last_name.unwrap_or_default(),
-            })
-        } else {
-            None
+    fn try_from(pg: PgRegistration) -> AppResult<Registration> {
+        let user = RegistrationUser {
+            user_id: pg.user_id.map(Into::into),
+            first_name: pg.first_name.unwrap_or(pg.guest_name.unwrap_or_default()),
+            infix: pg.infix,
+            last_name: pg.last_name.unwrap_or_default(),
         };
-        Ok(Self {
-            registration_id: pg.registration_id.into(),
+        Ok(Registration {
+            id: pg.id.into(),
             event_id: pg.event_id,
+            guest_email: pg.guest_email,
             user,
             attended: pg.attended,
             waiting_list_position: pg.waiting_list_position,
             answers: serde_json::from_value(pg.answers)?,
             created: pg.created,
             updated: pg.updated,
+        })
+    }
+}
+
+struct PgRegistrationUser {
+    user_id: Option<Uuid>,
+    guest_name: Option<String>,
+    first_name: Option<String>,
+    infix: Option<String>,
+    last_name: Option<String>,
+}
+
+impl TryFrom<PgRegistrationUser> for RegistrationUser {
+    type Error = Error;
+
+    fn try_from(pg: PgRegistrationUser) -> AppResult<RegistrationUser> {
+        Ok(RegistrationUser {
+            user_id: pg.user_id.map(Into::into),
+            first_name: pg.first_name.unwrap_or(pg.guest_name.unwrap_or_default()),
+            infix: pg.infix,
+            last_name: pg.last_name.unwrap_or_default(),
         })
     }
 }
@@ -355,8 +375,8 @@ impl EventStore {
                    e.event_type,
                    e.questions,
                    e.metadata,
-                   count(r.registration_id) FILTER ( WHERE r.waiting_list_position IS NULL ) as "registration_count!",
-                   count(r.registration_id) FILTER ( WHERE r.waiting_list_position IS NOT NULL ) as "waiting_list_count!",
+                   count(r.id) FILTER ( WHERE r.waiting_list_position IS NULL ) as "registration_count!",
+                   count(r.id) FILTER ( WHERE r.waiting_list_position IS NOT NULL ) as "waiting_list_count!",
                    e.created_by,
                    e.created,
                    e.updated
@@ -405,8 +425,8 @@ impl EventStore {
                    e.event_type,
                    e.questions,
                    e.metadata,
-                   count(r.registration_id) FILTER ( WHERE r.waiting_list_position IS NULL ) as "registration_count!",
-                   count(r.registration_id) FILTER ( WHERE r.waiting_list_position IS NOT NULL ) as "waiting_list_count!",
+                   count(r.id) FILTER ( WHERE r.waiting_list_position IS NULL ) as "registration_count!",
+                   count(r.id) FILTER ( WHERE r.waiting_list_position IS NOT NULL ) as "waiting_list_count!",
                    e.created_by,
                    e.created,
                    e.updated
@@ -432,6 +452,7 @@ impl EventStore {
         mut updated: EventContent<LocationId>,
     ) -> AppResult<Event<Location>> {
         updated.dates.sort_by_key(|date| date.start);
+
         let (start_dates, end_dates) = updated.dates.into_iter().fold(
             (Vec::new(), Vec::new()),
             |(mut start_dates, mut end_dates), date| {
@@ -441,30 +462,43 @@ impl EventStore {
             },
         );
 
+        let mut tx = self.db.begin().await?;
+
+        let old_registration_max = sqlx::query_scalar!(
+            r#"
+        SELECT registration_max
+        FROM event
+        WHERE id = $1
+        "#,
+            **id
+        )
+        .fetch_one(&mut *tx)
+        .await?;
+
         sqlx::query!(
             r#"
-            UPDATE event SET
-                location_id = $2,
-                name_nl = $3,
-                name_en = $4,
-                image = $5,
-                start_dates = $6,
-                end_dates = $7,
-                description_nl = $8,
-                description_en = $9,
-                registration_start = $10,
-                registration_end = $11,
-                registration_max = $12,
-                waiting_list_max = $13,
-                is_published = $14,
-                required_membership = $15::membership[],
-                event_type = $16,
-                questions = $17,
-                metadata = $18,
-                created_by = $19,
-                updated = now()
-            WHERE id = $1
-            "#,
+        UPDATE event SET
+            location_id = $2,
+            name_nl = $3,
+            name_en = $4,
+            image = $5,
+            start_dates = $6,
+            end_dates = $7,
+            description_nl = $8,
+            description_en = $9,
+            registration_start = $10,
+            registration_end = $11,
+            registration_max = $12,
+            waiting_list_max = $13,
+            is_published = $14,
+            required_membership = $15::membership[],
+            event_type = $16,
+            questions = $17,
+            metadata = $18,
+            created_by = $19,
+            updated = now()
+        WHERE id = $1
+        "#,
             **id,
             *updated.location,
             updated.name.nl,
@@ -485,8 +519,14 @@ impl EventStore {
             updated.metadata,
             updated.created_by,
         )
-        .execute(&self.db)
+        .execute(&mut *tx)
         .await?;
+
+        if old_registration_max != updated.registration_max {
+            Self::recalculate_waiting_list(&mut tx, id).await?;
+        }
+
+        tx.commit().await?;
 
         self.get_event(id, true).await
     }
@@ -495,6 +535,69 @@ impl EventStore {
         sqlx::query!(r#"DELETE FROM event WHERE id = $1"#, **id)
             .execute(&self.db)
             .await?;
+        Ok(())
+    }
+
+    async fn recalculate_waiting_list(tx: &mut PgConnection, event_id: &EventId) -> AppResult<()> {
+        struct Registration {
+            id: Uuid,
+        }
+
+        let registration_max = sqlx::query_scalar!(
+            r#"
+        SELECT registration_max
+        FROM event
+        WHERE id = $1
+        "#,
+            **event_id
+        )
+        .fetch_one(&mut *tx)
+        .await?;
+
+        let registrations = sqlx::query_as!(
+            Registration,
+            r#"
+        SELECT id
+        FROM event_registration
+        WHERE event_id = $1
+        ORDER BY created
+        "#,
+            **event_id
+        )
+        .fetch_all(&mut *tx)
+        .await?;
+
+        sqlx::query!(
+            r#"
+        UPDATE event_registration
+        SET waiting_list_position = -waiting_list_position - 1
+        WHERE event_id = $1
+          AND waiting_list_position IS NOT NULL
+        "#,
+            **event_id
+        )
+        .execute(&mut *tx)
+        .await?;
+
+        for (index, registration) in registrations.into_iter().enumerate() {
+            let waiting_list_position = registration_max
+                .filter(|max| index >= *max as usize)
+                .map(|max| (index - max as usize) as i32);
+
+            sqlx::query!(
+                r#"
+            UPDATE event_registration
+            SET waiting_list_position = $2,
+                updated = now()
+            WHERE id = $1
+            "#,
+                registration.id,
+                waiting_list_position
+            )
+            .execute(&mut *tx)
+            .await?;
+        }
+
         Ok(())
     }
 
@@ -511,7 +614,7 @@ impl EventStore {
         if let Position { pos: Some(pos) } = sqlx::query_as!(
             Position,
             r#"
-            SELECT waiting_list_position as pos FROM event_registration WHERE registration_id = $1
+            SELECT waiting_list_position as pos FROM event_registration WHERE id = $1
             "#,
             **registration_id,
         )
@@ -522,7 +625,7 @@ impl EventStore {
                 r#"
                 UPDATE event_registration
                 SET waiting_list_position = null
-                WHERE registration_id = $1
+                WHERE id = $1
                 "#,
                 **registration_id,
             )
@@ -533,12 +636,14 @@ impl EventStore {
                 r#"
                 UPDATE event_registration
                 SET waiting_list_position = waiting_list_position - 1
-                WHERE event_id = (SELECT event_id FROM event_registration WHERE registration_id = $1)
+                WHERE event_id = (SELECT event_id FROM event_registration WHERE id = $1)
                   AND waiting_list_position > $2
                 "#,
                 **registration_id,
                 pos
-            ).execute(&mut *tx).await?;
+            )
+            .execute(&mut *tx)
+            .await?;
             Ok(Some(pos))
         } else {
             Ok(None)
@@ -557,7 +662,7 @@ impl EventStore {
         let Position { pos } = sqlx::query_as!(
             Position,
             r#"
-            SELECT waiting_list_position as pos FROM event_registration WHERE registration_id = $1
+            SELECT waiting_list_position as pos FROM event_registration WHERE id = $1
             "#,
             **registration_id,
         )
@@ -580,10 +685,10 @@ impl EventStore {
         } = sqlx::query_as!(
             Count,
             r#"
-            SELECT count(r.registration_id) FILTER ( WHERE r.waiting_list_position IS NOT NULL ) as "count!"
+            SELECT count(r.id) FILTER ( WHERE r.waiting_list_position IS NOT NULL ) as "count!"
             FROM event e
                 LEFT JOIN event_registration r ON r.event_id = e.id
-            WHERE e.id = (SELECT event_id FROM event_registration WHERE registration_id = $1)
+            WHERE e.id = (SELECT event_id FROM event_registration WHERE id = $1)
             GROUP BY e.id
             "#,
             **registration_id
@@ -600,7 +705,7 @@ impl EventStore {
                 UPDATE event_registration
                 SET waiting_list_position = $2,
                     updated = now()
-                WHERE registration_id = $1
+                WHERE id = $1
                 "#,
                 **registration_id,
                 new_waiting_list_pos
@@ -616,37 +721,47 @@ impl EventStore {
         Ok(())
     }
 
-    pub async fn get_registered_users(&self, id: &EventId) -> AppResult<Vec<BasicUser>> {
-        Ok(sqlx::query_as!(
-            BasicUser,
+    pub async fn get_registered_users(&self, id: &EventId) -> AppResult<Vec<RegistrationUser>> {
+        sqlx::query_as!(
+            PgRegistrationUser,
             r#"
-            SELECT u.id, u.first_name, u.infix, u.last_name
-            FROM event_registration ar
-                JOIN "user" u ON ar.user_id = u.id
-            WHERE ar.event_id = $1
-              AND ar.waiting_list_position IS NULL
-            "#,
+        SELECT
+            er.user_id as "user_id?",
+            er.guest_name as "guest_name?",
+            u.first_name as "first_name?",
+            u.infix as "infix?",
+            u.last_name as "last_name?"
+        FROM event_registration er
+            LEFT JOIN "user" u ON er.user_id = u.id
+        WHERE er.event_id = $1
+          AND er.waiting_list_position IS NULL
+        "#,
             **id
         )
         .fetch_all(&self.db)
-        .await?)
+        .await?
+        .into_iter()
+        .map(TryInto::try_into)
+        .collect()
     }
 
     pub async fn get_user_registrations(&self, user_id: &UserId) -> AppResult<Vec<Registration>> {
         sqlx::query_as!(
             PgRegistration,
             r#"
-            SELECT registration_id,
-                   event_id,
-                   user_id,
-                   u.first_name,
-                   u.infix,
-                   u.last_name,
-                   answers,
-                   attended,
-                   waiting_list_position,
-                   u.created,
-                   u.updated
+            SELECT r.id,
+                   r.event_id,
+                   r.user_id as "user_id?",
+                   r.guest_name as "guest_name?",
+                   r.guest_email as "guest_email?",
+                   u.first_name as "first_name?",
+                   u.infix as "infix?",
+                   u.last_name as "last_name?",
+                   r.attended,
+                   r.waiting_list_position,
+                   r.answers,
+                   r.created,
+                   r.updated
             FROM event_registration r
                 JOIN "user" u ON r.user_id = u.id
             WHERE user_id = $1
@@ -689,8 +804,8 @@ impl EventStore {
                e.event_type,
                e.questions,
                e.metadata,
-               count(r2.registration_id) FILTER (WHERE r2.waiting_list_position IS NULL) as "registration_count!",
-               count(r2.registration_id) FILTER (WHERE r2.waiting_list_position IS NOT NULL) as "waiting_list_count!",
+               count(r2.id) FILTER (WHERE r2.waiting_list_position IS NULL) as "registration_count!",
+               count(r2.id) FILTER (WHERE r2.waiting_list_position IS NOT NULL) as "waiting_list_count!",
                e.created_by,
                e.created,
                e.updated
@@ -710,27 +825,29 @@ impl EventStore {
             .map(TryInto::try_into)
             .collect()
     }
-
     pub async fn get_registrations_detailed(&self, id: &EventId) -> AppResult<Vec<Registration>> {
         sqlx::query_as!(
             PgRegistration,
             r#"
-            SELECT registration_id,
-                   event_id,
-                   user_id,
-                   u.first_name as "first_name?",
-                   u.infix,
-                   u.last_name as "last_name?",
-                   answers,
-                   attended,
-                   waiting_list_position,
-                   r.created,
-                   r.updated
-            FROM event_registration r
-                LEFT JOIN "user" u ON r.user_id = u.id
-            WHERE r.event_id = $1
-            "#,
-            **id
+        SELECT
+            er.id,
+            er.event_id,
+            er.user_id as "user_id?",
+            er.guest_name as "guest_name?",
+            er.guest_email as "guest_email?",
+            u.first_name as "first_name?",
+            u.infix as "infix?",
+            u.last_name as "last_name?",
+            er.attended,
+            er.waiting_list_position,
+            er.answers,
+            er.created,
+            er.updated
+        FROM event_registration er
+            LEFT JOIN "user" u ON er.user_id = u.id
+        WHERE er.event_id = $1
+        "#,
+            **id,
         )
         .fetch_all(&self.db)
         .await?
@@ -738,7 +855,6 @@ impl EventStore {
         .map(TryInto::try_into)
         .collect()
     }
-
     pub async fn get_registration(
         &self,
         registration_id: &RegistrationId,
@@ -746,24 +862,24 @@ impl EventStore {
         sqlx::query_as!(
             PgRegistration,
             r#"
-            SELECT registration_id,
-                   event_id,
-                   user_id,
-                   -- the `first_name` and `last_name` must be explicitly marked optional
-                   -- due to the LEFT JOIN, as otherwise sqlx infers that they are NOT NULL from
-                   -- the schema
-                   u.first_name as "first_name?",
-                   u.infix,
-                   u.last_name as "last_name?",
-                   answers,
-                   attended,
-                   waiting_list_position,
-                   r.created,
-                   r.updated
-            FROM event_registration r
-                LEFT JOIN "user" u ON r.user_id = u.id
-            WHERE registration_id = $1
-            "#,
+        SELECT
+            er.id,
+            er.event_id,
+            er.user_id as "user_id?",
+            er.guest_name as "guest_name?",
+            er.guest_email as "guest_email?",
+            u.first_name as "first_name?",
+            u.infix as "infix?",
+            u.last_name as "last_name?",
+            er.attended,
+            er.waiting_list_position,
+            er.answers,
+            er.created,
+            er.updated
+        FROM event_registration er
+            LEFT JOIN "user" u ON er.user_id = u.id
+        WHERE er.id = $1
+        "#,
             **registration_id,
         )
         .fetch_one(&self.db)
@@ -778,15 +894,17 @@ impl EventStore {
         user_id: Option<UserId>,
         new: NewRegistration,
     ) -> AppResult<Registration> {
-        let registration_id = sqlx::query_scalar!(
+        let registration_id : Uuid = sqlx::query_scalar!(
             r#"
-            INSERT INTO event_registration (registration_id, event_id, user_id, waiting_list_position, answers, created, updated)
-            VALUES  ($1, $2, $3, $4, $5, now(), now())
-            RETURNING registration_id
+            INSERT INTO event_registration (id, event_id, user_id, guest_name, guest_email, waiting_list_position, answers, created, updated)
+            VALUES  ($1, $2, $3, $4, $5, $6, $7, now(), now())
+            RETURNING id
             "#,
             Uuid::now_v7(),
             **event_id,
             user_id.map(|u| *u),
+            new.guest_name,
+            new.guest_email,
             new.waiting_list_position,
             serde_json::to_value(new.answers)?
         )
@@ -806,11 +924,15 @@ impl EventStore {
             UPDATE event_registration
             SET answers = $1,
                 attended = $2,
+                guest_name = $3,
+                guest_email = $4,
                 updated = now()
-            WHERE registration_id = $3
+            WHERE id = $5
             "#,
             serde_json::to_value(updated.answers)?,
             updated.attended,
+            updated.guest_name,
+            updated.guest_email,
             **registration_id,
         )
         .execute(&mut *tx)
@@ -823,7 +945,6 @@ impl EventStore {
 
         self.get_registration(registration_id).await
     }
-
     pub async fn delete_registration(&self, registration_id: &RegistrationId) -> AppResult<()> {
         let mut tx = self.db.begin().await?;
 
@@ -832,19 +953,33 @@ impl EventStore {
             .is_none()
         {
             let event_id = sqlx::query_scalar!(
-                r#"SELECT event_id FROM event_registration WHERE registration_id = $1"#,
+                r#"SELECT event_id FROM event_registration WHERE id = $1"#,
                 **registration_id,
             )
             .fetch_one(&mut *tx)
             .await?;
 
+            //TODO: make this work
             sqlx::query!(
                 r#"
-                UPDATE event_registration
-                SET waiting_list_position = null
-                WHERE event_id = $1
-                  AND waiting_list_position = 0
+                UPDATE event
+                SET metadata = metadata - 'worga'
+                WHERE id = $1
+                  AND metadata->>'worga' = $2
                 "#,
+                event_id,
+                registration_id.to_string(),
+            )
+            .execute(&mut *tx)
+            .await?;
+
+            sqlx::query!(
+                r#"
+            UPDATE event_registration
+            SET waiting_list_position = null
+            WHERE event_id = $1
+              AND waiting_list_position = 0
+            "#,
                 event_id
             )
             .execute(&mut *tx)
@@ -852,10 +987,10 @@ impl EventStore {
 
             sqlx::query!(
                 r#"
-                UPDATE event_registration
-                SET waiting_list_position = waiting_list_position - 1
-                WHERE event_id = $1
-                "#,
+            UPDATE event_registration
+            SET waiting_list_position = waiting_list_position - 1
+            WHERE event_id = $1
+            "#,
                 event_id
             )
             .execute(&mut *tx)
@@ -864,8 +999,8 @@ impl EventStore {
 
         sqlx::query!(
             r#"
-            DELETE FROM event_registration WHERE registration_id = $1
-            "#,
+        DELETE FROM event_registration WHERE id = $1
+        "#,
             **registration_id
         )
         .execute(&mut *tx)

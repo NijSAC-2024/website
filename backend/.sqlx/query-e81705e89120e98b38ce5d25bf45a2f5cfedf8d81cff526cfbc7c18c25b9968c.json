@@ -1,11 +1,11 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT event_id FROM event_registration WHERE registration_id = $1",
+  "query": "\n        SELECT id\n        FROM event_registration\n        WHERE event_id = $1\n        ORDER BY created\n        ",
   "describe": {
     "columns": [
       {
         "ordinal": 0,
-        "name": "event_id",
+        "name": "id",
         "type_info": "Uuid"
       }
     ],
@@ -18,5 +18,5 @@
       false
     ]
   },
-  "hash": "848d4d70da30b12b8fc2554d915251bdf1bcd65e385b0e839781f7785e2a7f87"
+  "hash": "e81705e89120e98b38ce5d25bf45a2f5cfedf8d81cff526cfbc7c18c25b9968c"
 }

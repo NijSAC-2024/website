@@ -7,17 +7,19 @@ import {useCommitteeHook} from '../../hooks/useCommitteeHook.ts';
 import {useNavigate, useParams} from 'react-router-dom';
 import {useEventHook} from '../../hooks/useEventHook.ts';
 import {useUserHook} from '../../hooks/useUserHook.ts';
+import {useAuth} from '../../providers/AuthProvider.tsx';
 
 export default function DescriptionCard() {
   const {text, language} = useLanguage();
   const {useCommittees} = useCommitteeHook();
-  const params = useParams();
+  const {eventId} = useParams();
   const {useEvent} = useEventHook();
-  const currentEvent = useEvent(params.eventId)
+  const currentEvent = useEvent(eventId)
   const committees = useCommittees()
   const navigate = useNavigate();
   const {useUser} = useUserHook()
   const worgaUser = useUser(currentEvent?.metadata?.worga);
+  const {user} = useAuth();
 
   if (!currentEvent) {
     return null;
@@ -92,16 +94,16 @@ export default function DescriptionCard() {
             </div>
           </div>
         )}
-        {currentEvent.eventType === 'weekend' && (
+        {currentEvent.eventType === 'weekend' && user && (
           <div>
             <b className="text-[#1976d2] dark:text-[#90caf9]">
               {text('Weekend Organiser', 'Worga')}
             </b>
             <div>
               <Chip
-                label={currentEvent.metadata?.worga === 'nobody' ? text('No one assigned', 'Niemand toegewezen') : `${worgaUser?.firstName} ${worgaUser?.infix ?? ''} ${worgaUser?.lastName}`}
+                label={!currentEvent.metadata?.worga ? text('No one assigned', 'Niemand toegewezen') : `${worgaUser?.firstName} ${worgaUser?.infix ?? ''} ${worgaUser?.lastName}`}
                 className="uppercase font-semibold"
-                onClick={() => navigate(`/user/${currentEvent?.metadata?.worga}`)}
+                onClick={() => currentEvent.metadata?.worga && navigate(`/user/${currentEvent?.metadata?.worga}`)}
                 size="small"
               />
             </div>

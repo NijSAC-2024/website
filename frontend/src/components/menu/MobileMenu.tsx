@@ -23,7 +23,11 @@ import {useNavigate} from 'react-router-dom';
 import {MenuType} from '../../types.ts';
 import {useAuth} from '../../providers/AuthProvider.tsx';
 
-export default function MobileMenu({setShowLogin}: { setShowLogin: (show: boolean) => void }) {
+interface MobileMenuProps {
+  setShowLogin: (show: boolean) => void;
+}
+
+export default function MobileMenu({setShowLogin}: MobileMenuProps) {
   const {text} = useLanguage();
   const {checkDarkMode} = useThemeMode();
   const {user} = useAuth()

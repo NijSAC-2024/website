@@ -7,9 +7,9 @@ import LoadingComponent from '../loading/LoadingComponent.tsx';
 
 interface Props {
   registrations?: Registration[];
-  selectedUser: BasicUser | null;
-  setSelectedUser: (user: BasicUser | null) => void;
-  setSelectedRegistration: (registration: Registration | null) => void;
+  selectedUser?: BasicUser;
+  setSelectedUser: (user?: BasicUser) => void;
+  setSelectedRegistration: (registration?: Registration) => void;
   toggleRegisterDialog: () => void;
 }
 
@@ -34,8 +34,8 @@ export default function RegisterUserAutocomplete({
       getOptionLabel={(u: BasicUser) => `${u.firstName} ${u.infix ?? ''} ${u.lastName}`}
       value={selectedUser}
       onChange={(_, value) => {
-        setSelectedUser(value);
-        setSelectedRegistration(null);
+        setSelectedUser(value ?? undefined);
+        setSelectedRegistration(undefined);
         if (value) {
           toggleRegisterDialog();
         }

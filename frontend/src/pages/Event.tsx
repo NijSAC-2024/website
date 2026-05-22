@@ -29,7 +29,7 @@ export default function Event() {
 
   return (
     <>
-      {user && (isAdminOrBoard(user.roles) || inCommittee(myCommittees ?? [], currentEvent.createdBy)) && (
+      {user && (isAdminOrBoard(user.roles) || inCommittee(myCommittees, currentEvent.createdBy)) && (
         <div className="fixed bottom-5 right-5 z-10">
           <Fab
             variant="extended"
@@ -43,7 +43,7 @@ export default function Event() {
       )}
       <GenericPage image={currentEvent.image}>
         <div className="grid xl:grid-cols-3 gap-5">
-          <div className="xl:col-span-3 mb-[-0.5rem] flex justify-between items-center">
+          <div className="xl:absolute xl:z-50 xl:-mt-[3.3rem] -mb-2 xl:col-span-3 flex justify-between items-center">
             <div className="bg-white dark:bg-[#121212] rounded-[20px] inline-block">
               <Button
                 color="inherit"

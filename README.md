@@ -27,3 +27,17 @@ docker exec -i website-db-1 psql -U nijsac -d nijsac -f /tmp/fixtures/committee.
 docker exec -i website-db-1 psql -U nijsac -d nijsac -f /tmp/fixtures/event.sql
 docker exec -i website-db-1 psql -U nijsac -d nijsac -f /tmp/fixtures/event_registration.sql
 ```
+
+Update Rust version inside docker
+```shell
+docker exec -i website-backend-1 curl https://sh.rustup.rs -sSf | sh -s -- -y
+docker exec -i website-backend-1 rustup install stable
+docker exec -i website-backend-1 rustup default stable
+docker exec -i website-backend-1 rustc --version
+```
+
+Typescript errors
+```shell
+cd frontend
+npx tsc --noEmit
+```
