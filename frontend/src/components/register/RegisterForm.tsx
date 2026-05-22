@@ -132,7 +132,7 @@ export default function RegisterForm({
       {registrationQuestions.map((question, index) => {
         const label = `${text(question.question.en, question.question.nl)}${question.required ? ' *' : ''}`;
         const error = errors[index];
-        const answer = answers[index]
+        const answer = answers[index];
 
         switch (question.questionType.type) {
         case 'text':
