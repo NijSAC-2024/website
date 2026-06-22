@@ -1,7 +1,7 @@
 use crate::{
-    AppState, Language, LocationFilter,
+    AppResult, AppState, Language, LocationFilter,
     data_source::Count,
-    error::{AppResult, Error},
+    error::Error,
     location::{Location, LocationContent, LocationId, UsedBy},
 };
 use axum::{extract::FromRequestParts, http::request::Parts};

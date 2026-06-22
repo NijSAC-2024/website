@@ -4,10 +4,11 @@ use crate::{
     wire::event::{Event, EventContent, EventId},
 };
 
+use crate::api::is_admin_or_board;
 use crate::{
+    AppResult,
     auth::{role::Membership, session::Session},
-    error::AppResult,
-    event::{Date, NewRegistration, Registration, RegistrationId, RegistrationUser},
+    event::{Date, NewRegistration, Registration, RegistrationId},
     location::{Location, LocationContent, LocationId},
     user::UserId,
 };
@@ -169,27 +170,27 @@ impl TryFrom<PgRegistration> for Registration {
     type Error = Error;
 
     fn try_from(pg: PgRegistration) -> AppResult<Registration> {
-        let user = RegistrationUser {
-            user_id: pg.user_id.map(Into::into),
-            first_name: pg.first_name.unwrap_or(pg.guest_name.unwrap_or_default()),
-            infix: pg.infix,
-            last_name: pg.last_name.unwrap_or_default(),
-        };
         Ok(Registration {
             id: pg.id.into(),
             event_id: pg.event_id,
             guest_email: pg.guest_email,
-            user,
+            user_id: pg.user_id.map(Into::into),
+            first_name: pg.first_name.unwrap_or(pg.guest_name.unwrap_or_default()),
+            infix: pg.infix,
+            last_name: pg.last_name.unwrap_or_default(),
             attended: pg.attended,
             waiting_list_position: pg.waiting_list_position,
             answers: serde_json::from_value(pg.answers)?,
-            created: pg.created,
-            updated: pg.updated,
+            created: Some(pg.created),
+            updated: Some(pg.updated),
         })
     }
 }
 
+#[derive(sqlx::FromRow)]
 struct PgRegistrationUser {
+    id: Uuid,
+    event_id: Uuid,
     user_id: Option<Uuid>,
     guest_name: Option<String>,
     first_name: Option<String>,
@@ -197,15 +198,23 @@ struct PgRegistrationUser {
     last_name: Option<String>,
 }
 
-impl TryFrom<PgRegistrationUser> for RegistrationUser {
+impl TryFrom<PgRegistrationUser> for Registration {
     type Error = Error;
 
-    fn try_from(pg: PgRegistrationUser) -> AppResult<RegistrationUser> {
-        Ok(RegistrationUser {
+    fn try_from(pg: PgRegistrationUser) -> AppResult<Registration> {
+        Ok(Registration {
+            id: pg.id.into(),
+            event_id: pg.event_id.into(),
+            guest_email: None,
             user_id: pg.user_id.map(Into::into),
             first_name: pg.first_name.unwrap_or(pg.guest_name.unwrap_or_default()),
             infix: pg.infix,
             last_name: pg.last_name.unwrap_or_default(),
+            attended: None,
+            waiting_list_position: None,
+            answers: None,
+            created: None,
+            updated: None,
         })
     }
 }
@@ -216,7 +225,7 @@ impl EventStore {
         session: &Session,
         committee_id: &Uuid,
     ) -> AppResult<()> {
-        if crate::api::is_admin_or_board(session).is_ok() {
+        if is_admin_or_board(session).is_ok() {
             return Ok(());
         }
 
@@ -248,7 +257,7 @@ impl EventStore {
         session: &Session,
         committee_id: &Uuid,
     ) -> AppResult<()> {
-        if crate::api::is_admin_or_board(session).is_ok() {
+        if is_admin_or_board(session).is_ok() {
             return Ok(());
         }
 
@@ -721,11 +730,12 @@ impl EventStore {
         Ok(())
     }
 
-    pub async fn get_registered_users(&self, id: &EventId) -> AppResult<Vec<RegistrationUser>> {
-        sqlx::query_as!(
-            PgRegistrationUser,
+    pub async fn get_registrations(&self, id: &EventId) -> AppResult<Vec<Registration>> {
+        sqlx::query_as::<_, PgRegistrationUser>(
             r#"
         SELECT
+            er.id,
+            er.event_id,
             er.user_id as "user_id?",
             er.guest_name as "guest_name?",
             u.first_name as "first_name?",
@@ -736,8 +746,8 @@ impl EventStore {
         WHERE er.event_id = $1
           AND er.waiting_list_position IS NULL
         "#,
-            **id
         )
+        .bind(**id)
         .fetch_all(&self.db)
         .await?
         .into_iter()
@@ -888,7 +898,7 @@ impl EventStore {
         .try_into()
     }
 
-    pub async fn new_registration(
+    pub async fn create_registration(
         &self,
         event_id: &EventId,
         user_id: Option<UserId>,
@@ -919,22 +929,20 @@ impl EventStore {
         updated: NewRegistration,
     ) -> AppResult<Registration> {
         let mut tx = self.db.begin().await?;
-        sqlx::query!(
+        sqlx::query(
             r#"
             UPDATE event_registration
             SET answers = $1,
-                attended = $2,
-                guest_name = $3,
-                guest_email = $4,
+                guest_name = $2,
+                guest_email = $3,
                 updated = now()
-            WHERE id = $5
+            WHERE id = $4
             "#,
-            serde_json::to_value(updated.answers)?,
-            updated.attended,
-            updated.guest_name,
-            updated.guest_email,
-            **registration_id,
         )
+        .bind(serde_json::to_value(updated.answers)?)
+        .bind(updated.guest_name)
+        .bind(updated.guest_email)
+        .bind(**registration_id)
         .execute(&mut *tx)
         .await?;
 
@@ -945,6 +953,27 @@ impl EventStore {
 
         self.get_registration(registration_id).await
     }
+
+    pub async fn update_attendance(
+        &self,
+        registration_id: &RegistrationId,
+        attended: bool,
+    ) -> AppResult<()> {
+        sqlx::query(
+            r#"
+        UPDATE event_registration
+        SET attended = $1,
+            updated = now()
+        WHERE id = $2
+        "#,
+        )
+        .bind(attended)
+        .bind(**registration_id)
+        .execute(&self.db)
+        .await?;
+        Ok(())
+    }
+
     pub async fn delete_registration(&self, registration_id: &RegistrationId) -> AppResult<()> {
         let mut tx = self.db.begin().await?;
 

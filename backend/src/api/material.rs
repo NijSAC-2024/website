@@ -1,9 +1,9 @@
 use crate::{
-    Pagination,
-    api::{ApiResult, ValidatedJson, ValidatedQuery},
+    AppResult, Pagination,
+    api::{ApiResult, IntoApiResult, ValidatedJson, ValidatedQuery},
     auth::{role::Role, session::Session},
     data_source::MaterialStore,
-    error::{AppResult, Error},
+    error::Error,
     material::{Material, UserMaterial},
     user::UserId,
 };
@@ -58,17 +58,17 @@ pub async fn update_user_material(
     store: MaterialStore,
     session: Session,
     ValidatedJson(update_data): ValidatedJson<UserMaterial>,
-) -> ApiResult<Option<UserMaterial>> {
+) -> ApiResult {
     update_access(&update_data.user_id.clone(), &session)?;
 
-    let res = store
+    store
         .update_user_material(
             &update_data.user_id,
             &update_data.material_id,
             update_data.material_amount,
         )
-        .await?;
-    Ok(Json(res))
+        .await
+        .into_api()
 }
 
 pub async fn get_material_list(

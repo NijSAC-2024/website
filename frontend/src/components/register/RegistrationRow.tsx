@@ -39,7 +39,7 @@ export default function RegistrationRow({registration, onEditClick}: Registratio
       <TableCell>
         {<p className="hover:cursor-pointer hover:opacity-60 transition-all duration-100"
           onClick={() => registration.userId && user && navigate(`/user/${registration.userId}`)}>
-          <Tooltip title={canViewDetailedRegistration && registration.waitingListPosition !== null ? `${text('Queue position: ', 'Wachtlijst positie:')} ${registration.waitingListPosition}` : ''}>
+          <Tooltip title={canViewDetailedRegistration && registration.waitingListPosition !== null && registration.waitingListPosition !== undefined ? `${text('Queue position: ', 'Wachtlijst positie:')} ${registration.waitingListPosition + 1}` : ''}>
             <span>
               {canViewDetailedRegistration && registration.waitingListPosition !== null ? (
                 <span className="text-[#1976d2] dark:text-[#90caf9]">

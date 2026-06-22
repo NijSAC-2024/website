@@ -164,7 +164,19 @@ create table event_registration
     constraint consistent_waiting_list
         unique (event_id, waiting_list_position),
     constraint guest_info_required
-        check ((user_id is not null) or (guest_name is not null and guest_email is not null))
+        check (
+            (
+                user_id is not null
+                    and guest_name is null
+                    and guest_email is null
+                )
+                or
+            (
+                user_id is null
+                    and guest_name is not null
+                    and guest_email is not null
+                )
+            )
 );
 
 create type basic_user as

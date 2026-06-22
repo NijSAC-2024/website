@@ -1,14 +1,13 @@
 use crate::{
-    AppState, Pagination,
+    AppResult, AppState, Pagination,
     auth::role::{Membership, Status},
     data_source::Count,
-    error::{AppResult, Error},
+    error::Error,
     user::BasicUser,
     wire::user::{User, UserContent, UserId},
 };
 use axum::{extract::FromRequestParts, http::request::Parts};
 use sqlx::PgPool;
-use std::ops::Deref;
 use time::OffsetDateTime;
 use uuid::Uuid;
 
@@ -207,7 +206,7 @@ impl UserStore {
                 updated
             FROM "user" WHERE id = $1
             "#,
-            id.deref()
+            **id
         )
         .fetch_one(&self.db)
         .await?
@@ -225,7 +224,7 @@ impl UserStore {
                 last_name
             FROM "user" WHERE id = $1
             "#,
-            id.deref()
+            **id
         )
         .fetch_one(&self.db)
         .await?)
@@ -334,7 +333,7 @@ impl UserStore {
                 created,
                 updated
             "#,
-            id.deref(),
+            **id,
             user.first_name,
             user.infix,
             user.last_name,
@@ -392,7 +391,7 @@ impl UserStore {
                 created,
                 updated
             "#,
-            id.deref(),
+            **id,
             user.phone,
             user.student_number,
             user.nkbv_number,
@@ -416,7 +415,7 @@ impl UserStore {
                 updated = now()
             WHERE id = $1
             "#,
-            id.deref(),
+            **id,
             new_pwd_hash,
         )
         .execute(&self.db)

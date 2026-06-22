@@ -1,11 +1,11 @@
 use crate::{
-    AppState,
+    AppResult, AppState,
     auth::{
         COOKIE_NAME,
         role::{Membership, Roles, Status},
     },
     data_source::UserStore,
-    error::{AppResult, Error},
+    error::Error,
     user::{User, UserId},
     wire::user::UserCredentials,
 };

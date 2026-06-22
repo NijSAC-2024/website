@@ -12,8 +12,6 @@ use tracing::{error, info, trace, warn};
 use uuid::Uuid;
 use validator::ValidationErrors;
 
-pub type AppResult<T> = Result<T, Error>;
-
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     #[error("Error reading environment variable {0}")]

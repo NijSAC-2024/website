@@ -1,9 +1,9 @@
 use crate::{
-    Pagination, ValidatedQuery,
+    AppResult, Pagination, ValidatedQuery,
     api::{ApiResult, committee::active_committee_access},
     auth::session::Session,
     data_source::{FileStore, committee::CommitteeStore},
-    error::{AppResult, Error},
+    error::Error,
     file::{FileId, FileMetadata},
 };
 use axum::{
@@ -26,10 +26,10 @@ pub async fn upload(
     committee_store: CommitteeStore,
     session: Session,
     mut multipart: Multipart,
-) -> ApiResult<Vec<FileMetadata>> {
+) -> ApiResult {
     active_committee_access(&session, &committee_store).await?;
 
-    let mut result = vec![];
+    let mut result: Vec<FileMetadata> = vec![];
     let mut is_public = false;
     while let Some(field) = multipart.next_field().await.unwrap() {
         let name = field.name().unwrap().to_string();
@@ -67,7 +67,7 @@ pub async fn upload(
             len
         )
     }
-    Ok(Json(result))
+    Ok(Json(result).into_response())
 }
 
 fn reduce_image_size(bytes: &[u8]) -> AppResult<(Bytes, Mime)> {
@@ -124,12 +124,12 @@ pub async fn get_file_metadata(
     store: FileStore,
     Path(id): Path<FileId>,
     session: Option<Session>,
-) -> ApiResult<FileMetadata> {
+) -> ApiResult {
     let meta = store.get_metadata(&id).await?;
     if !meta.is_public && !session.is_some_and(|s| s.is_member()) {
         return Err(Error::Unauthorized);
     }
-    Ok(Json(meta))
+    Ok(Json(meta).into_response())
 }
 
 pub async fn get_files(
