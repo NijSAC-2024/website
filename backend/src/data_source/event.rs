@@ -4,9 +4,9 @@ use crate::{
     wire::event::{Event, EventContent, EventId},
 };
 
-use crate::api::is_admin_or_board;
 use crate::{
     AppResult,
+    api::is_admin_or_board,
     auth::{role::Membership, session::Session},
     event::{Date, NewRegistration, Registration, RegistrationId},
     location::{Location, LocationContent, LocationId},

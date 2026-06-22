@@ -210,18 +210,17 @@ pub async fn create_registration(
         Err(Error::BadRequest("Missing answer for required question"))?
     };
 
-    if let Some(session) = &session {
-        if is_admin_or_board(session).is_ok()
+    if let Some(session) = &session
+        && (is_admin_or_board(session).is_ok()
             || store
                 .ensure_user_is_committee_chair(session, &event.content.created_by)
                 .await
-                .is_ok()
-        {
-            return store
-                .create_registration(&event_id, user_id, new)
-                .await
-                .into_api();
-        }
+                .is_ok())
+    {
+        return store
+            .create_registration(&event_id, user_id, new)
+            .await
+            .into_api();
     }
 
     match (&new.user_id, &session) {
@@ -382,14 +381,13 @@ fn ensure_required_membership(event: &Event<Location>, session: Option<&Session>
     {
         return Ok(());
     };
-    if let Some(session) = session {
-        if event
+    if let Some(session) = session
+        && event
             .content
             .required_membership
             .contains(&session.membership())
-        {
-            return Ok(());
-        }
+    {
+        return Ok(());
     }
     Err(Error::BadRequest(
         "You do not meet the membership requirements for this event.",
