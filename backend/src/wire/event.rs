@@ -131,7 +131,6 @@ pub struct Registration {
     pub id: RegistrationId,
     pub event_id: EventId,
     pub guest_email: Option<String>,
-    #[serde(flatten)]
     pub user_id: Option<UserId>,
     pub first_name: String,
     pub infix: Option<String>,
