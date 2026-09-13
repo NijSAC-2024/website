@@ -15,7 +15,10 @@ use crate::{
     user::UserId,
     wire::event::EventId,
 };
-use axum::{extract::Path, extract::Query, http::HeaderMap};
+use axum::{
+    extract::{Path, Query},
+    http::HeaderMap,
+};
 use time::OffsetDateTime;
 use uuid::Uuid;
 
