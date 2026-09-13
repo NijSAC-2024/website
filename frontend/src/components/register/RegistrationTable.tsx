@@ -28,11 +28,13 @@ export default function RegistrationTable({onEditClick}: RegistrationTableProps)
     return null;
   }
 
+  const canViewDetailedRegistration = !!user && (isAdminOrBoard(user.roles) || isWorga(currentEvent, user) || inCommittee(myCommittees, currentEvent.createdBy));
+
   return (
     <div className="w-full overflow-x-auto">
       <Table className="min-w-max">
         <TableBody>
-          {user && (isAdminOrBoard(user.roles) || isWorga(currentEvent, user) || inCommittee(myCommittees, currentEvent.createdBy)) && (
+          {canViewDetailedRegistration && (
             <TableRow>
               <TableCell><b>{text('Name', 'Naam')}</b></TableCell>
               {currentEvent.questions.map((q) => (
@@ -40,23 +42,21 @@ export default function RegistrationTable({onEditClick}: RegistrationTableProps)
                   key={q.id}><b>{`${text(q.question)} ${q.required ? '*' : ''}`}</b></TableCell>
               ))}
               {(isAdminOrBoard(user.roles) || isChair(myCommittees, currentEvent.createdBy)) && (
-                <>
-                  <TableCell
-                    sx={{
-                      position: 'sticky',
-                      right: 80,
-                      backgroundColor: 'background.paper',
-                    }}
-                  ><b>{text('Attended', 'Aanwezig')}</b></TableCell>
-                  <TableCell
-                    sx={{
-                      position: 'sticky',
-                      right: 0,
-                      backgroundColor: 'background.paper',
-                    }}
-                  ><b>{text('Actions', 'Acties')}</b></TableCell>
-                </>
+                <TableCell
+                  sx={{
+                    position: 'sticky',
+                    right: 80,
+                    backgroundColor: 'background.paper',
+                  }}
+                ><b>{text('Actions', 'Acties')}</b></TableCell>
               )}
+              <TableCell
+                sx={{
+                  position: 'sticky',
+                  right: 0,
+                  backgroundColor: 'background.paper',
+                }}
+              ><b>{text('Attended', 'Aanwezig')}</b></TableCell>
             </TableRow>
           )}
           {eventRegistrations?.map((r) => (

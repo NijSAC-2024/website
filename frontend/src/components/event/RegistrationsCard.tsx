@@ -55,7 +55,7 @@ export default function RegistrationsCard() {
 
   const handleRegistration = async (answers: Answer[], registrationId?: string, userId?: string, waitingListPosition?: number, guestName?: string, guestEmail?: string) => {
     if (registrationId) {
-      await updateRegistration(currentEvent.id, registrationId, answers, undefined, waitingListPosition, guestName, guestEmail);
+      await updateRegistration(currentEvent.id, registrationId, answers, waitingListPosition, guestName, guestEmail);
     } else {
       await createRegistration(currentEvent.id, answers, userId, guestName, guestEmail);
     }
@@ -117,7 +117,7 @@ export default function RegistrationsCard() {
             {user && (isAdminOrBoard(user.roles) || isWorga(currentEvent, user) || inCommittee(myCommittees, currentEvent.createdBy)) && (
               <Tooltip title={text('Copy Table', 'Kopieer Tabel')}>
                 <IconButton onClick={copyTableToClipboard}>
-                  {copied ? <CheckIcon /> : <ContentCopyIcon />}
+                  {copied ? <CheckIcon/> : <ContentCopyIcon/>}
                 </IconButton>
               </Tooltip>
             )}
@@ -154,18 +154,16 @@ export default function RegistrationsCard() {
         </ContentCard>
       )}
 
-      {currentEvent && (
-        <RegistrationDialog
-          open={registerDialogOpen}
-          toggleDialog={toggleRegisterDialog}
-          name={currentEvent.name}
-          questions={currentEvent.questions}
-          selectedRegistration={selectedRegistration}
-          selectedUser={selectedUser}
-          handleRegistration={handleRegistration}
-          handleDeregisterClick={handleDeregisterClick}
-        />
-      )}
+      <RegistrationDialog
+        open={registerDialogOpen}
+        toggleDialog={toggleRegisterDialog}
+        name={currentEvent.name}
+        questions={currentEvent.questions}
+        selectedRegistration={selectedRegistration}
+        selectedUser={selectedUser}
+        handleRegistration={handleRegistration}
+        handleDeregisterClick={handleDeregisterClick}
+      />
 
       <AreYouSure
         open={confirmOpen}

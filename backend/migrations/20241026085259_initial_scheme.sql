@@ -152,7 +152,7 @@ create table event_registration
     -- ]
     -- if no answers are given, use an empty array
     answers               jsonb       not null,
-    attended              boolean,
+    attended              boolean     not null default false,
     -- null means not on the waiting list but regularly registered, 0 is the first list position
     waiting_list_position integer,
     created               timestamptz not null,

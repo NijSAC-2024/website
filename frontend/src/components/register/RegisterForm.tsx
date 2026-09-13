@@ -40,11 +40,11 @@ export default function RegisterForm({
         existingAnswer ?? {
           questionId: q.id,
           answer:
-            q.questionType.type === 'boolean'
-              ? 'false'
-              : q.questionType.type === 'date'
-                ? now.toISOString()
-                : ''
+                        q.questionType.type === 'boolean'
+                          ? 'false'
+                          : q.questionType.type === 'date'
+                            ? now.toISOString()
+                            : ''
         }
       );
     })
@@ -52,7 +52,7 @@ export default function RegisterForm({
 
 
   const [errors, setErrors] = useState<ErrorType[]>(Array(registrationQuestions.length).fill(false));
-  const [guestName, setGuestName] = useState<string | undefined>(registration?.firstName);
+  const [guestName, setGuestName] = useState<string | undefined>(requireGuestName ? registration?.firstName : undefined);
   const [guestEmail, setGuestEmail] = useState<string | undefined>(registration?.guestEmail);
   const [guestNameError, setGuestNameError] = useState<ErrorType>(false);
   const [guestEmailError, setGuestEmailError] = useState<ErrorType>(false);

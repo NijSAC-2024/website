@@ -30,7 +30,7 @@ export default function RegisterUserAutocomplete({
 
   return (
     <Autocomplete
-      options={users.filter((u) => !registrations?.some((r) => r.id === u.id)) || []}
+      options={users.filter((u) => !registrations?.some((r) => r.userId === u.id)) || []}
       getOptionLabel={(u: BasicUser) => `${u.firstName} ${u.infix ?? ''} ${u.lastName}`}
       value={selectedUser}
       onChange={(_, value) => {

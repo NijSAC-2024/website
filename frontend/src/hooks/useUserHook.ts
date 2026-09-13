@@ -48,12 +48,14 @@ export function useUserHook() {
     return data;
   }
 
-  function useUserEvents(userId?: string) {
+  function useUserEvents(userId?: string, includePast = false) {
     const {data} = useQuery<Event[]>({
-      queryKey: queryKeys.users.events(userId),
+      queryKey: [...queryKeys.users.events(userId), {includePast}],
       enabled: !!userId && !!user,
       queryFn: () =>
-        apiFetch<Event[]>(`/user/${userId}/events`),
+        apiFetch<Event[]>(
+          `/user/${userId}/events?include_past=${includePast}`,
+        ),
       staleTime: 60_000,
     });
     return data;

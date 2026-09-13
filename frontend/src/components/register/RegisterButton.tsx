@@ -44,7 +44,7 @@ export default function RegisterButton({
 
   const handleRegistration = async (answers: Answer[], guestName?: string, guestEmail?: string) => {
     if (registration?.id) {
-      await updateRegistration(eventId, registration.id, answers, registration?.attended, registration?.waitingListPosition, guestName, guestEmail);
+      await updateRegistration(eventId, registration.id, answers, registration?.waitingListPosition, guestName, guestEmail);
     } else {
       await createRegistration(eventId, answers, user?.id, guestName, guestEmail);
     }
@@ -111,11 +111,12 @@ export default function RegisterButton({
     const isQueueFull = event.waitingListMax ? event.waitingListCount >= event.waitingListMax : false;
     const canRegister = (
       (user && user.status === 'accepted' && event.requiredMembership.includes(user.membership))
-      || event.requiredMembership.includes('nonMember')
+            || event.requiredMembership.includes('nonMember')
     );
 
     if (registration) {
-      return <Button variant="contained" onClick={handleRegistrationClick} disabled={!isAdminOrBoard(user?.roles) && isClosed}>{inQueue ? text('In Queue', 'Op de wachtlijst') : text('Registered', 'Ingeschreven')}</Button>;
+      return <Button variant="contained" onClick={handleRegistrationClick}
+        disabled={!isAdminOrBoard(user?.roles) && isClosed}>{inQueue ? text('In Queue', 'Op de wachtlijst') : text('Registered', 'Ingeschreven')}</Button>;
     }
 
     if (isOpen || isAdminOrBoard(user?.roles)) {
@@ -124,9 +125,11 @@ export default function RegisterButton({
           if (isQueueFull) {
             return <Button variant="contained" disabled>{text('Full', 'Vol')}</Button>;
           }
-          return <Button variant="contained" onClick={handleRegistrationClick}>{text('Join Queue', 'Inschrijven wachtlijst')}{renderClock()}</Button>;
+          return <Button variant="contained"
+            onClick={handleRegistrationClick}>{text('Join Queue', 'Inschrijven wachtlijst')}{renderClock()}</Button>;
         } else {
-          return <Button variant="contained" onClick={handleRegistrationClick}>{text('Register', 'Inschrijven')}{renderClock()}</Button>;
+          return <Button variant="contained"
+            onClick={handleRegistrationClick}>{text('Register', 'Inschrijven')}{renderClock()}</Button>;
         }
       } else {
         return <Button variant="contained" disabled>{text('Login to register', 'Inloggen vereist')}</Button>;

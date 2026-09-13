@@ -8,15 +8,15 @@ use crate::{
     data_source::event::EventStore,
     error::Error,
     event::{
-        Answer, Date, Event, EventContent, NewRegistration, Question, Registration, RegistrationId,
+        Answer, Date, Event, EventContent, GetEventsQuery, NewRegistration, Question, Registration,
+        RegistrationId,
     },
     location::{Location, LocationId},
     user::UserId,
     wire::event::EventId,
 };
-use axum::{extract::Path, http::HeaderMap};
+use axum::{extract::Path, extract::Query, http::HeaderMap};
 use time::OffsetDateTime;
-use tracing::{trace, warn};
 use uuid::Uuid;
 
 pub async fn get_event_registrations(
@@ -102,9 +102,10 @@ pub async fn get_user_events(
     Path(id): Path<UserId>,
     session: Session,
     headers: HeaderMap,
+    Query(query): Query<GetEventsQuery>,
 ) -> ApiResult {
     if session.is_member() {
-        let events = store.get_user_events(&id).await?;
+        let events = store.get_user_events(&id, query.include_past).await?;
         conditional_json_response(&headers, &events)
     } else {
         Err(Error::Unauthorized)
@@ -136,16 +137,15 @@ pub async fn get_events(
     store: EventStore,
     session: Option<Session>,
     headers: HeaderMap,
+    Query(query): Query<GetEventsQuery>,
 ) -> ApiResult {
-    if let Some(session) = session
-        && is_admin_or_board(&session).is_ok()
-    {
-        let events = store.get_events(true).await?;
-        conditional_json_response(&headers, &events)
-    } else {
-        let events = store.get_events(false).await?;
-        conditional_json_response(&headers, &events)
-    }
+    let display_hidden = session
+        .as_ref()
+        .is_some_and(|session| is_admin_or_board(session).is_ok());
+
+    let events = store.get_events(display_hidden, query.include_past).await?;
+
+    conditional_json_response(&headers, &events)
 }
 
 pub async fn create_event(
@@ -203,7 +203,6 @@ pub async fn create_registration(
     Path(event_id): Path<EventId>,
     ValidatedJson(mut new): ValidatedJson<NewRegistration>,
 ) -> ApiResult {
-    let user_id = new.user_id.clone();
     let event = store.get_event(&event_id, true).await?;
 
     if !check_required_questions_answered(&event.content.questions, &new.answers) {
@@ -217,10 +216,7 @@ pub async fn create_registration(
                 .await
                 .is_ok())
     {
-        return store
-            .create_registration(&event_id, user_id, new)
-            .await
-            .into_api();
+        return store.create_registration(&event_id, new).await.into_api();
     }
 
     match (&new.user_id, &session) {
@@ -248,12 +244,9 @@ pub async fn create_registration(
 
     ensure_required_membership(&event, session.as_ref())?;
 
-    ensure_correct_waiting_list_position(&store, &event, &mut new, session.as_ref(), None).await?;
+    ensure_correct_waiting_list_position(&event, &mut new, None).await?;
 
-    store
-        .create_registration(&event_id, user_id, new)
-        .await
-        .into_api()
+    store.create_registration(&event_id, new).await.into_api()
 }
 
 pub async fn update_registration(
@@ -263,43 +256,71 @@ pub async fn update_registration(
     ValidatedJson(mut updated): ValidatedJson<NewRegistration>,
 ) -> ApiResult {
     let registration = store.get_registration(&registration_id).await?;
-
-    if is_admin_or_board(&session).is_err() {
-        let Some(user_id) = &registration.user_id else {
-            return Err(Error::BadRequest(
-                "Only admins can update anonymous sign-ups",
-            ));
-        };
-
-        has_registration_access(&store, user_id, &session, Some(&event_id)).await?;
-    }
-
     let event = store.get_event(&registration.event_id, true).await?;
 
-    if !(is_admin_or_board(&session).is_ok()
+    if !check_required_questions_answered(&event.content.questions, &updated.answers) {
+        Err(Error::BadRequest("Missing answer for required question"))?
+    };
+
+    if is_admin_or_board(&session).is_ok()
         || store
             .ensure_user_is_committee_chair(&session, &event.content.created_by)
             .await
-            .is_ok())
+            .is_ok()
     {
-        ensure_is_open(&event)?;
+        updated.user_id = registration.user_id.clone();
+
+        return store
+            .update_registration(&registration_id, updated)
+            .await
+            .into_api();
     }
+
+    if let Some(user_id) = &registration.user_id {
+        has_registration_access(&store, user_id, &session, Some(&event_id)).await?;
+    } else {
+        return Err(Error::BadRequest(
+            "Only admins can update anonymous sign-ups",
+        ));
+    }
+
+    ensure_is_open(&event)?;
 
     updated.user_id = registration.user_id.clone();
 
-    ensure_correct_waiting_list_position(
-        &store,
-        &event,
-        &mut updated,
-        Some(&session),
-        Some(&registration),
-    )
-    .await?;
+    ensure_correct_waiting_list_position(&event, &mut updated, Some(&registration)).await?;
 
     store
         .update_registration(&registration_id, updated)
         .await
         .into_api()
+}
+
+pub async fn update_attendance(
+    store: EventStore,
+    session: Session,
+    Path((event_id, registration_id)): Path<(EventId, RegistrationId)>,
+) -> ApiResult {
+    let event = store.get_event(&event_id, true).await?;
+
+    let worga_user = event
+        .content
+        .metadata
+        .get("worga")
+        .and_then(|v| v.as_str())
+        .and_then(|s| Uuid::parse_str(s).ok());
+
+    if !(is_admin_or_board(&session).is_ok()
+        || store
+            .ensure_user_in_committee(&session, &event.content.created_by)
+            .await
+            .is_ok()
+        || worga_user.is_some_and(|worga_uuid| **session.user_id() == worga_uuid))
+    {
+        return Err(Error::Unauthorized);
+    }
+
+    store.update_attendance(&registration_id).await.into_api()
 }
 
 pub async fn delete_registration(
@@ -394,78 +415,35 @@ fn ensure_required_membership(event: &Event<Location>, session: Option<&Session>
     ))
 }
 
-/// Depending on access rights, it allows overwriting the waiting list position
-/// Additionally, it ensures that only valid positions are accepted.
 async fn ensure_correct_waiting_list_position(
-    store: &EventStore,
     event: &Event<Location>,
     new_registration: &mut NewRegistration,
-    session: Option<&Session>,
     current_registration: Option<&Registration>,
 ) -> AppResult<()> {
-    if let Some(session) = session
-        && (is_admin_or_board(session).is_ok()
-            || store
-                .ensure_user_is_committee_chair(session, &event.content.created_by)
-                .await
-                .is_ok())
-    {
-        trace!("logged in user has admin access to the waiting list");
-        if new_registration.waiting_list_position.is_some() {
-            trace!(
-                event_id = event.id.to_string(),
-                new_waiting_list_position = new_registration.waiting_list_position,
-                "explicitly setting the waiting list position requested"
-            );
-            let mut valid_pos = false;
-            if new_registration.waiting_list_position == Some(event.waiting_list_count as i32) {
-                valid_pos = true
-            }
-            if let Some(current_registration) = current_registration
-                && current_registration.waiting_list_position
-                    == new_registration.waiting_list_position
-            {
-                valid_pos = true
-            }
-            if !valid_pos {
-                warn!(
-                    event_id = event.id.to_string(),
-                    new_waiting_list_position = new_registration.waiting_list_position,
-                    "Determined the requested waiting list position is invalid"
-                );
-                Err(Error::BadRequest("Invalid waiting list position"))?
-            }
-        }
-    } else if let Some(registration) = current_registration {
-        trace!(
-            event_id = event.id.to_string(),
-            "No admin access to waiting list, overriding with exising waiting list position"
-        );
-        new_registration.waiting_list_position = registration.waiting_list_position
-    } else if let Some(registration_max) = event.content.registration_max {
-        trace!(
-            event_id = event.id.to_string(),
-            "New registration without admin access"
-        );
-        if registration_max <= event.registration_count as i32 {
-            trace!("Registrations are full, adding to waiting list");
+    if let Some(registration) = current_registration {
+        new_registration.waiting_list_position = registration.waiting_list_position;
+        return Ok(());
+    }
 
-            if let Some(waiting_list_max) = event.content.waiting_list_max
-                && waiting_list_max <= event.waiting_list_count as i32
-            {
-                Err(Error::BadRequest(
-                    "Registrations and waiting list are already full",
-                ))?
-            }
-            trace!("Waiting list position is {}", event.waiting_list_count);
-            new_registration.waiting_list_position = Some(event.waiting_list_count as i32)
-        } else {
-            trace!("Still spots available, setting waiting list position to None");
-            new_registration.waiting_list_position = None
-        }
-    } else {
-        trace!("No limit to the registrations, setting waiting list position to None");
-        new_registration.waiting_list_position = None
+    let Some(registration_max) = event.content.registration_max else {
+        new_registration.waiting_list_position = None;
+        return Ok(());
     };
+
+    if registration_max > event.registration_count as i32 {
+        new_registration.waiting_list_position = None;
+        return Ok(());
+    }
+
+    if let Some(waiting_list_max) = event.content.waiting_list_max
+        && waiting_list_max <= event.waiting_list_count as i32
+    {
+        return Err(Error::BadRequest(
+            "Registrations and waiting list are already full",
+        ));
+    }
+
+    new_registration.waiting_list_position = Some(event.waiting_list_count as i32);
+
     Ok(())
 }

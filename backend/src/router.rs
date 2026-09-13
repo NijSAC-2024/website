@@ -7,9 +7,9 @@ use crate::{
         get_file_metadata, get_files, get_location, get_locations, get_material_list,
         get_page_by_slug, get_pages, get_registration, get_user, get_user_committees,
         get_user_events, get_user_materials, get_user_registrations, location_used_by, make_chair,
-        register, remove_user_from_committee, update_committee, update_event, update_location,
-        update_page, update_pwd, update_registration, update_user, update_user_material, upload,
-        who_am_i,
+        register, remove_user_from_committee, update_attendance, update_committee, update_event,
+        update_location, update_page, update_pwd, update_registration, update_user,
+        update_user_material, upload, who_am_i,
     },
     auth::{login, logout},
     state::AppState,
@@ -17,7 +17,7 @@ use crate::{
 use axum::{
     Json, Router,
     extract::{DefaultBodyLimit, State},
-    routing::{get, post, put},
+    routing::{get, patch, post, put},
 };
 use memory_serve::{MemoryServe, load_assets};
 use tower_http::{trace, trace::TraceLayer};
@@ -81,6 +81,10 @@ fn api_router() -> Router<AppState> {
             get(get_registration)
                 .put(update_registration)
                 .delete(delete_registration),
+        )
+        .route(
+            "/event/{:event_id}/registration/{:registration_id}/attendance",
+            patch(update_attendance),
         )
         .route("/location", get(get_locations).post(create_location))
         .route(

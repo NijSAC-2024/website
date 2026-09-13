@@ -32,23 +32,24 @@ export function useEventRegistrationHook() {
   const createRegistrationMutation = useMutation<
     Registration,
     ApiError,
-    { eventId: string;
+    {
+      eventId: string;
       answers: Answer[];
       userId?: string;
       guestName?: string,
       guestEmail?: string
     }
   >({
-    mutationFn: async ({ eventId, answers, userId, guestName, guestEmail }) => {
+    mutationFn: async ({eventId, answers, userId, guestName, guestEmail}) => {
       return apiFetch<Registration>(
         `/event/${eventId}/registration`,
         {
           method: 'POST',
-          body: JSON.stringify({ guestName, guestEmail, userId, answers }),
+          body: JSON.stringify({guestName, guestEmail, userId, answers}),
         }
       );
     },
-    onSuccess: (_, { eventId, userId }) => {
+    onSuccess: (_, {eventId, userId}) => {
       queryClient.invalidateQueries({queryKey: queryKeys.events.registrations(eventId)});
       queryClient.invalidateQueries({queryKey: queryKeys.events.detail(eventId)});
       if (userId) {
@@ -82,7 +83,6 @@ export function useEventRegistrationHook() {
       guestName?: string;
       guestEmail?: string;
       answers: Answer[];
-      attended?: boolean;
       waitingListPosition?: number;
     }
   >({
@@ -92,7 +92,6 @@ export function useEventRegistrationHook() {
       guestName,
       guestEmail,
       answers,
-      attended,
       waitingListPosition,
     }) => {
       return await apiFetch<Registration>(
@@ -103,20 +102,19 @@ export function useEventRegistrationHook() {
             guestName,
             guestEmail,
             answers,
-            attended,
             waitingListPosition,
           }),
         }
       );
     },
 
-    onSuccess: (_, { eventId }) => {
+    onSuccess: (_, {eventId}) => {
       queryClient.invalidateQueries({queryKey: queryKeys.events.registrations(eventId)});
       queryClient.invalidateQueries({queryKey: queryKeys.events.detail(eventId)});
       if (user?.id) {
         queryClient.invalidateQueries({queryKey: queryKeys.users.registrations(user.id)});
       }
-      enqueueSnackbar(text('Registration updated', 'Inschrijving bijgewerkt'), { variant: 'success' });
+      enqueueSnackbar(text('Registration updated', 'Inschrijving bijgewerkt'), {variant: 'success'});
     },
     onError: (error: ApiError) => enqueueSnackbar(`${error.message}: ${error.reference}`, {variant: 'error'})
   });
@@ -124,7 +122,6 @@ export function useEventRegistrationHook() {
     eventId: string,
     registrationId: string,
     answers: Answer[],
-    attended?: boolean,
     waitingListPosition?: number,
     guestName?: string,
     guestEmail?: string
@@ -135,8 +132,53 @@ export function useEventRegistrationHook() {
       guestName,
       guestEmail,
       answers,
-      attended,
       waitingListPosition,
+    });
+
+  const updateAttendanceMutation = useMutation<
+    void,
+    ApiError,
+    {
+      eventId: string;
+      registrationId: string;
+    }
+  >({
+    mutationFn: async ({eventId, registrationId}) => {
+      return await apiFetch<void>(
+        `/event/${eventId}/registration/${registrationId}/attendance`,
+        {
+          method: 'PATCH',
+        }
+      );
+    },
+
+    onSuccess: (_, {eventId}) => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.events.registrations(eventId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.events.detail(eventId),
+      });
+
+      enqueueSnackbar(
+        text('Attendance updated', 'Aanwezigheid bijgewerkt'),
+        {variant: 'success'}
+      );
+    },
+
+    onError: (error: ApiError) =>
+      enqueueSnackbar(`${error.message}: ${error.reference}`, {
+        variant: 'error',
+      }),
+  });
+
+  const updateAttendance = (
+    eventId: string,
+    registrationId: string,
+  ) =>
+    updateAttendanceMutation.mutateAsync({
+      eventId,
+      registrationId,
     });
 
   const deleteRegistrationMutation = useMutation<
@@ -144,7 +186,7 @@ export function useEventRegistrationHook() {
     ApiError,
     { eventId: string; userId?: string; registrationId: string }
   >({
-    mutationFn: async ({ eventId, registrationId }) => {
+    mutationFn: async ({eventId, registrationId}) => {
       await apiFetch<void>(
         `/event/${eventId}/registration/${registrationId}`,
         {
@@ -152,7 +194,7 @@ export function useEventRegistrationHook() {
         }
       );
     },
-    onSuccess: (_, { eventId, userId }) => {
+    onSuccess: (_, {eventId, userId}) => {
       queryClient.invalidateQueries({queryKey: queryKeys.events.registrations(eventId)});
       queryClient.invalidateQueries({queryKey: queryKeys.events.detail(eventId)});
       if (userId) {
@@ -179,6 +221,7 @@ export function useEventRegistrationHook() {
     useEventRegistrations,
     createRegistration,
     updateRegistration,
+    updateAttendance,
     deleteRegistration,
   };
 }

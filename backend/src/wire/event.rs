@@ -125,6 +125,12 @@ fn validate_date(event: &Date) -> Result<(), ValidationError> {
     }
 }
 
+#[derive(Deserialize)]
+pub struct GetEventsQuery {
+    #[serde(default)]
+    pub include_past: bool,
+}
+
 #[derive(Serialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Registration {

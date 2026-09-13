@@ -14,10 +14,13 @@ export function useEventHook() {
   const {text} = useLanguage();
   const queryClient = useQueryClient();
 
-  function useEvents() {
+  function useEvents(includePast = false) {
     const {data} = useQuery<Event[]>({
-      queryKey: queryKeys.events.all(),
-      queryFn: () => apiFetch<Event[]>('/event'),
+      queryKey: [...queryKeys.events.all(), {includePast}],
+      queryFn: () =>
+        apiFetch<Event[]>(
+          `/event?include_past=${includePast}`,
+        ),
       staleTime: 60_000,
     });
     return data;
@@ -58,7 +61,7 @@ export function useEventHook() {
   const updateEventMutation = useMutation<
     Event,
     ApiError,
-    {eventId: string; content: EventContent}
+    { eventId: string; content: EventContent }
   >({
     mutationFn: async ({eventId, content}) => {
       return await apiFetch<Event>(
@@ -77,12 +80,12 @@ export function useEventHook() {
     onError: (error: ApiError) => enqueueSnackbar(`${error.message}: ${error.reference}`, {variant: 'error'})
   });
   const updateEvent = (eventId: string, content: EventContent) =>
-    updateEventMutation.mutateAsync({ eventId, content });
+    updateEventMutation.mutateAsync({eventId, content});
 
   const deleteEventMutation = useMutation<
     void,
     ApiError,
-    {eventId: string}
+    { eventId: string }
   >({
     mutationFn: async ({eventId}) => {
       await apiFetch<void>(`/event/${eventId}`, {
@@ -98,7 +101,7 @@ export function useEventHook() {
     onError: (error: ApiError) => enqueueSnackbar(`${error.message}: ${error.reference}`, {variant: 'error'})
   });
   const deleteEvent = (eventId: string) =>
-    deleteEventMutation.mutateAsync({ eventId });
+    deleteEventMutation.mutateAsync({eventId});
 
   return {
     useEvent,

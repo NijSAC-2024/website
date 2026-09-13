@@ -77,7 +77,6 @@ export default function EditEvent() {
     <FormProvider {...form}>
       <GenericPage image={image}>
         <SaveButton id={eventId ?? ''} handleSave={handleSave}/>
-
         <div className="grid xl:grid-cols-3 gap-5 mt-[-9.3rem]">
           <div className="xl:absolute xl:z-50 xl:-mt-[3.3rem] -mb-2 xl:col-span-3 w-full">
             <div className="flex items-center justify-between w-full">

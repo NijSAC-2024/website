@@ -201,8 +201,6 @@ impl FromRequestParts<AppState> for Session {
             .await
             .map_err(|_| Self::Rejection::BadRequest("Cannot decode cookies"))?;
 
-        trace!("Cookies: {:?}", jar);
-
         let session_cookie = jar
             .get(COOKIE_NAME)
             .ok_or(Self::Rejection::Unauthorized)?
