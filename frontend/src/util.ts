@@ -46,8 +46,11 @@ export function isWorga(event: Event, user: User): boolean {
   return event.metadata?.worga === user.id
 }
 
-export function inCommittee(committees: UserCommittee[] | undefined, committeeId: string): boolean {
-  return committees?.some(uc => uc.left == null && uc.committeeId === committeeId) ?? false
+export function inCommittee(committees?: UserCommittee[], committeeId?: string): boolean {
+  if (committeeId) {
+    return committees?.some(uc => uc.left == null && uc.committeeId === committeeId) ?? false
+  }
+  return committees?.some(uc => uc.left == null) ?? false
 }
 
 export function isChair(committeeMembers: CommitteeUser[] | undefined, userId: string): boolean;

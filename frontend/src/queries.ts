@@ -7,9 +7,12 @@ export const queryKeys = {
   whoami: () => ['whoami'] as const,
 
   files: {
-    all: () => ['file'] as const,
-    detail: (id?: string) => ['file', id] as const,
-    metadata: (id?: string) => ['file', id, 'metadata'] as const,
+    all: () => ['files'] as const,
+    lists: () => ['files', 'list'] as const,
+    list: (limit: number, offset: number) =>
+      ['files', 'list', { limit, offset }] as const,
+    detail: (id: string) => ['files', 'detail', id] as const,
+    metadata: (id: string) => ['files', 'metadata', id] as const,
   },
 
   users: {

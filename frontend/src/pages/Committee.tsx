@@ -14,7 +14,6 @@ import ContentCard from '../components/ContentCard.tsx';
 import {useState} from 'react';
 import {useEventHook} from '../hooks/useEventHook.ts';
 import {Event} from '../types.ts';
-import moment from 'moment/moment';
 import EventCard from '../components/event/EventCard.tsx';
 
 export default function Committee() {
@@ -27,19 +26,11 @@ export default function Committee() {
   const [filterPastEvents, setFilterPastEvents] = useState<boolean>(false);
   const navigate = useNavigate();
   const {useEvents} = useEventHook();
-  const events = useEvents();
-  const now = new Date();
+  const events = useEvents(filterPastEvents);
 
-  if (!committee) {
+  if (!committee || !events) {
     return <LoadingPage/>;
   }
-
-  const filteredEvents =
-    ((events ?? []) as unknown as Event[]).filter((event) =>
-      (filterPastEvents ||
-        moment(event.dates[0].start).isAfter(moment(now))) && event.createdBy === committeeId
-    );
-
 
   let imageUrl = '/images/test-header-image.jpg';
   if (committee.image) {
@@ -105,7 +96,7 @@ export default function Committee() {
               </div>
             </div>
           </ContentCard>
-          {filteredEvents.map((event: Event) => (
+          {(events as unknown as Event[]).map((event: Event) => (
             <EventCard
               key={event.id}
               event={event}

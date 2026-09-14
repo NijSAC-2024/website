@@ -113,7 +113,7 @@ function EditDescription() {
                     variant="outlined"
                     onChange={field.onChange}
                   >
-                    {eventRegistrations?.map((registration, index) => (
+                    {eventRegistrations?.filter(registration => registration.userId).map((registration, index) => (
                       <MenuItem key={index} value={registration.userId}>
                         {`${registration.firstName} ${registration.infix ?? ''} ${registration.lastName}`}
                       </MenuItem>

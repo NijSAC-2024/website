@@ -10,8 +10,7 @@ export default function Location() {
   const locations = useLocations();
   const {text} = useLanguage();
   const {locationId} = useParams();
-  const id = locationId
-  const location = locations?.find(loc => loc.id === id);
+  const location = locations?.find(loc => loc.id === locationId);
 
   if (!location) {
     return <LoadingPage/>;

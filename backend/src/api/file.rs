@@ -134,11 +134,12 @@ pub async fn get_file_metadata(
 
 pub async fn get_files(
     store: FileStore,
+    committee_store: CommitteeStore,
     session: Session,
     ValidatedQuery(pagination): ValidatedQuery<Pagination>,
 ) -> AppResult<(HeaderMap, Json<Vec<FileMetadata>>)> {
     let total = store.count().await?;
-
+    active_committee_access(&session, &committee_store).await?;
     Ok((
         total.as_header(),
         Json(store.get_all_metadata(pagination, &session).await?),

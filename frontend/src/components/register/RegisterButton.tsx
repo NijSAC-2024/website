@@ -132,6 +132,12 @@ export default function RegisterButton({
             onClick={handleRegistrationClick}>{text('Register', 'Inschrijven')}{renderClock()}</Button>;
         }
       } else {
+        if (isFull) {
+          if (isQueueFull) {
+            return <Button variant="contained" disabled>{text('Full', 'Vol')}</Button>;
+          }
+          return <Button variant="contained" disabled>{text('Login to join queue', 'Inloggen voor inschrijven wachtlijst')}</Button>;
+        }
         return <Button variant="contained" disabled>{text('Login to register', 'Inloggen vereist')}</Button>;
       }
     }
@@ -178,7 +184,7 @@ export default function RegisterButton({
               <AccessAlarmIcon className=" mr-2"/>
               {`${text('Registrations close at ', 'Inschrijvingen sluiten op ')} ${moment(event.registrationPeriod.end).format('DD MMM HH:mm')}.`}
             </p>
-            {!registration && event.registrationMax && !!event.registrationCount && event.registrationCount >= event.registrationMax && (user && !isAdminOrBoard(user.roles)) && (
+            {!registration && event.registrationMax && !!event.registrationCount && event.registrationCount >= event.registrationMax && !isAdminOrBoard(user?.roles) && (
               <b>
                 {text('The event is currently full. By registering, you will be put in the waiting queue. If a spot becomes available, you will automatically be registered and notified.',
                   'Het evenement zit momenteel vol. Door je aan te melden kom je op de wachtlijst. Zodra er een plek vrijkomt, word je automatisch ingeschreven en ontvang je bericht.')}

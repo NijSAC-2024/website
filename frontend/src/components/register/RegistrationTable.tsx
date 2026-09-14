@@ -46,7 +46,6 @@ export default function RegistrationTable({onEditClick}: RegistrationTableProps)
                   sx={{
                     position: 'sticky',
                     right: 80,
-                    backgroundColor: 'background.paper',
                   }}
                 ><b>{text('Actions', 'Acties')}</b></TableCell>
               )}
@@ -54,7 +53,6 @@ export default function RegistrationTable({onEditClick}: RegistrationTableProps)
                 sx={{
                   position: 'sticky',
                   right: 0,
-                  backgroundColor: 'background.paper',
                 }}
               ><b>{text('Attended', 'Aanwezig')}</b></TableCell>
             </TableRow>

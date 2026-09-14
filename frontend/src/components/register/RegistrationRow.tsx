@@ -73,7 +73,6 @@ export default function RegistrationRow({registration, onEditClick}: Registratio
           sx={{
             position: 'sticky',
             right: 80,
-            backgroundColor: 'background.paper',
           }}
         >
           <IconButton onClick={() => onEditClick(registration)}
@@ -87,7 +86,6 @@ export default function RegistrationRow({registration, onEditClick}: Registratio
           sx={{
             position: 'sticky',
             right: 0,
-            backgroundColor: 'background.paper',
           }}
         >
           <Checkbox

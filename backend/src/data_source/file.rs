@@ -167,7 +167,7 @@ impl FileStore {
         sqlx::query_as::<_, PgFileMetadata>(
             r#"
             SELECT * FROM file
-            ORDER BY created
+            ORDER BY created DESC
             LIMIT $1 OFFSET $2
             "#,
         )
