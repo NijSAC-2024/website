@@ -4,7 +4,7 @@ import GroupIcon from '@mui/icons-material/Group';
 import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import {useUserHook} from '../../hooks/useUserHook.ts';
 import {useCommitteeHook} from '../../hooks/useCommitteeHook.ts';
-import {isAdminOrBoard, isChair} from '../../util.ts';
+import {inCommittee, isAdminOrBoard, isChair} from '../../util.ts';
 import AreYouSure from '../AreYouSure.tsx';
 import {Committee} from '../../types.ts';
 import {useParams} from 'react-router-dom';
@@ -35,15 +35,11 @@ export function ChangeCommittees() {
   }
 
   const toggleCommittee = async (committeeId: string) => {
-    if (!currentUser) {
+    if (!currentUser || (currentUser.id === user.id && !isAdminOrBoard(user.roles))) {
       return;
     }
 
-    const inCommittee = currentCommittees?.some(
-      (c) => c.committeeId === committeeId && c.left == null,
-    );
-
-    if (inCommittee) {
+    if (inCommittee(currentCommittees, committeeId)) {
       await deleteUserFromCommittee(committeeId, currentUser.id);
     } else {
       await addUserToCommittee(committeeId, currentUser.id);
@@ -63,17 +59,13 @@ export function ChangeCommittees() {
 
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
         {committees?.map((committee) => {
-          const inCommittee = currentCommittees?.some(
-            (c) => c.committeeId === committee.id && c.left == null,
-          );
-
           return (
             (isAdminOrBoard(user.roles) || isChair(myCommittees, committee.id)) && (
               <MenuItem key={committee.id} onClick={() => {
                 setSelectedCommittee(committee);
                 toggleDialog()
               }}>
-                <Checkbox checked={inCommittee} size="small"/>
+                <Checkbox checked={inCommittee(currentCommittees, committee.id)} size="small"/>
                 {text(committee.name)}
               </MenuItem>
             )
@@ -83,8 +75,7 @@ export function ChangeCommittees() {
 
       <AreYouSure open={dialogOpen} onConfirm={() => toggleCommittee(selectedCommittee!.id)}
         onCancel={toggleDialog}
-        message={`${text('You are about to ', 'Je staat op het punt om deze gebruiker ')}${currentCommittees?.some(
-          (c) => c.committeeId === selectedCommittee?.id && c.left == null) ? text('remove this user from the ', 'te verwijderen van ') : text('add this user to the ', 'toe te voegen aan ')}${selectedCommittee ? text(selectedCommittee.name) : ''}.`}/>
+        message={`${text('You are about to ', 'Je staat op het punt om deze gebruiker ')}${inCommittee(currentCommittees, selectedCommittee?.id) ? text('remove this user from the ', 'te verwijderen van ') : text('add this user to the ', 'toe te voegen aan ')}${selectedCommittee ? text(selectedCommittee.name) : ''}.`}/>
     </>
   );
 }

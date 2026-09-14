@@ -42,7 +42,6 @@ import ErrorBoundary from './error/ErrorBoundary.tsx';
 import {AppError} from './error/error.ts';
 import AuthProvider from './providers/AuthProvider.tsx';
 import MemberStatus from './components/user/MemberStatus.tsx';
-import Gallery from './pages/Gallery.tsx';
 
 
 const queryClient = new QueryClient({
@@ -191,7 +190,6 @@ export function App() {
                       <Route path="/committees/:committeeId/edit" element={<EditCommittee/>}/>
                       <Route path="/pages" element={<Pages/>}/>
                       <Route path="/pages/new" element={<EditMarkdownPage/>}/>
-                      <Route path="/gallery" element={<Gallery/>}/>
                       <Route path="/location/:locationId" element={<Location/>}/>
                       <Route path="/:slug/edit" element={<EditMarkdownPage/>}/>
                       <Route path="/:slug" element={<MarkdownPage/>}/>

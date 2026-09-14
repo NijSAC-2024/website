@@ -10,12 +10,12 @@ import Markdown from 'react-markdown';
 import RegisterButton from '../register/RegisterButton.tsx';
 import {useNavigate} from 'react-router-dom';
 
-interface AgendaCardProps {
+interface EventCardProps {
   event: Event;
   agendaPage: boolean;
 }
 
-export default function EventCard({event, agendaPage}: AgendaCardProps) {
+export default function EventCard({event, agendaPage}: EventCardProps) {
   const navigate = useNavigate();
   const {text, language} = useLanguage();
 

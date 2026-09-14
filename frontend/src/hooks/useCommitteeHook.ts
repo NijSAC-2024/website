@@ -17,6 +17,7 @@ export function useCommitteeHook() {
       queryKey: queryKeys.committees.detail(committeeId),
       enabled: !!committeeId,
       queryFn: () => apiFetch<Committee>(`/committee/${committeeId}`),
+      placeholderData: (prev) => prev,
       staleTime: 60_000,
     });
     return data;
@@ -26,6 +27,7 @@ export function useCommitteeHook() {
     const {data} = useQuery<Committee[]>({
       queryKey: queryKeys.committees.all(),
       queryFn: () => apiFetch<Committee[]>('/committee'),
+      placeholderData: (prev) => prev,
       staleTime: 60_000,
     });
     return data;
@@ -37,6 +39,7 @@ export function useCommitteeHook() {
       enabled: !!committeeId && !!user,
       queryFn: () =>
         apiFetch<CommitteeUser[]>(`/committee/${committeeId}/members`),
+      placeholderData: (prev) => prev,
       staleTime: 60_000,
     });
     return data;
@@ -66,7 +69,7 @@ export function useCommitteeHook() {
   const updateCommitteeMutation = useMutation<
     Committee,
     ApiError,
-    {committeeId: string; content: CommitteeContent}
+    { committeeId: string; content: CommitteeContent }
   >({
     mutationFn: async ({committeeId, content}) => {
       return await apiFetch<Committee>(
@@ -85,7 +88,7 @@ export function useCommitteeHook() {
     onError: (error: ApiError) => enqueueSnackbar(`${error.message}: ${error.reference}`, {variant: 'error'})
   });
   const updateCommittee = (committeeId: string, content: CommitteeContent) =>
-    updateCommitteeMutation.mutateAsync({ committeeId, content });
+    updateCommitteeMutation.mutateAsync({committeeId, content});
 
   const deleteCommitteeMutation = useMutation<
     void,
@@ -106,12 +109,12 @@ export function useCommitteeHook() {
     onError: (error: ApiError) => enqueueSnackbar(`${error.message}: ${error.reference}`, {variant: 'error'})
   });
   const deleteCommittee = (committeeId: string) =>
-    deleteCommitteeMutation.mutateAsync({ committeeId });
+    deleteCommitteeMutation.mutateAsync({committeeId});
 
   const addUserToCommitteeMutation = useMutation<
     void,
     ApiError,
-    {committeeId: string; userId: string}
+    { committeeId: string; userId: string }
   >({
     mutationFn: async ({committeeId, userId}) => {
       await apiFetch<BasicUser>(
@@ -129,12 +132,12 @@ export function useCommitteeHook() {
     onError: (error: ApiError) => enqueueSnackbar(`${error.message}: ${error.reference}`, {variant: 'error'})
   });
   const addUserToCommittee = (committeeId: string, userId: string) =>
-    addUserToCommitteeMutation.mutateAsync({ committeeId, userId });
+    addUserToCommitteeMutation.mutateAsync({committeeId, userId});
 
   const deleteUserFromCommitteeMutation = useMutation<
     void,
     ApiError,
-    {committeeId: string; userId: string}
+    { committeeId: string; userId: string }
   >({
     mutationFn: async ({committeeId, userId}) => {
       await apiFetch<void>(
@@ -156,12 +159,12 @@ export function useCommitteeHook() {
     onError: (error: ApiError) => enqueueSnackbar(`${error.message}: ${error.reference}`, {variant: 'error'})
   });
   const deleteUserFromCommittee = (committeeId: string, userId: string) =>
-    deleteUserFromCommitteeMutation.mutateAsync({ committeeId, userId });
+    deleteUserFromCommitteeMutation.mutateAsync({committeeId, userId});
 
   const makeChairMutation = useMutation<
     void,
     ApiError,
-    {committeeId: string; userId: string}
+    { committeeId: string; userId: string }
   >({
     mutationFn: async ({committeeId, userId}) => {
       await apiFetch<void>(
@@ -179,7 +182,7 @@ export function useCommitteeHook() {
     onError: (error: ApiError) => enqueueSnackbar(`${error.message}: ${error.reference}`, {variant: 'error'})
   });
   const makeChair = (committeeId: string, userId: string) =>
-    makeChairMutation.mutateAsync({ committeeId, userId });
+    makeChairMutation.mutateAsync({committeeId, userId});
 
   return {
     useCommittee,

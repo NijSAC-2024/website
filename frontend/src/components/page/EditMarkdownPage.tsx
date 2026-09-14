@@ -2,13 +2,13 @@ import {Button, FormControlLabel, Switch, TextField} from '@mui/material';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
 import GenericPage from '../../pages/GenericPage.tsx';
 import {usePageHook} from '../../hooks/usePageHook.ts';
-import {PageContent} from '../../types.ts';
-import {ChangeEvent, useState} from 'react';
+import {FileMetadata, PageContent} from '../../types.ts';
+import {useState} from 'react';
 import MarkdownEditor from '../markdown/MarkdownEditor.tsx';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import SaveButton from '../page/SaveButton.tsx';
-import {useFileHook} from '../../hooks/useFileHook.ts';
+import Gallery from '../Gallery.tsx';
 
 export default function EditMarkdownPage() {
   const {slug} = useParams();
@@ -17,7 +17,11 @@ export default function EditMarkdownPage() {
   const {text} = useLanguage();
   const {usePage, createPage, updatePage} = usePageHook();
   const existing = usePage(slug);
-  const {uploadFile, uploading} = useFileHook();
+  const [galleryOpen, setGalleryOpen] = useState(false);
+
+  const toggleGallerOpen = () => {
+    setGalleryOpen(prevState => !prevState);
+  };
 
   const initial: PageContent = existing ?? {
     name: {en: 'New page', nl: 'Nieuwe pagina'},
@@ -31,22 +35,12 @@ export default function EditMarkdownPage() {
 
   const isCreate = location.pathname === '/pages/new';
 
-
-  const handleImageUpload = async (
-    e: ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = e.target.files?.[0];
-    if (!file) {
-      return;
-    }
-    const uploaded = await uploadFile(
-      file,
-      true
-    );
+  const handleGallerySelect = (file: FileMetadata) => {
     setContent({
       ...content,
-      image: uploaded[0].id,
+      image: file.id,
     });
+    setGalleryOpen(false);
   };
 
   const handleSave = async () => {
@@ -78,20 +72,21 @@ export default function EditMarkdownPage() {
             alt="Page"/>
           <div className="p-5 grid gap-3">
             <Button
-              component="label"
+              fullWidth
               variant="contained"
+              color="primary"
+              aria-label={text('Select Image', 'Afbeelding Selecteren')}
+              className="mx-auto"
               startIcon={<PhotoCameraIcon/>}
-              loading={uploading}
+              onClick={toggleGallerOpen}
             >
-              {text('Upload image', 'Afbeelding uploaden')}
-
-              <input
-                type="file"
-                accept="image/*"
-                hidden
-                onChange={handleImageUpload}
-              />
+              {text('Select Image', 'Afbeelding Selecteren')}
             </Button>
+            <Gallery
+              dialogOpen={galleryOpen}
+              toggleDialogOpen={toggleGallerOpen}
+              onSelect={handleGallerySelect}
+            />
             <div className="grid md:grid-cols-2 gap-3">
               <TextField label={text('English name', 'Engelse naam')} value={content.name.en}
                 onChange={(e) => setContent({

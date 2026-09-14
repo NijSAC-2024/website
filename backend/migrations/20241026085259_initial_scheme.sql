@@ -179,14 +179,6 @@ create table event_registration
             )
 );
 
-create type basic_user as
-(
-    id         uuid,
-    first_name text,
-    infix      text,
-    last_name  text
-);
-
 -- Maybe keep the following to use as prefill for registrations:
 create table "material"
 (

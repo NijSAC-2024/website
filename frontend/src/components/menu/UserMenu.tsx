@@ -7,11 +7,10 @@ import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import GroupIcon from '@mui/icons-material/Group';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import ArticleIcon from '@mui/icons-material/Article';
-import CollectionsIcon from '@mui/icons-material/Collections';
 import {useUserHook} from '../../hooks/useUserHook.ts';
 import {useNavigate} from 'react-router-dom';
 import {useAuth} from '../../providers/AuthProvider.tsx';
-import {inCommittee, isAdminOrBoard} from '../../util.ts';
+import {isAdminOrBoard} from '../../util.ts';
 
 interface UserMenuProps {
   toggleDropdown?: () => void;
@@ -21,8 +20,6 @@ export default function UserMenu({toggleDropdown}: UserMenuProps) {
   const {text} = useLanguage();
   const {logout} = useUserHook();
   const {user} = useAuth()
-  const {useUserCommittees} = useUserHook();
-  const myCommittees = useUserCommittees(user?.id)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
@@ -81,14 +78,6 @@ export default function UserMenu({toggleDropdown}: UserMenuProps) {
           </ListItemIcon>
           {text('Documents', 'Documenten')}
         </MenuItem>
-        {inCommittee(myCommittees) && (
-          <MenuItem onClick={() => navigateSubmenu('/gallery')}>
-            <ListItemIcon>
-              <CollectionsIcon fontSize="small"/>
-            </ListItemIcon>
-            {text('Gallery', 'Gallerij\'s')}
-          </MenuItem>
-        )}
         {isAdminOrBoard(user.roles) && (
           <MenuItem onClick={() => navigateSubmenu('/pages')}>
             <ListItemIcon>

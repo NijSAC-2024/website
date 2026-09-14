@@ -1,15 +1,15 @@
-import {ChangeEvent, useState} from 'react';
+import {useState} from 'react';
 import {Button, TextField} from '@mui/material';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import GenericPage from '../../pages/GenericPage.tsx';
 import {useLanguage} from '../../providers/LanguageProvider.tsx';
-import {CommitteeContent} from '../../types.ts';
+import {CommitteeContent, FileMetadata} from '../../types.ts';
 import SaveButton from './SaveButton.tsx';
 import MarkdownEditor from '../markdown/MarkdownEditor.tsx';
 import {useCommitteeHook} from '../../hooks/useCommitteeHook.ts';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
-import {useFileHook} from '../../hooks/useFileHook.ts';
 import LoadingPage from '../loading/LoadingPage.tsx';
+import Gallery from '../Gallery.tsx';
 
 export default function EditCommittee() {
   const {text} = useLanguage();
@@ -17,7 +17,11 @@ export default function EditCommittee() {
   const {committeeId} = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const {uploadFile, uploading} = useFileHook();
+  const [galleryOpen, setGalleryOpen] = useState(false);
+
+  const toggleGallerOpen = () => {
+    setGalleryOpen(prevState => !prevState);
+  };
 
   let initialCommittee: CommitteeContent | undefined = useCommittee(committeeId);
   if (location.pathname === '/committees/new') {
@@ -38,17 +42,11 @@ export default function EditCommittee() {
     setCommitteeContent({...committeeContent, ...changes});
   };
 
-  const handleImageChange = async (
-    event: ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = event.target.files?.[0];
-    if (!file) {
-      return;
-    }
-    const uploadInfo = await uploadFile(file, true);
+  const handleGallerySelect = (file: FileMetadata) => {
     handleCommitteeChange({
-      image: uploadInfo[0].id,
+      image: file.id,
     });
+    setGalleryOpen(false);
   };
 
   const handleSave = async () => {
@@ -85,27 +83,22 @@ export default function EditCommittee() {
           <img className="w-full aspect-4/2 object-cover" src={imageUrl} alt="Committee"/>
           <div className="p-5 grid gap-5">
             {/* Image upload */}
-            <form encType="multipart/form-data" action="/file" method="post">
-              <Button
-                fullWidth
-                component="label"
-                variant="contained"
-                loading={uploading}
-                color="primary"
-                aria-label={text('Change Image', 'Afbeelding Wijzigen')}
-                className="mx-auto"
-                startIcon={<PhotoCameraIcon/>}
-              >
-                {text('Upload Image', 'Afbeelding Uploaden')}
-                <input
-                  type="file"
-                  accept="image/*"
-                  hidden
-                  onChange={handleImageChange}
-                />
-              </Button>
-            </form>
-
+            <Button
+              fullWidth
+              variant="contained"
+              color="primary"
+              aria-label={text('Select Image', 'Afbeelding Selecteren')}
+              className="mx-auto"
+              startIcon={<PhotoCameraIcon/>}
+              onClick={toggleGallerOpen}
+            >
+              {text('Select Image', 'Afbeelding Selecteren')}
+            </Button>
+            <Gallery
+              dialogOpen={galleryOpen}
+              toggleDialogOpen={toggleGallerOpen}
+              onSelect={handleGallerySelect}
+            />
             {/* Name */}
             <div className="grid grid-cols-2 gap-3">
               <TextField

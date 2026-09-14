@@ -18,6 +18,7 @@ export function useLocationHook() {
     const {data} = useQuery<Location[]>({
       queryKey: queryKeys.locations.all(),
       queryFn: () => apiFetch<Location[]>('/location'),
+      placeholderData: (prev) => prev,
       staleTime: 60_000,
     });
     return data;

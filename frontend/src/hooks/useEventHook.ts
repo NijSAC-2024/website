@@ -21,6 +21,7 @@ export function useEventHook() {
         apiFetch<Event[]>(
           `/event?include_past=${includePast}`,
         ),
+      placeholderData: (prev) => prev,
       staleTime: 60_000,
     });
     return data;
@@ -32,6 +33,7 @@ export function useEventHook() {
       enabled: !!eventId,
       queryFn: () =>
         apiFetch<Event>(`/event/${eventId}`),
+      placeholderData: (prev) => prev,
       staleTime: 60_000,
     });
     return data;

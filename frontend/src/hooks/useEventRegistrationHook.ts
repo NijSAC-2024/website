@@ -24,6 +24,7 @@ export function useEventRegistrationHook() {
         apiFetch<Registration[]>(
           `/event/${eventId}/registration`
         ),
+      placeholderData: (prev) => prev,
       staleTime: 60_000,
     });
     return data;
@@ -151,7 +152,6 @@ export function useEventRegistrationHook() {
         }
       );
     },
-
     onSuccess: (_, {eventId}) => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.events.registrations(eventId),
@@ -165,7 +165,6 @@ export function useEventRegistrationHook() {
         {variant: 'success'}
       );
     },
-
     onError: (error: ApiError) =>
       enqueueSnackbar(`${error.message}: ${error.reference}`, {
         variant: 'error',

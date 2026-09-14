@@ -49,14 +49,12 @@ export function useFileHook() {
         headers: {},
       });
     },
-
     onSuccess: () => {
       enqueueSnackbar(
         text('File uploaded', 'Bestand geüpload'),
         {variant: 'success'}
       );
     },
-
     onError: (error: ApiError) => {
       enqueueSnackbar(
         `${error.message}: ${error.reference}`,
@@ -111,7 +109,6 @@ export function useFileHook() {
         {variant: 'success'}
       );
     },
-
     onError: (error: ApiError) => {
       enqueueSnackbar(
         `${error.message}: ${error.reference}`,
@@ -129,10 +126,53 @@ export function useFileHook() {
       isPublic,
     });
 
+  const deleteFileMutation = useMutation<
+    void,
+    ApiError,
+    { fileId: string }
+  >({
+    mutationFn: async ({fileId}) => {
+      await apiFetch<void>(
+        `/file/${fileId}`,
+        {
+          method: 'DELETE',
+        }
+      );
+    },
+
+    onSuccess: (_, {fileId}) => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.files.lists(),
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.files.detail(fileId),
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.files.metadata(fileId),
+      });
+
+      enqueueSnackbar(text('File deleted', 'Bestand verwijderd'), {
+        variant: 'success',
+      });
+    },
+
+    onError: (error: ApiError) =>
+      enqueueSnackbar(`${error.message}: ${error.reference}`, {
+        variant: 'error',
+      }),
+  });
+
+  const deleteFile = (fileId: string) =>
+    deleteFileMutation.mutateAsync({fileId});
+
+
   return {
     useFiles,
     uploadFile,
     uploadFiles,
+    deleteFile,
     uploading: uploadFileMutation.isPending || uploadFilesMutation.isPending,
   };
 }

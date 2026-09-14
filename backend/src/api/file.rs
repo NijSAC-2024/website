@@ -142,6 +142,18 @@ pub async fn get_files(
     active_committee_access(&session, &committee_store).await?;
     Ok((
         total.as_header(),
-        Json(store.get_all_metadata(pagination, &session).await?),
+        Json(store.get_all_metadata(pagination).await?),
     ))
+}
+
+pub async fn delete_file(
+    store: FileStore,
+    committee_store: CommitteeStore,
+    Path(id): Path<FileId>,
+    session: Session,
+) -> AppResult<impl IntoResponse> {
+    active_committee_access(&session, &committee_store).await?;
+    store.delete_file(&id).await?;
+
+    Ok(().into_response())
 }
