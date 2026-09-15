@@ -97,39 +97,39 @@ export default function SignupForm({newUser, handleChange, handleSubmit}: Signup
 
   const validateInputs = () => {
     switch (activeStep) {
-    case 0: {
-      setErrors({
-        ...errors,
-        firstName: nameValidator(newUser.firstName),
-        infix: optionalOnlyLetterValidator(newUser.infix),
-        lastName: nameValidator(newUser.lastName),
-        phone: phoneValidator(newUser.phone),
-        email: emailValidator(newUser.email),
-        password: passwordValidator(newUser.password),
-        importantInfo: optionalOnlyLetterNumberValidator(newUser.importantInfo)
-      });
-      break;
-    }
-    case 1: {
-      setErrors({
-        ...errors,
-        studentNumber: onlyNumbersValidator(newUser.studentNumber.toString()),
-        sportcardNumber: onlyNumbersValidator(newUser.sportcardNumber.toString()),
-        nkbvNumber: onlyNumbersValidator(newUser.nkbvNumber.toString())
-      });
-      break;
-    }
-    case 2: {
-      setErrors({
-        ...errors,
-        iceContactName: emergencyContactNameValidator(newUser.iceContactName),
-        iceContactEmail: emailValidator(newUser.iceContactEmail),
-        iceContactPhone: phoneValidator(newUser.iceContactPhone)
-      });
-      break;
-    }
-    default:
-      break;
+      case 0: {
+        setErrors({
+          ...errors,
+          firstName: nameValidator(newUser.firstName),
+          infix: optionalOnlyLetterValidator(newUser.infix),
+          lastName: nameValidator(newUser.lastName),
+          phone: phoneValidator(newUser.phone),
+          email: emailValidator(newUser.email),
+          password: passwordValidator(newUser.password),
+          importantInfo: optionalOnlyLetterNumberValidator(newUser.importantInfo)
+        });
+        break;
+      }
+      case 1: {
+        setErrors({
+          ...errors,
+          studentNumber: onlyNumbersValidator(newUser.studentNumber.toString()),
+          sportcardNumber: onlyNumbersValidator(newUser.sportcardNumber.toString()),
+          nkbvNumber: onlyNumbersValidator(newUser.nkbvNumber.toString())
+        });
+        break;
+      }
+      case 2: {
+        setErrors({
+          ...errors,
+          iceContactName: emergencyContactNameValidator(newUser.iceContactName),
+          iceContactEmail: emailValidator(newUser.iceContactEmail),
+          iceContactPhone: phoneValidator(newUser.iceContactPhone)
+        });
+        break;
+      }
+      default:
+        break;
     }
   };
 
@@ -145,11 +145,11 @@ export default function SignupForm({newUser, handleChange, handleSubmit}: Signup
 
   const renderStepContent = () => {
     switch (activeStep) {
-    case 0: return <PersonalStep {...stepProps} />;
-    case 1: return <EducationStep {...stepProps} />;
-    case 2: return <EmergencyContactStep {...stepProps} />;
-    case 3: return <OverviewStep {...stepProps} />;
-    default: return null;
+      case 0: return <PersonalStep {...stepProps} />;
+      case 1: return <EducationStep {...stepProps} />;
+      case 2: return <EmergencyContactStep {...stepProps} />;
+      case 3: return <OverviewStep {...stepProps} />;
+      default: return null;
     }
   };
 
