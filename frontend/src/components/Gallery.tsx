@@ -9,9 +9,8 @@ import {
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import {ChangeEvent, useMemo, useState} from 'react';
 import {useLanguage} from '../providers/LanguageProvider.tsx';
-import LoadingPage from './loading/LoadingPage.tsx';
 import {useFileHook} from '../hooks/useFileHook.ts';
-import {inCommittee, useLoggedIn} from '../util.ts';
+import {inCommittee, isAdminOrBoard, useLoggedIn} from '../util.ts';
 import UploadIcon from '@mui/icons-material/Upload';
 import {useAuth} from '../providers/AuthProvider.tsx';
 import {useUserHook} from '../hooks/useUserHook.ts';
@@ -73,8 +72,8 @@ export default function Gallery({dialogOpen, toggleDialogOpen, onSelect}: Galler
     );
   }, [files, search]);
 
-  if (!files || !inCommittee(myCommittees)) {
-    return <LoadingPage/>;
+  if (!(inCommittee(myCommittees) || isAdminOrBoard(user?.roles))) {
+    return null;
   }
 
   const fileCard = (file: FileMetadata) => {
@@ -196,7 +195,7 @@ export default function Gallery({dialogOpen, toggleDialogOpen, onSelect}: Galler
                   onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}>
                   {text('Previous', 'Vorige')}
                 </Button>
-                <Button disabled={files.length < PAGE_SIZE}
+                <Button disabled={filtered.length < PAGE_SIZE}
                   onClick={() => setOffset(offset + PAGE_SIZE)}>
                   {text('Next', 'Volgende')}
                 </Button>

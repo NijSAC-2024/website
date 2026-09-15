@@ -35,12 +35,12 @@ pub async fn committee_access(
 }
 
 pub async fn active_committee_access(session: &Session, store: &CommitteeStore) -> AppResult<()> {
-    let user_id = session.user_id().clone();
-    let user_committees: Vec<UserCommittee> = store.get_committees_for_user(&user_id).await?;
+    let user_committees: Vec<UserCommittee> =
+        store.get_committees_for_user(session.user_id()).await?;
 
     let is_active_in_any_committee = user_committees.iter().any(|c| c.left.is_none());
 
-    if is_active_in_any_committee {
+    if is_active_in_any_committee || is_admin_or_board(session).is_ok() {
         Ok(())
     } else {
         Err(Error::Unauthorized)

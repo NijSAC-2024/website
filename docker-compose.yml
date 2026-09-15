@@ -8,7 +8,7 @@ services:
     volumes:
       - .:/app
     working_dir: /app/backend
-    command: sh -c "cargo watch -x run" 
+    command: sh -c "cargo watch -x run"
     environment:
       CARGO_HOME: .cargo
       DATABASE_URL: postgresql://nijsac@db/nijsac
@@ -17,7 +17,7 @@ services:
     ports: [ "127.0.0.1:3000:3000" ]
 
   db:
-    image: postgres:17
+    image: postgres:18
     pull_policy: always
     environment:
       POSTGRES_USER: nijsac
