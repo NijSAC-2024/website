@@ -20,16 +20,16 @@ export default function ItemSelection({
       {language === 'en' ? (
         <Autocomplete
           options={rentOptions}
+          getOptionKey={(option) => option.name.en}
           getOptionLabel={(option) => option.name.en}
-          renderOption={(props, option) => {
-            const { ...optionProps } = props;
-            return (
-              <li {...optionProps}>
-                <p>{option.name.en}</p>
-                <b className="ml-1">{`€${option.price.toFixed(2)} ${option.remark?.en || ''}`}</b>
-              </li>
-            );
-          }}
+          renderOption={(props, option) => (
+            <li {...props}>
+              <p>{option.name.en}</p>
+              <b className="ml-1">
+                {`€${option.price.toFixed(2)} ${option.remark?.en || ''}`}
+              </b>
+            </li>
+          )}
           renderInput={(params) => (
             <TextField
               {...params}
@@ -41,16 +41,16 @@ export default function ItemSelection({
       ) : (
         <Autocomplete
           options={rentOptions}
+          getOptionKey={(option) => option.name.nl}
           getOptionLabel={(option) => option.name.nl}
-          renderOption={(props, option) => {
-            const { ...optionProps } = props;
-            return (
-              <li {...optionProps}>
-                <p>{option.name.nl}</p>
-                <b className="ml-1">{`€${option.price} ${option.remark?.nl || ''}`}</b>
-              </li>
-            );
-          }}
+          renderOption={(props, option) => (
+            <li {...props}>
+              <p>{option.name.nl}</p>
+              <b className="ml-1">
+                {`€${option.price} ${option.remark?.nl || ''}`}
+              </b>
+            </li>
+          )}
           renderInput={(params) => (
             <TextField
               {...params}

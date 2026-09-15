@@ -135,107 +135,107 @@ export default function RegisterForm({
         const answer = answers[index];
 
         switch (question.questionType.type) {
-        case 'text':
-          return (
-            <FormControl key={question.id} fullWidth>
-              <TextField
-                label={label}
-                value={answer?.answer}
-                onChange={(e) => {
-                  const updated = [...answers];
-                  updated[index].answer = e.target.value;
-                  setAnswers(updated);
-                }}
-                error={!!error}
-                helperText={error && text(error as Language)}
-                fullWidth
-              />
-            </FormControl>
-          );
-
-        case 'number':
-          return (
-            <FormControl key={question.id} fullWidth>
-              <TextField
-                label={label}
-                type="number"
-                value={answer?.answer}
-                onChange={(e) => {
-                  const updated = [...answers];
-                  updated[index].answer = e.target.value;
-                  setAnswers(updated);
-                }}
-                error={!!error}
-                helperText={error && text(error as Language)}
-                fullWidth
-              />
-            </FormControl>
-          );
-
-        case 'multipleChoice':
-          return (
-            <FormControl key={question.id} fullWidth>
-              <Select
-                value={answer?.answer}
-                displayEmpty
-                onChange={(e) => {
-                  const updated = [...answers];
-                  updated[index].answer = e.target.value;
-                  setAnswers(updated);
-                }}
-                error={!!error}
-              >
-                <MenuItem value="" disabled>
-                  {label}
-                </MenuItem>
-                {(question.questionType.options ?? []).map((opt, i) => (
-                  <MenuItem key={i} value={opt[language]}>
-                    {text(opt.en, opt.nl)}
-                  </MenuItem>
-                ))}
-              </Select>
-              {error && (
-                <span className="text-red-500 text-xs ml-3">
-                  {text(error as Language)}
-                </span>
-              )}
-            </FormControl>
-          );
-
-        case 'date':
-          return (
-            <DateTimePicker
-              key={question.id}
-              label={label}
-              value={moment(answer?.answer)}
-              onChange={(date) => {
-                const updated = [...answers];
-                updated[index].answer = date ? date.toISOString() : '';
-                setAnswers(updated);
-              }}
-            />
-          );
-
-        case 'boolean':
-          return (
-            <FormControl key={question.id} fullWidth error={!!error}>
-              <div
-                className="flex items-center justify-between border border-[#c4c4c4] dark:border-[#4c4c4c] rounded-xl pl-3 py-1.5">
-                {label}
-                <Checkbox
-                  checked={answer?.answer === 'true'}
+          case 'text':
+            return (
+              <FormControl key={question.id} fullWidth>
+                <TextField
+                  label={label}
+                  value={answer?.answer}
                   onChange={(e) => {
                     const updated = [...answers];
-                    updated[index].answer = e.target.checked ? 'true' : 'false';
+                    updated[index].answer = e.target.value;
                     setAnswers(updated);
                   }}
+                  error={!!error}
+                  helperText={error && text(error as Language)}
+                  fullWidth
                 />
-              </div>
-            </FormControl>
-          );
+              </FormControl>
+            );
 
-        default:
-          return null;
+          case 'number':
+            return (
+              <FormControl key={question.id} fullWidth>
+                <TextField
+                  label={label}
+                  type="number"
+                  value={answer?.answer}
+                  onChange={(e) => {
+                    const updated = [...answers];
+                    updated[index].answer = e.target.value;
+                    setAnswers(updated);
+                  }}
+                  error={!!error}
+                  helperText={error && text(error as Language)}
+                  fullWidth
+                />
+              </FormControl>
+            );
+
+          case 'multipleChoice':
+            return (
+              <FormControl key={question.id} fullWidth>
+                <Select
+                  value={answer?.answer}
+                  displayEmpty
+                  onChange={(e) => {
+                    const updated = [...answers];
+                    updated[index].answer = e.target.value;
+                    setAnswers(updated);
+                  }}
+                  error={!!error}
+                >
+                  <MenuItem value="" disabled>
+                    {label}
+                  </MenuItem>
+                  {(question.questionType.options ?? []).map((opt, i) => (
+                    <MenuItem key={i} value={opt[language]}>
+                      {text(opt.en, opt.nl)}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {error && (
+                  <span className="text-red-500 text-xs ml-3">
+                    {text(error as Language)}
+                  </span>
+                )}
+              </FormControl>
+            );
+
+          case 'date':
+            return (
+              <DateTimePicker
+                key={question.id}
+                label={label}
+                value={moment(answer?.answer)}
+                onChange={(date) => {
+                  const updated = [...answers];
+                  updated[index].answer = date ? date.toISOString() : '';
+                  setAnswers(updated);
+                }}
+              />
+            );
+
+          case 'boolean':
+            return (
+              <FormControl key={question.id} fullWidth error={!!error}>
+                <div
+                  className="flex items-center justify-between border border-[#c4c4c4] dark:border-[#4c4c4c] rounded-xl pl-3 py-1.5">
+                  {label}
+                  <Checkbox
+                    checked={answer?.answer === 'true'}
+                    onChange={(e) => {
+                      const updated = [...answers];
+                      updated[index].answer = e.target.checked ? 'true' : 'false';
+                      setAnswers(updated);
+                    }}
+                  />
+                </div>
+              </FormControl>
+            );
+
+          default:
+            return null;
         }
       })}
 

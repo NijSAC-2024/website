@@ -79,7 +79,7 @@ export default function RegisterButton({
     const diffHours = close.diff(now, 'hours');
     const diffDays = close.diff(now, 'days');
 
-    let message = '';
+    let message;
     let color = 'inherit';
 
     if (diffHours <= 24) {
