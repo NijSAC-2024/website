@@ -24,7 +24,6 @@ import ErrorPage from './error/ErrorPage.tsx';
 import Pages from './pages/Pages.tsx';
 import MarkdownPage from './pages/MarkdownPage.tsx';
 import EditMarkdownPage from './components/page/EditMarkdownPage.tsx';
-import Upload from './pages/Upload.tsx';
 
 import ThemeProvider, {useThemeMode} from './providers/ThemeProvider.tsx';
 import LanguageProvider, {useLanguage} from './providers/LanguageProvider.tsx';
@@ -191,9 +190,7 @@ export function App() {
                       <Route path="/committees/:committeeId/edit" element={<EditCommittee/>}/>
                       <Route path="/pages" element={<Pages/>}/>
                       <Route path="/pages/new" element={<EditMarkdownPage/>}/>
-                      <Route path="/upload" element={<Upload/>}/>
-                      <Route path="/location" element={<Location/>}/>
-                      <Route path="/material_rental" element={<h1>Material Rental</h1>}/>
+                      <Route path="/location/:locationId" element={<Location/>}/>
                       <Route path="/:slug/edit" element={<EditMarkdownPage/>}/>
                       <Route path="/:slug" element={<MarkdownPage/>}/>
 

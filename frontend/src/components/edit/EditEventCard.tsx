@@ -1,9 +1,9 @@
 import {Button, FormControl, InputLabel, MenuItem, Select, TextField} from '@mui/material';
 import {Controller, useFormContext, useWatch} from 'react-hook-form';
-import {EventContent, EventType, typesOptions, WeekendType} from '../../types.ts';
+import {EventContent, EventType, FileMetadata, typesOptions, WeekendType} from '../../types.ts';
 import OptionSelector from '../OptionSelector.tsx';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
-import {ChangeEvent, memo} from 'react';
+import {memo, useState} from 'react';
 import EditDates from './EditDates.tsx';
 import {useLanguage} from '../../providers/LanguageProvider.tsx';
 import {isAdminOrBoard} from '../../util.ts';
@@ -11,7 +11,7 @@ import {useUserHook} from '../../hooks/useUserHook.ts';
 import {useCommitteeHook} from '../../hooks/useCommitteeHook.ts';
 import EditLocation from './EditLocation.tsx';
 import {useAuth} from '../../providers/AuthProvider.tsx';
-import {useFileHook} from '../../hooks/useFileHook.ts';
+import Gallery from '../Gallery.tsx';
 
 function EditEventCard() {
   const {text} = useLanguage();
@@ -22,24 +22,20 @@ function EditEventCard() {
     control,
     name: ['image', 'metadata', 'location']
   });
-
   const {user} = useAuth();
   const committees = useCommittees()
   const myCommittees = useUserCommittees(user?.id)
+  const [galleryOpen, setGalleryOpen] = useState(false);
 
-  const {uploadFile, uploading} = useFileHook();
+  const toggleGallerOpen = () => {
+    setGalleryOpen(prevState => !prevState);
+  };
 
-  const handleImageChange = async (
-    event: ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = event.target.files?.[0];
-    if (!file) {
-      return;
-    }
-    const uploadInfo = await uploadFile(file, true);
-    setValue('image', uploadInfo[0].id, {
+  const handleGallerySelect = (file: FileMetadata) => {
+    setValue('image', file.id, {
       shouldDirty: true,
     });
+    setGalleryOpen(false);
   };
 
   return (
@@ -53,26 +49,22 @@ function EditEventCard() {
       <div className="p-5">
         <div className="grid gap-5">
           {/* Image */}
-          <form encType="multipart/form-data" action="/file" method="post">
-            <Button
-              fullWidth
-              component="label"
-              variant="contained"
-              loading={uploading}
-              color="primary"
-              aria-label={text('Change Image', 'Afbeelding Wijzigen')}
-              className="mx-auto"
-              startIcon={<PhotoCameraIcon/>}
-            >
-              {text('Upload Image', 'Afbeelding Uploaden')}
-              <input
-                type="file"
-                accept="image/*"
-                hidden
-                onChange={handleImageChange}
-              />
-            </Button>
-          </form>
+          <Button
+            fullWidth
+            variant="contained"
+            color="primary"
+            aria-label={text('Select Image', 'Afbeelding Selecteren')}
+            className="mx-auto"
+            startIcon={<PhotoCameraIcon/>}
+            onClick={toggleGallerOpen}
+          >
+            {text('Select Image', 'Afbeelding Selecteren')}
+          </Button>
+          <Gallery
+            dialogOpen={galleryOpen}
+            toggleDialogOpen={toggleGallerOpen}
+            onSelect={handleGallerySelect}
+          />
           {/* Category, Committee and Type */}
           <div className="grid gap-3">
             <FormControl fullWidth required>

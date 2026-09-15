@@ -1,6 +1,5 @@
 import {useState} from 'react';
 import {Switch} from '@mui/material';
-import moment from 'moment';
 import {useLanguage} from '../../providers/LanguageProvider';
 import ContentCard from '../ContentCard';
 import EventCard from '../event/EventCard';
@@ -13,21 +12,14 @@ export default function UserRegistrations() {
   const {text} = useLanguage();
   const {userId} = useParams();
   const {useUserEvents} = useUserHook();
-  const userEvents = useUserEvents(userId)
-  const {user} = useAuth()
   const [filterPastEvents, setFilterPastEvents] = useState<boolean>(false);
-  const now = new Date();
+  const userEvents = useUserEvents(userId, filterPastEvents)
+  const {user} = useAuth()
 
   if (!user) {
     return null;
   }
   const isMe = userId === user.id;
-
-  const filteredEvents =
-    ((userEvents ?? []) as unknown as Event[]).filter((event) =>
-      filterPastEvents ||
-            moment(event.dates[0].start).isAfter(moment(now))
-    );
 
   return (
     <>
@@ -44,10 +36,10 @@ export default function UserRegistrations() {
         </div>
       </ContentCard>
 
-      {filteredEvents.length > 0 && (
+      {userEvents && userEvents.length > 0 && (
         <div className="grid xl:grid-cols-3 gap-5 mt-5">
           {
-            filteredEvents.map((event: Event) => (
+            (userEvents as unknown as Event[]).map((event: Event) => (
               <EventCard
                 key={event.id}
                 event={event}

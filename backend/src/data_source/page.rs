@@ -1,6 +1,6 @@
 use crate::{
-    AppState, Language,
-    error::{AppResult, Error},
+    AppResult, AppState, Language,
+    error::Error,
     page::{Page, PageContent, PageId},
     user::UserId,
 };

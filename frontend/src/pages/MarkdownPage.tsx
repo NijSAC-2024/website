@@ -34,7 +34,7 @@ export default function MarkdownPage() {
         </div>
       )}
       <GenericPage image={page.image ? `/api/file/${page.image}` : undefined}>
-        <ContentCard>
+        <ContentCard className="grid gap-2">
           <h1>{text(page.name.en, page.name.nl)}</h1>
           <Markdown remarkPlugins={[remarkGfm]}>
             {text(page.content.en || '', page.content.nl || '')}

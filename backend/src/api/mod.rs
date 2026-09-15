@@ -8,7 +8,7 @@ mod user;
 
 use crate::{
     auth::{role::Role, session::Session},
-    error::{AppResult, Error},
+    error::Error,
 };
 use axum::{
     Json,
@@ -38,7 +38,24 @@ use std::{
 pub use user::*;
 use validator::Validate;
 
-type ApiResult<T> = Result<Json<T>, Error>;
+pub type AppResult<T> = Result<T, Error>;
+pub type ApiResult = Result<Response, Error>;
+
+pub trait IntoApiResult {
+    fn into_api(self) -> ApiResult;
+}
+
+impl<T> IntoApiResult for AppResult<T>
+where
+    T: serde::Serialize,
+{
+    fn into_api(self) -> ApiResult {
+        match self {
+            Ok(value) => Ok(Json(value).into_response()),
+            Err(err) => Err(err),
+        }
+    }
+}
 
 #[serde_as]
 #[derive(Deserialize, Debug, Validate)]
@@ -119,14 +136,14 @@ fn compute_etag(bytes: &[u8]) -> String {
 
 pub(crate) fn conditional_json_response<T: serde::Serialize>(
     request_headers: &HeaderMap,
-    mut response_headers: HeaderMap,
     value: &T,
-) -> AppResult<Response> {
+) -> ApiResult {
     let body = serde_json::to_vec(value)?;
     let etag = compute_etag(&body);
     let etag_value =
         HeaderValue::from_str(&etag).map_err(|err| Error::Internal(err.to_string()))?;
 
+    let mut response_headers = HeaderMap::new();
     response_headers.insert(ETAG, etag_value.clone());
 
     if request_headers

@@ -6,7 +6,6 @@ import EventCard from '../components/event/EventCard.tsx';
 import {useLanguage} from '../providers/LanguageProvider.tsx';
 import NewEventButton from '../components/events/NewEventButton.tsx';
 import EventsFilter from '../components/events/EventsFilter.tsx';
-import moment from 'moment/moment';
 import {Switch} from '@mui/material';
 import {useEventHook} from '../hooks/useEventHook.ts';
 import LoadingPage from '../components/loading/LoadingPage.tsx';
@@ -14,14 +13,12 @@ import LoadingPage from '../components/loading/LoadingPage.tsx';
 export default function Events() {
   const {text} = useLanguage();
   const {useEvents} = useEventHook();
-  const events = useEvents();
+  const [filterPastEvents, setFilterPastEvents] = useState<boolean>(false);
+  const events = useEvents(filterPastEvents);
   const [category, setCategory] = useState<EventType | 'all'>(
     'all'
   );
   const [type, setType] = useState<WeekendType | 'all'>('all');
-  const [filterPastEvents, setFilterPastEvents] = useState<boolean>(false);
-
-  const now = new Date();
 
   if (!events) {
     return <LoadingPage/>;
@@ -66,9 +63,6 @@ export default function Events() {
             .flatMap((event: Event) =>
               event.dates
                 .map((date, originalIndex) => ({date, originalIndex}))
-                .filter(
-                  ({date}) => filterPastEvents || moment(date.end).isAfter(moment(now))
-                )
                 .map(({date, originalIndex}) => (
                   <EventCard
                     key={`${event.id}-${originalIndex}`}

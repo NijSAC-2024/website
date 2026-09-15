@@ -1,12 +1,12 @@
-import { ChangeEvent, SyntheticEvent, useRef, useState } from 'react';
+import {ChangeEvent, SyntheticEvent, useRef, useState} from 'react';
 import Markdown from 'react-markdown';
-import { Tab, TextField } from '@mui/material';
+import {Tab, TextField} from '@mui/material';
 import TextCard from '../TextCard.tsx';
-import { TabContext, TabList, TabPanel } from '@mui/lab';
+import {TabContext, TabList, TabPanel} from '@mui/lab';
 import MarkdownEditorToolbar from './MarkdownEditorToolbar.tsx';
 import remarkGfm from 'remark-gfm';
-import { Language } from '../../types.ts';
-import { useLanguage } from '../../providers/LanguageProvider.tsx';
+import {Language} from '../../types.ts';
+import {useLanguage} from '../../providers/LanguageProvider.tsx';
 
 interface MarkdownEditorProps {
   value?: Language;
@@ -14,10 +14,10 @@ interface MarkdownEditorProps {
 }
 
 export default function MarkdownEditor({
-  value = { en: '', nl: '' },
+  value = {en: '', nl: ''},
   onChange,
 }: MarkdownEditorProps) {
-  const { text } = useLanguage();
+  const {text} = useLanguage();
   const [tabValue, setTabValue] = useState('1');
   const markdownContent = value;
   const emitChange = onChange ?? (() => undefined);
@@ -59,13 +59,12 @@ export default function MarkdownEditor({
     const selectedText = currentContent.slice(selectionStart, selectionEnd);
 
     const isInlineSyntax = ['**', '~~', '`', '_'].includes(syntax);
-    const isBlockSyntax = ['### ', '> ', '- ', '1. ', '- [ ] '].includes(
-      syntax
-    );
-    const isSpecialSyntax = ['[](url)', '![](url)'].includes(syntax);
+    const isBlockSyntax = ['### ', '> ', '- ', '1. ', '- [ ] '].includes(syntax);
 
-    let newContent = currentContent;
-    let newCursorPosition = selectionEnd;
+    const isLinkPlaceholder = syntax === '[](url)';
+
+    let newContent: string;
+    let newCursorPosition: number;
 
     if (isInlineSyntax) {
       newContent =
@@ -78,6 +77,7 @@ export default function MarkdownEditor({
       newCursorPosition = selectedText
         ? selectionStart + syntax.length + selectedText.length + syntax.length
         : selectionStart + syntax.length;
+
     } else if (isBlockSyntax) {
       newContent =
         currentContent.slice(0, selectionStart) +
@@ -87,20 +87,33 @@ export default function MarkdownEditor({
 
       newCursorPosition = selectedText
         ? selectionStart + syntax.length + selectedText.length
-        : selectionStart + syntax.length + 10;
-    } else if (isSpecialSyntax) {
+        : selectionStart + syntax.length;
+
+    } else if (isLinkPlaceholder) {
       newContent =
         currentContent.slice(0, selectionStart) +
-        (syntax === '[](url)' ? '[](url)' : '![alt text](url)') +
+        syntax +
         currentContent.slice(selectionEnd);
 
-      newCursorPosition = selectionStart + (syntax === '[](url)' ? 1 : 15);
+      newCursorPosition = selectionStart + 1;
+
+    } else {
+      // Already-complete Markdown, e.g.
+      // [document.pdf](https://example.com/file/123)
+      // ![](https://example.com/file/123)
+      newContent =
+        currentContent.slice(0, selectionStart) +
+        syntax +
+        currentContent.slice(selectionEnd);
+
+      newCursorPosition = selectionStart + syntax.length;
     }
 
     const updatedMarkdown = {
       ...markdownContent,
       [langCode]: newContent
     };
+
     emitChange(updatedMarkdown);
 
     setTimeout(() => {
@@ -113,9 +126,9 @@ export default function MarkdownEditor({
     <>
       <TabContext value={tabValue}>
         <TabList onChange={handleChange}>
-          <Tab label={text('Edit', 'Bewerken')} value="1" />
-          <Tab label={text('Preview', 'Voorbeeld')} value="2" />
-          <Tab label={text('Combined', 'Gecombineerd')} value="3" />
+          <Tab label={text('Edit', 'Bewerken')} value="1"/>
+          <Tab label={text('Preview', 'Voorbeeld')} value="2"/>
+          <Tab label={text('Combined', 'Gecombineerd')} value="3"/>
         </TabList>
         <TabPanel value="1">
           <MarkdownEditorToolbar

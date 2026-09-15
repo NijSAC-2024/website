@@ -21,6 +21,7 @@ export function useUserHook() {
       queryKey: queryKeys.users.all(),
       enabled: !!user,
       queryFn: () => apiFetch<User[]>('/user'),
+      placeholderData: (prev) => prev,
       staleTime: 60_000,
     });
     return data;
@@ -32,6 +33,7 @@ export function useUserHook() {
       enabled: !!userId && !!user,
       queryFn: () =>
         apiFetch<User>(`/user/${userId}`),
+      placeholderData: (prev) => prev,
       staleTime: 60_000,
     });
     return data;
@@ -43,17 +45,21 @@ export function useUserHook() {
       enabled: !!userId && !!user,
       queryFn: () =>
         apiFetch<UserCommittee[]>(`/user/${userId}/committees`),
+      placeholderData: (prev) => prev,
       staleTime: 60_000,
     });
     return data;
   }
 
-  function useUserEvents(userId?: string) {
+  function useUserEvents(userId?: string, includePast = false) {
     const {data} = useQuery<Event[]>({
-      queryKey: queryKeys.users.events(userId),
+      queryKey: [...queryKeys.users.events(userId), {includePast}],
       enabled: !!userId && !!user,
       queryFn: () =>
-        apiFetch<Event[]>(`/user/${userId}/events`),
+        apiFetch<Event[]>(
+          `/user/${userId}/events?include_past=${includePast}`,
+        ),
+      placeholderData: (prev) => prev,
       staleTime: 60_000,
     });
     return data;

@@ -152,7 +152,7 @@ create table event_registration
     -- ]
     -- if no answers are given, use an empty array
     answers               jsonb       not null,
-    attended              boolean,
+    attended              boolean     not null default false,
     -- null means not on the waiting list but regularly registered, 0 is the first list position
     waiting_list_position integer,
     created               timestamptz not null,
@@ -164,15 +164,19 @@ create table event_registration
     constraint consistent_waiting_list
         unique (event_id, waiting_list_position),
     constraint guest_info_required
-        check ((user_id is not null) or (guest_name is not null and guest_email is not null))
-);
-
-create type basic_user as
-(
-    id         uuid,
-    first_name text,
-    infix      text,
-    last_name  text
+        check (
+            (
+                user_id is not null
+                    and guest_name is null
+                    and guest_email is null
+                )
+                or
+            (
+                user_id is null
+                    and guest_name is not null
+                    and guest_email is not null
+                )
+            )
 );
 
 -- Maybe keep the following to use as prefill for registrations:

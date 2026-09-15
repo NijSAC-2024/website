@@ -24,9 +24,9 @@ export default function SaveButton({ id, handleSave }: SaveButtonProps) {
   const {handleSubmit, control} = useFormContext<EventContent>();
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
-  const [location, name, eventType, dates, registrationPeriod] = useWatch({
+  const [location, name, eventType, dates, registrationPeriod, createdBy, image] = useWatch({
     control,
-    name: ['location', 'name', 'eventType', 'dates', 'registrationPeriod']
+    name: ['location', 'name', 'eventType', 'dates', 'registrationPeriod', 'createdBy', 'image']
   });
   const navigate = useNavigate();
 
@@ -36,6 +36,8 @@ export default function SaveButton({ id, handleSave }: SaveButtonProps) {
     !name?.en ||
     !eventType ||
     !dates?.[0] ||
+    !createdBy ||
+    !image ||
     moment(dates[0].end).isBefore(moment(dates[0].start)) ||
     (!!registrationPeriod && moment(registrationPeriod.end).isBefore(moment(registrationPeriod.start)));
 

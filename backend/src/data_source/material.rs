@@ -1,14 +1,14 @@
 use crate::{
-    AppState, Pagination,
+    AppResult, AppState, Pagination,
     data_source::Count,
-    error::{AppResult, Error},
+    error::Error,
     material::MaterialId,
     user::UserId,
     wire::material::{Material, UserMaterial},
 };
 use axum::{extract::FromRequestParts, http::request::Parts};
 use sqlx::PgPool;
-use std::{convert::TryInto, ops::Deref};
+use std::convert::TryInto;
 use uuid::Uuid;
 
 pub struct MaterialStore {
@@ -124,7 +124,7 @@ impl MaterialStore {
             FROM "user_material"
             WHERE user_id = $1
             "#,
-            user_id.deref()
+            **user_id
         )
         .fetch_one(&self.db)
         .await?;

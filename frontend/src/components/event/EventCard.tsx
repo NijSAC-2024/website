@@ -10,12 +10,12 @@ import Markdown from 'react-markdown';
 import RegisterButton from '../register/RegisterButton.tsx';
 import {useNavigate} from 'react-router-dom';
 
-interface AgendaCardProps {
+interface EventCardProps {
   event: Event;
   agendaPage: boolean;
 }
 
-export default function EventCard({event, agendaPage}: AgendaCardProps) {
+export default function EventCard({event, agendaPage}: EventCardProps) {
   const navigate = useNavigate();
   const {text, language} = useLanguage();
 
@@ -67,7 +67,7 @@ export default function EventCard({event, agendaPage}: AgendaCardProps) {
     <div
       className="w-full rounded-2xl bg-[rgba(255,255,255,0.9)] dark:bg-[rgba(18,18,18,0.7)] border border-[rgba(1,1,1,0.1)] overflow-hidden dark:border-[rgba(255,255,255,0.1)] flex flex-col relative justify-between">
       <div
-        onClick={() => navigate(`/events/${event.id}`)}
+        onClick={() => agendaPage ? navigate(`/events/${event.id}`) : null}
         className={agendaPage ? 'hover:cursor-pointer' : ''}
       >
         <Chip

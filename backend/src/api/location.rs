@@ -1,16 +1,16 @@
 use crate::{
-    Pagination, ValidatedJson,
-    api::{ApiResult, committee::active_committee_access, conditional_json_response},
+    AppResult, Pagination, ValidatedJson,
+    api::{
+        ApiResult, IntoApiResult, committee::active_committee_access, conditional_json_response,
+    },
     auth::{role::Role, session::Session},
     data_source::{LocationStore, committee::CommitteeStore},
-    error::{AppResult, Error},
-    location::{Location, LocationContent, LocationId, UsedBy},
+    error::Error,
+    location::{Location, LocationContent, LocationId},
 };
 use axum::{
-    Json,
     extract::{Path, Query},
     http::HeaderMap,
-    response::Response,
 };
 use serde::Deserialize;
 
@@ -41,8 +41,13 @@ fn update_access(session: &Session) -> AppResult<()> {
     }
 }
 
-pub async fn get_location(store: LocationStore, Path(id): Path<LocationId>) -> ApiResult<Location> {
-    Ok(Json(store.get_one(&id).await?))
+pub async fn get_location(
+    store: LocationStore,
+    Path(id): Path<LocationId>,
+    headers: HeaderMap,
+) -> ApiResult {
+    let location: Location = store.get_one(&id).await?;
+    conditional_json_response(&headers, &location)
 }
 
 /// Partially public endpoint, no login required.
@@ -53,7 +58,7 @@ pub async fn get_locations(
     Query(mut filter): Query<LocationFilter>,
     session: Option<Session>,
     headers: HeaderMap,
-) -> AppResult<Response> {
+) -> ApiResult {
     match session {
         None => filter.reusable = Some(true),
         Some(session) => {
@@ -62,10 +67,8 @@ pub async fn get_locations(
             }
         }
     }
-    let total = store.count(&filter).await?;
-    let response_headers = total.as_header();
     let locations = store.get_all(&filter).await?;
-    conditional_json_response(&headers, response_headers, &locations)
+    conditional_json_response(&headers, &locations)
 }
 
 pub async fn create_location(
@@ -73,10 +76,9 @@ pub async fn create_location(
     committee_store: CommitteeStore,
     session: Session,
     ValidatedJson(new): ValidatedJson<LocationContent>,
-) -> ApiResult<Location> {
+) -> ApiResult {
     active_committee_access(&session, &committee_store).await?;
-
-    Ok(Json(store.create(new).await?))
+    store.create(new).await.into_api()
 }
 
 pub async fn update_location(
@@ -84,28 +86,25 @@ pub async fn update_location(
     session: Session,
     Path(id): Path<LocationId>,
     ValidatedJson(updated): ValidatedJson<LocationContent>,
-) -> ApiResult<Location> {
+) -> ApiResult {
     update_access(&session)?;
-
-    Ok(Json(store.update(&id, updated).await?))
+    store.update(&id, updated).await.into_api()
 }
 
 pub async fn delete_location(
     store: LocationStore,
     session: Session,
     Path(id): Path<LocationId>,
-) -> AppResult<()> {
+) -> ApiResult {
     update_access(&session)?;
-
-    store.delete(&id).await
+    store.delete(&id).await.into_api()
 }
 
 pub async fn location_used_by(
     store: LocationStore,
     session: Session,
     Path(id): Path<LocationId>,
-) -> ApiResult<UsedBy> {
+) -> ApiResult {
     update_access(&session)?;
-
-    Ok(Json(store.used_by(&id).await?))
+    store.used_by(&id).await.into_api()
 }

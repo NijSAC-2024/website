@@ -1,4 +1,4 @@
-use crate::error::{AppResult, Error};
+use crate::{AppResult, error::Error};
 use axum::{extract::FromRequestParts, http::request::Parts};
 use object_store::{ObjectStore, memory::InMemory};
 use sqlx::{PgPool, postgres::PgPoolOptions};

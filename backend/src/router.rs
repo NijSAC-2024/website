@@ -1,15 +1,15 @@
 use crate::{
     api::{
         add_user_to_committee, create_committee, create_event, create_location, create_page,
-        create_registration, delete_committee, delete_event, delete_location, delete_page,
-        delete_registration, delete_user, get_activities, get_all_users, get_committee,
-        get_committee_members, get_committees, get_event, get_event_registrations,
+        create_registration, delete_committee, delete_event, delete_file, delete_location,
+        delete_page, delete_registration, delete_user, get_all_users, get_committee,
+        get_committee_members, get_committees, get_event, get_event_registrations, get_events,
         get_file_content, get_file_metadata, get_files, get_location, get_locations,
         get_material_list, get_page_by_slug, get_pages, get_registration, get_user,
         get_user_committees, get_user_events, get_user_materials, get_user_registrations,
-        location_used_by, make_chair, register, remove_user_from_committee, update_committee,
-        update_event, update_location, update_page, update_pwd, update_registration, update_user,
-        update_user_material, upload, who_am_i,
+        location_used_by, make_chair, register, remove_user_from_committee, update_attendance,
+        update_committee, update_event, update_location, update_page, update_pwd,
+        update_registration, update_user, update_user_material, upload, who_am_i,
     },
     auth::{login, logout},
     state::AppState,
@@ -17,7 +17,7 @@ use crate::{
 use axum::{
     Json, Router,
     extract::{DefaultBodyLimit, State},
-    routing::{get, post, put},
+    routing::{get, patch, post, put},
 };
 use memory_serve::{MemoryServe, load_assets};
 use tower_http::{trace, trace::TraceLayer};
@@ -50,7 +50,7 @@ fn api_router() -> Router<AppState> {
         // instead of the default 2MB other endpoints have
         .route("/file", post(upload).layer(DefaultBodyLimit::max(52428800)))
         .route("/file", get(get_files))
-        .route("/file/{:id}", get(get_file_content))
+        .route("/file/{:id}", get(get_file_content).delete(delete_file))
         .route("/file/{:id}/metadata", get(get_file_metadata))
         .route("/user", get(get_all_users))
         .route(
@@ -67,7 +67,7 @@ fn api_router() -> Router<AppState> {
         .route("/user/{:id}/material", get(get_material_list))
         .route("/user/{:id}/getMaterial", get(get_user_materials))
         .route("/user/{:id}/material/update", put(update_user_material))
-        .route("/event", get(get_activities).post(create_event))
+        .route("/event", get(get_events).post(create_event))
         .route(
             "/event/{:id}",
             get(get_event).put(update_event).delete(delete_event),
@@ -81,6 +81,10 @@ fn api_router() -> Router<AppState> {
             get(get_registration)
                 .put(update_registration)
                 .delete(delete_registration),
+        )
+        .route(
+            "/event/{:event_id}/registration/{:registration_id}/attendance",
+            patch(update_attendance),
         )
         .route("/location", get(get_locations).post(create_location))
         .route(

@@ -1,14 +1,13 @@
 use crate::{
-    AppState, Language,
+    AppResult, AppState, Language,
     committee::{
         Committee, CommitteeContent, CommitteeId, CommitteeRole, CommitteeUser, UserCommittee,
     },
-    error::{AppResult, Error, Error::BadRequest},
+    error::{Error, Error::BadRequest},
     user::{BasicUser, UserId},
 };
 use axum::{extract::FromRequestParts, http::request::Parts};
 use sqlx::PgPool;
-use std::ops::Deref;
 use time::OffsetDateTime;
 use uuid::Uuid;
 
@@ -254,7 +253,7 @@ impl CommitteeStore {
             FROM t JOIN "user" u ON u.id = t.user_id
             "#,
             Uuid::now_v7(),
-            user_id.deref(),
+            **user_id,
             committee_id
         )
         .fetch_one(&self.db)

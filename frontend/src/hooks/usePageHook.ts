@@ -24,6 +24,7 @@ export function usePageHook() {
       queryKey: queryKeys.pages.detail(slug),
       enabled: !!slug,
       queryFn: () => apiFetch<Page>(`/page/${slug}`),
+      placeholderData: (prev) => prev,
       staleTime: 60_000,
     });
     return data;
@@ -36,9 +37,12 @@ export function usePageHook() {
       queryClient.invalidateQueries({queryKey: queryKeys.pages.all()});
       enqueueSnackbar(text('Page created', 'Pagina aangemaakt'), {variant: 'success'});
     },
+    onError: (error) => {
+      enqueueSnackbar(`${error.message}: ${error.reference}`, {variant: 'error'})
+    },
   });
 
-  const updatePageMutation = useMutation<Page, ApiError, {pageId: string; content: PageContent}>({
+  const updatePageMutation = useMutation<Page, ApiError, { pageId: string; content: PageContent }>({
     mutationFn: ({pageId, content}) =>
       apiFetch<Page>(`/page/id/${pageId}`, {method: 'PUT', body: JSON.stringify(content)}),
     onSuccess: (_, {content}) => {
@@ -46,14 +50,20 @@ export function usePageHook() {
       queryClient.invalidateQueries({queryKey: queryKeys.pages.detail(content.slug)});
       enqueueSnackbar(text('Page updated', 'Pagina bijgewerkt'), {variant: 'success'});
     },
+    onError: (error) => {
+      enqueueSnackbar(`${error.message}: ${error.reference}`, {variant: 'error'})
+    },
   });
 
-  const deletePageMutation = useMutation<void, ApiError, {pageId: string; slug: string}>({
+  const deletePageMutation = useMutation<void, ApiError, { pageId: string; slug: string }>({
     mutationFn: ({pageId}) => apiFetch<void>(`/page/id/${pageId}`, {method: 'DELETE'}),
     onSuccess: (_, {slug}) => {
       queryClient.invalidateQueries({queryKey: queryKeys.pages.all()});
       queryClient.removeQueries({queryKey: queryKeys.pages.detail(slug)});
       enqueueSnackbar(text('Page deleted', 'Pagina verwijderd'), {variant: 'success'});
+    },
+    onError: (error) => {
+      enqueueSnackbar(`${error.message}: ${error.reference}`, {variant: 'error'})
     },
   });
 

@@ -1,11 +1,11 @@
 use crate::{
-    AppState,
+    AppResult, AppState,
     auth::{
         COOKIE_NAME,
         role::{Membership, Roles, Status},
     },
     data_source::UserStore,
-    error::{AppResult, Error},
+    error::Error,
     user::{User, UserId},
     wire::user::UserCredentials,
 };
@@ -200,8 +200,6 @@ impl FromRequestParts<AppState> for Session {
         let jar = CookieJar::from_request_parts(parts, state)
             .await
             .map_err(|_| Self::Rejection::BadRequest("Cannot decode cookies"))?;
-
-        trace!("Cookies: {:?}", jar);
 
         let session_cookie = jar
             .get(COOKIE_NAME)

@@ -125,30 +125,29 @@ fn validate_date(event: &Date) -> Result<(), ValidationError> {
     }
 }
 
+#[derive(Deserialize)]
+pub struct GetEventsQuery {
+    #[serde(default)]
+    pub include_past: bool,
+}
+
 #[derive(Serialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Registration {
     pub id: RegistrationId,
     pub event_id: EventId,
     pub guest_email: Option<String>,
-    #[serde(flatten)]
-    pub user: RegistrationUser,
-    pub attended: Option<bool>,
-    pub waiting_list_position: Option<i32>,
-    pub answers: Vec<Answer>,
-    #[serde(with = "time::serde::rfc3339")]
-    pub created: OffsetDateTime,
-    #[serde(with = "time::serde::rfc3339")]
-    pub updated: OffsetDateTime,
-}
-
-#[derive(Serialize, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct RegistrationUser {
     pub user_id: Option<UserId>,
     pub first_name: String,
     pub infix: Option<String>,
     pub last_name: String,
+    pub attended: Option<bool>,
+    pub waiting_list_position: Option<i32>,
+    pub answers: Option<Vec<Answer>>,
+    #[serde(with = "time::serde::rfc3339::option")]
+    pub created: Option<OffsetDateTime>,
+    #[serde(with = "time::serde::rfc3339::option")]
+    pub updated: Option<OffsetDateTime>,
 }
 
 #[derive(Deserialize, Debug, Validate)]
@@ -158,7 +157,6 @@ pub struct NewRegistration {
     pub guest_name: Option<String>,
     pub guest_email: Option<String>,
     pub answers: Vec<Answer>,
-    pub attended: Option<bool>,
     pub waiting_list_position: Option<i32>,
 }
 

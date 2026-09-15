@@ -1,7 +1,7 @@
 import GenericPage from './GenericPage.tsx';
 import ContentCard from '../components/ContentCard.tsx';
 import {useLanguage} from '../providers/LanguageProvider.tsx';
-import {Fab, IconButton, TextField, Tooltip} from '@mui/material';
+import {Fab, TextField} from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import Markdown from 'react-markdown';
 import {isAdminOrBoard, truncateMarkdown} from '../util.ts';
@@ -9,7 +9,6 @@ import {useAuth} from '../providers/AuthProvider.tsx';
 import {useNavigate} from 'react-router-dom';
 import {usePageHook} from '../hooks/usePageHook.ts';
 import {useMemo, useState} from 'react';
-import UploadIcon from '@mui/icons-material/Upload';
 import LoadingPage from '../components/loading/LoadingPage.tsx';
 
 export default function Pages() {
@@ -45,17 +44,11 @@ export default function Pages() {
         </div>
       )}
       <GenericPage>
-        <ContentCard className="grid gap-4">
-          <div className="flex justify-between">
-            <h1>{text('Pages', 'Pagina\'s')}</h1>
-            {isAdminOrBoard(user?.roles) && (
-              <Tooltip title={text('Upload image/document', 'Upload afbeelding/document')}>
-                <IconButton onClick={() => navigate('/upload')}>
-                  <UploadIcon/>
-                </IconButton>
-              </Tooltip>
-            )}
-          </div>
+        <ContentCard className="grid gap-2">
+          <h1>{text('Pages', 'Pagina\'s')}</h1>
+          <p>
+            {text('All pages on the NijSAC website.', 'Alle pagina\'s van de NijSAC website.')}
+          </p>
           <TextField
             label={text('Search', 'Zoeken')}
             fullWidth
