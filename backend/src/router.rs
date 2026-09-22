@@ -19,14 +19,12 @@ use axum::{
     extract::{DefaultBodyLimit, State},
     routing::{get, patch, post, put},
 };
-use memory_serve::{MemoryServe, load_assets};
+use memory_serve::load;
 use tower_http::{trace, trace::TraceLayer};
 use tracing::Level;
 
 pub fn create_router(state: AppState) -> Router {
-    let memory_router = MemoryServe::new(load_assets!("../frontend/dist"))
-        .index_file(Some("/index.html"))
-        .into_router();
+    let memory_router = load!().index_file(Some("/index.html")).into_router();
 
     Router::new()
         .merge(memory_router)

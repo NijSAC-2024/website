@@ -4,7 +4,6 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import moment from 'moment';
 import {Chip} from '@mui/material';
 import {getLabel, truncateMarkdown} from '../../util.ts';
-import 'moment/dist/locale/nl';
 import {DateType, Event} from '../../types.ts';
 import Markdown from 'react-markdown';
 import RegisterButton from '../register/RegisterButton.tsx';

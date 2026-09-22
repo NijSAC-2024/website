@@ -42,6 +42,7 @@ import ErrorBoundary from './error/ErrorBoundary.tsx';
 import {AppError} from './error/error.ts';
 import AuthProvider from './providers/AuthProvider.tsx';
 import MemberStatus from './components/user/MemberStatus.tsx';
+import GalleryPage from './pages/Gallery.tsx';
 
 
 const queryClient = new QueryClient({
@@ -103,15 +104,15 @@ function AppLayout() {
       },
       MuiDialog: {
         styleOverrides: {
+          paper: {
+            borderRadius: 16,
+            padding: '0.6rem',
+            background: isDarkMode ? '#121212' : 'white',
+            borderBottom: isDarkMode
+              ? '2px solid #90caf9'
+              : '3px solid #1976d2',
+          },
           root: {
-            '& .MuiPaper-root': {
-              borderRadius: 16,
-              padding: '0.6rem',
-              background: isDarkMode ? '#121212' : 'white',
-              borderBottom: isDarkMode
-                ? '2px solid #90caf9'
-                : '3px solid #1976d2',
-            },
             '& .MuiBackdrop-root': {
               backgroundColor: isDarkMode
                 ? 'rgb(0,0,0,0.5)'
@@ -191,6 +192,7 @@ export function App() {
                       <Route path="/pages" element={<Pages/>}/>
                       <Route path="/pages/new" element={<EditMarkdownPage/>}/>
                       <Route path="/location/:locationId" element={<Location/>}/>
+                      <Route path="/gallery" element={<GalleryPage/>}/>
                       <Route path="/:slug/edit" element={<EditMarkdownPage/>}/>
                       <Route path="/:slug" element={<MarkdownPage/>}/>
 

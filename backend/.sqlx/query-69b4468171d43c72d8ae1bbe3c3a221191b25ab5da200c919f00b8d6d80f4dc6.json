@@ -1,11 +1,11 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT r.id,\n                   r.event_id,\n                   r.user_id as \"user_id?\",\n                   r.guest_name as \"guest_name?\",\n                   r.guest_email as \"guest_email?\",\n                   u.first_name as \"first_name?\",\n                   u.infix as \"infix?\",\n                   u.last_name as \"last_name?\",\n                   r.attended,\n                   r.waiting_list_position,\n                   r.answers,\n                   r.created,\n                   r.updated\n            FROM event_registration r\n                JOIN \"user\" u ON r.user_id = u.id\n            WHERE user_id = $1\n            ",
+  "query": "\n        SELECT\n            er.id as \"id!\",\n            er.event_id as \"event_id!\",\n            er.user_id as \"user_id?\",\n            er.guest_name as \"guest_name?\",\n            er.guest_email as \"guest_email?\",\n            u.first_name as \"first_name?\",\n            u.infix as \"infix?\",\n            u.last_name as \"last_name?\",\n            er.attended,\n            er.waiting_list_position,\n            er.answers,\n            er.created AS \"created!\",\n            er.updated AS \"updated!\"\n        FROM event_registration er\n            LEFT JOIN \"user\" u ON er.user_id = u.id\n        WHERE er.event_id = $1\n        ",
   "describe": {
     "columns": [
       {
         "ordinal": 0,
-        "name": "id",
+        "name": "id!",
         "type_info": "Uuid",
         "origin": {
           "Table": {
@@ -16,7 +16,7 @@
       },
       {
         "ordinal": 1,
-        "name": "event_id",
+        "name": "event_id!",
         "type_info": "Uuid",
         "origin": {
           "Table": {
@@ -126,7 +126,7 @@
       },
       {
         "ordinal": 11,
-        "name": "created",
+        "name": "created!",
         "type_info": "Timestamptz",
         "origin": {
           "Table": {
@@ -137,7 +137,7 @@
       },
       {
         "ordinal": 12,
-        "name": "updated",
+        "name": "updated!",
         "type_info": "Timestamptz",
         "origin": {
           "Table": {
@@ -153,20 +153,20 @@
       ]
     },
     "nullable": [
+      true,
+      true,
+      true,
+      true,
+      true,
       false,
+      true,
       false,
       true,
       true,
       true,
-      false,
       true,
-      false,
-      false,
-      true,
-      false,
-      false,
-      false
+      true
     ]
   },
-  "hash": "5b1510438d5a05b32be083401776cb53ff7c8e7ba3867d7d05b5cb594418aab7"
+  "hash": "69b4468171d43c72d8ae1bbe3c3a221191b25ab5da200c919f00b8d6d80f4dc6"
 }

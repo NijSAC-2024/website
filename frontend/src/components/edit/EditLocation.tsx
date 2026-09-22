@@ -86,9 +86,10 @@ export default function EditLocation({value, onChange}: EditLocationProps) {
             filterOptions={filterOptions}
             onChange={handleAutocompleteChange}
             isOptionEqualToValue={(option, selected) => option.id === selected.id}
+            getOptionKey={(location) => location.id}
             getOptionLabel={(location) => text(location.name)}
             renderOption={(props, location) => (
-              <li {...props} key={location.id}>
+              <li {...props}>
                 <div>
                   <div>{text(location.name)}</div>
                   {(location.description?.en || location.description?.nl) && (
@@ -104,7 +105,10 @@ export default function EditLocation({value, onChange}: EditLocationProps) {
                 {...params}
                 required
                 label={text('Location', 'Locatie')}
-                placeholder={text('Search in English or Dutch', 'Zoek in het Engels of Nederlands')}
+                placeholder={text(
+                  'Search in English or Dutch',
+                  'Zoek in het Engels of Nederlands',
+                )}
               />
             )}
           />

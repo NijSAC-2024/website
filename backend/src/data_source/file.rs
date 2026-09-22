@@ -9,7 +9,7 @@ use crate::{
 use axum::{extract::FromRequestParts, http::request::Parts};
 use bytes::Bytes;
 use mime::Mime;
-use object_store::{ObjectStore, PutPayload};
+use object_store::{ObjectStore, ObjectStoreExt, PutPayload};
 use sqlx::{FromRow, PgPool};
 use std::sync::Arc;
 use time::OffsetDateTime;

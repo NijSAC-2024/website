@@ -134,7 +134,7 @@ impl Session {
         // If the user currently has no password set
         let pw_hash = user.pw_hash.ok_or(Error::Unauthorized)?;
 
-        let parsed_hash = PasswordHash::new(&pw_hash).map_err(Error::Argon2)?;
+        let parsed_hash = PasswordHash::new(&pw_hash).map_err(Error::PasswordHash)?;
         credentials.verify_pwd(&parsed_hash)?;
 
         let session = Self::new(db, &user.id).await?;

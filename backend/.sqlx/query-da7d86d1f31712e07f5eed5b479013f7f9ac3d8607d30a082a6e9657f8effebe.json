@@ -6,107 +6,233 @@
       {
         "ordinal": 0,
         "name": "id",
-        "type_info": "Uuid"
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "event",
+            "name": "id"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "location_id",
-        "type_info": "Uuid"
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "location",
+            "name": "id"
+          }
+        }
       },
       {
         "ordinal": 2,
         "name": "location_name_en",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "location",
+            "name": "name_en"
+          }
+        }
       },
       {
         "ordinal": 3,
         "name": "location_name_nl",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "location",
+            "name": "name_nl"
+          }
+        }
       },
       {
         "ordinal": 4,
         "name": "location_description_nl",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "location",
+            "name": "description_nl"
+          }
+        }
       },
       {
         "ordinal": 5,
         "name": "location_description_en",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "location",
+            "name": "description_en"
+          }
+        }
       },
       {
         "ordinal": 6,
         "name": "location_reusable",
-        "type_info": "Bool"
+        "type_info": "Bool",
+        "origin": {
+          "Table": {
+            "table": "location",
+            "name": "reusable"
+          }
+        }
       },
       {
         "ordinal": 7,
         "name": "location_created",
-        "type_info": "Timestamptz"
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "location",
+            "name": "created"
+          }
+        }
       },
       {
         "ordinal": 8,
         "name": "location_updated",
-        "type_info": "Timestamptz"
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "location",
+            "name": "updated"
+          }
+        }
       },
       {
         "ordinal": 9,
         "name": "name_nl",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "event",
+            "name": "name_nl"
+          }
+        }
       },
       {
         "ordinal": 10,
         "name": "name_en",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "event",
+            "name": "name_en"
+          }
+        }
       },
       {
         "ordinal": 11,
         "name": "image",
-        "type_info": "Uuid"
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "event",
+            "name": "image"
+          }
+        }
       },
       {
         "ordinal": 12,
         "name": "description_nl",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "event",
+            "name": "description_nl"
+          }
+        }
       },
       {
         "ordinal": 13,
         "name": "description_en",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "event",
+            "name": "description_en"
+          }
+        }
       },
       {
         "ordinal": 14,
         "name": "start_dates",
-        "type_info": "TimestamptzArray"
+        "type_info": "TimestamptzArray",
+        "origin": {
+          "Table": {
+            "table": "event",
+            "name": "start_dates"
+          }
+        }
       },
       {
         "ordinal": 15,
         "name": "end_dates",
-        "type_info": "TimestamptzArray"
+        "type_info": "TimestamptzArray",
+        "origin": {
+          "Table": {
+            "table": "event",
+            "name": "end_dates"
+          }
+        }
       },
       {
         "ordinal": 16,
         "name": "registration_start",
-        "type_info": "Timestamptz"
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "event",
+            "name": "registration_start"
+          }
+        }
       },
       {
         "ordinal": 17,
         "name": "registration_end",
-        "type_info": "Timestamptz"
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "event",
+            "name": "registration_end"
+          }
+        }
       },
       {
         "ordinal": 18,
         "name": "registration_max",
-        "type_info": "Int4"
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "event",
+            "name": "registration_max"
+          }
+        }
       },
       {
         "ordinal": 19,
         "name": "waiting_list_max",
-        "type_info": "Int4"
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "event",
+            "name": "waiting_list_max"
+          }
+        }
       },
       {
         "ordinal": 20,
         "name": "is_published",
-        "type_info": "Bool"
+        "type_info": "Bool",
+        "origin": {
+          "Table": {
+            "table": "event",
+            "name": "is_published"
+          }
+        }
       },
       {
         "ordinal": 21,
@@ -130,47 +256,91 @@
               }
             }
           }
+        },
+        "origin": {
+          "Table": {
+            "table": "event",
+            "name": "required_membership"
+          }
         }
       },
       {
         "ordinal": 22,
         "name": "event_type",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "event",
+            "name": "event_type"
+          }
+        }
       },
       {
         "ordinal": 23,
         "name": "questions",
-        "type_info": "Jsonb"
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "event",
+            "name": "questions"
+          }
+        }
       },
       {
         "ordinal": 24,
         "name": "metadata",
-        "type_info": "Jsonb"
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "event",
+            "name": "metadata"
+          }
+        }
       },
       {
         "ordinal": 25,
         "name": "registration_count!",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": "Expression"
       },
       {
         "ordinal": 26,
         "name": "waiting_list_count!",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": "Expression"
       },
       {
         "ordinal": 27,
         "name": "created_by",
-        "type_info": "Uuid"
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "event",
+            "name": "created_by"
+          }
+        }
       },
       {
         "ordinal": 28,
         "name": "created",
-        "type_info": "Timestamptz"
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "event",
+            "name": "created"
+          }
+        }
       },
       {
         "ordinal": 29,
         "name": "updated",
-        "type_info": "Timestamptz"
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "event",
+            "name": "updated"
+          }
+        }
       }
     ],
     "parameters": {
