@@ -1,0 +1,172 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            er.id as \"id!\",\n            er.event_id as \"event_id!\",\n            er.user_id as \"user_id?\",\n            er.guest_name as \"guest_name?\",\n            er.guest_email as \"guest_email?\",\n            u.first_name as \"first_name?\",\n            u.infix as \"infix?\",\n            u.last_name as \"last_name?\",\n            er.attended,\n            er.waiting_list_position,\n            er.answers,\n            er.created AS \"created!\",\n            er.updated AS \"updated!\"\n        FROM event_registration er\n            LEFT JOIN \"user\" u ON er.user_id = u.id\n        WHERE er.event_id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id!",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "event_registration",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "event_id!",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "event_registration",
+            "name": "event_id"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "user_id?",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "event_registration",
+            "name": "user_id"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "guest_name?",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "event_registration",
+            "name": "guest_name"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "guest_email?",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "event_registration",
+            "name": "guest_email"
+          }
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "first_name?",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "\"user\"",
+            "name": "first_name"
+          }
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "infix?",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "\"user\"",
+            "name": "infix"
+          }
+        }
+      },
+      {
+        "ordinal": 7,
+        "name": "last_name?",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "\"user\"",
+            "name": "last_name"
+          }
+        }
+      },
+      {
+        "ordinal": 8,
+        "name": "attended",
+        "type_info": "Bool",
+        "origin": {
+          "Table": {
+            "table": "event_registration",
+            "name": "attended"
+          }
+        }
+      },
+      {
+        "ordinal": 9,
+        "name": "waiting_list_position",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "event_registration",
+            "name": "waiting_list_position"
+          }
+        }
+      },
+      {
+        "ordinal": 10,
+        "name": "answers",
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "event_registration",
+            "name": "answers"
+          }
+        }
+      },
+      {
+        "ordinal": 11,
+        "name": "created!",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "event_registration",
+            "name": "created"
+          }
+        }
+      },
+      {
+        "ordinal": 12,
+        "name": "updated!",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "event_registration",
+            "name": "updated"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "69b4468171d43c72d8ae1bbe3c3a221191b25ab5da200c919f00b8d6d80f4dc6"
+}
