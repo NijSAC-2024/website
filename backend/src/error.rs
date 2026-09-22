@@ -34,6 +34,8 @@ pub enum Error {
     Validation(#[from] ValidationErrors),
     #[error("Password hashing error {0}")]
     Argon2(password_hash::Error),
+    #[error("Password hash parsing error {0}")]
+    PasswordHash(password_hash::phc::Error),
     #[error("Conflict")]
     Conflict(Box<dyn DatabaseError>),
     #[error("Foreign key error")]
@@ -143,6 +145,14 @@ impl IntoResponse for Error {
                 warn!(%reference, "Password hashing error: {err}");
                 Problem {
                     message: "Password hashing error".to_string(),
+                    status: StatusCode::INTERNAL_SERVER_ERROR,
+                    reference,
+                }
+            }
+            Error::PasswordHash(err) => {
+                warn!(%reference, "Password hash parsing error: {err}");
+                Problem {
+                    message: "Password hash parsing error".to_string(),
                     status: StatusCode::INTERNAL_SERVER_ERROR,
                     reference,
                 }

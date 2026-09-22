@@ -6,67 +6,145 @@
       {
         "ordinal": 0,
         "name": "id",
-        "type_info": "Uuid"
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "\"user\"",
+            "name": "id"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "first_name",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "\"user\"",
+            "name": "first_name"
+          }
+        }
       },
       {
         "ordinal": 2,
         "name": "infix",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "\"user\"",
+            "name": "infix"
+          }
+        }
       },
       {
         "ordinal": 3,
         "name": "last_name",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "\"user\"",
+            "name": "last_name"
+          }
+        }
       },
       {
         "ordinal": 4,
         "name": "phone",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "\"user\"",
+            "name": "phone"
+          }
+        }
       },
       {
         "ordinal": 5,
         "name": "student_number",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "\"user\"",
+            "name": "student_number"
+          }
+        }
       },
       {
         "ordinal": 6,
         "name": "nkbv_number",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "\"user\"",
+            "name": "nkbv_number"
+          }
+        }
       },
       {
         "ordinal": 7,
         "name": "sportcard_number",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "\"user\"",
+            "name": "sportcard_number"
+          }
+        }
       },
       {
         "ordinal": 8,
         "name": "ice_contact_name",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "\"user\"",
+            "name": "ice_contact_name"
+          }
+        }
       },
       {
         "ordinal": 9,
         "name": "ice_contact_email",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "\"user\"",
+            "name": "ice_contact_email"
+          }
+        }
       },
       {
         "ordinal": 10,
         "name": "ice_contact_phone",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "\"user\"",
+            "name": "ice_contact_phone"
+          }
+        }
       },
       {
         "ordinal": 11,
         "name": "important_info",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "\"user\"",
+            "name": "important_info"
+          }
+        }
       },
       {
         "ordinal": 12,
         "name": "roles",
-        "type_info": "Jsonb"
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "\"user\"",
+            "name": "roles"
+          }
+        }
       },
       {
         "ordinal": 13,
@@ -82,6 +160,12 @@
                 "donor"
               ]
             }
+          }
+        },
+        "origin": {
+          "Table": {
+            "table": "\"user\"",
+            "name": "membership"
           }
         }
       },
@@ -99,22 +183,46 @@
               ]
             }
           }
+        },
+        "origin": {
+          "Table": {
+            "table": "\"user\"",
+            "name": "status"
+          }
         }
       },
       {
         "ordinal": 15,
         "name": "email",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "\"user\"",
+            "name": "email"
+          }
+        }
       },
       {
         "ordinal": 16,
         "name": "created",
-        "type_info": "Timestamptz"
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "\"user\"",
+            "name": "created"
+          }
+        }
       },
       {
         "ordinal": 17,
         "name": "updated",
-        "type_info": "Timestamptz"
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "\"user\"",
+            "name": "updated"
+          }
+        }
       }
     ],
     "parameters": {

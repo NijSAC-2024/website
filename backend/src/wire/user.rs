@@ -2,10 +2,7 @@ use crate::{
     auth::role::{Membership, Roles, Status},
     error::Error,
 };
-use argon2::{
-    Argon2, PasswordHash, PasswordHasher, PasswordVerifier, password_hash,
-    password_hash::{SaltString, rand_core::OsRng},
-};
+use argon2::{Argon2, PasswordHash, PasswordHasher, PasswordVerifier, password_hash};
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 use sqlx::FromRow;
@@ -100,7 +97,7 @@ impl UserCredentials {
         Argon2::default()
             .verify_password(self.password.as_bytes(), hash)
             .map_err(|err| match err {
-                password_hash::Error::Password => Error::Unauthorized,
+                password_hash::Error::PasswordInvalid => Error::Unauthorized,
                 _ => Error::Argon2(err),
             })
     }
@@ -115,9 +112,8 @@ pub struct Password {
 
 impl Password {
     pub fn pwd_hash(&self) -> Result<String, Error> {
-        let salt = SaltString::generate(&mut OsRng);
         Ok(Argon2::default()
-            .hash_password(self.password.as_bytes(), &salt)
+            .hash_password(self.password.as_bytes())
             .map_err(Error::Argon2)?
             .to_string())
     }
@@ -170,9 +166,8 @@ pub struct RegisterNewUser {
 
 impl RegisterNewUser {
     pub fn pwd_hash(&self) -> Result<String, Error> {
-        let salt = SaltString::generate(&mut OsRng);
         Ok(Argon2::default()
-            .hash_password(self.password.as_bytes(), &salt)
+            .hash_password(self.password.as_bytes())
             .map_err(Error::Argon2)?
             .to_string())
     }
@@ -182,7 +177,7 @@ impl Debug for RegisterNewUser {
     fn fmt(&self, _: &mut Formatter<'_>) -> std::fmt::Result {
         unimplemented!(
             "This is a placeholder to make sure you don't accidentally derive 'Debug'.\
-                If you need a debug implementation, make sure to exclude the password field"
+             If you need a debug implementation, make sure to exclude the password field"
         )
     }
 }

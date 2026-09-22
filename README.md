@@ -36,6 +36,5 @@ npx tsc --noEmit
 ## Updates
 ```shell
 npx npm-check-updates
-cargo outdated
 cargo outdated -R  
 ```

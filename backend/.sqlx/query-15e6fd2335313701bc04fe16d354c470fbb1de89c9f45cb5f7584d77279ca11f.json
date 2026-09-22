@@ -6,7 +6,13 @@
       {
         "ordinal": 0,
         "name": "pos",
-        "type_info": "Int4"
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "event_registration",
+            "name": "waiting_list_position"
+          }
+        }
       }
     ],
     "parameters": {

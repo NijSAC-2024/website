@@ -856,8 +856,8 @@ impl EventStore {
             PgRegistration,
             r#"
         SELECT
-            er.id,
-            er.event_id,
+            er.id as "id!",
+            er.event_id as "event_id!",
             er.user_id as "user_id?",
             er.guest_name as "guest_name?",
             er.guest_email as "guest_email?",
@@ -867,8 +867,8 @@ impl EventStore {
             er.attended,
             er.waiting_list_position,
             er.answers,
-            er.created,
-            er.updated
+            er.created AS "created!",
+            er.updated AS "updated!"
         FROM event_registration er
             LEFT JOIN "user" u ON er.user_id = u.id
         WHERE er.event_id = $1
