@@ -28,7 +28,14 @@ docker exec -i website-db-1 psql -U nijsac -d nijsac -f /tmp/fixtures/event.sql
 docker exec -i website-db-1 psql -U nijsac -d nijsac -f /tmp/fixtures/event_registration.sql
 ```
 
-TypeScript errors
+## TypeScript errors
 ```shell
 npx tsc --noEmit
+```
+
+## Updates
+```shell
+npx npm-check-updates
+cargo outdated
+cargo outdated -R  
 ```
